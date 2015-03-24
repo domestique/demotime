@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.forms import formset_factory
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from demotime import forms, models
 
@@ -9,9 +11,15 @@ def index(request):
     return render(request, 'demotime/index.html', {})
 
 
+class ReviewDetail(DetailView):
+    template_name = 'demotime/review.html'
+    model = models.Review
+
+
 class CreateReviewView(TemplateView):
     template_name = 'demotime/create_review.html'
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
 
@@ -31,9 +39,6 @@ class CreateReviewView(TemplateView):
             for form in self.attachment_forms.forms:
                 if form.cleaned_data:
                     data['attachments'].append(form.cleaned_data['attachment'])
-                    print 'yay'
-                else:
-                    print 'damnit'
 
             models.Review.create_review(**data)
 
@@ -61,3 +66,4 @@ class CreateReviewView(TemplateView):
 
 
 review_form_view = CreateReviewView.as_view()
+review_detail = ReviewDetail.as_view()

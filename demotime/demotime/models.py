@@ -12,6 +12,7 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ['-created']
 
 
 def attachment_filename(instance, filename):
@@ -78,10 +79,14 @@ class Review(BaseModel):
             case_link=case_link,
             status=cls.OPEN,
         )
+        rev = ReviewRevision.objects.create(
+            review=obj,
+            description=obj.description
+        )
         for attachment in attachments:
             Attachment.objects.create(
                 attachment=attachment,
-                content_object=obj,
+                content_object=rev,
             )
         for reviewer in reviewers:
             Reviewer.objects.create(
@@ -89,6 +94,10 @@ class Review(BaseModel):
                 reviewer=reviewer,
                 status=Reviewer.REVIEWING,
             )
+
+    @property
+    def revision(self):
+        return self.reviewrevision_set.latest()
 
 
 class Reviewer(BaseModel):
@@ -117,6 +126,8 @@ class ReviewRevision(BaseModel):
     description = models.TextField()
     attachments = GenericRelation(Attachment)
 
+    class Meta:
+        get_latest_by = 'created'
 
 class Comment(BaseModel):
 

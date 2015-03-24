@@ -1,0 +1,36 @@
+{% extends 'demotime/base.html' %}
+{% block content %}
+    <div class="main-content">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>{{ object.title }}</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {% if object.revision.description %}
+                    <p>{{ object.revision.description }}</p>
+                {% else %}
+                    <p>{{ object.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p><a href="{{ object.case_link }}">Case Link</a></p>
+            </div>
+        </div>
+        <div class="row">
+            {% if object.reviewrevision_set.exists %}
+            <div class="col-md-6">
+                Revisions ({{ object.reviewrevision_set.count }}):
+                <ol>
+                    {% for revision in object.reviewrevision_set.all %}
+                        <li> Revision {{ forloop.revcounter }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
