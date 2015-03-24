@@ -27,10 +27,29 @@ def attachment_filename(instance, filename):
 
 class Attachment(BaseModel):
 
+    PHOTO = 'photo'
+    DOCUMENT = 'document'
+    MOVIE = 'movie'
+    AUDIO = 'audio'
+    OTHER = 'other'
+
+    ATTACHMENT_TYPE_CHOICES = (
+        (PHOTO, 'Photo'),
+        (DOCUMENT, 'Document'),
+        (MOVIE, 'Movie/Screencast'),
+        (AUDIO, 'Audio'),
+        (OTHER, 'Other'),
+    )
+
     attachment = models.FileField(upload_to=attachment_filename)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
+    attachment_type = models.CharField(
+        max_length=128,
+        choices=ATTACHMENT_TYPE_CHOICES,
+        db_index=True,
+    )
 
     class Meta:
         index_together = [
@@ -85,7 +104,8 @@ class Review(BaseModel):
         )
         for attachment in attachments:
             Attachment.objects.create(
-                attachment=attachment,
+                attachment=attachment['attachment'],
+                attachment_type=attachment['attachment_type'],
                 content_object=rev,
             )
         for reviewer in reviewers:
@@ -128,6 +148,7 @@ class ReviewRevision(BaseModel):
 
     class Meta:
         get_latest_by = 'created'
+
 
 class Comment(BaseModel):
 
