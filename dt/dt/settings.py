@@ -36,9 +36,15 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_nose',
     'demotime',
 )
+
+try:
+    import django_nose
+except ImportError:
+    pass
+else:
+    INSTALLED_APPS += ('django_nose', )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
