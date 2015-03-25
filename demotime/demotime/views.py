@@ -15,6 +15,10 @@ class ReviewDetail(DetailView):
     template_name = 'demotime/review.html'
     model = models.Review
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
+
 
 class CreateReviewView(TemplateView):
     template_name = 'demotime/create_review.html'
@@ -49,13 +53,16 @@ class CreateReviewView(TemplateView):
         return self.get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        self.review_inst = models.Review(creator=self.request.user)
-        self.review_form = forms.ReviewForm(
-            user=self.request.user,
-            instance=self.review_inst
-        )
-        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=4, max_num=5)
-        self.attachment_forms = AttachmentFormSet()
+        if request.method == 'GET':
+            # If we're using this method as the POST error path, let's
+            # preserve the existing forms. Also, maybe this is dumb?
+            self.review_inst = models.Review(creator=self.request.user)
+            self.review_form = forms.ReviewForm(
+                user=self.request.user,
+                instance=self.review_inst
+            )
+            AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=4, max_num=5)
+            self.attachment_forms = AttachmentFormSet()
         return super(CreateReviewView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

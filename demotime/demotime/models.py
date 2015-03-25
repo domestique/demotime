@@ -115,6 +115,8 @@ class Review(BaseModel):
                 status=Reviewer.REVIEWING,
             )
 
+        return obj
+
     @property
     def revision(self):
         return self.reviewrevision_set.latest()

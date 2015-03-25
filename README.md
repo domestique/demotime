@@ -13,3 +13,7 @@ Steps to get the project running:
 * Login via the admin at http://localhost:8000/admin/ (Proper logins coming later)
 * Create a review via http://localhost:8000/create/ 
 * Wait for cooler features.
+
+For running unit tests, you'll need to install the test reqs too:
+
+* `pip install -r testing_requirements.txt`
