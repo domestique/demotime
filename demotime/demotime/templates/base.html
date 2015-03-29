@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>DemoTime!</title>
+    <title>DemoTime!{% block title %}{% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
@@ -51,6 +51,7 @@
                     This looks like garbage!
                     <li><a href="#">Logged in as: {{ request.user.username }}</a></li>
                 {% endcomment %}
+                <li><a href="{% url 'create-review' %}">Create Review</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             {% else %}
                 <li><a href="{% url 'login' %}">Login</a></li>

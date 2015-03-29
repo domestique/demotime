@@ -51,6 +51,11 @@ class Attachment(BaseModel):
         db_index=True,
     )
 
+    @property
+    def pretty_name(self):
+        ''' Just cleaning up the filename display a bit '''
+        return ''.join(self.attachment.name.split('/')[1:])
+
     class Meta:
         index_together = [
             ('content_type', 'object_id'),
@@ -156,10 +161,24 @@ class Comment(BaseModel):
 
     commenter = models.ForeignKey('auth.User')
     comment = models.TextField()
-    review = models.ForeignKey('Review')
+    review = models.ForeignKey('ReviewRevision')
     attachments = GenericRelation(Attachment)
 
     def __unicode__(self):
         return u'Comment by {} on Review: {}'.format(
             self.commenter.username, self.review
         )
+
+    @classmethod
+    def create_comment(cls, commenter, comment, review, attachments=None):
+        obj = cls.objects.create(
+            commenter=commenter,
+            comment=comment,
+            review=review
+        )
+        for attachment in attachments:
+            Attachment.objects.create(
+                attachment=attachment['attachment'],
+                attachment_type=attachment['attachment_type'],
+                content_object=obj,
+            )

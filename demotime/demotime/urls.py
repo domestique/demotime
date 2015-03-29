@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('demotime.views',
     # General
-    url('^$', 'index', name='index'),
+    url('^$', 'index_view', name='index'),
 
     # Reviews
     url('^create/$', 'review_form_view', name='create-review'),

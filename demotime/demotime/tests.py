@@ -81,6 +81,8 @@ class TestReviewViews(BaseTestCase):
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         self.assertTemplateUsed(response, 'demotime/index.html')
+        for key in ['open_demos', 'open_reviews', 'updated_demos']:
+            assert key in response.context
 
     def test_get_review_detail(self):
         response = self.client.get(reverse('review-detail', args=[self.review.pk]))
@@ -142,3 +144,23 @@ class TestReviewViews(BaseTestCase):
         self.assertStatusCode(response, 200)
         form = response.context['review_form']
         self.assertIn('title', form.errors)
+
+    def test_comment_on_review(self):
+        fh = StringIO('testing')
+        fh.name = 'test_file_1'
+        response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
+            'comment': "Oh nice demo!",
+            'form-TOTAL_FORMS': 3,
+            'form-INITIAL_FORMS': 0,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 3,
+            'form-0-attachment': fh,
+            'form-0-attachment_type': 'photo',
+        })
+        self.assertStatusCode(response, 302)
+        rev = self.review.revision
+        self.assertEqual(rev.comment_set.count(), 1)
+        comment = rev.comment_set.get()
+        self.assertEqual(comment.commenter, self.user)
+        self.assertEqual(comment.comment, 'Oh nice demo!')
+        self.assertEqual(comment.attachment_set.count(), 1)

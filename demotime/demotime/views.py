@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.forms import formset_factory
+from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -7,8 +8,26 @@ from django.utils.decorators import method_decorator
 from demotime import forms, models
 
 
-def index(request):
-    return render(request, 'demotime/index.html', {})
+class IndexView(TemplateView):
+    template_name = 'demotime/index.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(IndexView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexView, self).get_context_data(**kwargs)
+        context['open_demos'] = models.Review.objects.filter(
+            creator=self.request.user,
+            status=models.Review.OPEN,
+        )
+        context['open_reviews'] = models.Review.objects.filter(
+            reviewers=self.request.user,
+            status=models.Review.OPEN,
+        )
+        # TODO: Figure out how to show the recently updated ones
+        context['updated_demos'] = []
+        return context
 
 
 class ReviewDetail(DetailView):
@@ -17,7 +36,45 @@ class ReviewDetail(DetailView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        self.comment = models.Comment(
+            review=self.get_object().revision,
+            commenter=self.request.user
+        )
+        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
+        self.attachment_forms = AttachmentFormSet()
+        self.comment_form = None
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ReviewDetail, self).get_context_data(**kwargs)
+        context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
+        context['attachment_forms'] = self.attachment_forms
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.comment_form = forms.CommentForm(data=request.POST, instance=self.comment)
+        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
+        self.attachment_forms = AttachmentFormSet(data=request.POST, files=request.FILES)
+        data = {}
+        if self.comment_form.is_valid():
+            data = self.comment_form.cleaned_data
+        else:
+            return self.get(request, *args, **kwargs)
+
+        if self.attachment_forms.is_valid():
+            data['attachments'] = []
+            for form in self.attachment_forms.forms:
+                if form.cleaned_data:
+                    data['attachments'].append({
+                        'attachment': form.cleaned_data['attachment'],
+                        'attachment_type': form.cleaned_data['attachment_type'],
+                    })
+
+        obj = self.get_object()
+        data['commenter'] = self.request.user
+        data['review'] = obj.revision
+        models.Comment.create_comment(**data)
+        return redirect(reverse('review-detail', kwargs={'pk': obj.pk}))
 
 
 class CreateReviewView(TemplateView):
@@ -34,7 +91,7 @@ class CreateReviewView(TemplateView):
             instance=self.review_inst,
             data=request.POST
         )
-        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=4, max_num=5)
+        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
         self.attachment_forms = AttachmentFormSet(data=request.POST, files=request.FILES)
         if self.review_form.is_valid() and self.attachment_forms.is_valid():
             data = self.review_form.cleaned_data
@@ -61,7 +118,7 @@ class CreateReviewView(TemplateView):
                 user=self.request.user,
                 instance=self.review_inst
             )
-            AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=4, max_num=5)
+            AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
             self.attachment_forms = AttachmentFormSet()
         return super(CreateReviewView, self).get(request, *args, **kwargs)
 
@@ -75,5 +132,6 @@ class CreateReviewView(TemplateView):
         return context
 
 
+index_view = IndexView.as_view()
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()

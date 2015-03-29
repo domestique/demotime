@@ -3,4 +3,33 @@
     <div class="main-content">
         <h1>Welcome To DemoTime</h1>
     </div>
+    <div class="row">
+        <div class="col-md-4">
+            <h3>Your Open Demos</h3>
+            {% if open_demos %}
+                <ul>
+                    {% for demo in open_demos %}
+                        <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No open demos!</p>
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <h3>Your Open Reviews</h3>
+            {% if open_reviews %}
+                <ul>
+                    {% for demo in open_demos %}
+                        <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No open reviews!</p>
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <h3>Updated Demos</h3>
+        </div>
+    </div>
 {% endblock %}
