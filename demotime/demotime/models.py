@@ -122,6 +122,32 @@ class Review(BaseModel):
 
         return obj
 
+    @classmethod
+    def update_review(
+            cls, review, creator, title, description,
+            case_link, reviewers, attachments=None):
+        ''' Standard update review method '''
+        obj = cls.objects.get(pk=review)
+        obj.title = title
+        obj.case_link = case_link
+        obj.save()
+        rev = ReviewRevision.objects.create(
+            review=obj,
+            description=description
+        )
+        for attachment in attachments:
+            Attachment.objects.create(
+                attachment=attachment['attachment'],
+                attachment_type=attachment['attachment_type'],
+                content_object=rev,
+            )
+        for reviewer in reviewers:
+            Reviewer.objects.get_or_create(
+                review=obj,
+                reviewer=reviewer,
+                defaults={'status': Reviewer.REVIEWING}
+            )
+
     @property
     def revision(self):
         return self.reviewrevision_set.latest()
@@ -155,6 +181,7 @@ class ReviewRevision(BaseModel):
 
     class Meta:
         get_latest_by = 'created'
+        ordering = ['-created']
 
 
 class Comment(BaseModel):
@@ -170,15 +197,16 @@ class Comment(BaseModel):
         )
 
     @classmethod
-    def create_comment(cls, commenter, comment, review, attachments=None):
+    def create_comment(cls, commenter, comment,
+                       review, attachment=None, attachment_type=None):
         obj = cls.objects.create(
             commenter=commenter,
             comment=comment,
             review=review
         )
-        for attachment in attachments:
+        if attachment or attachment_type:
             Attachment.objects.create(
-                attachment=attachment['attachment'],
-                attachment_type=attachment['attachment_type'],
+                attachment=attachment,
+                attachment_type=attachment_type,
                 content_object=obj,
             )

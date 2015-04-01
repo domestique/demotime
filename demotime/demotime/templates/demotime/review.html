@@ -5,97 +5,117 @@
         <h1>{{ object.title }}</h1>
     </div>
     <div class="row">
-        <div class="col-md-4">
-            <h3>Case Link:</h3>
-            <p><a href="{{ object.case_link }}">Case Link</a></p>
-        </div>
-        <div class="col-md-4">
-            <h3>Reviewers:</h3>
-            <ul>
-                {% for reviewer in object.reviewer_set.all %}
-                    <li>{{ reviewer.reviewer.username }}: {{ reviewer.get_status_display }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="col-md-4">
-            <h4>Revisions ({{ object.reviewrevision_set.count }}):</h4>
-            <ol>
-                {% for revision in object.reviewrevision_set.all %}
-                    <li> Revision {{ forloop.revcounter }}</li>
-                {% endfor %}
-            </ol>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Description: </h3>
-            {% if object.revision.description %}
-                <p>{{ object.revision.description|safe }}</p>
-            {% else %}
-                <p>{{ object.description|safe }}</p>
-            {% endif %}
-        </div>
-    </div>
-    {% if not object.revision.attachments.exists %}
-        <div class="row">
-            <h3>Attachments</h3>
+        <div class="col-md-6">
+            <div class="row">
                 <div class="col-md-12">
-                    <p>No attachments!</p>
+                    <h4>Case Link:</h4> <a href="{{ object.case_link }}">{{ object.case_link }}</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>Reviewers:</h4>
+                    <ul class="list-inline">
+                        {% for reviewer in object.reviewer_set.all %}
+                            <li>{{ reviewer.reviewer.username }}: {{ reviewer.get_status_display }}</li>
+                        {% endfor %}
+                    </ul>
+            </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>Revisions:</h4>
+                    <ol>
+                        {% for revision in object.reviewrevision_set.all %}
+                            <li><a href="{% url 'review-rev-detail' pk=object.pk rev_pk=revision.pk %}">Revision {{ forloop.revcounter }}</a></li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>Manage Review</h4>
+                    <ul class="list-unstyled">
+                        {% if request.user == object.creator %}
+                            <li><a href="{% url 'edit-review' object.pk %}" class="btn btn-default btn-xs">Update Review</a></li>
+                            <br />
+                            <li><a href="#" class="btn btn-danger btn-xs">Close Review</a></li>
+                        {% else %}
+                            <li><a href="#" class="btn btn-primary btn-xs">Accept Demo</a></li>
+                            <br />
+                            <li><a href="#" class="btn btn-danger btn-xs">Reject Demo</a></li>
+                        {% endif %}
+                    </ul>
+            </div>
+            </div>
         </div>
-    {% else %}
-        <div class="row">
-            <h3>Attachments</h3>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Description</h4>
+                    {% if revision.description %}
+                        <p>{{ revision.description|safe|linebreaksbr }}</p>
+                    {% else %}
+                        <p>{{ object.description|safe|linebreaksbr }}</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="row">
-            {% for attachment in object.revision.attachments.all %}
-                    {% if attachment.attachment_type == 'photo' %}
-                        <div class="col-md-4">
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
-                                <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% if attachment.attachment_type == 'movie' %}
-                        <div class="col-md-4">
-                            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
-                        </div>
-                    {% endif %}
-                    {% if attachment.attachment_type == 'audio' %}
-                        <div class="col-md-4">
-                            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-                        </div>
-                    {% endif %}
-                    {% if attachment.attachment_type == 'document' %}
-                        <div class="col-md-4">
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
-                        </div>
-                    {% endif %}
-                    {% if attachment.attachment_type == 'other' %}
-                        <div class="col-md-4">
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
-                        </div>
-                    {% endif %}
-                {% if forloop.counter0 > 2 %}
-                    {# Hopefully we never have 7 attachments on one revision #}
-                    </div><div class="row">
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endif %}
+    </div>
+        {% if not revision.attachments.exists %}
+            <div class="row">
+                <h3>Attachments</h3>
+                    <div class="col-md-12">
+                        <p>No attachments!</p>
+                    </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <h3>Attachments</h3>
+            </div>
+            <div class="row">
+                {% for attachment in revision.attachments.all %}
+                        {% if attachment.attachment_type == 'photo' %}
+                            <div class="col-md-4">
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
+                                    <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
+                                </a>
+                            </div>
+                        {% endif %}
+                        {% if attachment.attachment_type == 'movie' %}
+                            <div class="col-md-4">
+                                <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
+                            </div>
+                        {% endif %}
+                        {% if attachment.attachment_type == 'audio' %}
+                            <div class="col-md-4">
+                                <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+                            </div>
+                        {% endif %}
+                        {% if attachment.attachment_type == 'document' %}
+                            <div class="col-md-4">
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
+                            </div>
+                        {% endif %}
+                        {% if attachment.attachment_type == 'other' %}
+                            <div class="col-md-4">
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
+                            </div>
+                        {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
     <div class="row">
         <h3>Comments</h3>
-        {% for comment in object.revision.comment_set.all %}
+        {% for comment in revision.comment_set.all %}
             <div class="row">
                 <div class="col-md-12">
                     <h4>Comment by {{ comment.commenter }} @ {{ comment.created }}</h4>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
-                    {{ comment.comment|safe }}
+                <div class="col-md-6">
+                    <p>{{ comment.comment|safe|linebreaksbr }}</p>
                 </div>
-            </div>
-            <div class="row">
                 {% for attachment in comment.attachments.all %}
                         {% if attachment.attachment_type == 'photo' %}
                             <div class="col-md-4">
@@ -130,35 +150,32 @@
                     {% endif %}
                 {% endfor %}
             </div>
-            <hr>
         {% endfor %}
     </div>
     <div class="row">
         <h3>Post a Comment</h3>
-            <form action="" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group">
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
                     <label for="{{ comment_form.comment.id_for_label }}">{{ comment_form.comment.label }}</label>
                     {{ comment_form.comment }}
                     {{ comment_form.comment.errors }}
                 </div>
-                <div class="row">
-                    {{ attachment_forms.management_form }}
-                    {% for form in attachment_forms %}
-                    <div class="col-md-4">
-                        <label for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }} {{ forloop.counter }} (<em>Optional</em>)</label>
-                            {{ form.attachment }}
-                            {{ form.attachment.errors }}
-                            {% for radio in form.attachment_type %}
-                                <div class="radio">{{ radio }}</div>
-                            {% endfor %}
-                    </div>
-                    {% endfor %}
+                <div class="col-md-6">
+                    <label for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>)</label>
+                        {{ attachment_form.attachment }}
+                        {{ attachment_form.attachment.errors }}
+                        {% for radio in attachment_form.attachment_type %}
+                            <div class="radio">{{ radio }}</div>
+                        {% endfor %}
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <input class="btn btn-primary btn-large" type="submit" value="Add Comment">
-                    </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <input class="btn btn-primary btn-large" type="submit" value="Comment">
                 </div>
-            </form>
+            </div>
+        </form>
+    </div>
 {% endblock %}

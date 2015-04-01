@@ -150,12 +150,8 @@ class TestReviewViews(BaseTestCase):
         fh.name = 'test_file_1'
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
             'comment': "Oh nice demo!",
-            'form-TOTAL_FORMS': 3,
-            'form-INITIAL_FORMS': 0,
-            'form-MIN_NUM_FORMS': 0,
-            'form-MAX_NUM_FORMS': 3,
-            'form-0-attachment': fh,
-            'form-0-attachment_type': 'photo',
+            'attachment': fh,
+            'attachment_type': 'photo',
         })
         self.assertStatusCode(response, 302)
         rev = self.review.revision
@@ -163,4 +159,6 @@ class TestReviewViews(BaseTestCase):
         comment = rev.comment_set.get()
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Oh nice demo!')
-        self.assertEqual(comment.attachment_set.count(), 1)
+        self.assertEqual(comment.attachments.count(), 1)
+        attachment = comment.attachments.get()
+        self.assertEqual(attachment.attachment_type, models.Attachment.PHOTO)

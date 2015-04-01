@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
 from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView, DetailView
@@ -40,35 +40,34 @@ class ReviewDetail(DetailView):
             review=self.get_object().revision,
             commenter=self.request.user
         )
-        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
-        self.attachment_forms = AttachmentFormSet()
+        self.attachment_form = None
         self.comment_form = None
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ReviewDetail, self).get_context_data(**kwargs)
+        if self.kwargs.get('rev_pk'):
+            context['revision'] = get_object_or_404(
+                models.ReviewRevision, pk=self.kwargs['rev_pk']
+            )
+        else:
+            context['revision'] = self.object.revision
+
         context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
-        context['attachment_forms'] = self.attachment_forms
+        context['attachment_form'] = self.attachment_form if self.attachment_form else forms.AttachmentForm()
         return context
 
     def post(self, request, *args, **kwargs):
         self.comment_form = forms.CommentForm(data=request.POST, instance=self.comment)
-        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
-        self.attachment_forms = AttachmentFormSet(data=request.POST, files=request.FILES)
+        self.attachment_form = forms.AttachmentForm(data=request.POST, files=request.FILES)
         data = {}
         if self.comment_form.is_valid():
             data = self.comment_form.cleaned_data
         else:
             return self.get(request, *args, **kwargs)
 
-        if self.attachment_forms.is_valid():
-            data['attachments'] = []
-            for form in self.attachment_forms.forms:
-                if form.cleaned_data:
-                    data['attachments'].append({
-                        'attachment': form.cleaned_data['attachment'],
-                        'attachment_type': form.cleaned_data['attachment_type'],
-                    })
+        if self.attachment_form.is_valid():
+            data.update(self.attachment_form.cleaned_data)
 
         obj = self.get_object()
         data['commenter'] = self.request.user
@@ -84,8 +83,12 @@ class CreateReviewView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        self.review_inst = models.Review(creator=self.request.user)
+    def post(self, request, pk=None, *args, **kwargs):
+        if pk:
+            self.review_inst = get_object_or_404(models.Review, pk=pk)
+            self.template_name = 'demotime/edit_review.html'
+        else:
+            self.review_inst = models.Review(creator=self.request.user)
         self.review_form = forms.ReviewForm(
             user=self.request.user,
             instance=self.review_inst,
@@ -104,19 +107,27 @@ class CreateReviewView(TemplateView):
                         'attachment_type': form.cleaned_data['attachment_type'],
                     })
 
-            models.Review.create_review(**data)
+            if pk:
+                models.Review.update_review(self.review_inst.pk, **data)
+            else:
+                models.Review.create_review(**data)
 
             return redirect('index')
         return self.get(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, pk=None, *args, **kwargs):
         if request.method == 'GET':
             # If we're using this method as the POST error path, let's
             # preserve the existing forms. Also, maybe this is dumb?
-            self.review_inst = models.Review(creator=self.request.user)
+            if pk:
+                self.review_inst = get_object_or_404(models.Review, pk=pk)
+                self.template_name = 'demotime/edit_review.html'
+            else:
+                self.review_inst = models.Review(creator=self.request.user)
             self.review_form = forms.ReviewForm(
                 user=self.request.user,
-                instance=self.review_inst
+                instance=self.review_inst,
+                initial={'description': ''},
             )
             AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
             self.attachment_forms = AttachmentFormSet()

@@ -8,6 +8,8 @@ urlpatterns = patterns('demotime.views',
     # Reviews
     url('^create/$', 'review_form_view', name='create-review'),
     url('^review/(?P<pk>[\d]+)/$', 'review_detail', name='review-detail'),
+    url('^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$$', 'review_detail', name='review-rev-detail'),
+    url('^review/(?P<pk>[\d]+)/edit/$', 'review_form_view', name='edit-review'),
 )
 
 # Accounts
