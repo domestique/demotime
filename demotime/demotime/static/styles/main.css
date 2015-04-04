@@ -1,0 +1,35 @@
+body, html {
+    margin:0;
+}
+body {
+    font-family: "Roboto", sans-serif;
+    font-size:100%;
+}
+h1, h2, h3 {
+    font-size:2em;
+}
+.container {
+    margin:0 auto;
+    max-width:1000px;
+    width:100%;
+}
+@media screen and (max-width:1000px) {
+    .cradle {
+        margin:0 auto;
+        padding-left:20px;
+        padding-right:20px;
+    }
+}
+
+h3 {
+    font-size:1.5em;
+    color:#555;
+}
+
+section {
+    background:#fafafa;
+    margin-top:.75em;
+    margin-bottom:2em;
+    padding:2em;
+    box-shadow:0 0 3px #ddd;
+}

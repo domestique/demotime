@@ -1,0 +1,16 @@
+.review-attachments {
+    overflow:hidden;
+}
+.attachment-card {
+    box-sizing:border-box;
+    width:30%;
+    box-shadow:0 0 5px #ccc;
+    margin:10px;
+    float:left;
+}
+
+section {
+    background:#fafafa;
+    margin-bottom:2em;
+    padding:2em;
+}

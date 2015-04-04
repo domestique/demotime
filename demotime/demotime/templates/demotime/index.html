@@ -1,35 +1,59 @@
 {% extends 'base.html' %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    .reviews-list h3 {
+        margin:0;
+    }
+    .reviews-list section {
+        min-height:150px;
+    }
+    .reviews-list ul {
+        margin:0;
+        padding:0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
     <div class="main-content">
         <h1>Welcome To DemoTime</h1>
     </div>
-    <div class="row">
-        <div class="col-md-4">
+    <div class="reviews-list split~680 by:3 with-gap:3">
+        <div class="cel">
             <h3>Your Open Demos</h3>
-            {% if open_demos %}
-                <ul>
-                    {% for demo in open_demos %}
-                        <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No open demos!</p>
-            {% endif %}
+            <section>
+                {% if open_demos %}
+                    <ul>
+                        {% for demo in open_demos %}
+                            <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    No open demos
+                {% endif %}
+            </section>
         </div>
-        <div class="col-md-4">
+        <div class="cel">
             <h3>Your Open Reviews</h3>
-            {% if open_reviews %}
-                <ul>
-                    {% for demo in open_demos %}
-                        <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No open reviews!</p>
-            {% endif %}
+            <section>
+                {% if open_reviews %}
+                    <ul>
+                        {% for demo in open_demos %}
+                            <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    No open reviews
+                {% endif %}
+            </section>
         </div>
-        <div class="col-md-4">
+        <div class="cel">
             <h3>Updated Demos</h3>
+            <section>
+                Coming soon
+            </section>
         </div>
     </div>
 {% endblock %}
