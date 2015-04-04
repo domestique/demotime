@@ -108,11 +108,15 @@ class CreateReviewView(TemplateView):
                     })
 
             if pk:
-                models.Review.update_review(self.review_inst.pk, **data)
+                review = models.Review.update_review(self.review_inst.pk, **data)
             else:
-                models.Review.create_review(**data)
+                review = models.Review.create_review(**data)
 
-            return redirect('index')
+            return redirect(
+                'review-rev-detail',
+                pk=review.pk,
+                rev_pk=review.revision.pk
+            )
         return self.get(request, *args, **kwargs)
 
     def get(self, request, pk=None, *args, **kwargs):

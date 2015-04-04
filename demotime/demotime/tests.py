@@ -21,14 +21,15 @@ class BaseTestCase(TestCase):
 
 class TestReviewModels(BaseTestCase):
 
-    def test_create_review(self):
-        obj = models.Review.create_review(
-            creator=self.user,
-            title='Test Title',
-            description='Test Description',
-            case_link='http://example.org/',
-            reviewers=User.objects.exclude(username=self.user.username),
-            attachments=[
+    def setUp(self):
+        super(TestReviewModels, self).setUp()
+        self.default_review_kwargs = {
+            'creator': self.user,
+            'title': 'Test Title',
+            'description': 'Test Description',
+            'case_link': 'http://example.org/',
+            'reviewers': User.objects.exclude(username=self.user.username),
+            'attachments': [
                 {
                     'attachment': File(BytesIO('test_file_1')),
                     'attachment_type': 'photo',
@@ -38,7 +39,10 @@ class TestReviewModels(BaseTestCase):
                     'attachment_type': 'photo',
                 },
             ],
-        )
+        }
+
+    def test_create_review(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
         assert obj.revision
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, 'Test Title')
@@ -46,6 +50,38 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.case_link, 'http://example.org/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 2)
+
+    def test_update_review(self):
+        review_kwargs = self.default_review_kwargs.copy()
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+        })
+        new_obj = models.Review.update_review(**review_kwargs)
+        self.assertEqual(obj.pk, new_obj.pk)
+        self.assertEqual(new_obj.title, 'New Title')
+        self.assertEqual(new_obj.case_link, 'http://badexample.org')
+        # Desc should be unchanged
+        self.assertEqual(new_obj.description, 'Test Description')
+        self.assertEqual(new_obj.revision.description, 'New Description')
+        self.assertEqual(new_obj.reviewrevision_set.count(), 2)
+
+    def test_create_comment(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=review.revision,
+            comment='Test Comment',
+            attachment=File(BytesIO('test_file_1')),
+            attachment_type='photo',
+        )
+        self.assertEqual(comment.review, review.revision)
+        self.assertEqual(comment.attachments.count(), 1)
+        self.assertEqual(comment.commenter, self.user)
+        self.assertEqual(comment.comment, 'Test Comment')
 
 
 class TestReviewViews(BaseTestCase):

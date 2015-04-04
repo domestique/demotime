@@ -57,3 +57,4 @@ target/
 dt/db.sqlite3
 dt/uploads
 *.swp
+*.swo

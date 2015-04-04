@@ -147,6 +147,7 @@ class Review(BaseModel):
                 reviewer=reviewer,
                 defaults={'status': Reviewer.REVIEWING}
             )
+        return obj
 
     @property
     def revision(self):
@@ -210,3 +211,5 @@ class Comment(BaseModel):
                 attachment_type=attachment_type,
                 content_object=obj,
             )
+
+        return obj

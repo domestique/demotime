@@ -6,10 +6,10 @@ urlpatterns = patterns('demotime.views',
     url('^$', 'index_view', name='index'),
 
     # Reviews
-    url('^create/$', 'review_form_view', name='create-review'),
-    url('^review/(?P<pk>[\d]+)/$', 'review_detail', name='review-detail'),
-    url('^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$$', 'review_detail', name='review-rev-detail'),
-    url('^review/(?P<pk>[\d]+)/edit/$', 'review_form_view', name='edit-review'),
+    url(r'^create/$', 'review_form_view', name='create-review'),
+    url(r'^review/(?P<pk>[\d]+)/$', 'review_detail', name='review-detail'),
+    url(r'^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$', 'review_detail', name='review-rev-detail'),
+    url(r'^review/(?P<pk>[\d]+)/edit/$', 'review_form_view', name='edit-review'),
 )
 
 # Accounts
