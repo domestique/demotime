@@ -14,6 +14,15 @@
         margin:0;
         padding:0;
     }
+    section.demos {
+        background:#C2FDBC;
+    }
+    section.reviews {
+        background:#FDC0AF;
+    }
+    section.updates {
+        background:#B6F9FD;
+    }
 </style>
 {% endblock %}
 
@@ -24,7 +33,7 @@
     <div class="reviews-list split~680 by:3 with-gap:3">
         <div class="cel">
             <h3 class="icon icon-calendar">Your Open Demos</h3>
-            <section>
+            <section class="demos">
                 {% if open_demos %}
                     <ul>
                         {% for demo in open_demos %}
@@ -38,7 +47,7 @@
         </div>
         <div class="cel">
             <h3 class="icon icon-inbox">Your Open Reviews</h3>
-            <section>
+            <section class="reviews">
                 {% if open_reviews %}
                     <ul>
                         {% for demo in open_demos %}
@@ -52,7 +61,7 @@
         </div>
         <div class="cel">
             <h3 class="icon icon-mail">Updated Demos</h3>
-            <section>
+            <section class="updates">
                 Coming soon
             </section>
         </div>
