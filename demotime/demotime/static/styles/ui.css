@@ -1,16 +1,43 @@
 .review-attachments {
     overflow:hidden;
 }
+.attachment h4 {
+    margin-top:3em;
+}
+.attachment h4:first-child {
+    margin-top:0;
+}
 .attachment-card {
-    box-sizing:border-box;
-    width:30%;
-    box-shadow:0 0 5px #ccc;
     margin:10px;
+}
+.attachment-card video {
+    width:100%;
+    height:auto;
+}
+.attachment-card.photo {
     float:left;
+    width:30%;
+    box-sizing:border-box;
+    box-shadow:0 0 5px #ccc;
 }
 
 section {
     background:#fafafa;
     margin-bottom:2em;
     padding:2em;
+}
+section h2:first-child,
+section h3:first-child,
+section h4:first-child,
+section h5:first-child {
+    margin-top:0;
+}
+section blockquote {
+    background:#fff;
+    margin:0;
+    padding:1em;
+    box-shadow:4px 4px 0 #eaeaea
+}
+section blockquote p:first-child {
+    margin:0;
 }

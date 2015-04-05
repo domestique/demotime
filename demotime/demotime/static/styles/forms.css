@@ -25,8 +25,6 @@ input[type=search] {
     font-size: 1rem;
     margin: 0 0 15px 0;
     padding: 0;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
     box-shadow: none;
     box-sizing: border-box;
     -webkit-transition: 0.3s;
@@ -47,6 +45,8 @@ textarea {
     -o-transition: 0.3s;
     -ms-transition: 0.3s;
     transition: 0.3s;
+    border:1px solid #eee;
+    box-shadow:4px 4px 0 #eaeaea
 }
 textarea:focus {
     outline:none;
@@ -81,6 +81,21 @@ button {
 button:hover, input[type="submit"]:hover,
 input[type="button"]:hover {
     background-color: #2bbbad;
+}
+
+select[multiple="multiple"]{
+    padding:10px;
+    min-width:50%;
+    font-size:1.4em;
+    border:1px solid #eee;
+    box-shadow:4px 4px 0 #eaeaea
+}
+select[multiple="multiple"] option {
+    color:#666;
+    background:#fafafa;
+}
+select[multiple="multiple"]:focus {
+    outline:none;
 }
 
 .form-group {

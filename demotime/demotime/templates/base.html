@@ -12,7 +12,15 @@
 
         <title>DemoTime!{% block title %}{% endblock %}</title>
 
+        {# Web fonts #}
         <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300,900' rel='stylesheet' type='text/css'>
+
+        {# Fontello #}
+        <link rel="stylesheet" href="/static/fonts/css/fontello.css">
+        <link rel="stylesheet" href="/static/fonts/css/animation.css">
+
+        {# Lightbox #}
+        <link rel="stylesheet" href="/static/scripts/lib/fancybox/jquery.fancybox.css">
 
         {% block styles %}
             <link href="/static/styles/lib/cel-0.2.0.min.css" rel="stylesheet">
@@ -36,9 +44,9 @@
                             {% url 'create-review' as create_review_url %}
                             {% url 'login' as login_url %}
                             {% if request.user.is_authenticated %}
-                                <li>Logged in as: {{ request.user.username }}</li>
-                                <li class="{% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{% url 'create-review' %}">Create Review</a></li>
-                                <li><a href="{% url 'logout' %}">Logout</a></li>
+                                <li class="icon icon-user">Logged in as: {{ request.user.username }}</li>
+                                <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{% url 'create-review' %}">Create Review</a></li>
+                                <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Logout</a></li>
                             {% else %}
                                 <li class="{% if request.path == login_url %}active{% else %}{% endif %}"><a href="{% url 'login' %}">Login</a></li>
                             {% endif %}
@@ -48,15 +56,22 @@
             </div>
         </nav>
 
-        <div class="container">
+        <div class="container content">
             <div class="cradle">
                 {% block content %}{% endblock %}
             </div>
         </div>
 
+        {# Main libs #}
         <script src="/static/scripts/lib/jquery-2.1.3.min.js"></script>
         <script src="/static/scripts/lib/cel-0.2.0.min.js"></script>
-        {% block footer_scripts %}{% endblock %}
+
+        {# Lightbox #}
+        <script src="/static/scripts/lib/fancybox/jquery.fancybox.pack.js"></script>
+
+        {% block footer_scripts %}
+            <script src="/static/scripts/footer_scripts.js"></script>
+        {% endblock %}
     </body>
 </html>
 

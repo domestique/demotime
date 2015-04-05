@@ -24,16 +24,49 @@
         margin-bottom:2em;
         padding:2em;
     }
+    .manage-review {
+        padding:10px;
+        text-align:right;
+        background:#6096D2;
+        border-radius:5px;
+        box-shadow:4px 4px 0 #ddd;
+        margin:1em 0 4em;
+    }
+    .manage-review ul {
+        margin:0;
+        padding:0;
+        display:inline-block;
+    }
+    .manage-review ul li {
+        list-style:none;
+        display:inline-block;
+        margin-left:20px;
+    }
+    .manage-review a {
+        color:#fff;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="review">
+    <div class="manage-review">
+        <ul>
+            {% if request.user == object.creator %}
+                <li><a href="{% url 'edit-review' object.pk %}" class="icon icon-pencil">Update Review</a></li>
+                <li><a href="#" class="icon icon-ok">Close Review</a></li>
+            {% else %}
+                <li><a href="#" class="icon icon-thumbs-up-1">Accept Demo</a></li>
+                <li><a href="#" class="icon icon-thumbs-down">Reject Demo</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
     <div class="main-content">
         <h1>{{ object.title }}</h1>
     </div>
 
-    <div class="split~680 by:4 review-overview">
+    <div class="split~680 by:3 review-overview">
         <div class="cel">
             <h4>Case Link:</h4> <a href="{{ object.case_link }}">{{ object.case_link }}</a>
         </div>
@@ -53,18 +86,6 @@
                 {% endfor %}
             </ol>
         </div>
-        <div class="cel">
-            <h4>Manage Review</h4>
-            <ul class="list-unstyled">
-                {% if request.user == object.creator %}
-                    <li><a href="{% url 'edit-review' object.pk %}" class="btn btn-default btn-xs">Update Review</a></li>
-                    <li><a href="#" class="btn btn-danger btn-xs">Close Review</a></li>
-                {% else %}
-                    <li><a href="#" class="btn btn-primary btn-xs">Accept Demo</a></li>
-                    <li><a href="#" class="btn btn-danger btn-xs">Reject Demo</a></li>
-                {% endif %}
-            </ul>
-        </div>
     </div>
 
     <h4>Description</h4>
@@ -83,38 +104,65 @@
         </section>
     {% else %}
         <h3>Attachments</h3>
-        <section>
-            <div class="review-attachments">
-                {% for attachment in revision.attachments.all %}
-                    <div class="attachment-card">
-                        {% if attachment.attachment_type == 'photo' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
-                                <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
-                            </a>
-                        {% endif %}
-                        {% if attachment.attachment_type == 'movie' %}
-                            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
-                        {% endif %}
-                        {% if attachment.attachment_type == 'audio' %}
-                            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-                        {% endif %}
+        <section class="attachment">
+            <div class="split by:2">
+                <div class="cel">
+                    {% for attachment in revision.attachments.all %}
                         {% if attachment.attachment_type == 'document' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
+                            <h4 class="icon icon-mail">Document:</h4>
+                            <div class="attachment-card {{ attachment.attachment_type }}">
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
+                            </div>
                         {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="cel">
+                    {% for attachment in revision.attachments.all %}
                         {% if attachment.attachment_type == 'other' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
+                            <h4 class="icon icon-attach">Other:</h4>
+                            <div class="attachment-card {{ attachment.attachment_type }}">
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
+                            </div>
                         {% endif %}
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
+            {% for attachment in revision.attachments.all %}
+                {% if attachment.attachment_type == 'photo' %}
+                    <div class="attachment-card">
+                        <h4 class="icon icon-photo">Photo:</h4>
+                        <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="lightboxed">
+                            <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for attachment in revision.attachments.all %}
+                {% if attachment.attachment_type == 'movie' %}
+                    <h4 class="icon icon-videocam">Video:</h4>
+                    <div class="attachment-card {{ attachment.attachment_type }}">
+                        <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for attachment in revision.attachments.all %}
+                {% if attachment.attachment_type == 'audio' %}
+                    <h4 class="icon icon-music">Audio:</h4>
+                    <div class="attachment-card {{ attachment.attachment_type }}">
+                        <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+                    </div>
+                {% endif %}
+            {% endfor %}
         </section>
     {% endif %}
 
     <h3>Comments</h3>
-    <section>
+    <section class="comments">
         {% for comment in revision.comment_set.all %}
             <h4>Comment by {{ comment.commenter }} @ {{ comment.created }}</h4>
-            <p>{{ comment.comment|safe|linebreaksbr }}</p>
+            <blockquote>
+                <p>{{ comment.comment|safe|linebreaksbr }}</p>
+            </blockquote>
             <div class="review-attachments">
             {% for attachment in comment.attachments.all %}
                 <div class="attachment-card">
@@ -144,10 +192,10 @@
     <section>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <label for="{{ comment_form.comment.id_for_label }}">{{ comment_form.comment.label }}</label>
+            <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">{{ comment_form.comment.label }}</label>
             {{ comment_form.comment }}
             {{ comment_form.comment.errors }}
-            <label for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>)</label>
+            <label class="icon icon-attach" for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>)</label>
             {{ attachment_form.attachment }}
             {{ attachment_form.attachment.errors }}
             {% for radio in attachment_form.attachment_type %}

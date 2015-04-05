@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load ui_tags %}
 {% block title %} - Create Review{% endblock %}
 {% block content %}
     <div class="main-content">
@@ -31,11 +32,13 @@
                 <div class="split~680 by:3">
                     {% for form in attachment_forms %}
                         <div class="cel">
-                            <label for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }} {{ forloop.counter }} (<em>Optional</em>)</label>
+                            <label class="icon icon-attach" for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }} {{ forloop.counter }} (<em>Optional</em>)</label>
                                 {{ form.attachment }}
                                 {{ form.attachment.errors }}
                             {% for radio in form.attachment_type %}
-                                <div class="radio">{{ radio }}</div>
+                                <div class="{# iconify_attachment radio #} radio">
+                                    {{ radio }}
+                                </div>
                             {% endfor %}
                         </div>
                     {% endfor %}
