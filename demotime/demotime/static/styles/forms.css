@@ -18,7 +18,7 @@ input[type=number],
 input[type=search] {
     background-color: transparent;
     border: none;
-    border-bottom: 1px solid #9e9e9e;
+    border-bottom: 1px solid #ddd;
     outline: none;
     height: 3rem;
     width: 100%;
