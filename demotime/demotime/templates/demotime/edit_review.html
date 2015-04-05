@@ -27,15 +27,17 @@
             </div>
             <h3>Attachments</h3>
             {{ attachment_forms.management_form }}
-            <div class="split~680 by:3">
+            <div class="split~680 by:3 with-gap:2">
                 {% for form in attachment_forms %}
                     <div class="cel">
-                        <label for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }} {{ forloop.counter }} (<em>Optional</em>)</label>
-                            {{ form.attachment.errors }}
-                            {{ form.attachment }}
-                        {% for radio in form.attachment_type %}
-                            <div class="radio">{{ radio }}</div>
-                        {% endfor %}
+                        <section>
+                            <label for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }} {{ forloop.counter }} (<em>Optional</em>)</label>
+                                {{ form.attachment.errors }}
+                                {{ form.attachment }}
+                            {% for radio in form.attachment_type %}
+                                <div class="radio">{{ radio }}</div>
+                            {% endfor %}
+                        </section>
                     </div>
                 {% endfor %}
             </div>
