@@ -83,7 +83,7 @@
             <h4>Revisions:</h4>
             <ol>
                 {% for revision in object.reviewrevision_set.all %}
-                    <li><a href="{% url 'review-rev-detail' pk=object.pk rev_pk=revision.pk %}">Revision {{ forloop.revcounter }}</a></li>
+                    <li><a href="{{ revision.get_absolute_url }}">Revision {{ forloop.revcounter }}</a></li>
                 {% endfor %}
             </ol>
         </div>
@@ -159,33 +159,57 @@
 
     <h3>Comments</h3>
     <section class="comments">
-        {% for comment in revision.comment_set.all %}
-            <h4>Comment by {{ comment.commenter }} @ {{ comment.created }}</h4>
-            <blockquote>
-                <p>{{ comment.comment|safe|linebreaksbr }}</p>
-            </blockquote>
-            <div class="review-attachments">
-            {% for attachment in comment.attachments.all %}
-                <div class="attachment-card">
-                    {% if attachment.attachment_type == 'photo' %}
-                        <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
-                            <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
-                        </a>
-                    {% endif %}
-                    {% if attachment.attachment_type == 'movie' %}
-                        <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
-                    {% endif %}
-                    {% if attachment.attachment_type == 'audio' %}
-                        <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-                    {% endif %}
-                    {% if attachment.attachment_type == 'document' %}
-                        <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
-                    {% endif %}
-                    {% if attachment.attachment_type == 'other' %}
-                        <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
-                    {% endif %}
-                </div>
+        {% for thread in revision.commentthread_set.all %}
+            {% for comment in thread.comment_set.all %}
+                {% if forloop.first %}
+                    <h4>Comment by {{ comment.commenter }} @ {{ comment.created }}</h4>
+                {% else %}
+                    <h4>Reply by {{ comment.commenter }} @ {{ comment.created }}</h4>
+                {% endif %}
+                <blockquote>
+                    <p>{{ comment.comment|safe|linebreaksbr }}</p>
+                </blockquote>
+                <div class="review-attachments">
+                {% for attachment in comment.attachments.all %}
+                    <div class="attachment-card">
+                        {% if attachment.attachment_type == 'photo' %}
+                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
+                                <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
+                            </a>
+                        {% endif %}
+                        {% if attachment.attachment_type == 'movie' %}
+                            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
+                        {% endif %}
+                        {% if attachment.attachment_type == 'audio' %}
+                            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+                        {% endif %}
+                        {% if attachment.attachment_type == 'document' %}
+                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
+                        {% endif %}
+                        {% if attachment.attachment_type == 'other' %}
+                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             {% endfor %}
+            <section>
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">{{ comment_form.comment.label }}</label>
+                    {{ comment_form.comment }}
+                    {{ comment_form.comment.errors }}
+                    <label class="icon icon-attach" for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>)</label>
+                    {{ attachment_form.attachment }}
+                    {{ attachment_form.attachment.errors }}
+                    {% for radio in attachment_form.attachment_type %}
+                        <div class="radio">{{ radio }}</div>
+                    {% endfor %}
+                    <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
+                    <div class="form-group">
+                        <input class="btn btn-primary btn-large" type="submit" value="Reply">
+                    </div>
+                </form>
+            </section>
         {% endfor %}
     </section>
 

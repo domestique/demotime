@@ -37,7 +37,7 @@
                 {% if open_demos %}
                     <ul>
                         {% for demo in open_demos %}
-                            <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
+                            <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}
@@ -51,7 +51,7 @@
                 {% if open_reviews %}
                     <ul>
                         {% for demo in open_demos %}
-                            <li><a href="{% url 'review-detail' demo.pk %}">{{ demo.title }}</a></li>
+                            <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}

@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
-from django.core.urlresolvers import reverse
 from django.views.generic import TemplateView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -36,8 +35,14 @@ class ReviewDetail(DetailView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        if self.kwargs.get('rev_pk'):
+            self.revision = get_object_or_404(
+                models.ReviewRevision, pk=self.kwargs['rev_pk']
+            )
+        else:
+            self.revision = self.get_object().revision
+
         self.comment = models.Comment(
-            review=self.get_object().revision,
             commenter=self.request.user
         )
         self.attachment_form = None
@@ -46,19 +51,20 @@ class ReviewDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ReviewDetail, self).get_context_data(**kwargs)
-        if self.kwargs.get('rev_pk'):
-            context['revision'] = get_object_or_404(
-                models.ReviewRevision, pk=self.kwargs['rev_pk']
-            )
-        else:
-            context['revision'] = self.object.revision
-
+        context['revision'] = self.revision
         context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
         context['attachment_form'] = self.attachment_form if self.attachment_form else forms.AttachmentForm()
         return context
 
     def post(self, request, *args, **kwargs):
-        self.comment_form = forms.CommentForm(data=request.POST, instance=self.comment)
+        thread = None
+        if 'thread' in request.POST:
+            if self.revision.commentthread_set.filter(
+                    pk=request.POST.get('thread')
+            ):
+                thread = models.CommentThread.objects.get(pk=request.POST['thread'])
+
+        self.comment_form = forms.CommentForm(thread=thread, data=request.POST, instance=self.comment)
         self.attachment_form = forms.AttachmentForm(data=request.POST, files=request.FILES)
         data = {}
         if self.comment_form.is_valid():
@@ -73,7 +79,7 @@ class ReviewDetail(DetailView):
         data['commenter'] = self.request.user
         data['review'] = obj.revision
         models.Comment.create_comment(**data)
-        return redirect(reverse('review-detail', kwargs={'pk': obj.pk}))
+        return redirect(obj.get_absolute_url())
 
 
 class CreateReviewView(TemplateView):

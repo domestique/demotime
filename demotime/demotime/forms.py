@@ -26,8 +26,20 @@ class ReviewForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
+    thread = forms.ModelChoiceField(
+        queryset=models.CommentThread.objects.none(),
+        widget=forms.widgets.HiddenInput(),
+        required=False
+    )
+
+    def __init__(self, thread=None, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
+        if thread:
+            self.fields['thread'].queryset = models.CommentThread.objects.filter(
+                pk=thread.pk
+            )
+            self.fields['thread'].required = True
+
         for key, value in self.fields.iteritems():
             self.fields[key].widget.attrs['class'] = 'form-control'
 

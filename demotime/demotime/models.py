@@ -1,8 +1,11 @@
 import os
 
 from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.template import Context, loader
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 
 class BaseModel(models.Model):
@@ -91,6 +94,34 @@ class Review(BaseModel):
             self.title, self.creator.username
         )
 
+    def get_absolute_url(self):
+        return self.revision.get_absolute_url()
+
+    def _send_messages(self, update=False):
+        system_user = User.objects.get(username='demotime_sys')
+        title = 'New Review: {}'.format(self.title)
+        if update:
+            title = 'Update on Review: {}'.format(self.title)
+
+        for reviewer in self.reviewers.all():
+            msg_template = loader.get_template('demotime/messages/review.html')
+            context = Context({
+                'receipient': reviewer,
+                'sender': system_user,
+                'url': self.get_absolute_url(),
+                'update': update,
+                'title': self.title,
+            })
+            msg_text = msg_template.render(context)
+            Message.create_message(
+                receipient=reviewer,
+                sender=system_user,
+                title=title,
+                review_revision=self.revision,
+                message=msg_text,
+                thread=None,
+            )
+
     @classmethod
     def create_review(
             cls, creator, title, description,
@@ -120,6 +151,7 @@ class Review(BaseModel):
                 status=Reviewer.REVIEWING,
             )
 
+        obj._send_messages()
         return obj
 
     @classmethod
@@ -147,6 +179,8 @@ class Review(BaseModel):
                 reviewer=reviewer,
                 defaults={'status': Reviewer.REVIEWING}
             )
+
+        obj._send_messages()
         return obj
 
     @property
@@ -180,6 +214,61 @@ class ReviewRevision(BaseModel):
     description = models.TextField()
     attachments = GenericRelation(Attachment)
 
+    def __unicode__(self):
+        return u'Review Revision: {}'.format(self.review)
+
+    def get_absolute_url(self):
+        return reverse('review-rev-detail', kwargs={
+            'pk': self.review.pk,
+            'rev_pk': self.pk
+        })
+
+    class Meta:
+        get_latest_by = 'created'
+        ordering = ['-created']
+
+
+class Message(BaseModel):
+
+    receipient = models.ForeignKey('auth.User', related_name='receipient')
+    sender = models.ForeignKey('auth.User', related_name='sender')
+    title = models.CharField(max_length=1024)
+    review = models.ForeignKey('ReviewRevision', null=True)
+    thread = models.ForeignKey('CommentThread', null=True)
+    message = models.TextField(blank=True)
+    read = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u'Message for {}, From {}'.format(
+            self.receipient.username, self.sender.username
+        )
+
+    @classmethod
+    def create_message(cls, receipient, sender, title, review_revision, thread, message):
+        return cls.objects.create(
+            receipient=receipient,
+            sender=sender,
+            title=title,
+            review=review_revision,
+            thread=thread,
+            message=message,
+        )
+
+    class Meta:
+        ordering = ['-created']
+
+
+class CommentThread(BaseModel):
+
+    review_revision = models.ForeignKey('ReviewRevision')
+
+    def __unicode__(self):
+        return u'Comment Thread for Review: {}'.format(self.review)
+
+    @classmethod
+    def create_comment_thread(cls, review_revision):
+        return cls.objects.create(review_revision=review_revision)
+
     class Meta:
         get_latest_by = 'created'
         ordering = ['-created']
@@ -189,21 +278,24 @@ class Comment(BaseModel):
 
     commenter = models.ForeignKey('auth.User')
     comment = models.TextField()
-    review = models.ForeignKey('ReviewRevision')
+    thread = models.ForeignKey('CommentThread')
     attachments = GenericRelation(Attachment)
 
     def __unicode__(self):
         return u'Comment by {} on Review: {}'.format(
-            self.commenter.username, self.review
+            self.commenter.username, self.thread.review_revision.review.title
         )
 
     @classmethod
-    def create_comment(cls, commenter, comment,
-                       review, attachment=None, attachment_type=None):
+    def create_comment(cls, commenter, comment, review,
+                       thread=None, attachment=None, attachment_type=None):
+        if not thread:
+            thread = CommentThread.create_comment_thread(review)
+
         obj = cls.objects.create(
             commenter=commenter,
             comment=comment,
-            review=review
+            thread=thread
         )
         if attachment or attachment_type:
             Attachment.objects.create(
@@ -212,4 +304,32 @@ class Comment(BaseModel):
                 content_object=obj,
             )
 
+        system_user = User.objects.get(username='demotime_sys')
+        users = list(review.review.reviewers.all())
+        users.append(review.review.creator)
+        for reviewer in users:
+            if reviewer == commenter:
+                continue
+
+            msg_template = loader.get_template('demotime/messages/new_comment.html')
+            context = Context({
+                'receipient': reviewer,
+                'sender': system_user,
+                'commenter': commenter,
+                'url': review.get_absolute_url(),
+                'title': review.review.title,
+            })
+            msg_text = msg_template.render(context)
+            Message.create_message(
+                receipient=reviewer,
+                sender=system_user,
+                title='New Comment on {}'.format(review.review.title),
+                thread=thread,
+                review_revision=review,
+                message=msg_text
+            )
+
         return obj
+
+    class Meta:
+        ordering = ['created']
