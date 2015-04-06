@@ -23,6 +23,11 @@
     section.updates {
         background:#B6F9FD;
     }
+    section.done {
+        background-image:url(/static/images/done.png);
+        background-repeat:no-repeat;
+        background-position:50% 50%;
+    }
 </style>
 {% endblock %}
 
@@ -33,7 +38,7 @@
     <div class="reviews-list split~680 by:3 with-gap:3">
         <div class="cel">
             <h3 class="icon icon-calendar">Your Open Demos</h3>
-            <section class="demos">
+            <section class="demos {% if not open_demos %}done{% endif %}">
                 {% if open_demos %}
                     <ul>
                         {% for demo in open_demos %}
@@ -41,28 +46,40 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    No open demos
+                    You don't have any open demos.
+                    <a href="{% url 'create-review' %}" class="icon icon-pencil">Create a demo now</a>
                 {% endif %}
             </section>
         </div>
         <div class="cel">
             <h3 class="icon icon-inbox">Your Open Reviews</h3>
-            <section class="reviews">
+            <section class="reviews {% if not open_reviews %}done{% endif %}">
                 {% if open_reviews %}
                     <ul>
-                        {% for demo in open_demos %}
+                        {% for demo in open_reviews %}
                             <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                         {% endfor %}
                     </ul>
                 {% else %}
-                    No open reviews
+                    Reviews are demos that have been assigned to you
+                    to review. You can leave feedback and ultimately
+                    approve or reject a demo.
                 {% endif %}
             </section>
         </div>
         <div class="cel">
             <h3 class="icon icon-mail">Updated Demos</h3>
-            <section class="updates">
-                Coming soon
+            <section class="updates {% if not updated_reviews %}done{% endif %}">
+                {% if updated_reviews %}
+                    <ul>
+                        {% for demo in updated_reviews %}
+                            <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    Demos owned by others that have been updated since you last
+                    reviewed them will appear here.
+                {% endif %}
             </section>
         </div>
     </div>
