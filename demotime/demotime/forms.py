@@ -60,5 +60,5 @@ class AttachmentForm(forms.Form):
     )
     attachment_type = forms.ChoiceField(
         choices=models.Attachment.ATTACHMENT_TYPE_CHOICES,
-        widget=forms.RadioSelect
+        widget=forms.Select
     )

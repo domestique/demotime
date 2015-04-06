@@ -26,19 +26,35 @@
                 {{ review_form.reviewers }}
             </div>
             <h3>Attachments</h3>
-            {{ attachment_forms.management_form }}
-            <div class="split~680 by:3 with-gap:2">
+            <div class="attachments">
+                <h3 class="icon icon-attach">Attachments</h3>
+                {{ attachment_forms.management_form }}
                 {% for form in attachment_forms %}
-                    <div class="cel">
-                        <section>
-                            <label for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }} {{ forloop.counter }} (<em>Optional</em>)</label>
-                                {{ form.attachment.errors }}
+                    <section class="attachment-{{ forloop.counter }}">
+                        <div class="split~680 by:4 with-gap:3">
+                            <div class="cel">
+                                <label>File type:</label>
+                                {% for select in form.attachment_type %}
+                                    <div>
+                                        {{ select }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="cel">
+                                <label>Attach your file:</label>
                                 {{ form.attachment }}
-                            {% for radio in form.attachment_type %}
-                                <div class="radio">{{ radio }}</div>
-                            {% endfor %}
-                        </section>
-                    </div>
+                                {{ form.attachment.errors }}
+                            </div>
+                            <div class="cel">
+                                <label>Short description:</label>
+                                <input type="text" value="TODO">
+                            </div>
+                            <div class="cel">
+                                <label>&nbsp;</label>
+                            </div>
+                        </div>
+                        {{ form.attachment.errors }}
+                    </section>
                 {% endfor %}
             </div>
             <div class="form-group">
@@ -48,4 +64,3 @@
         </form>
     </div>
 {% endblock %}
-

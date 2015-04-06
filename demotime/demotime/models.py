@@ -37,6 +37,7 @@ class Attachment(BaseModel):
     OTHER = 'other'
 
     ATTACHMENT_TYPE_CHOICES = (
+        ('', '-----'),
         (PHOTO, 'Photo'),
         (DOCUMENT, 'Document'),
         (MOVIE, 'Movie/Screencast'),

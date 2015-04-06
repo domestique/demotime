@@ -48,3 +48,13 @@ section blockquote p:first-child {
 .toggled_text {
     display:none;
 }
+
+.attachments section {
+    padding:1em;
+}
+.attachments label {
+    margin:0;
+}
+.attachments input[type="text"] {
+    height:1.5rem;
+}

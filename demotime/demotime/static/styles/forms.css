@@ -93,6 +93,7 @@ select[multiple="multiple"]{
 select[multiple="multiple"] option {
     color:#666;
     background:#fafafa;
+    margin:5px 0;
 }
 select[multiple="multiple"]:focus {
     outline:none;
