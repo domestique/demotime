@@ -31,7 +31,7 @@
                 <h3 class="icon icon-attach">Attachments</h3>
                 {{ attachment_forms.management_form }}
                 {% for form in attachment_forms %}
-                    <section class="attachment-{{ forloop.counter }}" {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                    <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
                         <div class="split by:4 with-gap:3">
                             <div class="cel">
                                 <label>File type:</label>
@@ -67,14 +67,4 @@
             </div>
         </form>
     </div>
-{% endblock %}
-
-{% block footer_scripts %}
-{{ block.super }}
-<script>
-    $('.attachment-add').click(function(event) {
-        event.preventDefault();
-        $(this).parents('section').next().slideDown();
-    });
-</script>
 {% endblock %}

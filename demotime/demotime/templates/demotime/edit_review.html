@@ -30,7 +30,7 @@
                 <h3 class="icon icon-attach">Attachments</h3>
                 {{ attachment_forms.management_form }}
                 {% for form in attachment_forms %}
-                    <section class="attachment-{{ forloop.counter }}">
+                    <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
                         <div class="split~680 by:4 with-gap:3">
                             <div class="cel">
                                 <label>File type:</label>
@@ -50,7 +50,10 @@
                                 <input type="text" value="TODO">
                             </div>
                             <div class="cel">
-                                <label>&nbsp;</label>
+                                {% if forloop.counter < attachment_forms|length %}
+                                    <label>&nbsp;</label>
+                                    <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
+                                {% endif %}
                             </div>
                         </div>
                         {{ form.attachment.errors }}

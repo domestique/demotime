@@ -6,4 +6,9 @@ $(document).ready(function() {
         event.preventDefault();
         $(this).parents('.summary').next().slideToggle();
     });
+
+    $('.attachment-add').click(function(event) {
+        event.preventDefault();
+        $(this).parents('section').next().slideDown();
+    });
 });

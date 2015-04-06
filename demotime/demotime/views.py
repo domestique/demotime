@@ -100,7 +100,7 @@ class CreateReviewView(TemplateView):
             instance=self.review_inst,
             data=request.POST
         )
-        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
+        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)
         self.attachment_forms = AttachmentFormSet(data=request.POST, files=request.FILES)
         if self.review_form.is_valid() and self.attachment_forms.is_valid():
             data = self.review_form.cleaned_data
@@ -139,7 +139,7 @@ class CreateReviewView(TemplateView):
                 instance=self.review_inst,
                 initial={'description': ''},
             )
-            AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=3, max_num=3)
+            AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)
             self.attachment_forms = AttachmentFormSet()
         return super(CreateReviewView, self).get(request, *args, **kwargs)
 
