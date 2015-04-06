@@ -57,3 +57,10 @@
 .navbar ul li.active {
     background:#618A55;
 }
+
+footer {
+    margin-top:8em;
+    font-size:.9em;
+    text-align:center;
+    color:#ccc;
+}
