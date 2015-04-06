@@ -27,7 +27,7 @@
     .manage-review {
         padding:10px;
         text-align:right;
-        background:#6096D2;
+        background:#4EC39F;
         border-radius:5px;
         box-shadow:4px 4px 0 #ddd;
         margin:1em 0 4em;
@@ -45,6 +45,33 @@
     }
     .manage-review a {
         color:#fff;
+    }
+    .comments h4 {
+        margin-top:2.5em;
+    }
+    .comments-reply {
+        font-size:0.8em;
+    }
+    .comments-reply,
+    .comments-reply_new {
+        margin:2em 0 1em 2em;
+    }
+    .comments-reply_new textarea {
+        height:80px;
+    }
+    .comments-reply h4 {
+        text-align:right;
+        color:#aaa;
+        margin:0;
+    }
+    .comments-reply_new input[type="submit"] {
+        float:right;
+        margin-top:-30px;
+    }
+    @media screen and (max-width:680px) {
+        .comments-reply_new input[type="submit"] {
+            float:left;
+        }
     }
 </style>
 {% endblock %}
@@ -104,7 +131,7 @@
             <p>No attachments!</p>
         </section>
     {% else %}
-        <h3>Attachments</h3>
+        <h3 class="icon icon-attach">Attachments</h3>
         <section class="attachment">
             <div class="split by:2">
                 <div class="cel">
@@ -157,77 +184,95 @@
         </section>
     {% endif %}
 
-    <h3>Comments</h3>
+    <h3 class="icon icon-comment">Previous comments</h3>
     <section class="comments">
         {% for thread in revision.commentthread_set.all %}
             {% for comment in thread.comment_set.all %}
                 {% if forloop.first %}
-                    <h4>Comment by {{ comment.commenter }} @ {{ comment.created }}</h4>
+                    <h4>New comment by {{ comment.commenter }} @ {{ comment.created }}</h4>
+                    <blockquote>
+                        <p>{{ comment.comment|safe|linebreaksbr }}</p>
+                    </blockquote>
                 {% else %}
-                    <h4>Reply by {{ comment.commenter }} @ {{ comment.created }}</h4>
+                    <div class="comments-reply">
+                        <blockquote>
+                            <p>{{ comment.comment|safe|linebreaksbr }}</p>
+                            <h4>Reply by {{ comment.commenter }} @ {{ comment.created }}</h4>
+                        </blockquote>
+                    </div>
                 {% endif %}
-                <blockquote>
-                    <p>{{ comment.comment|safe|linebreaksbr }}</p>
-                </blockquote>
                 <div class="review-attachments">
-                {% for attachment in comment.attachments.all %}
-                    <div class="attachment-card">
-                        {% if attachment.attachment_type == 'photo' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
-                                <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
-                            </a>
-                        {% endif %}
-                        {% if attachment.attachment_type == 'movie' %}
-                            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
-                        {% endif %}
-                        {% if attachment.attachment_type == 'audio' %}
-                            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-                        {% endif %}
-                        {% if attachment.attachment_type == 'document' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
-                        {% endif %}
-                        {% if attachment.attachment_type == 'other' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            {% endfor %}
-            <section>
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">{{ comment_form.comment.label }}</label>
-                    {{ comment_form.comment }}
-                    {{ comment_form.comment.errors }}
-                    <label class="icon icon-attach" for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>)</label>
-                    {{ attachment_form.attachment }}
-                    {{ attachment_form.attachment.errors }}
-                    {% for radio in attachment_form.attachment_type %}
-                        <div class="radio">{{ radio }}</div>
+                    {% for attachment in comment.attachments.all %}
+                        <div class="attachment-card">
+                            {% if attachment.attachment_type == 'photo' %}
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
+                                    <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
+                                </a>
+                            {% endif %}
+                            {% if attachment.attachment_type == 'movie' %}
+                                <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
+                            {% endif %}
+                            {% if attachment.attachment_type == 'audio' %}
+                                <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+                            {% endif %}
+                            {% if attachment.attachment_type == 'document' %}
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
+                            {% endif %}
+                            {% if attachment.attachment_type == 'other' %}
+                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
+                            {% endif %}
+                        </div>
                     {% endfor %}
-                    <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
-                    <div class="form-group">
-                        <input class="btn btn-primary btn-large" type="submit" value="Reply">
+                </div>
+            {% endfor %}
+            <form action="" method="post" enctype="multipart/form-data" class="comments-reply_new">
+                {% csrf_token %}
+                <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
+                {{ comment_form.comment }}
+                {{ comment_form.comment.errors }}
+                <div class="split~680 by:2">
+                    <div class="cel">
+                        <div class="summary">
+                            <label class="icon icon-attach" for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add)</a></label>
+                        </div>
+                        <div class="toggled_text">
+                            {{ attachment_form.attachment }}
+                            {{ attachment_form.attachment.errors }}
+                            {% for radio in attachment_form.attachment_type %}
+                                <div class="radio">{{ radio }}</div>
+                            {% endfor %}
+                            <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
+                        </div>
                     </div>
-                </form>
-            </section>
+                    <div class="cel">
+                        <div class="form-group">
+                            <input class="btn btn-primary btn-large" type="submit" value="Reply">
+                        </div>
+                    </div>
+                </div>
+            </form>
         {% endfor %}
     </section>
 
-    <h3>Post a Comment</h3>
+    <h3 class="icon icon-comment">Post a New Comment</h3>
     <section>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">{{ comment_form.comment.label }}</label>
             {{ comment_form.comment }}
             {{ comment_form.comment.errors }}
-            <label class="icon icon-attach" for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>)</label>
-            {{ attachment_form.attachment }}
-            {{ attachment_form.attachment.errors }}
-            {% for radio in attachment_form.attachment_type %}
-                <div class="radio">{{ radio }}</div>
-            {% endfor %}
+            <div class="summary">
+                <label class="icon icon-attach" for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add)</a></label>
+            </div>
+            <div class="toggled_text">
+                {{ attachment_form.attachment }}
+                {{ attachment_form.attachment.errors }}
+                {% for radio in attachment_form.attachment_type %}
+                    <div class="radio">{{ radio }}</div>
+                {% endfor %}
+            </div>
             <div class="form-group">
-                <input class="btn btn-primary btn-large" type="submit" value="Comment">
+                <input type="submit" value="Comment">
             </div>
         </form>
     </section>

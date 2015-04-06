@@ -26,10 +26,10 @@ section {
     margin-bottom:2em;
     padding:2em;
 }
-section h2:first-child,
-section h3:first-child,
-section h4:first-child,
-section h5:first-child {
+section > h2:first-child,
+section > h3:first-child,
+section > h4:first-child,
+section > h5:first-child {
     margin-top:0;
 }
 section blockquote {
@@ -40,4 +40,11 @@ section blockquote {
 }
 section blockquote p:first-child {
     margin:0;
+}
+
+.summary a {
+    font-size:0.8em;
+}
+.toggled_text {
+    display:none;
 }
