@@ -52,7 +52,10 @@
             </section>
         </div>
         <div class="cel">
-            <h3 class="icon icon-inbox">Your Open Reviews</h3>
+            <h3 class="icon icon-inbox">
+                Your Open Reviews
+                <span class="tooltip" title="Reviews are demos that have been assigned to you to review. You can leave feedback and ultimately approve or reject a demo."></span>
+            </h3>
             <section class="reviews {% if not open_reviews %}done{% endif %}">
                 {% if open_reviews %}
                     <ul>
@@ -60,15 +63,14 @@
                             <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                         {% endfor %}
                     </ul>
-                {% else %}
-                    Reviews are demos that have been assigned to you
-                    to review. You can leave feedback and ultimately
-                    approve or reject a demo.
                 {% endif %}
             </section>
         </div>
         <div class="cel">
-            <h3 class="icon icon-mail">Updated Demos</h3>
+            <h3 class="icon icon-mail">
+                Updated Demos
+                <span class="tooltip" title="Demos owned by others that have been updated since you last reviewed them will appear here."></span>
+            </h3>
             <section class="updates {% if not updated_reviews %}done{% endif %}">
                 {% if updated_reviews %}
                     <ul>
@@ -76,9 +78,6 @@
                             <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                         {% endfor %}
                     </ul>
-                {% else %}
-                    Demos owned by others that have been updated since you last
-                    reviewed them will appear here.
                 {% endif %}
             </section>
         </div>

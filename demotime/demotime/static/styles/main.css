@@ -36,6 +36,9 @@ section {
     padding:2em;
     box-shadow:4px 4px 0 #ddd;
 }
+section section {
+    background:#eaeaea;
+}
 
 .content h1 {
     color:#aaa;
