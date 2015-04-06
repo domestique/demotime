@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load ui_tags %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+.review h3 {
+    font-size:1.1em;
+    font-weight:400;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="review">
+        <h1>{% block page_title %}{% endblock %}</h1>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <h3 class="icon icon-lightbulb">{{ review_form.title.label }}</h3>
+                {{ review_form.title.errors }}
+                {{ review_form.title }}
+            </div>
+            <div class="form-group">
+                <h3 class="icon icon-pencil">{{ review_form.description.label }}</h3>
+                {{ review_form.description.errors }}
+                {{ review_form.description }}
+            </div>
+            <div class="form-group">
+                <h3 class="icon icon-link-ext">{{ review_form.case_link.label }}</h3>
+                {{ review_form.case_link.errors }}
+                {{ review_form.case_link }}
+            </div>
+            <div class="form-group">
+                <h3 class="icon icon-user">{{ review_form.reviewers.label }}</h3>
+                {{ review_form.reviewers.errors }}
+                {{ review_form.reviewers }}
+            </div>
+            <div class="attachments">
+                <h3 class="icon icon-attach">Attachments</h3>
+                {{ attachment_forms.management_form }}
+                {% for form in attachment_forms %}
+                    <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                        <div class="split by:4 with-gap:3">
+                            <div class="cel">
+                                <label>File type:</label>
+                                {% for select in form.attachment_type %}
+                                    <div>
+                                        {{ select }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="cel">
+                                <label>Attach your file:</label>
+                                {{ form.attachment }}
+                                {{ form.attachment.errors }}
+                            </div>
+                            <div class="cel">
+                                <label>Short description:</label>
+                                <input type="text" value="TODO">
+                            </div>
+                            <div class="cel">
+                                {% if forloop.counter < attachment_forms|length %}
+                                    <label>&nbsp;</label>
+                                    <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {{ form.attachment.errors }}
+                    </section>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                <input type="submit" value="{% block button_text %}{% endblock %}">
+                <input type="button" value="Cancel" onclick="javascript: history.go(-1)">
+            </div>
+        </form>
+    </div>
+{% endblock %}
