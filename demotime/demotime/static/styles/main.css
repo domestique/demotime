@@ -4,9 +4,13 @@ body, html {
 body {
     font-family: "Roboto", sans-serif;
     font-size:100%;
+    font-weight:300;
 }
 h1, h2, h3 {
     font-size:2em;
+}
+h1, h2, h3, h4, h5 {
+    font-weight:300;
 }
 ul {
     list-style:circle;
@@ -36,8 +40,23 @@ section {
     padding:2em;
     box-shadow:4px 4px 0 #ddd;
 }
+section > h2:first-child,
+section > h3:first-child,
+section > h4:first-child,
+section > h5:first-child {
+    margin-top:0;
+}
+section blockquote {
+    background:#fff;
+    margin:0;
+    padding:1em;
+    box-shadow:4px 4px 0 #eaeaea
+}
+section blockquote p:first-child {
+    margin:0;
+}
 section section {
-    background:#eaeaea;
+    background:#fff;
 }
 
 .content h1 {
@@ -55,7 +74,13 @@ section section {
 }
 
 .content a {
-    color:#4B727F;
+    color:#54BB9C;
+    text-decoration:none;
     font-weight:700;
+}
+.content a:hover {
+    text-decoration:underline;
+}
+.content a.icon:hover:before {
     text-decoration:none;
 }

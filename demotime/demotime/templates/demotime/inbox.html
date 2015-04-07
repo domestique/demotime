@@ -3,12 +3,148 @@
 
 {% block styles %}
 {{ block.super }}
+<style>
+dl.messages_nav {
+    border:1px solid #415E73;
+    display:table;
+    width:auto;
+    margin:0 auto 2em;
+    border-radius:10px;
+}
+dl.messages_nav dt {
+    display:none;
+}
+dl.messages_nav dd {
+    margin:0;
+    text-align:center;
+    display:table-cell;
+    box-sizing:border-box;
+    border-right:1px solid #415E73;
+}
+dl.messages_nav dd a {
+    display:inline-block;
+    min-width:150px;
+    padding:10px 20px;
+}
+dl.messages_nav dd.last {
+    border-right:0;
+}
+dl.messages_nav dd.current.first {
+    border-radius:10px 0 0 10px;
+}
+dl.messages_nav dd.current.last {
+    border-radius:0 10px 10px 0;
+}
+dl.messages_nav dd.current {
+    background:#54BB9C;
+}
+dl.messages_nav dd.current a {
+    color:#fff;
+}
+@media screen and (max-width:680px) {
+    dl.messages_nav {
+        position:relative;
+        margin:40px auto;
+        width:200px;
+        height:40px;
+        background:#54BB9C;
+        border:2px solid #415E73;
+        border-radius:6px;
+        display:block;
+        overflow:hidden;
+    }
+
+    dl.messages_nav dt {
+        position:absolute;
+        display:inline-block;
+        top:0;
+        right:0;
+        width:40px;
+        height:40px;
+        overflow:hidden;
+    }
+
+    dl.messages_nav dt:before {
+        content:"v";
+        display:block;
+        width:40px;
+        height:40px;
+        background-color:#fff;
+        color:#54BB9C;
+        font-size:18px;
+        font-family:Verdana, sans-serif;
+        line-height:40px;
+        text-align:center;
+        cursor:pointer;
+    }
+
+    dl.messages_nav dd {
+        text-align:left;
+        width:200px;
+        min-width:0;
+        border:0;
+        height:0;
+        margin:0;
+        padding:0;
+        overflow:hidden;
+        transition:height 0.1s ease;
+        display:block;
+    }
+
+    dl.messages_nav dd.current {
+        height:40px;
+    }
+
+    dl.messages_nav dd.current a {
+        background-color:#54BB9C;
+        color:#fff;
+    }
+
+    dl.messages_nav dd a {
+        display:block;
+        padding:6px 40px 6px 6px;
+        height:40px;
+        background:#fff;
+        color:#415E73;
+        font-family:sans-serif;
+        line-height:28px;
+        text-align:center;
+        text-decoration:none;
+        transition:background-color 0.125s ease;
+    }
+
+    dl.messages_nav dd a:hover {
+        background-color:#54BB9C;
+        color:#fff;
+    }
+
+    dl.messages_nav dd.current a:hover {
+        background-color:#415E73;
+        color:#fff;
+    }
+
+    dl.messages_nav:hover {
+        height:auto;
+        box-shadow:0 2px 2px gray;
+    }
+
+    dl.messages_nav:hover dd {
+        height:40px;
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}
     <div class="main-content">
         <h1>Your Inbox</h1>
     </div>
+    <dl class="messages_nav">
+        <dt>Menu</dt>
+        <dd class="first {% if request.path == inbox_url %}current{% endif %}"><a href="{% url 'inbox' %}">New Messages</a></dd>
+        <dd><a href="{% url 'inbox' %}?filter=deleted">Deleted Messages</a></dd>
+        <dd class="last"><a href="{% url 'inbox' %}?filter=read">View Archive</a></dd>
+    </dl>
     <div class="reviews-list">
         <div class="cel">
             <h3>Messages</h3>
@@ -16,12 +152,6 @@
                 {% for message in object_list %}
                     <li><a href="{{ message.get_absolute_url }}">{{ message.title }}</a></li>
                 {% endfor %}
-            </ul>
-            <h3>Filters</h3>
-            <ul>
-                <li><a href="{% url 'inbox' %}">Inbox</a></li>
-                <li><a href="{% url 'inbox' %}?filter=deleted">View Deleted Messages</a></li>
-                <li><a href="{% url 'inbox' %}?filter=read">View Read Messages</a></li>
             </ul>
             <h3>Sort by:</h3>
             <ul>

@@ -50,7 +50,7 @@
                             {% if request.user.is_authenticated %}
                                 <li class="icon icon-user">Logged in as: {{ request.user.username }}</li>
                                 <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
-                                <li class="icon icon-mail{% if has_unread_messages %}{# Could use a diff icon here? #}{% endif %} {% if request.path == inbox_url %}active{% else %}{% endif %}"><a href="{{ inbox_url }}">Inbox{% if has_unread_messages %} - {{ unread_message_count }}{% endif %}</a></li>
+                                <li class="icon icon-mail {% if has_unread_messages %}mail-unread{% endif %} {% if request.path == inbox_url %}active{% else %}{% endif %}"><a href="{{ inbox_url }}">Inbox{% if has_unread_messages %} - {{ unread_message_count }}{% endif %}</a></li>
                                 <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Logout</a></li>
                             {% else %}
                                 <li class="{% if request.path == login_url %}active{% else %}{% endif %}"><a href="{% url 'login' %}">Login</a></li>
