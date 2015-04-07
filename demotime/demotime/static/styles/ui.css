@@ -1,3 +1,18 @@
+a.button-link {
+    background:#54BB9C;
+    box-shadow:4px 4px 0 #ccc;
+    padding:5px 8px;
+    margin:0 8px;
+    display:inline-block;
+    color:#fff;
+}
+a.button-link:hover {
+    text-decoration:none;
+}
+a.button-link.alert {
+    background:#E03743;
+}
+
 .review-attachments {
     overflow:hidden;
 }
@@ -56,5 +71,6 @@
     }
 }
 
-.some {
+.mail-unread:before {
+    color:yellow;
 }

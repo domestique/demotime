@@ -4,45 +4,45 @@
 {% block styles %}
 {{ block.super }}
 <style>
-dl.messages_nav {
+dl.messages-nav {
     border:1px solid #415E73;
     display:table;
     width:auto;
     margin:0 auto 2em;
     border-radius:10px;
 }
-dl.messages_nav dt {
+dl.messages-nav dt {
     display:none;
 }
-dl.messages_nav dd {
+dl.messages-nav dd {
     margin:0;
     text-align:center;
     display:table-cell;
     box-sizing:border-box;
     border-right:1px solid #415E73;
 }
-dl.messages_nav dd a {
+dl.messages-nav dd a {
     display:inline-block;
     min-width:150px;
     padding:10px 20px;
 }
-dl.messages_nav dd.last {
+dl.messages-nav dd.last {
     border-right:0;
 }
-dl.messages_nav dd.current.first {
+dl.messages-nav dd.current.first {
     border-radius:10px 0 0 10px;
 }
-dl.messages_nav dd.current.last {
+dl.messages-nav dd.current.last {
     border-radius:0 10px 10px 0;
 }
-dl.messages_nav dd.current {
+dl.messages-nav dd.current {
     background:#54BB9C;
 }
-dl.messages_nav dd.current a {
+dl.messages-nav dd.current a {
     color:#fff;
 }
 @media screen and (max-width:680px) {
-    dl.messages_nav {
+    dl.messages-nav {
         position:relative;
         margin:40px auto;
         width:200px;
@@ -54,7 +54,7 @@ dl.messages_nav dd.current a {
         overflow:hidden;
     }
 
-    dl.messages_nav dt {
+    dl.messages-nav dt {
         position:absolute;
         display:inline-block;
         top:0;
@@ -64,7 +64,7 @@ dl.messages_nav dd.current a {
         overflow:hidden;
     }
 
-    dl.messages_nav dt:before {
+    dl.messages-nav dt:before {
         content:"v";
         display:block;
         width:40px;
@@ -78,7 +78,7 @@ dl.messages_nav dd.current a {
         cursor:pointer;
     }
 
-    dl.messages_nav dd {
+    dl.messages-nav dd {
         text-align:left;
         width:200px;
         min-width:0;
@@ -91,16 +91,16 @@ dl.messages_nav dd.current a {
         display:block;
     }
 
-    dl.messages_nav dd.current {
+    dl.messages-nav dd.current {
         height:40px;
     }
 
-    dl.messages_nav dd.current a {
+    dl.messages-nav dd.current a {
         background-color:#54BB9C;
         color:#fff;
     }
 
-    dl.messages_nav dd a {
+    dl.messages-nav dd a {
         display:block;
         padding:6px 40px 6px 6px;
         height:40px;
@@ -113,51 +113,93 @@ dl.messages_nav dd.current a {
         transition:background-color 0.125s ease;
     }
 
-    dl.messages_nav dd a:hover {
+    dl.messages-nav dd a:hover {
         background-color:#54BB9C;
         color:#fff;
     }
 
-    dl.messages_nav dd.current a:hover {
+    dl.messages-nav dd.current a:hover {
         background-color:#415E73;
         color:#fff;
     }
 
-    dl.messages_nav:hover {
+    dl.messages-nav:hover {
         height:auto;
         box-shadow:0 2px 2px gray;
     }
 
-    dl.messages_nav:hover dd {
+    dl.messages-nav:hover dd {
         height:40px;
+    }
+}
+
+.messages-list {
+    border:1px solid #ddd;
+}
+.messages-list .split {
+    padding:1em;
+    border-top:1px solid #ddd;
+    background:#fff;
+}
+.messages-list .split:first-child {
+    border-top:0;
+}
+.messages-list .split:nth-child(even) {
+    background:#fefefe;
+}
+.messages-list .split:hover {
+    background:#ffffe7;
+}
+
+@media screen and (max-width:680px) {
+    .filters {
+        display:none;
+    }
+    .messages-list .cel:first-child {
+        display:none;
     }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-    <div class="main-content">
-        <h1>Your Inbox</h1>
-    </div>
-    <dl class="messages_nav">
+<div class="messages main-content">
+    <h1>Your Inbox</h1>
+    <dl class="messages-nav">
         <dt>Menu</dt>
-        <dd class="first {% if request.path == inbox_url %}current{% endif %}"><a href="{% url 'inbox' %}">New Messages</a></dd>
-        <dd><a href="{% url 'inbox' %}?filter=deleted">Deleted Messages</a></dd>
-        <dd class="last"><a href="{% url 'inbox' %}?filter=read">View Archive</a></dd>
+        <dd class="first {% if request.path == inbox_url and not request.GET.filter %}current{% endif %}"><a href="{% url 'inbox' %}">New Messages</a></dd>
+        <dd {% if request.GET.filter == 'deleted' %}class="current"{% endif %}><a href="{% url 'inbox' %}?filter=deleted">Deleted Messages</a></dd>
+        <dd class="last {% if request.GET.filter == 'read' %}current{% endif %}"><a href="{% url 'inbox' %}?filter=read">View Archive</a></dd>
     </dl>
-    <div class="reviews-list">
-        <div class="cel">
-            <h3>Messages</h3>
-            <ul>
+    {% if object_list %}
+        <section>
+            <div class="messages-list">
+                <div class="split by:1/3 with-gap:3 filters">
+                    <div class="cel">
+                        {% if request.GET.sort == 'oldest' %}
+                            <a href="{% url 'inbox' %}?sort=newest" class="icon icon-up-dir">Date</a>
+                        {% else %}
+                            <a href="{% url 'inbox' %}?sort=oldest" class="icon icon-down-dir">Date</a>
+                        {% endif %}
+                    </div>
+                    <div class="cel">
+                        Review
+                    </div>
+                </div>
                 {% for message in object_list %}
-                    <li><a href="{{ message.get_absolute_url }}">{{ message.title }}</a></li>
+                    <div class="split by:1/3 with-gap:3">
+                        <div class="cel">
+                            {{ message.created }}
+                        </div>
+                        <div class="cel">
+                            <a href="{{ message.get_absolute_url }}">{{ message.title }}</a>
+                        </div>
+                    </div>
                 {% endfor %}
-            </ul>
-            <h3>Sort by:</h3>
-            <ul>
-                <li><a href="{% url 'inbox' %}?sort=newest">Newest</a></li>
-                <li><a href="{% url 'inbox' %}?sort=oldest">Oldest</a></li>
-            </ul>
-        </div>
-    </div>
+            </div>
+        </section>
+    {% else %}
+        There's nothing here. Enjoy your life.
+    {% endif %}
+</div>
 {% endblock %}

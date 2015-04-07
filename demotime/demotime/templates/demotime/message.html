@@ -3,21 +3,54 @@
 
 {% block styles %}
 {{ block.super }}
+<style>
+    .message section {
+        margin-top:2em;
+        overflow:hidden;
+    }
+    section .message-nav {
+        float:right;
+    }
+    .message-nav {
+        display:inline-block;
+        margin:0;
+        border-radius:5px;
+        padding:5px;
+    }
+    @media screen and (max-width:680px) {
+        .message-nav {
+            margin-top:20px;
+        }
+    }
+    .message-nav li {
+        display:inline-block;
+        list-style:none;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <div class="main-content">
-        <h1>{{ object.title }}</h1>
-    </div>
-    <div class="reviews-list">
+<div class="message">
+    <h1>{{ object.title }}</h1>
+    <ul class="message-nav">
+        <li>
+            <a href="{% url 'inbox' %}" class="button-link">Back to Inbox</a>
+        </li>
+        <li>
+            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open {{ object.review.review.title }}</a>
+        </li>
+    </ul>
+    <section>
         {{ object.message|safe|linebreaksbr }}
-
-        <ul>
-            <li><a href="{% url 'inbox' %}">Back to Inbox</a></li>
-            <li><a href="{{ object.review.get_absolute_url }}">Review {{ object.review.review.title }}</a></li>
-            <li><a href="{{ object.get_absolute_url }}?action=mark-unread">Mark Unread</a></li>
-            <li><a href="{{ object.get_absolute_url }}?action=delete">Delete</a></li>
+        <ul class="message-nav">
+            <li>
+                <a href="{{ object.get_absolute_url }}?action=mark-unread" class="button-link">Mark Unread</a>
+            </li>
+            <li>
+                <a href="{{ object.get_absolute_url }}?action=delete" class="button-link">Delete</a>
+            </li>
         </ul>
-    </div>
+    </section>
+</div>
 {% endblock %}
 
