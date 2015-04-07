@@ -12,7 +12,9 @@ class ReviewForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
-        self.fields['reviewers'].queryset = User.objects.exclude(pk=user.pk)
+        self.fields['reviewers'].queryset = User.objects.exclude(
+            pk=user.pk).exclude(username='demotime_sys')
+
         for key, value in self.fields.iteritems():
             self.fields[key].widget.attrs['class'] = 'form-control'
 

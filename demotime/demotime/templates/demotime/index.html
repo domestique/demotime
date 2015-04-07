@@ -45,9 +45,6 @@
                             <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                         {% endfor %}
                     </ul>
-                {% else %}
-                    You don't have any open demos.
-                    <a href="{% url 'create-review' %}" class="icon icon-pencil">Create a demo now</a>
                 {% endif %}
             </section>
         </div>

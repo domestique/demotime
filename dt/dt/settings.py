@@ -94,7 +94,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
     'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages'
+    'django.contrib.messages.context_processors.messages',
+    'demotime.context_processors.has_unread_messages',
+    'demotime.context_processors.unread_message_count',
 )
 
 

@@ -7,28 +7,6 @@ from django.utils.decorators import method_decorator
 from demotime import forms, models
 
 
-class IndexView(TemplateView):
-    template_name = 'demotime/index.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        return super(IndexView, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(IndexView, self).get_context_data(**kwargs)
-        context['open_demos'] = models.Review.objects.filter(
-            creator=self.request.user,
-            status=models.Review.OPEN,
-        )
-        context['open_reviews'] = models.Review.objects.filter(
-            reviewers=self.request.user,
-            status=models.Review.OPEN,
-        )
-        # TODO: Figure out how to show the recently updated ones
-        context['updated_demos'] = []
-        return context
-
-
 class ReviewDetail(DetailView):
     template_name = 'demotime/review.html'
     model = models.Review
@@ -152,7 +130,5 @@ class CreateReviewView(TemplateView):
         })
         return context
 
-
-index_view = IndexView.as_view()
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()

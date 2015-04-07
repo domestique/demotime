@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %} - Inbox {% endblock %}
+
+{% block styles %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="main-content">
+        <h1>{{ object.title }}</h1>
+    </div>
+    <div class="reviews-list">
+        {{ object.message|safe|linebreaksbr }}
+
+        <ul>
+            <li><a href="{% url 'inbox' %}">Back to Inbox</a></li>
+            <li><a href="{{ object.review.get_absolute_url }}">Review {{ object.review.review.title }}</a></li>
+            <li><a href="{{ object.get_absolute_url }}?action=mark-unread">Mark Unread</a></li>
+            <li><a href="{{ object.get_absolute_url }}?action=delete">Delete</a></li>
+        </ul>
+    </div>
+{% endblock %}
+

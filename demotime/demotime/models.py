@@ -238,11 +238,15 @@ class Message(BaseModel):
     thread = models.ForeignKey('CommentThread', null=True)
     message = models.TextField(blank=True)
     read = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'Message for {}, From {}'.format(
             self.receipient.username, self.sender.username
         )
+
+    def get_absolute_url(self):
+        return reverse('message-detail', args=[self.pk])
 
     @classmethod
     def create_message(cls, receipient, sender, title, review_revision, thread, message):

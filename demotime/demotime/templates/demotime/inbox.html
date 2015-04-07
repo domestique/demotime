@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %} - Inbox {% endblock %}
+
+{% block styles %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="main-content">
+        <h1>Your Inbox</h1>
+    </div>
+    <div class="reviews-list">
+        <div class="cel">
+            <h3>Messages</h3>
+            <ul>
+                {% for message in object_list %}
+                    <li><a href="{{ message.get_absolute_url }}">{{ message.title }}</a></li>
+                {% endfor %}
+            </ul>
+            <h3>Filters</h3>
+            <ul>
+                <li><a href="{% url 'inbox' %}">Inbox</a></li>
+                <li><a href="{% url 'inbox' %}?filter=deleted">View Deleted Messages</a></li>
+                <li><a href="{% url 'inbox' %}?filter=read">View Read Messages</a></li>
+            </ul>
+            <h3>Sort by:</h3>
+            <ul>
+                <li><a href="{% url 'inbox' %}?sort=newest">Newest</a></li>
+                <li><a href="{% url 'inbox' %}?sort=oldest">Oldest</a></li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
