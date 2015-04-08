@@ -4,7 +4,7 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install -r testing_requirements.txt
-  - pip install demotime/
+  - export PYTHONPATH=$PYTHONPATH:`pwd`/demotime
 script:
   - python dt/manage.py test
 notifications:
