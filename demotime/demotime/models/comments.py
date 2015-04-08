@@ -13,7 +13,7 @@ class CommentThread(BaseModel):
     review_revision = models.ForeignKey('ReviewRevision')
 
     def __unicode__(self):
-        return u'Comment Thread for Review: {}'.format(self.review)
+        return u'Comment Thread for Review: {}'.format(self.review_revision)
 
     @classmethod
     def create_comment_thread(cls, review_revision):
