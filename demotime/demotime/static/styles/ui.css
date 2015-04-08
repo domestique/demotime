@@ -35,6 +35,9 @@ a.button-link.alert {
     width:100%;
     height:auto;
 }
+.attachment-card img {
+    max-width:100%;
+}
 
 .summary a {
     font-size:0.8em;
