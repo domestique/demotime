@@ -1,3 +1,10 @@
+/* Fontello aliases */
+.icon-audio:before { content: '\e816'; } /* '' */
+.icon-video:before { content: '\e808'; } /* '' */
+.icon-other:before { content: '\e805'; } /* '' */
+.icon-photo:before { content: '\e806'; } /* '' */
+.icon-document:before { content: '\e801'; } /* '' */
+
 a.button-link {
     background:#54BB9C;
     box-shadow:4px 4px 0 #ccc;
