@@ -2,7 +2,6 @@ from demotime import models
 
 
 def unread_message_count(request):
-    print request.user.is_authenticated()
     if request.user.is_authenticated():
         return {
             'unread_message_count': models.Message.objects.filter(
