@@ -38,7 +38,7 @@ section {
     margin-top:.75em;
     margin-bottom:2em;
     padding:2em;
-    box-shadow:4px 4px 0 #ddd;
+    box-shadow:4px 4px 0 #ccc;
 }
 section > h2:first-child,
 section > h3:first-child,
@@ -50,7 +50,7 @@ section blockquote {
     background:#fff;
     margin:0;
     padding:1em;
-    box-shadow:4px 4px 0 #eaeaea
+    box-shadow:4px 4px 0 #ccc;
 }
 section blockquote p:first-child {
     margin:0;

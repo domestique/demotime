@@ -20,11 +20,6 @@
     .review h3 {
         margin-top:3em;
     }
-    section {
-        background:#fafafa;
-        margin-bottom:2em;
-        padding:2em;
-    }
     .manage-review {
         padding:10px;
         text-align:right;
@@ -49,6 +44,12 @@
     }
     .comments-reply {
         font-size:0.8em;
+    }
+    .comments .attachment-card {
+        margin:-13px 0;
+    }
+    .attachment-card h3 {
+        font-size:1em;
     }
     .comments-reply,
     .comments-reply_new {
@@ -143,54 +144,9 @@
         </section>
     {% else %}
         <h3 class="icon icon-attach">Attachments</h3>
-        <section class="attachment">
-            <div class="split by:2">
-                <div class="cel">
-                    {% for attachment in revision.attachments.all %}
-                        {% if attachment.attachment_type == 'document' %}
-                            <h4 class="icon icon-mail">Document:</h4>
-                            <div class="attachment-card {{ attachment.attachment_type }}">
-                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <div class="cel">
-                    {% for attachment in revision.attachments.all %}
-                        {% if attachment.attachment_type == 'other' %}
-                            <h4 class="icon icon-attach">Other:</h4>
-                            <div class="attachment-card {{ attachment.attachment_type }}">
-                                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
+        <section>
             {% for attachment in revision.attachments.all %}
-                {% if attachment.attachment_type == 'photo' %}
-                    <div class="attachment-card">
-                        <h4 class="icon icon-photo">Photo:</h4>
-                        <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="lightboxed">
-                            <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
-                        </a>
-                    </div>
-                {% endif %}
-            {% endfor %}
-            {% for attachment in revision.attachments.all %}
-                {% if attachment.attachment_type == 'movie' %}
-                    <h4 class="icon icon-videocam">Video:</h4>
-                    <div class="attachment-card {{ attachment.attachment_type }}">
-                        <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-                    </div>
-                {% endif %}
-            {% endfor %}
-            {% for attachment in revision.attachments.all %}
-                {% if attachment.attachment_type == 'audio' %}
-                    <h4 class="icon icon-music">Audio:</h4>
-                    <div class="attachment-card {{ attachment.attachment_type }}">
-                        <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-                    </div>
-                {% endif %}
+                {% include "includes/review_attachment.html" with attachment=attachment %}
             {% endfor %}
         </section>
     {% endif %}
@@ -200,25 +156,7 @@
         {% if revision.commentthread_set.all %}
             {% macro attachments %}
                 {% for attachment in comment.attachments.all %}
-                    <div class="attachment-card">
-                        {% if attachment.attachment_type == 'photo' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">
-                                <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
-                            </a>
-                        {% endif %}
-                        {% if attachment.attachment_type == 'movie' %}
-                            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" height=300 width=300 controls="true">
-                        {% endif %}
-                        {% if attachment.attachment_type == 'audio' %}
-                            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-                        {% endif %}
-                        {% if attachment.attachment_type == 'document' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
-                        {% endif %}
-                        {% if attachment.attachment_type == 'other' %}
-                            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
-                        {% endif %}
-                    </div>
+                    {% include "includes/review_attachment.html" with attachment=attachment %}
                 {% endfor %}
             {% endmacro %}
 
@@ -273,16 +211,17 @@
                         <blockquote>
                             <p>{{ comment.comment|safe|linebreaksbr }}</p>
                         </blockquote>
+                        {% usemacro attachments %}
                     {% else %}
                         <div class="comments-reply">
-                            <blockquote>
+                            <div><blockquote>
                                 <p>{{ comment.comment|safe|linebreaksbr }}</p>
                                 <h4>Reply by {{ comment.commenter }} @ {{ comment.created }}</h4>
                             </blockquote>
+                            {% usemacro attachments %}
                         </div>
                     {% endif %}
                     </div>
-                    {% usemacro attachments %}
                 {% endfor %}
                 <div class="comments-reply_new">
                     {% usemacro form %}

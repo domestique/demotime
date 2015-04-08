@@ -1,0 +1,25 @@
+<div class="attachment-card {{ attachment.attachment_type }}">
+    <section>
+        <h3 class="icon icon-{{ attachment.attachment_type }}">
+            {{ attachment.attachment_type|capfirst }}:
+            <span class="tooltip" title="Reviewer note: {{ attachment.description }}"></span>
+        </h3>
+        {% if attachment.attachment_type == "audio" %}
+            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+        {% endif %}
+        {% if attachment.attachment_type == "video" %}
+            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+        {% endif %}
+        {% if attachment.attachment_type == "photo" %}
+            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="lightboxed">
+                <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
+            </a>
+        {% endif %}
+        {% if attachment.attachment_type == "document" %}
+            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
+        {% endif %}
+        {% if attachment.attachment_type == "other" %}
+            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
+        {% endif %}
+    </section>
+</div>

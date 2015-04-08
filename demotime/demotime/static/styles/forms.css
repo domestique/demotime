@@ -46,7 +46,7 @@ textarea {
     -ms-transition: 0.3s;
     transition: 0.3s;
     border:1px solid #eee;
-    box-shadow:4px 4px 0 #eaeaea
+    box-shadow:4px 4px 0 #ccc;
 }
 textarea:focus {
     outline:none;
@@ -88,7 +88,7 @@ select[multiple="multiple"]{
     min-width:50%;
     font-size:1.4em;
     border:1px solid #eee;
-    box-shadow:4px 4px 0 #eaeaea
+    box-shadow:4px 4px 0 #ccc;
 }
 select[multiple="multiple"] option {
     color:#666;
