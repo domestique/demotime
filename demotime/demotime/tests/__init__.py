@@ -22,10 +22,12 @@ class BaseTestCase(TestCase):
                 {
                     'attachment': File(BytesIO('test_file_1')),
                     'attachment_type': 'photo',
+                    'description': 'Testing',
                 },
                 {
                     'attachment': File(BytesIO('test_file_2')),
                     'attachment_type': 'photo',
+                    'description': 'Testing',
                 },
             ],
         }

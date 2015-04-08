@@ -238,7 +238,8 @@
                         </div>
                         <div class="cel">
                             <label>Short description:</label>
-                            <input type="text" value="TODO">
+                            {{ attachment_form.description }}
+                            {{ attachment_form.description.errors }}
                         </div>
                     </div>
                     {{ form.attachment.errors }}
@@ -280,9 +281,9 @@
                             </blockquote>
                         </div>
                     {% endif %}
+                    </div>
+                    {% usemacro attachments %}
                 {% endfor %}
-                </div>
-                {% usemacro attachments %}
                 <div class="comments-reply_new">
                     {% usemacro form %}
                 </div>

@@ -57,7 +57,8 @@
                             </div>
                             <div class="cel">
                                 <label>Short description:</label>
-                                <input type="text" value="TODO">
+                                {{ form.description }}
+                                {{ form.description.errors }}
                             </div>
                             <div class="cel">
                                 {% if forloop.counter < attachment_forms|length %}

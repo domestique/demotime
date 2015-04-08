@@ -28,10 +28,12 @@ class TestReviewViews(BaseTestCase):
                 {
                     'attachment': File(BytesIO('test_file_1')),
                     'attachment_type': 'photo',
+                    'description': 'Testing',
                 },
                 {
                     'attachment': File(BytesIO('test_file_2')),
                     'attachment_type': 'photo',
+                    'description': 'Testing',
                 },
             ],
         )
@@ -82,6 +84,7 @@ class TestReviewViews(BaseTestCase):
             'form-MAX_NUM_FORMS': 5,
             'form-0-attachment': fh,
             'form-0-attachment_type': 'photo',
+            'form-0-description': 'Test Description',
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
@@ -91,6 +94,9 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.case_link, 'http://www.example.org')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 1)
+        attachment = obj.revision.attachments.get()
+        self.assertEqual(attachment.attachment_type, 'photo')
+        self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(
             models.Message.objects.filter(title__contains='POST').count(),
             3
@@ -115,6 +121,7 @@ class TestReviewViews(BaseTestCase):
             'form-MAX_NUM_FORMS': 5,
             'form-0-attachment': fh,
             'form-0-attachment_type': 'photo',
+            'form-0-description': 'Test Description',
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
@@ -125,6 +132,9 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 1)
+        attachment = obj.revision.attachments.get()
+        self.assertEqual(attachment.attachment_type, 'photo')
+        self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(obj.reviewrevision_set.count(), 2)
         self.assertEqual(
             models.Message.objects.filter(title__contains='Update Review POST').count(),
@@ -153,6 +163,7 @@ class TestReviewViews(BaseTestCase):
             'comment': "Oh nice demo!",
             'attachment': fh,
             'attachment_type': 'photo',
+            'description': 'Test Description',
         })
         self.assertStatusCode(response, 302)
         rev = self.review.revision
@@ -167,6 +178,7 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(comment.attachments.count(), 1)
         attachment = comment.attachments.get()
         self.assertEqual(attachment.attachment_type, models.Attachment.PHOTO)
+        self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
             3

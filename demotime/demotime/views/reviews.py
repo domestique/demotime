@@ -36,7 +36,7 @@ class ReviewDetail(DetailView):
 
     def post(self, request, *args, **kwargs):
         thread = None
-        if 'thread' in request.POST:
+        if request.POST.get('thread'):
             if self.revision.commentthread_set.filter(
                     pk=request.POST.get('thread')
             ):
@@ -89,6 +89,7 @@ class CreateReviewView(TemplateView):
                     data['attachments'].append({
                         'attachment': form.cleaned_data['attachment'],
                         'attachment_type': form.cleaned_data['attachment_type'],
+                        'description': form.cleaned_data['description'],
                     })
 
             if pk:

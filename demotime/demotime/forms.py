@@ -64,3 +64,8 @@ class AttachmentForm(forms.Form):
         choices=models.Attachment.ATTACHMENT_TYPE_CHOICES,
         widget=forms.Select
     )
+    description = forms.CharField(
+        required=False,
+        widget=forms.widgets.TextInput(attrs={'class': 'form-control'}),
+        max_length=2048
+    )
