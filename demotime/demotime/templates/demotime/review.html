@@ -91,7 +91,7 @@
         <ul>
             {% if request.user == object.creator %}
                 <li><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Update demo</a></li>
-                <li><a href="#" class="button-link icon icon-ok">Close demo</a></li>
+                <li><a href="#" class="button-link alert icon icon-ok">Close demo</a></li>
             {% else %}
                 <li><a href="#" class="button-link icon icon-thumbs-up-1">Accept demo</a></li>
                 <li><a href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
