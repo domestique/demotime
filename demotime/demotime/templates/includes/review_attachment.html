@@ -2,7 +2,7 @@
     <section>
         <h3 class="icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
-            <span class="tooltip" title="Reviewer note: {{ attachment.description }}"></span>
+            <span class="tooltip alert" title="Reviewer note: {{ attachment.description }}"></span>
         </h3>
         {% if attachment.attachment_type == "audio" %}
             <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
