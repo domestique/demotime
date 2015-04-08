@@ -1,4 +1,6 @@
-Demotime application idea I'm fleshing out
+[![Build Status](https://travis-ci.org/f4nt/demotime.svg?branch=master)](https://travis-ci.org/f4nt/demotime)
+
+Demotime application idea we're fleshing out
 
 Getting Started
 =====================================
