@@ -1,0 +1,18 @@
+<div class="cel">
+    <label>File type:</label>
+    {% for select in form.attachment_type %}
+        <div>
+            {{ select }}
+        </div>
+    {% endfor %}
+</div>
+<div class="cel">
+    <label>Attach your file:</label>
+    {{ form.attachment }}
+    {{ form.attachment.errors }}
+</div>
+<div class="cel">
+    <label>Short description:</label>
+    {{ form.description }}
+    {{ form.description.errors }}
+</div>

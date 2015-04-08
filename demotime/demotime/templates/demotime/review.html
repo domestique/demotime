@@ -163,22 +163,7 @@
             {% macro attachment %}
                 <section>
                     <div class="split~680 by:3 with-gap:3">
-                        <div class="cel">
-                            <label>File type:</label>
-                            {% for select in attachment_form.attachment_type %}
-                                <div>{{ select }}</div>
-                            {% endfor %}
-                        </div>
-                        <div class="cel">
-                            <label>Attach your file:</label>
-                            {{ attachment_form.attachment }}
-                            {{ attachment_form.attachment.errors }}
-                        </div>
-                        <div class="cel">
-                            <label>Short description:</label>
-                            {{ attachment_form.description }}
-                            {{ attachment_form.description.errors }}
-                        </div>
+                        {% include "includes/attachments_form.html" with form=attachment_form %}
                     </div>
                     {{ form.attachment.errors }}
                 </section>
@@ -191,7 +176,7 @@
                     {{ comment_form.comment }}
                     {{ comment_form.comment.errors }}
                     <div class="summary">
-                        <label class="icon icon-attach" for="{{ attachment_form.attachment.id_for_label }}">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add)</a></label>
+                        <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
                     </div>
                     <div class="toggled_text attachments">
                         {% usemacro attachment %}
