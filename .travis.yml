@@ -4,7 +4,7 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install -r testing_requirements.txt
-  - python demotime/setup.py develop
+  - pip install demotime/
 script:
   - python dt/manage.py test
 notifications:
