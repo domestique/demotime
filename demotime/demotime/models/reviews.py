@@ -56,29 +56,38 @@ class Review(BaseModel):
     def get_absolute_url(self):
         return self.revision.get_absolute_url()
 
-    def _send_messages(self, update=False):
+    def _send_message(self, title, template_name, context_dict, receipient):
         system_user = User.objects.get(username='demotime_sys')
+        context_dict['sender'] = system_user
+        msg_text = loader.get_template(
+            template_name
+        ).render(Context(context_dict))
+        Message.create_message(
+            receipient=receipient,
+            sender=system_user,
+            title=title,
+            review_revision=self.revision,
+            message=msg_text,
+            thread=None
+        )
+
+    def _send_revision_messages(self, update=False):
         title = 'New Review: {}'.format(self.title)
         if update:
             title = 'Update on Review: {}'.format(self.title)
 
         for reviewer in self.reviewers.all():
-            msg_template = loader.get_template('demotime/messages/review.html')
-            context = Context({
+            context = {
                 'receipient': reviewer,
-                'sender': system_user,
                 'url': self.get_absolute_url(),
                 'update': update,
                 'title': self.title,
-            })
-            msg_text = msg_template.render(context)
-            Message.create_message(
-                receipient=reviewer,
-                sender=system_user,
-                title=title,
-                review_revision=self.revision,
-                message=msg_text,
-                thread=None,
+            }
+            self._send_message(
+                title,
+                'demotime/messages/review.html',
+                context,
+                reviewer,
             )
 
     @classmethod
@@ -108,7 +117,7 @@ class Review(BaseModel):
         for reviewer in reviewers:
             Reviewer.create_reviewer(obj, reviewer)
 
-        obj._send_messages()
+        obj._send_revision_messages()
         return obj
 
     @classmethod
@@ -141,12 +150,38 @@ class Review(BaseModel):
         # TODO: Send a message here?
         Reviewer.objects.exclude(reviewer__in=reviewers).delete()
 
-        obj._send_messages()
+        obj._send_revision_messages()
         return obj
 
     def _change_reviewer_state(self, state):
+        previous_state = self.get_reviewer_state_display()
         self.reviewer_state = state
         self.save(update_fields=['reviewer_state'])
+        if state == APPROVED:
+            self._send_message(
+                '"{}" has been Approved!',
+                'demotime/messages/approved.html',
+                {'review': self},
+                self.creator
+            )
+        elif state == REJECTED:
+            self._send_message(
+                '"{}" has been Rejected',
+                'demotime/messages/rejected.html',
+                {'review': self},
+                self.creator
+            )
+        elif state == REVIEWING:
+            self._send_message(
+                '"{}" is back Under Review',
+                'demotime/messages/reviewing.html',
+                {'review': self, 'previous_state': previous_state},
+                self.creator
+            )
+        else:
+            # Uhh, how'd we get here, eh?
+            1/0
+            pass
 
     def update_reviewer_state(self):
         statuses = self.reviewer_set.values_list('status', flat=True)

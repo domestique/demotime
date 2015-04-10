@@ -71,6 +71,8 @@ class TestDemoTimeModels(BaseTestCase):
         obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.APPROVED)
+        msg = models.Message.objects.get(review=obj, receipient=obj.creator)
+        self.assertEqual(msg.title, '"{}" has been Approved!')
 
     def test_update_reviewer_state_rejected(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -78,16 +80,22 @@ class TestDemoTimeModels(BaseTestCase):
         obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
+        msg = models.Message.objects.get(review=obj, receipient=obj.creator)
+        self.assertEqual(msg.title, '"{}" has been Rejected')
 
-    def test_update_reviewer_state_undecided(self):
+    def test_update_reviewer_state_reviewing(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.reviewer_set.update(status=models.reviews.REJECTED)
+        obj.reviewer_state = models.reviews.REJECTED
+        obj.save(update_fields=['reviewer_state'])
         undecided_person = obj.reviewer_set.all()[0]
         undecided_person.status = models.reviews.REVIEWING
         undecided_person.save()
         obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
+        msg = models.Message.objects.get(review=obj, receipient=obj.creator)
+        self.assertEqual(msg.title, '"{}" is back Under Review')
 
     def test_create_comment_thread(self):
         review = models.Review.create_review(**self.default_review_kwargs)
