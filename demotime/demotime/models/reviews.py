@@ -8,15 +8,26 @@ from .attachments import Attachment
 from .base import BaseModel
 from .messages import Message
 
+REVIEWING = 'reviewing'
+REJECTED = 'rejected'
+APPROVED = 'approved'
+OPEN = 'open'
+CLOSED = 'closed'
+ABORTED = 'aborted'
+
 
 class Review(BaseModel):
 
-    OPEN = 'open'
-    CLOSED = 'closed'
-
     STATUS_CHOICES = (
-        (OPEN, 'Open'),
-        (CLOSED, 'Closed')
+        (OPEN, OPEN.capitalize()),
+        (CLOSED, CLOSED.capitalize()),
+        (ABORTED, ABORTED.capitalize()),
+    )
+
+    REVIEWER_STATE_CHOICES = (
+        (REVIEWING, REVIEWING.capitalize()),
+        (APPROVED, APPROVED.capitalize()),
+        (REJECTED, REJECTED.capitalize()),
     )
 
     creator = models.ForeignKey('auth.User', related_name='creator')
@@ -28,9 +39,13 @@ class Review(BaseModel):
     title = models.CharField(max_length=1024)
     description = models.TextField()
     case_link = models.CharField(max_length=2048, blank=True)
-    status = models.CharField(
+    state = models.CharField(
         max_length=128, choices=STATUS_CHOICES,
-        default='open', db_index=True
+        default=OPEN, db_index=True
+    )
+    reviewer_state = models.CharField(
+        max_length=128, choices=REVIEWER_STATE_CHOICES,
+        default=REVIEWING, db_index=True
     )
 
     def __unicode__(self):
@@ -76,7 +91,8 @@ class Review(BaseModel):
             title=title,
             description=description,
             case_link=case_link,
-            status=cls.OPEN,
+            state=OPEN,
+            reviewer_state=REVIEWING,
         )
         rev = ReviewRevision.objects.create(
             review=obj,
@@ -90,11 +106,7 @@ class Review(BaseModel):
                 content_object=rev,
             )
         for reviewer in reviewers:
-            Reviewer.objects.create(
-                review=obj,
-                reviewer=reviewer,
-                status=Reviewer.REVIEWING,
-            )
+            Reviewer.create_reviewer(obj, reviewer)
 
         obj._send_messages()
         return obj
@@ -120,14 +132,33 @@ class Review(BaseModel):
                 content_object=rev,
             )
         for reviewer in reviewers:
-            Reviewer.objects.get_or_create(
-                review=obj,
-                reviewer=reviewer,
-                defaults={'status': Reviewer.REVIEWING}
-            )
+            try:
+                Reviewer.objects.get(review=obj, reviewer=reviewer)
+            except Reviewer.DoesNotExist:
+                Reviewer.create_reviewer(obj, reviewer)
+
+        # Drop people that were removed
+        # TODO: Send a message here?
+        Reviewer.objects.exclude(reviewer__in=reviewers).delete()
 
         obj._send_messages()
         return obj
+
+    def _change_reviewer_state(self, state):
+        self.reviewer_state = state
+        self.save(update_fields=['reviewer_state'])
+
+    def update_reviewer_state(self):
+        statuses = self.reviewer_set.values_list('status', flat=True)
+        approved = all(status == APPROVED for status in statuses)
+        rejected = all(status == REJECTED for status in statuses)
+        reviewing = not approved and not rejected
+        if approved and self.reviewer_state != APPROVED:
+            self._change_reviewer_state(APPROVED)
+        elif rejected and self.reviewer_state != REJECTED:
+            self._change_reviewer_state(REJECTED)
+        elif reviewing and self.reviewer_state != REVIEWING:
+            self._change_reviewer_state(REVIEWING)
 
     @property
     def revision(self):
@@ -136,14 +167,10 @@ class Review(BaseModel):
 
 class Reviewer(BaseModel):
 
-    REVIEWING = 'reviewing'
-    REJECTED = 'rejected'
-    ACCEPTED = 'accepted'
-
     STATUS_CHOICES = (
-        (REVIEWING, 'Reviewing'),
-        (REJECTED, 'Rejected'),
-        (ACCEPTED, 'Accepted')
+        (REVIEWING, REVIEWING.capitalize()),
+        (REJECTED, REJECTED.capitalize()),
+        (APPROVED, APPROVED.capitalize())
     )
 
     review = models.ForeignKey('Review')
@@ -152,6 +179,18 @@ class Reviewer(BaseModel):
         max_length=128, choices=STATUS_CHOICES,
         default='reviewing', db_index=True
     )
+
+    @classmethod
+    def create_reviewer(cls, review, reviewer):
+        return cls.objects.create(
+            review=review,
+            reviewer=reviewer,
+            status=REVIEWING
+        )
+
+    def set_status(self, status):
+        self.status = status
+        self.save(update_fields=['status'])
 
 
 class ReviewRevision(BaseModel):

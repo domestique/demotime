@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import models
@@ -15,6 +16,8 @@ class TestDemoTimeModels(BaseTestCase):
         self.assertEqual(obj.case_link, 'http://example.org/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
 
     def test_update_review(self):
         review_kwargs = self.default_review_kwargs.copy()
@@ -33,6 +36,58 @@ class TestDemoTimeModels(BaseTestCase):
         self.assertEqual(new_obj.description, 'Test Description')
         self.assertEqual(new_obj.revision.description, 'New Description')
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
+
+    def test_create_reviewer(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.reviewer_set.all().delete()
+        user = User.objects.get(username='test_user_0')
+        reviewer = models.Reviewer.create_reviewer(obj, user)
+        self.assertEqual(reviewer.status, models.reviews.REVIEWING)
+        self.assertEqual(reviewer.review.pk, obj.pk)
+        self.assertEqual(reviewer.reviewer.pk, user.pk)
+
+    def test_set_status(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        reviewer = obj.reviewer_set.all()[0]
+        reviewer.set_status(models.reviews.APPROVED)
+        self.assertEqual(
+            models.Reviewer.objects.get(pk=reviewer.pk).status,
+            models.reviews.APPROVED
+        )
+        reviewer.set_status(models.reviews.REJECTED)
+        self.assertEqual(
+            models.Reviewer.objects.get(pk=reviewer.pk).status,
+            models.reviews.REJECTED
+        )
+        reviewer.set_status(models.reviews.REVIEWING)
+        self.assertEqual(
+            models.Reviewer.objects.get(pk=reviewer.pk).status,
+            models.reviews.REVIEWING
+        )
+
+    def test_update_reviewer_state_approved(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.reviewer_set.update(status=models.reviews.APPROVED)
+        obj.update_reviewer_state()
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.reviewer_state, models.reviews.APPROVED)
+
+    def test_update_reviewer_state_rejected(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.reviewer_set.update(status=models.reviews.REJECTED)
+        obj.update_reviewer_state()
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
+
+    def test_update_reviewer_state_undecided(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.reviewer_set.update(status=models.reviews.REJECTED)
+        undecided_person = obj.reviewer_set.all()[0]
+        undecided_person.status = models.reviews.REVIEWING
+        undecided_person.save()
+        obj.update_reviewer_state()
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
 
     def test_create_comment_thread(self):
         review = models.Review.create_review(**self.default_review_kwargs)

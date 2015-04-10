@@ -16,11 +16,11 @@ class IndexView(TemplateView):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['open_demos'] = models.Review.objects.filter(
             creator=self.request.user,
-            status=models.Review.OPEN,
+            state=models.reviews.OPEN,
         )
         context['open_reviews'] = models.Review.objects.filter(
             reviewers=self.request.user,
-            status=models.Review.OPEN,
+            state=models.reviews.OPEN,
         )
         # TODO: Figure out how to show the recently updated ones
         context['updated_demos'] = []
