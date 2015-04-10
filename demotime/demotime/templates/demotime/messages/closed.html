@@ -1,0 +1,6 @@
+Hello {{ reviewer }},
+
+The review, <a href="{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're reviewing has changed from {{ prev_state }} to {{ review.state.get_state_display }} and is now closed. 
+
+Thanks,
+{{ sender }}

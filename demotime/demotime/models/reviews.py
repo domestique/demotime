@@ -159,21 +159,21 @@ class Review(BaseModel):
         self.save(update_fields=['reviewer_state'])
         if state == APPROVED:
             self._send_message(
-                '"{}" has been Approved!',
+                '"{}" has been Approved!'.format(self.title),
                 'demotime/messages/approved.html',
                 {'review': self},
                 self.creator
             )
         elif state == REJECTED:
             self._send_message(
-                '"{}" has been Rejected',
+                '"{}" has been Rejected'.format(self.title),
                 'demotime/messages/rejected.html',
                 {'review': self},
                 self.creator
             )
         elif state == REVIEWING:
             self._send_message(
-                '"{}" is back Under Review',
+                '"{}" is back Under Review'.format(self.title),
                 'demotime/messages/reviewing.html',
                 {'review': self, 'previous_state': previous_state},
                 self.creator
@@ -194,6 +194,44 @@ class Review(BaseModel):
             self._change_reviewer_state(REJECTED)
         elif reviewing and self.reviewer_state != REVIEWING:
             self._change_reviewer_state(REVIEWING)
+
+    def _reopen_review(self, state):
+        # We take a state because this can be closed or aborted, it's okay
+        # we don't judge
+        prev_state = self.get_state_display()
+        self.state = state
+        self.save(update_fields=['state'])
+        for reviewer in self.reviewers.all():
+            self._send_message(
+                '"{}" has been Reopened'.format(self.title),
+                'demotime/messages/reopened.html',
+                {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
+                reviewer,
+            )
+
+    def _close_review(self, state):
+        # We take a state because this can be closed or aborted, it's okay
+        # we don't judge
+        prev_state = self.get_state_display()
+        self.state = state
+        self.save(update_fields=['state'])
+        for reviewer in self.reviewers.all():
+            self._send_message(
+                '"{}" has been {}'.format(self.title, state.capitalize()),
+                'demotime/messages/closed.html',
+                {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
+                reviewer,
+            )
+
+    def update_state(self, new_state):
+        if self.state == OPEN and new_state == CLOSED:
+            self._close_review(new_state)
+        elif self.state == OPEN and new_state == ABORTED:
+            self._close_review(new_state)
+        elif self.state == CLOSED and new_state == OPEN:
+            self._reopen_review(new_state)
+        elif self.state == ABORTED and new_state == OPEN:
+            self._reopen_review(new_state)
 
     @property
     def revision(self):

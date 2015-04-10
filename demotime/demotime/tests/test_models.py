@@ -72,7 +72,7 @@ class TestDemoTimeModels(BaseTestCase):
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.APPROVED)
         msg = models.Message.objects.get(review=obj, receipient=obj.creator)
-        self.assertEqual(msg.title, '"{}" has been Approved!')
+        self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
 
     def test_update_reviewer_state_rejected(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -81,7 +81,7 @@ class TestDemoTimeModels(BaseTestCase):
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
         msg = models.Message.objects.get(review=obj, receipient=obj.creator)
-        self.assertEqual(msg.title, '"{}" has been Rejected')
+        self.assertEqual(msg.title, '"{}" has been Rejected'.format(obj.title))
 
     def test_update_reviewer_state_reviewing(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -95,7 +95,66 @@ class TestDemoTimeModels(BaseTestCase):
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
         msg = models.Message.objects.get(review=obj, receipient=obj.creator)
-        self.assertEqual(msg.title, '"{}" is back Under Review')
+        self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
+
+    def test_review_state_change_closed(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.update_state(models.reviews.CLOSED)
+        # refresh it
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.state, models.reviews.CLOSED)
+        msgs = models.Message.objects.filter(
+            review=obj,
+            title='"{}" has been {}'.format(
+                obj.title, models.reviews.CLOSED.capitalize()
+            )
+        )
+        self.assertEqual(msgs.count(), 3)
+
+    def test_review_state_change_aborted(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.update_state(models.reviews.ABORTED)
+        # refresh it
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.state, models.reviews.ABORTED)
+        msgs = models.Message.objects.filter(review=obj)
+        msgs = models.Message.objects.filter(
+            review=obj,
+            title='"{}" has been {}'.format(
+                obj.title, models.reviews.ABORTED.capitalize()
+            )
+        )
+        self.assertEqual(msgs.count(), 3)
+
+    def test_review_state_change_closed_to_open(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.state = models.reviews.CLOSED
+        obj.save(update_fields=['state'])
+        obj.update_state(models.reviews.OPEN)
+        # refresh it
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.state, models.reviews.OPEN)
+        msgs = models.Message.objects.filter(review=obj)
+        msgs = models.Message.objects.filter(
+            review=obj,
+            title='"{}" has been Reopened'.format(obj.title)
+        )
+        self.assertEqual(msgs.count(), 3)
+
+    def test_review_state_change_aborted_to_open(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.state = models.reviews.ABORTED
+        obj.save(update_fields=['state'])
+        obj.update_state(models.reviews.OPEN)
+        # refresh it
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.state, models.reviews.OPEN)
+        msgs = models.Message.objects.filter(review=obj)
+        msgs = models.Message.objects.filter(
+            review=obj,
+            title='"{}" has been Reopened'.format(obj.title)
+        )
+        self.assertEqual(msgs.count(), 3)
 
     def test_create_comment_thread(self):
         review = models.Review.create_review(**self.default_review_kwargs)
