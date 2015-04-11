@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from demotime import forms, models
+from . import JsonView
 
 
 class ReviewDetail(DetailView):
@@ -29,6 +30,16 @@ class ReviewDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ReviewDetail, self).get_context_data(**kwargs)
+        try:
+            reviewer = models.Reviewer.objects.get(
+                review=self.revision.review,
+                reviewer=self.request.user
+            )
+        except models.Reviewer.DoesNotExist:
+            reviewer = None
+        else:
+            context['reviewer_status_form'] = forms.ReviewerStatusForm(reviewer)
+
         context['revision'] = self.revision
         context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
         context['attachment_form'] = self.attachment_form if self.attachment_form else forms.AttachmentForm()
@@ -131,5 +142,34 @@ class CreateReviewView(TemplateView):
         })
         return context
 
+
+class ReviewerStatusView(JsonView):
+
+    status = 200
+
+    def post(self, *args, **kwargs):
+        reviewer_pk = kwargs['reviewer_pk']
+        reviewer = get_object_or_404(models.Reviewer, pk=reviewer_pk)
+        form = forms.ReviewerStatusForm(reviewer, data=self.request.POST)
+        if form.is_valid() and self.request.user == reviewer.reviewer:
+            state_changed, new_state = reviewer.set_status(
+                form.cleaned_data['status']
+            )
+            return {
+                'reviewer_state_changed': state_changed,
+                'new_state': new_state,
+                'reviewer_status': form.cleaned_data['status'],
+                'success': True,
+            }
+        else:
+            self.status = 400
+            return {
+                'reviewer_state_changed': False,
+                'new_state': '',
+                'reviewer_status': reviewer.status,
+                'success': False,
+            }
+
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
+reviewer_status_view = ReviewerStatusView.as_view()

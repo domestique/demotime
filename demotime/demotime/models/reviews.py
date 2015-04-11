@@ -190,10 +190,15 @@ class Review(BaseModel):
         reviewing = not approved and not rejected
         if approved and self.reviewer_state != APPROVED:
             self._change_reviewer_state(APPROVED)
+            return True, APPROVED
         elif rejected and self.reviewer_state != REJECTED:
             self._change_reviewer_state(REJECTED)
+            return True, REJECTED
         elif reviewing and self.reviewer_state != REVIEWING:
             self._change_reviewer_state(REVIEWING)
+            return True, REVIEWING
+
+        return False, ''
 
     def _reopen_review(self, state):
         # We take a state because this can be closed or aborted, it's okay
@@ -264,6 +269,7 @@ class Reviewer(BaseModel):
     def set_status(self, status):
         self.status = status
         self.save(update_fields=['status'])
+        return self.review.update_reviewer_state()
 
 
 class ReviewRevision(BaseModel):

@@ -1,5 +1,7 @@
+import json
 from StringIO import StringIO
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import BytesIO, File
 
@@ -50,6 +52,22 @@ class TestReviewViews(BaseTestCase):
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
         self.assertTemplateUsed(response, 'demotime/review.html')
+        # We're the creator, not a reviewer
+        self.assertNotIn('reviewer_status_form', response.context)
+
+    def test_get_review_detail_as_reviewer(self):
+        self.client.logout()
+        self.client.login(username='test_user_0', password='testing')
+        response = self.client.get(reverse('review-detail', args=[self.review.pk]))
+        self.assertStatusCode(response, 200)
+        self.assertEqual(response.context['object'].pk, self.review.pk)
+        self.assertTemplateUsed(response, 'demotime/review.html')
+        # We're the reviewer
+        self.assertIn('reviewer_status_form', response.context)
+        reviewer_form = response.context['reviewer_status_form']
+        self.assertTrue(reviewer_form.fields['reviewer'].queryset.filter(
+            reviewer__username='test_user_0'
+        ).exists())
 
     def test_get_review_login_required(self):
         self.client.logout()
@@ -229,3 +247,106 @@ class TestReviewViews(BaseTestCase):
         self.assertTrue(
             new_thread.comment_set.filter(comment='New Comment!').exists()
         )
+
+    def test_update_reviewer_status(self):
+        user = User.objects.get(username='test_user_0')
+        self.client.logout()
+        self.client.login(username=user.username, password='testing')
+        reviewer = models.Reviewer.objects.get(
+            review=self.review,
+            reviewer=user,
+        )
+        url = reverse(
+            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+        )
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'reviewer': reviewer.pk,
+            'status': models.reviews.APPROVED
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'reviewer_state_changed': False,
+            'new_state': '',
+            'reviewer_status': models.reviews.APPROVED,
+            'success': True
+        })
+
+    def test_update_reviewer_status_failure(self):
+        user = User.objects.get(username='test_user_0')
+        self.client.logout()
+        self.client.login(username=user.username, password='testing')
+        reviewer = models.Reviewer.objects.get(
+            review=self.review,
+            reviewer=user,
+        )
+        url = reverse(
+            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+        )
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'reviewer': reviewer.pk,
+            'status': 'BOGUS',
+        })
+        self.assertStatusCode(response, 400)
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'reviewer_state_changed': False,
+            'new_state': '',
+            'reviewer_status': reviewer.status,
+            'success': False,
+        })
+
+    def test_update_reviewer_status_state_change(self):
+        self.review.reviewer_set.update(status=models.reviews.APPROVED)
+        user = User.objects.get(username='test_user_0')
+        self.client.logout()
+        self.client.login(username=user.username, password='testing')
+        reviewer = models.Reviewer.objects.get(
+            review=self.review,
+            reviewer=user,
+        )
+        reviewer.status = models.reviews.REVIEWING
+        reviewer.save(update_fields=['status'])
+        reviewer = models.Reviewer.objects.get(pk=reviewer.pk)
+        self.assertEqual(self.review.reviewer_state, models.reviews.REVIEWING)
+        self.assertEqual(reviewer.status, models.reviews.REVIEWING)
+        url = reverse('update-reviewer-status', kwargs={
+            'review_pk': self.review.pk, 'reviewer_pk': reviewer.pk
+        })
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'reviewer': reviewer.pk,
+            'status': models.reviews.APPROVED
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'reviewer_state_changed': True,
+            'new_state': models.reviews.APPROVED,
+            'reviewer_status': models.reviews.APPROVED,
+            'success': True
+        })
+
+    def test_update_reviewer_status_failure_wrong_user(self):
+        reviewer = models.Reviewer.objects.get(
+            review=self.review,
+            reviewer=self.test_users[0],
+        )
+        url = reverse(
+            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+        )
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'reviewer': reviewer.pk,
+            'status': 'BOGUS',
+        })
+        self.assertStatusCode(response, 400)
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'reviewer_state_changed': False,
+            'new_state': '',
+            'reviewer_status': reviewer.status,
+            'success': False,
+        })

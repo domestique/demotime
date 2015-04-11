@@ -69,3 +69,17 @@ class AttachmentForm(forms.Form):
         widget=forms.widgets.TextInput(attrs={'class': 'form-control'}),
         max_length=2048
     )
+
+
+class ReviewerStatusForm(forms.Form):
+
+    status = forms.ChoiceField(choices=models.Reviewer.STATUS_CHOICES)
+    review = forms.ModelChoiceField(queryset=models.Review.objects.none)
+    reviewer = forms.ModelChoiceField(queryset=models.Reviewer.objects.none)
+
+    def __init__(self, reviewer, *args, **kwargs):
+        super(ReviewerStatusForm, self).__init__(*args, **kwargs)
+        self.fields['review'].queryset = models.Review.objects.filter(
+            pk=reviewer.review.pk)
+        self.fields['reviewer'].queryset = models.Reviewer.objects.filter(
+            pk=reviewer.pk)
