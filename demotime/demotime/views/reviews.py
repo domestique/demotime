@@ -38,7 +38,12 @@ class ReviewDetail(DetailView):
         except models.Reviewer.DoesNotExist:
             reviewer = None
         else:
-            context['reviewer_status_form'] = forms.ReviewerStatusForm(reviewer)
+            context['reviewer_status_form'] = forms.ReviewerStatusForm(
+                reviewer, initial={
+                    'reviewer': reviewer,
+                    'review': reviewer.review
+                }
+            )
 
         context['revision'] = self.revision
         context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
