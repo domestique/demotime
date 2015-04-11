@@ -74,8 +74,14 @@ class AttachmentForm(forms.Form):
 class ReviewerStatusForm(forms.Form):
 
     status = forms.ChoiceField(choices=models.Reviewer.STATUS_CHOICES)
-    review = forms.ModelChoiceField(queryset=models.Review.objects.none)
-    reviewer = forms.ModelChoiceField(queryset=models.Reviewer.objects.none)
+    review = forms.ModelChoiceField(
+        queryset=models.Review.objects.none,
+        widget=forms.widgets.HiddenInput
+    )
+    reviewer = forms.ModelChoiceField(
+        queryset=models.Reviewer.objects.none,
+        widget=forms.widgets.HiddenInput
+    )
 
     def __init__(self, reviewer, *args, **kwargs):
         super(ReviewerStatusForm, self).__init__(*args, **kwargs)
