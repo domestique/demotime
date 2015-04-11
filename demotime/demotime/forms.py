@@ -89,3 +89,18 @@ class ReviewerStatusForm(forms.Form):
             pk=reviewer.review.pk)
         self.fields['reviewer'].queryset = models.Reviewer.objects.filter(
             pk=reviewer.pk)
+
+
+class ReviewStateForm(forms.Form):
+
+    state = forms.ChoiceField(choices=models.Review.STATUS_CHOICES)
+    review = forms.ModelChoiceField(
+        queryset=models.Review.objects.none()
+    )
+
+    def __init__(self, user, review_pk, *args, **kwargs):
+        super(ReviewStateForm, self).__init__(*args, **kwargs)
+        self.fields['review'].queryset = models.Review.objects.filter(
+            creator=user,
+            pk=review_pk
+        )

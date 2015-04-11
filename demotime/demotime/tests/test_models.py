@@ -109,9 +109,13 @@ class TestDemoTimeModels(BaseTestCase):
         self.assertFalse(changed)
         self.assertEqual(new_state, '')
 
+    def test_review_state_unchanged(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertFalse(obj.update_state(models.reviews.OPEN))
+
     def test_review_state_change_closed(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
-        obj.update_state(models.reviews.CLOSED)
+        self.assertTrue(obj.update_state(models.reviews.CLOSED))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.CLOSED)
@@ -125,7 +129,7 @@ class TestDemoTimeModels(BaseTestCase):
 
     def test_review_state_change_aborted(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
-        obj.update_state(models.reviews.ABORTED)
+        self.assertTrue(obj.update_state(models.reviews.ABORTED))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.ABORTED)
@@ -142,7 +146,7 @@ class TestDemoTimeModels(BaseTestCase):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.state = models.reviews.CLOSED
         obj.save(update_fields=['state'])
-        obj.update_state(models.reviews.OPEN)
+        self.assertTrue(obj.update_state(models.reviews.OPEN))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
@@ -157,7 +161,7 @@ class TestDemoTimeModels(BaseTestCase):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.state = models.reviews.ABORTED
         obj.save(update_fields=['state'])
-        obj.update_state(models.reviews.OPEN)
+        self.assertTrue(obj.update_state(models.reviews.OPEN))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)

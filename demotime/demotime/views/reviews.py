@@ -45,6 +45,18 @@ class ReviewDetail(DetailView):
                 }
             )
 
+        if self.request.user == self.revision.review.creator:
+            context['review_state_form'] = forms.ReviewStateForm(
+                self.request.user,
+                self.revision.review.pk,
+                initial={'review': self.revision.review}
+            )
+
+        if self.revision.review.reviewer_set.filter(reviewer=self.request.user).exists():
+            context['reviewer'] = self.revision.review.reviewer_set.get(
+                reviewer=self.request.user
+            )
+
         context['revision'] = self.revision
         context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
         context['attachment_form'] = self.attachment_form if self.attachment_form else forms.AttachmentForm()
@@ -154,9 +166,11 @@ class ReviewerStatusView(JsonView):
 
     def post(self, *args, **kwargs):
         reviewer_pk = kwargs['reviewer_pk']
-        reviewer = get_object_or_404(models.Reviewer, pk=reviewer_pk)
+        reviewer = get_object_or_404(
+            models.Reviewer, pk=reviewer_pk, reviewer=self.request.user
+        )
         form = forms.ReviewerStatusForm(reviewer, data=self.request.POST)
-        if form.is_valid() and self.request.user == reviewer.reviewer:
+        if form.is_valid():
             state_changed, new_state = reviewer.set_status(
                 form.cleaned_data['status']
             )
@@ -165,6 +179,7 @@ class ReviewerStatusView(JsonView):
                 'new_state': new_state,
                 'reviewer_status': form.cleaned_data['status'],
                 'success': True,
+                'errors': {},
             }
         else:
             self.status = 400
@@ -173,8 +188,36 @@ class ReviewerStatusView(JsonView):
                 'new_state': '',
                 'reviewer_status': reviewer.status,
                 'success': False,
+                'errors': form.errors,
+            }
+
+
+class ReviewStateView(JsonView):
+
+    status = 200
+
+    def post(self, *args, **kwargs):
+        review_pk = kwargs['pk']
+        review = get_object_or_404(models.Review, pk=review_pk)
+        form = forms.ReviewStateForm(self.request.user, review.pk, data=self.request.POST)
+        if form.is_valid():
+            changed = review.update_state(form.cleaned_data['state'])
+            return {
+                'state': review.state,
+                'state_changed': changed,
+                'success': True,
+                'errors': {},
+            }
+        else:
+            self.status = 400
+            return {
+                'state': review.state,
+                'state_changed': False,
+                'success': False,
+                'errors': form.errors,
             }
 
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
+review_state_view = ReviewStateView.as_view()

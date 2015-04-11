@@ -214,6 +214,8 @@ class Review(BaseModel):
                 reviewer,
             )
 
+        return True
+
     def _close_review(self, state):
         # We take a state because this can be closed or aborted, it's okay
         # we don't judge
@@ -228,15 +230,19 @@ class Review(BaseModel):
                 reviewer,
             )
 
+        return True
+
     def update_state(self, new_state):
         if self.state == OPEN and new_state == CLOSED:
-            self._close_review(new_state)
+            return self._close_review(new_state)
         elif self.state == OPEN and new_state == ABORTED:
-            self._close_review(new_state)
+            return self._close_review(new_state)
         elif self.state == CLOSED and new_state == OPEN:
-            self._reopen_review(new_state)
+            return self._reopen_review(new_state)
         elif self.state == ABORTED and new_state == OPEN:
-            self._reopen_review(new_state)
+            return self._reopen_review(new_state)
+
+        return False
 
     @property
     def revision(self):

@@ -53,7 +53,11 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(response.context['object'].pk, self.review.pk)
         self.assertTemplateUsed(response, 'demotime/review.html')
         # We're the creator, not a reviewer
+        self.assertNotIn('reviewer', response.context)
         self.assertNotIn('reviewer_status_form', response.context)
+        self.assertIn('review_state_form', response.context)
+        review_state_form = response.context['review_state_form']
+        self.assertEqual(review_state_form.initial['review'], self.review)
 
     def test_get_review_detail_as_reviewer(self):
         self.client.logout()
@@ -63,16 +67,32 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(response.context['object'].pk, self.review.pk)
         self.assertTemplateUsed(response, 'demotime/review.html')
         # We're the reviewer
+        self.assertIn('reviewer', response.context)
         self.assertIn('reviewer_status_form', response.context)
         reviewer_form = response.context['reviewer_status_form']
         self.assertTrue(reviewer_form.fields['reviewer'].queryset.filter(
             reviewer__username='test_user_0'
         ).exists())
+        self.assertEqual(reviewer_form.initial['review'], self.review)
 
     def test_get_review_login_required(self):
         self.client.logout()
         response = self.client.get(reverse('review-detail', args=[self.review.pk]))
         self.assertStatusCode(response, 302)
+
+    def test_review_rev_detail(self):
+        response = self.client.get(reverse('review-rev-detail', kwargs={
+            'pk': self.review.pk,
+            'rev_pk': self.review.revision.pk
+        }))
+        self.assertStatusCode(response, 200)
+
+    def test_review_rev_detail_404(self):
+        response = self.client.get(reverse('review-rev-detail', kwargs={
+            'pk': self.review.pk,
+            'rev_pk': 500,
+        }))
+        self.assertStatusCode(response, 404)
 
     def test_get_create_review(self):
         response = self.client.get(reverse('create-review'))
@@ -270,7 +290,8 @@ class TestReviewViews(BaseTestCase):
             'reviewer_state_changed': False,
             'new_state': '',
             'reviewer_status': models.reviews.APPROVED,
-            'success': True
+            'success': True,
+            'errors': {},
         })
 
     def test_update_reviewer_status_failure(self):
@@ -296,6 +317,9 @@ class TestReviewViews(BaseTestCase):
             'new_state': '',
             'reviewer_status': reviewer.status,
             'success': False,
+            'errors': {
+                'status': [u'Select a valid choice. BOGUS is not one of the available choices.'],
+            },
         })
 
     def test_update_reviewer_status_state_change(self):
@@ -326,7 +350,8 @@ class TestReviewViews(BaseTestCase):
             'reviewer_state_changed': True,
             'new_state': models.reviews.APPROVED,
             'reviewer_status': models.reviews.APPROVED,
-            'success': True
+            'success': True,
+            'errors': {},
         })
 
     def test_update_reviewer_status_failure_wrong_user(self):
@@ -342,11 +367,81 @@ class TestReviewViews(BaseTestCase):
             'reviewer': reviewer.pk,
             'status': 'BOGUS',
         })
+        self.assertStatusCode(response, 404)
+
+    def test_update_review_state_closed(self):
+        url = reverse('update-review-state', args=[self.review.pk])
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'state': models.reviews.CLOSED
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content), {
+            'state': models.reviews.CLOSED,
+            'state_changed': True,
+            'success': True,
+            'errors': {},
+        })
+        title = '"{}" has been Closed'.format(self.review.title)
+        self.assertEqual(
+            models.Message.objects.filter(title=title).count(),
+            3
+        )
+
+    def test_update_review_state_aborted(self):
+        url = reverse('update-review-state', args=[self.review.pk])
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'state': models.reviews.ABORTED
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content), {
+            'state': models.reviews.ABORTED,
+            'state_changed': True,
+            'success': True,
+            'errors': {},
+        })
+        title = '"{}" has been Aborted'.format(self.review.title)
+        self.assertEqual(
+            models.Message.objects.filter(title=title).count(),
+            3
+        )
+
+    def test_update_review_state_reopened(self):
+        self.review.state = models.reviews.CLOSED
+        self.review.save(update_fields=['state'])
+        url = reverse('update-review-state', args=[self.review.pk])
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'state': models.reviews.OPEN,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content), {
+            'state': models.reviews.OPEN,
+            'state_changed': True,
+            'success': True,
+            'errors': {},
+        })
+        title = '"{}" has been Reopened'.format(self.review.title)
+        self.assertEqual(
+            models.Message.objects.filter(title=title).count(),
+            3
+        )
+
+    def test_update_review_state_invalid(self):
+        self.client.logout()
+        self.client.login(username='test_user_0', password='testing')
+        url = reverse('update-review-state', args=[self.review.pk])
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'state': models.reviews.OPEN,
+        })
         self.assertStatusCode(response, 400)
-        data = json.loads(response.content)
-        self.assertEqual(data, {
-            'reviewer_state_changed': False,
-            'new_state': '',
-            'reviewer_status': reviewer.status,
+        self.assertEqual(json.loads(response.content), {
+            'state': self.review.state,
+            'state_changed': False,
             'success': False,
+            'errors': {
+                'review': ['Select a valid choice. That choice is not one of the available choices.']
+            },
         })
