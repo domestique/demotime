@@ -179,7 +179,7 @@
                         <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
                     </div>
                     <div class="toggled_text attachments">
-                        {% usemacro attachment %}
+                        {% use_macro attachment %}
                         <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                     </div>
                     <div class="form-group">
@@ -196,20 +196,20 @@
                         <blockquote>
                             <p>{{ comment.comment|safe|linebreaksbr }}</p>
                         </blockquote>
-                        {% usemacro attachments %}
+                        {% use_macro attachments %}
                     {% else %}
                         <div class="comments-reply">
                             <div><blockquote>
                                 <p>{{ comment.comment|safe|linebreaksbr }}</p>
                                 <h4>Reply by {{ comment.commenter }} @ {{ comment.created }}</h4>
                             </blockquote>
-                            {% usemacro attachments %}
+                            {% use_macro attachments %}
                         </div>
                     {% endif %}
                     </div>
                 {% endfor %}
                 <div class="comments-reply_new">
-                    {% usemacro form %}
+                    {% use_macro form %}
                 </div>
             {% endfor %}
         {% else %}
@@ -219,7 +219,7 @@
 
     <h3 class="icon icon-comment">Post a New Comment</h3>
     <section>
-        {% usemacro form %}
+        {% use_macro form %}
     </section>
 </div>
 {% endblock %}

@@ -2,3 +2,4 @@ Django==1.7.7
 gnureadline==6.3.3
 ipdb==0.8
 ipython==2.3.1
+django-macros==0.3.3
