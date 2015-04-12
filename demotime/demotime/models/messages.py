@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.template import Context, loader
 from django.core.urlresolvers import reverse
 
 from .base import BaseModel
@@ -22,6 +24,25 @@ class Message(BaseModel):
 
     def get_absolute_url(self):
         return reverse('message-detail', args=[self.pk])
+
+    @classmethod
+    def send_system_message(
+            cls, title, template_name, context_dict, receipient,
+            revision=None, thread=None
+    ):
+        system_user = User.objects.get(username='demotime_sys')
+        context_dict['sender'] = system_user
+        msg_text = loader.get_template(
+            template_name
+        ).render(Context(context_dict))
+        return cls.create_message(
+            receipient=receipient,
+            sender=system_user,
+            title=title,
+            review_revision=revision,
+            message=msg_text,
+            thread=thread,
+        )
 
     @classmethod
     def create_message(cls, receipient, sender, title, review_revision, thread, message):

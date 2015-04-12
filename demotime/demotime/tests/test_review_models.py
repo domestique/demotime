@@ -1,11 +1,10 @@
 from django.contrib.auth.models import User
-from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import models
 from demotime.tests import BaseTestCase
 
 
-class TestDemoTimeModels(BaseTestCase):
+class TestReviewModels(BaseTestCase):
 
     def test_create_review(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -171,78 +170,3 @@ class TestDemoTimeModels(BaseTestCase):
             title='"{}" has been Reopened'.format(obj.title)
         )
         self.assertEqual(msgs.count(), 3)
-
-    def test_create_comment_thread(self):
-        review = models.Review.create_review(**self.default_review_kwargs)
-        models.CommentThread.create_comment_thread(review.revision)
-
-    def test_create_comment(self):
-        self.assertEqual(models.Message.objects.count(), 0)
-        review = models.Review.create_review(**self.default_review_kwargs)
-        comment = models.Comment.create_comment(
-            commenter=self.user,
-            review=review.revision,
-            comment='Test Comment',
-            attachment=File(BytesIO('test_file_1')),
-            attachment_type='photo',
-            description='Test Description',
-        )
-        self.assertEqual(comment.thread.review_revision, review.revision)
-        self.assertEqual(comment.attachments.count(), 1)
-        attachment = comment.attachments.get()
-        self.assertEqual(attachment.description, 'Test Description')
-        self.assertEqual(attachment.attachment_type, 'photo')
-        self.assertEqual(comment.commenter, self.user)
-        self.assertEqual(comment.comment, 'Test Comment')
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='New Comment').count(),
-            3
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
-
-    def test_create_comment_with_thread(self):
-        self.assertEqual(models.Message.objects.count(), 0)
-        review = models.Review.create_review(**self.default_review_kwargs)
-        thread = models.CommentThread.create_comment_thread(review.revision)
-        comment = models.Comment.create_comment(
-            commenter=self.user,
-            review=review.revision,
-            comment='Test Comment',
-            attachment=File(BytesIO('test_file_1')),
-            attachment_type='photo',
-            description='Test Description',
-            thread=thread,
-        )
-        self.assertEqual(comment.thread, thread)
-        self.assertEqual(comment.thread.review_revision, review.revision)
-        self.assertEqual(comment.attachments.count(), 1)
-        attachment = comment.attachments.get()
-        self.assertEqual(attachment.description, 'Test Description')
-        self.assertEqual(attachment.attachment_type, 'photo')
-        self.assertEqual(comment.commenter, self.user)
-        self.assertEqual(comment.comment, 'Test Comment')
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='New Comment').count(),
-            3
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
-
-    def test_create_message(self):
-        review = models.Review.create_review(**self.default_review_kwargs)
-        msg = models.Message.create_message(
-            receipient=self.user,
-            sender=self.system_user,
-            title='Test Title',
-            review_revision=review.revision,
-            thread=None,
-            message='Test Message'
-        )
-        self.assertEqual(msg.receipient, self.user)
-        self.assertEqual(msg.sender, self.system_user)
-        self.assertEqual(msg.review, review.revision)
-        self.assertEqual(msg.title, 'Test Title')
-        self.assertEqual(msg.message, 'Test Message')

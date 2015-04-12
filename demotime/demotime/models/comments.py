@@ -1,5 +1,4 @@
 from django.db import models
-from django.template import Context, loader
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -63,22 +62,20 @@ class Comment(BaseModel):
             if reviewer == commenter:
                 continue
 
-            msg_template = loader.get_template('demotime/messages/new_comment.html')
-            context = Context({
+            context = {
                 'receipient': reviewer,
                 'sender': system_user,
                 'commenter': commenter,
                 'url': review.get_absolute_url(),
                 'title': review.review.title,
-            })
-            msg_text = msg_template.render(context)
-            Message.create_message(
-                receipient=reviewer,
-                sender=system_user,
-                title='New Comment on {}'.format(review.review.title),
+            }
+            Message.send_system_message(
+                'New Comment on {}'.format(review.review.title),
+                'demotime/messages/new_comment.html',
+                context,
+                reviewer,
+                revision=review,
                 thread=thread,
-                review_revision=review,
-                message=msg_text
             )
 
         return obj

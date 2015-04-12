@@ -1,6 +1,4 @@
 from django.db import models
-from django.template import Context, loader
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -56,21 +54,6 @@ class Review(BaseModel):
     def get_absolute_url(self):
         return self.revision.get_absolute_url()
 
-    def _send_message(self, title, template_name, context_dict, receipient):
-        system_user = User.objects.get(username='demotime_sys')
-        context_dict['sender'] = system_user
-        msg_text = loader.get_template(
-            template_name
-        ).render(Context(context_dict))
-        Message.create_message(
-            receipient=receipient,
-            sender=system_user,
-            title=title,
-            review_revision=self.revision,
-            message=msg_text,
-            thread=None
-        )
-
     def _send_revision_messages(self, update=False):
         title = 'New Review: {}'.format(self.title)
         if update:
@@ -83,11 +66,12 @@ class Review(BaseModel):
                 'update': update,
                 'title': self.title,
             }
-            self._send_message(
+            Message.send_system_message(
                 title,
                 'demotime/messages/review.html',
                 context,
                 reviewer,
+                revision=self.revision,
             )
 
     @classmethod
@@ -158,25 +142,28 @@ class Review(BaseModel):
         self.reviewer_state = state
         self.save(update_fields=['reviewer_state'])
         if state == APPROVED:
-            self._send_message(
+            Message.send_system_message(
                 '"{}" has been Approved!'.format(self.title),
                 'demotime/messages/approved.html',
                 {'review': self},
-                self.creator
+                self.creator,
+                revision=self.revision,
             )
         elif state == REJECTED:
-            self._send_message(
+            Message.send_system_message(
                 '"{}" has been Rejected'.format(self.title),
                 'demotime/messages/rejected.html',
                 {'review': self},
-                self.creator
+                self.creator,
+                revision=self.revision,
             )
         elif state == REVIEWING:
-            self._send_message(
+            Message.send_system_message(
                 '"{}" is back Under Review'.format(self.title),
                 'demotime/messages/reviewing.html',
                 {'review': self, 'previous_state': previous_state},
-                self.creator
+                self.creator,
+                revision=self.revision,
             )
         else:
             # Uhh, how'd we get here, eh?
@@ -207,11 +194,12 @@ class Review(BaseModel):
         self.state = state
         self.save(update_fields=['state'])
         for reviewer in self.reviewers.all():
-            self._send_message(
+            Message.send_system_message(
                 '"{}" has been Reopened'.format(self.title),
                 'demotime/messages/reopened.html',
                 {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
                 reviewer,
+                revision=self.revision,
             )
 
         return True
@@ -223,11 +211,12 @@ class Review(BaseModel):
         self.state = state
         self.save(update_fields=['state'])
         for reviewer in self.reviewers.all():
-            self._send_message(
+            Message.send_system_message(
                 '"{}" has been {}'.format(self.title, state.capitalize()),
                 'demotime/messages/closed.html',
                 {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
                 reviewer,
+                revision=self.revision,
             )
 
         return True
