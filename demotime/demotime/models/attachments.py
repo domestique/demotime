@@ -14,7 +14,7 @@ def attachment_filename(instance, filename):
     else:
         folder = instance.content_object.pk
     folder = str(folder)
-    return os.path.join(folder, filename)
+    return os.path.join('reviews', folder, filename)
 
 
 class Attachment(BaseModel):

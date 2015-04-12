@@ -13,8 +13,6 @@ class TestReviewViews(BaseTestCase):
 
     def setUp(self):
         super(TestReviewViews, self).setUp()
-        self.user.set_password('testing')
-        self.user.save()
         assert self.client.login(
             username=self.user.username,
             password='testing'

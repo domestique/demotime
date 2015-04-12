@@ -11,8 +11,6 @@ class TestMessageViews(BaseTestCase):
         super(TestMessageViews, self).setUp()
         self.review = models.Review.create_review(**self.default_review_kwargs)
         self.user = User.objects.get(username='test_user_0')
-        self.user.set_password('testing')
-        self.user.save()
         self.first_message = models.Message.objects.get(receipient=self.user)
         system_user = User.objects.get(username='demotime_sys')
         for x in range(0, 20):

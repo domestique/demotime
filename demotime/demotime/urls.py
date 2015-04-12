@@ -29,5 +29,7 @@ urlpatterns += patterns('demotime.views.messages',
 # Accounts
 urlpatterns += patterns('',
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login', name='logout')
+    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login', name='logout'),
+    url(r'^accounts/profile/(?P<pk>[\d]+)/$', 'demotime.views.users.profile_view', name='profile'),
+    url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', 'demotime.views.users.edit_profile_view', name='edit-profile'),
 )
