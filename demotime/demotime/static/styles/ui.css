@@ -18,6 +18,9 @@ a.button-link:hover {
 a.button-link.alert {
     background:#E03743;
 }
+a.button-link.confirm {
+    background:#09BEFF;
+}
 
 .review-attachments {
     overflow:hidden;
@@ -78,6 +81,6 @@ a.button-link.alert {
     }
 }
 
-.mail-unread:before {
+.icon-highlight:before {
     color:yellow;
 }
