@@ -15,7 +15,9 @@ class UserProfile(BaseModel):
     user = models.OneToOneField('auth.User')
     avatar = models.ImageField(upload_to=avatar_field, null=True, blank=True)
     bio = models.TextField()
-    display_name = models.CharField(max_length=2048, blank=True, null=True)
+    display_name = models.CharField(
+        max_length=2048, blank=True, null=True, unique=True
+    )
 
     def __unicode__(self):
         return u'{}'.format(self.display_name or self.user.username)
