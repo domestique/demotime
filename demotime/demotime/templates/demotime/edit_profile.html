@@ -3,47 +3,19 @@
 {% block styles %}
 {{ block.super }}
 <style>
-    .reviews-list h3 {
-        margin:0;
-        font-size:1.3em;
-    }
-    .reviews-list section {
-        min-height:150px;
-    }
-    .reviews-list ul {
-        margin:0;
-        padding:0;
-    }
-    section.demos {
-        background:#54BB9C;
-    }
-    section.demos,
-    section.demos a {
-        color:#fff;
-    }
-    section.reviews {
-        background:#FFE8E1;
-    }
-    section.updates {
-        background:#B6F9FD;
-    }
-    section.done {
-        background-image:url(/static/images/done.png);
-        background-repeat:no-repeat;
-        background-position:50% 50%;
+    label[for="id_email"] {
+        margin-top:60px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <div class="main-content">
-        <h1>Edit Your Profile</h1>
-    </div>
-    <div>
+    <h1>Edit Your Profile</h1>
+    <section>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ profile_form.as_p }}
             <input type="submit" value="Update Profile">
         </form>
-    </div>
+    </section>
 {% endblock %}

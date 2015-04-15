@@ -1,84 +1,77 @@
-{% extends 'base.html' %}
+{% extends 'layout-profile.html' %}
 
 {% block styles %}
 {{ block.super }}
 <style>
-    .reviews-list h3 {
-        margin:0;
-        font-size:1.3em;
+    .reviews-list[class~='by:3'][class~='with-gap:3']>.cel {
+        display:block;
+        width:100%;
     }
     .reviews-list section {
-        min-height:150px;
+        min-height:0;
     }
-    .reviews-list ul {
-        margin:0;
-        padding:0;
+    .reviews-list section.done {
+        background-image:none;
     }
-    section.demos {
-        background:#54BB9C;
+    .avatar {
+        width:100%;
+        height:auto;
     }
-    section.demos,
-    section.demos a {
-        color:#fff;
+    .avatarless a {
+        border:1px solid #C3B2FF;
+        text-align:center;
+        padding:80px 20px;
+        display:block;
+        transition:1s;
     }
-    section.reviews {
-        background:#FFE8E1;
+    .avatarless a:hover {
+        text-decoration:none;
+        background:#ffffe7;
     }
-    section.updates {
-        background:#B6F9FD;
+    {% if not owner_viewing %}
+    .reviews-updates > *,
+    .tooltip {
+        display:none;
     }
-    section.done {
-        background-image:url(/static/images/done.png);
-        background-repeat:no-repeat;
-        background-position:50% 50%;
-    }
+    {% endif %}
 </style>
 {% endblock %}
 
-{% block content %}
-    <div class="main-content">
-        <h1>{% if owner_viewing %}Your Profile{% else %}{{ object }}'s Profile{% endif %}</h1>
-    </div>
-    <div class="reviews-list split~680 by:2 with-gap:2">
-        <div class="cel">
-            <h3 class="icon icon-calendar">{% if owner_viewing %}Your Open Demos{% else %}{{ object }}'s Open Demos{% endif %}</h3>
-            <section class="demos {% if not open_demos %}done{% endif %}">
-                {% if open_demos %}
-                    <ul>
-                        {% for demo in open_demos %}
-                            <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </section>
-        </div>
-        <div class="cel">
-            <h3 class="icon icon-inbox">
-                {% if owner_viewing %}
-                    Your Open Reviews
-                {% else %}
-                    {{ object }}'s Open Reviews
-                {% endif %}
-                <span class="tooltip" title="Reviews are demos that have been assigned to you to review. You can leave feedback and ultimately approve or reject a demo."></span>
-            </h3>
-            <section class="reviews {% if not open_reviews %}done{% endif %}">
-                {% if open_reviews %}
-                    <ul>
-                        {% for demo in open_reviews %}
-                            <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </section>
-        </div>
-    </div>
-    <div>
-        <ul>
-            <li>Display Name: {{ object.display_name }}</li>
-            <li>Email: {{ object.user.email }}</li>
-            <li>Avatar: <img src="{{ MEDIA_URL }}{{ object.avatar.name }}" class="img-thumbnail" height=20 width=20>
-            <li>Bio: {{ object.bio }}</li>
-        </ul>
+{% block page_title %}
+    {% if owner_viewing %}Your Profile{% else %}{{ object }}'s Profile{% endif %}
+    {% if owner_viewing %}
+        <a href="{% url 'edit-profile' object.pk %}">(edit)</a>
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <div class="cel">
+        {% if object.avatar.name %}
+            <img src="{{ MEDIA_URL }}{{ object.avatar.name }}" width="475" height="370" class="avatar">
+        {% else %}
+            {% if owner_viewing %}
+                <div class="avatarless">
+                    <a href="{% url 'edit-profile' object.pk %}">Edit your profile to add an avatar</a>
+                </div>
+            {% endif %}
+        {% endif %}
+        <section>
+            <label>Display Name:</label>
+            {{ object.display_name }}
+            {% if owner_viewing %}
+                <label>
+                    Email:
+                    {% if owner_viewing %}<span class="tooltip" title="Your email is not displayed publicly."></span>{% endif %}
+                </label>
+                {{ object.user.email }}
+            {% endif %}
+            {% if object.bio %}
+                <label>
+                    Bio:
+                </label>
+                {{ object.bio }}
+            {% endif %}
+        </section>
         {% if owner_viewing %}
             <a href="{% url 'edit-profile' object.pk %}">Edit Your Profile</a>
         {% endif %}

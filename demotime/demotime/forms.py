@@ -130,4 +130,4 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = models.UserProfile
-        fields = ('avatar', 'bio', 'display_name')
+        fields = ('display_name', 'bio', 'avatar')
