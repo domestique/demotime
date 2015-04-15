@@ -1,0 +1,2 @@
+recursive-include demotime/templates *
+recursive-include demotime/static *
