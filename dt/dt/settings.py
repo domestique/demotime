@@ -120,3 +120,9 @@ NOSE_ARGS = [
 
 # ACCOUNT SETTINGS
 LOGIN_REDIRECT_URL = '/'
+
+if os.env.get('DT_PROD'):
+    try:
+        from prod_settings import *
+    except ImportError:
+        pass
