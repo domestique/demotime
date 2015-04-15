@@ -1,3 +1,5 @@
+import os
+
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
@@ -8,5 +10,6 @@ urlpatterns = patterns('',
     url('', include('demotime.urls')),
 )
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+if not os.environs.get('DT_PROD'):
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

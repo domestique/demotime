@@ -1,3 +1,5 @@
+import os
+
 from uuid import uuid4
 
 from fabric import api
@@ -43,5 +45,13 @@ def deploy(branch='master'):
 
     # Create our symlinks
     with api.cd(REMOTE_ROOT):
-        api.run('ln -s builds/{} demotime-current'.format(dir_name))
-        api.run('ln -s prod_settings.py demotime-current/dt/dt/prod_settings.py')
+        api.run('ln -s {}/{} demotime-current'.format(BUILD_DIR, dir_name))
+
+    # App setup stuff
+    with api.cd(os.path.join(BUILD_DIR, dir_name, 'dt')):
+        api.run('cd dt && ln -s {}/prod_settings.py .'.format(REMOTE_ROOT))
+        api.run('{}/bin/python manage.py collectstatic --noinput'.format(REMOTE_ROOT))
+        api.run('{}/bin/python manage.py migrate'.format(REMOTE_ROOT))
+        # Restart seems finicky
+        api.run('sudo stop demotime')
+        api.run('sudo start demotime')
