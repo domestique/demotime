@@ -46,6 +46,10 @@ class TestReviewViews(BaseTestCase):
             assert key in response.context
 
     def test_get_review_detail(self):
+        models.UserReviewStatus.objects.filter(
+            review=self.review,
+            user=self.user
+        ).update(read=False)
         response = self.client.get(reverse('review-detail', args=[self.review.pk]))
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
@@ -56,6 +60,11 @@ class TestReviewViews(BaseTestCase):
         self.assertIn('review_state_form', response.context)
         review_state_form = response.context['review_state_form']
         self.assertEqual(review_state_form.initial['review'], self.review)
+        user_review_status = models.UserReviewStatus.objects.get(
+            review=self.review,
+            user=self.user
+        )
+        self.assertTrue(user_review_status.read)
 
     def test_get_review_detail_as_reviewer(self):
         self.client.logout()

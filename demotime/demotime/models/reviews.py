@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from .attachments import Attachment
 from .base import BaseModel
 from .messages import Message
+from .users import UserReviewStatus
 
 REVIEWING = 'reviewing'
 REJECTED = 'rejected'
@@ -100,6 +101,16 @@ class Review(BaseModel):
             )
         for reviewer in reviewers:
             Reviewer.create_reviewer(obj, reviewer)
+            UserReviewStatus.objects.create(
+                review=obj,
+                user=reviewer
+            )
+
+        # Creator UserReviewStatus, set read to True, cuz they just created it
+        # so I'm assuming they read it
+        UserReviewStatus.create_user_review_status(
+            obj, obj.creator, True
+        )
 
         obj._send_revision_messages()
         return obj
@@ -129,6 +140,11 @@ class Review(BaseModel):
                 Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
                 Reviewer.create_reviewer(obj, reviewer)
+
+        # Update UserReviewStatuses
+        UserReviewStatus.objects.filter(review=review).exclude(
+            user=creator
+        ).update(read=False)
 
         # Drop people that were removed
         # TODO: Send a message here?

@@ -48,7 +48,11 @@ class IndexView(TemplateView):
             state=models.reviews.OPEN,
         )
         # TODO: Figure out how to show the recently updated ones
-        context['updated_demos'] = []
+        updated_demos = models.UserReviewStatus.objects.filter(
+            user=self.request.user,
+            read=False
+        ).order_by('-modified')
+        context['updated_demos'] = updated_demos
         return context
 
 index_view = IndexView.as_view()

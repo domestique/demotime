@@ -13,6 +13,7 @@ class TestCommentModels(BaseTestCase):
     def test_create_comment(self):
         self.assertEqual(models.Message.objects.count(), 0)
         review = models.Review.create_review(**self.default_review_kwargs)
+        models.UserReviewStatus.objects.filter(review=review).update(read=True)
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -35,11 +36,16 @@ class TestCommentModels(BaseTestCase):
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
+        statuses = models.UserReviewStatus.objects.filter(review=review)
+        self.assertEqual(statuses.count(), 4)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 3)
 
     def test_create_comment_with_thread(self):
         self.assertEqual(models.Message.objects.count(), 0)
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        models.UserReviewStatus.objects.filter(review=review).update(read=True)
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -64,3 +70,7 @@ class TestCommentModels(BaseTestCase):
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
+        statuses = models.UserReviewStatus.objects.filter(review=review)
+        self.assertEqual(statuses.count(), 4)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 3)

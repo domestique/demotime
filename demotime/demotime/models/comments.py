@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from .attachments import Attachment
 from .base import BaseModel
 from .messages import Message
+from .users import UserReviewStatus
 
 
 class CommentThread(BaseModel):
@@ -61,6 +62,11 @@ class Comment(BaseModel):
         for reviewer in users:
             if reviewer == commenter:
                 continue
+
+            UserReviewStatus.objects.filter(
+                review=review.review,
+                user=reviewer,
+            ).update(read=False)
 
             context = {
                 'receipient': reviewer,

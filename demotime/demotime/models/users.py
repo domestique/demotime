@@ -24,3 +24,20 @@ class UserProfile(BaseModel):
 
     def get_absolute_url(self):
         return reverse('profile', args=[self.pk])
+
+
+class UserReviewStatus(BaseModel):
+
+    review = models.ForeignKey('Review')
+    user = models.ForeignKey('auth.User')
+    read = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u'UserReviewStatus: {} - {}'.format(
+            self.user.username,
+            self.review.title
+        )
+
+    @classmethod
+    def create_user_review_status(cls, review, user, read=False):
+        return cls.objects.create(review=review, user=user, read=read)

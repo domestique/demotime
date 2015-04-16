@@ -57,6 +57,10 @@ class ReviewDetail(DetailView):
                 reviewer=self.request.user
             )
 
+        models.UserReviewStatus.objects.filter(
+            review=self.revision.review,
+            user=self.request.user,
+        ).update(read=True)
         context['revision'] = self.revision
         context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
         context['attachment_form'] = self.attachment_form if self.attachment_form else forms.AttachmentForm()

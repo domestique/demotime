@@ -17,10 +17,15 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.state, models.reviews.OPEN)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
+        statuses = models.UserReviewStatus.objects.filter(review=obj)
+        self.assertEqual(statuses.count(), 4)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 3)
 
     def test_update_review(self):
         review_kwargs = self.default_review_kwargs.copy()
         obj = models.Review.create_review(**self.default_review_kwargs)
+        models.UserReviewStatus.objects.filter(review=obj).update(read=True)
         review_kwargs.update({
             'review': obj.pk,
             'title': 'New Title',
@@ -35,6 +40,10 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_obj.description, 'Test Description')
         self.assertEqual(new_obj.revision.description, 'New Description')
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
+        statuses = models.UserReviewStatus.objects.filter(review=obj)
+        self.assertEqual(statuses.count(), 4)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 3)
 
     def test_create_reviewer(self):
         obj = models.Review.create_review(**self.default_review_kwargs)

@@ -74,11 +74,11 @@
                             Updated Demos
                             <span class="tooltip" title="Demos owned by others that have been updated since you last reviewed them will appear here."></span>
                         </h3>
-                        <section class="updates {% if not updated_reviews %}done{% endif %}">
-                            {% if updated_reviews %}
+                        <section class="updates {% if not updated_demos %}done{% endif %}">
+                            {% if updated_demos %}
                                 <ul>
-                                    {% for demo in updated_reviews %}
-                                        <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
+                                    {% for demo in updated_demos %}
+                                        <li><a href="{{ demo.review.get_absolute_url }}">{{ demo.review.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
