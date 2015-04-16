@@ -1,0 +1,11 @@
+{# Should we make an HTML version too? I really don't want to be in the mail sending business :( #}
+Hello {{ user.username }},
+
+    Please complete your registration process with DemoTime by proceeding to:
+
+        http://{{ site.domain }}{% url 'registration_activate' activation_key %}
+
+You have {{ expiration_days }} to activate this account before it is automatically closed.
+
+Thanks,
+DemoTime

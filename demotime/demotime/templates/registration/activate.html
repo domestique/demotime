@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    label[for="id_email"] {
+        margin-top:60px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Activation Unsuccessful</h1>
+    <section>
+        {# Someday we're going to need an email address for people to contact when these things go wrong #}
+        <p>Unfortunately your activation key, {{ activation_key }}, is invalid and we were unable to complete the activation process for your account</p>
+    </section>
+{% endblock %}

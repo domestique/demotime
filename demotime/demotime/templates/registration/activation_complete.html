@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    label[for="id_email"] {
+        margin-top:60px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Activation Successfull</h1>
+    <section>
+        <p>Your account has been activated, thanks for joining us here at DemoTime! Please <a href="{% url 'login' %}">login</a> and enjoy your time with us at DemoTime.</p>
+    </section>
+{% endblock %}
+

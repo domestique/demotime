@@ -5,9 +5,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import patterns, include, url
 
+admin.autodiscover()
+
 urlpatterns = patterns('',
-    url(r'^admin/', include(admin.site.urls)),
+    # DT needs to be on top, otherwise django-reg tramples some urls
     url('', include('demotime.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^accounts/', include('registration.backends.default.urls')),
 )
 
 if not os.environ.get('DT_PROD'):

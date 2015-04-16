@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # Third Party Libs
     'macros',
+    'registration',
     # Our libs
     'demotime',
 )
@@ -120,6 +121,7 @@ NOSE_ARGS = [
 
 # ACCOUNT SETTINGS
 LOGIN_REDIRECT_URL = '/'
+ACCOUNT_ACTIVATION_DAYS = 7
 
 if os.environ.get('DT_PROD'):
     try:
