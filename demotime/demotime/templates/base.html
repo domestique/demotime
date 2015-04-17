@@ -64,7 +64,9 @@
                                         <li class="icon icon-mail {% if has_unread_messages %}icon-highlight{% endif %} {% if request.path == inbox_url %}active{% else %}{% endif %}"><a href="{{ inbox_url }}">Inbox{% if has_unread_messages %} ({{ unread_message_count }}){% endif %}</a></li>
                                         <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Logout</a></li>
                                     {% else %}
-                                        <li class="{% if request.path == login_url %}active{% else %}{% endif %}"><a href="{% url 'login' %}">Login</a></li>
+                                        {% if request.path != login_url %}
+                                            <li><a href="{% url 'login' %}">Login</a></li>
+                                        {% endif %}
                                     {% endif %}
                                 </ul>
                             </div>
@@ -72,6 +74,7 @@
                     </div>
                 </div>
             </div>
+            {% block sub_nav %}{% endblock %}
         </nav>
 
         <div class="container content">
@@ -112,6 +115,12 @@
         {% block footer_scripts %}
             <script src="/static/scripts/footer_scripts.js"></script>
         {% endblock %}
+
+        {% if request.GET.hide_header %}
+        <script>
+            $('body').addClass('bookmarklet');
+        </script>
+        {% endif %}
     </body>
 </html>
 

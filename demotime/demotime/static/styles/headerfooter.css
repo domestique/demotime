@@ -1,3 +1,10 @@
+body.bookmarklet nav,
+body.bookmarklet footer {
+    display:none;
+}
+body.bookmarklet h1 {
+    margin-top:.5em;
+}
 .navbar {
     color:#fff;
     background:#303030;
@@ -25,7 +32,7 @@
 }
 .navbar .navbar-nav {
     text-align:right;
-    line-height:75px;
+    line-height:60px;
 }
 @media screen and (max-width:1000px) {
     .navbar .navbar-nav {

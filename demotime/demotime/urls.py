@@ -1,9 +1,12 @@
 from django.conf.urls import patterns, url
+from django.views.generic import TemplateView
 
 
 # General
 urlpatterns = patterns('demotime.views',
     url('^$', 'index_view', name='index'),
+    url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
+    url(r'^addons/$', TemplateView.as_view(template_name='addons.html'), name='addons'),
 )
 
 # Reviews
