@@ -3,8 +3,8 @@
 {% block styles %}
 {{ block.super }}
 <style>
-    label[for="id_email"] {
-        margin-top:60px;
+    input[type="submit"] {
+        margin-top:2em;
     }
 </style>
 {% endblock %}
@@ -12,9 +12,13 @@
 {% block content %}
     <h1>Register An Account</h1>
     <section>
-        <form action="" method="post">
+        <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
+            {% for form in form %}
+                <label>{{ form.label }}</label>
+                {{ form.errors }}
+                {{ form }}
+            {% endfor %}
             <input type="submit" value="Sign up!">
         </form>
     </section>
