@@ -13,4 +13,10 @@ $(document).ready(function() {
     });
 
     $('.tooltip').tooltipster();
+
+    $('button').click(function() {
+        if ($(this).data('href')) {
+            window.location.href = $(this).data('href');
+        }
+    });
 });

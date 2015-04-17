@@ -12,10 +12,10 @@
 {% block content %}
     <h1>Register An Account</h1>
     <section>
-        <form action="" method="post"> 
+        <form action="" method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="Update Profile">
+            <input type="submit" value="Sign up!">
         </form>
     </section>
 {% endblock %}

@@ -77,6 +77,7 @@ button {
     -o-transition: 0.2s ease-out;
     -ms-transition: 0.2s ease-out;
     transition: 0.2s ease-out;
+    box-shadow:4px 4px 0 #ccc;
 }
 button:hover, input[type="submit"]:hover,
 input[type="button"]:hover {

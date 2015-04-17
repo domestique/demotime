@@ -15,9 +15,11 @@ a.button-link {
 a.button-link:hover {
     text-decoration:none;
 }
+button.alert,
 a.button-link.alert {
     background:#E03743;
 }
+button.confirm,
 a.button-link.confirm {
     background:#09BEFF;
 }
