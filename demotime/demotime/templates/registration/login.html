@@ -11,7 +11,7 @@
         line-height:28px;
     }
     .signup {
-        margin-top:-20px;
+        margin-top:-10px;
         color:#fff;
         background:#FF499E url(/static/images/rupee.gif) 50% 100% no-repeat;
         background-size:100%;
@@ -36,13 +36,14 @@
     <h1>Welcome to DemoTime</h1>
     <div class="split~680 by:2/1 with-gap:5">
         <div class="cel">
+            <h2 class="heading">Have an account? Sign in here.</h2>
+
             {% if form.errors %}
                 <ul class="errorlist">
                     <li>Your username and password didn't match. Please try again.</li>
                 </ul>
             {% endif %}
 
-            <h2 class="heading">Have an account? Sign in here.</h2>
 
             <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
                 {% csrf_token %}
