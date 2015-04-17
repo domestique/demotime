@@ -3,7 +3,6 @@
     background:#303030;
     box-shadow:0 2px 5px #ccc;
     padding:5px 0;
-    overflow:hidden;
     margin-bottom:3em;
 }
 .navbar a {
@@ -22,13 +21,9 @@
     display:inline-block;
 }
 .navbar .navbar-brand {
-    float:left;
-    width:20%;
     padding:5px 0;
 }
 .navbar .navbar-nav {
-    float:right;
-    width:70%;
     text-align:right;
     line-height:75px;
 }
@@ -40,6 +35,16 @@
     }
     .navbar .navbar-nav li {
         display:block;
+    }
+}
+@media screen and (max-width:370px) {
+    .navbar .navbar-nav {
+        text-align:right;
+    }
+    .navbar .navbar-nav li {
+        display:inline-block;
+        padding:5px 0;
+        margin-left:2px;
     }
 }
 .navbar ul {

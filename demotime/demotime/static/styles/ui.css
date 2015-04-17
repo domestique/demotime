@@ -85,5 +85,7 @@ a.button-link.confirm {
 }
 
 .icon-highlight:before {
-    color:yellow;
+    transition:1s;
+    background:#E03743;
+    padding:2px;
 }

@@ -39,8 +39,10 @@
     .manage-review a {
         color:#fff;
     }
-    .manage-review form {
-        display:none;
+    .manage-review .icon-highlight:before {
+        font-size:1.5em;
+        background:#fff;
+        color:#222;
     }
     .comments h4 {
         margin-top:2.5em;
@@ -96,7 +98,6 @@
                 <li><a href="{% url 'edit-review' object.pk %}" class="updated button-link icon icon-pencil">Update demo</a></li>
                 <li><a data-type="open" href="#" class="open button-link icon icon-eye">Open demo</a></li>
                 <li><a data-type="closed" href="#" class="closed button-link confirm icon icon-ok">Close demo</a></li>
-                <li><a data-type="aborted" href="#" class="aborted button-link alert icon icon-cancel-circled">Abort demo</a></li>
             {% else %}
                 {% if reviewer %}
                     <li><a data-type="approved" href="#" class="approved button-link icon icon-thumbs-up-1">Accept demo</a></li>
@@ -104,9 +105,6 @@
                 {% endif %}
             {% endif %}
         </ul>
-        <form>
-            {{ reviewer_status_form }}
-        </form>
     </div>
 
     <div class="main-content">
@@ -283,15 +281,9 @@ function check_review_status() {
         {% if request.user == object.creator %}
             var error = error.responseJSON.state;
         {% endif %}
-        console.log(error);
+
         $('a.icon-highlight').removeClass('icon-highlight');
         $('a.' + error).addClass('icon-highlight');
-
-        if (error == 'aborted') {
-            $('a.closed').parents('li').hide();
-        } else {
-            $('a.closed').parents('li').show();
-        }
     });
 }
 
