@@ -7,14 +7,27 @@
     .heading {
         margin:0;
     }
+    .heading {
+        line-height:28px;
+    }
     .signup {
-        background:#405D73;
+        margin-top:-20px;
         color:#fff;
+        background:#FF499E url(/static/images/rupee.gif) 50% 100% no-repeat;
+        background-size:100%;
+        padding-bottom:160px;
+    }
+    @media screen and (max-width:680px) {
+        .signup {
+            background-image:none;
+            padding-bottom:2em;
+        }
     }
     .signup button {
         width:100%;
         font-size:1.4em;
         margin:10px 0 0;
+        opacity:0.8;
     }
 </style>
 {% endblock %}
@@ -51,7 +64,7 @@
             <section class="signup">
                 <h2 class="heading">Want an account?</h2>
                 <p>Signing up is easy and free.</p>
-                <button class="alert" data-href="{% url 'registration_register' %}">Sign Up!</button>
+                <button class="confirm" data-href="{% url 'registration_register' %}">Sign Up!</button>
             </section>
         </div>
     </div>
