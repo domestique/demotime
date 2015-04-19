@@ -34,6 +34,7 @@ class Message(BaseModel):
                 msg_text,
                 settings.DEFAULT_FROM_EMAIL,
                 [recipient.email],
+                html_message=msg_text,
                 fail_silently=True,
             )
 
