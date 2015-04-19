@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url('', include('demotime.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('registration.backends.default.urls')),
+    url('^markdown/', include('django_markdown.urls')),
 )
 
 if not os.environ.get('DT_PROD'):
