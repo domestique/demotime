@@ -1,7 +1,17 @@
 {% extends 'layout-profile.html' %}
 
+{% block styles %}
+{{ block.super }}
+<style>
+    .icon-highlight:before {
+        font-size:1.5em;
+    }
+</style>
+{% endblock %}
+
+
 {% block page_title %}
-    Welcome To DemoTime
+    Your dashboard
 {% endblock %}
 
 {# disabling split on homepage #}

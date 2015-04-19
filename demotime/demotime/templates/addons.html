@@ -1,0 +1,26 @@
+{% extends 'layout-marketing.html' %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    .bookmarklet {
+        display:inline-block;
+        border:1px solid #f2f2f2;
+        box-shadow:2px 2px 0 #ccc;
+        padding:5px;
+        margin:0 5px;
+    }
+    .bookmarklet:hover {
+        text-decoration:none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Add-ons and extras</h1>
+<section>
+    Power tools for power users
+</section>
+<h2>Bookmarklet</h2>
+<p>Click and drag <a class="bookmarklet" href="javascript:q%3Dlocation.href%3Bif(document.getSelection)%7Bd%3Ddocument.getSelection()%3B%7Delse%7Bd%3D%27%27%3B%7D%3Bp%3Ddocument.title%3Bvoid(open(%27http://analyte.localhost:8008/create/?hide_header=true&url%3D%27%2BencodeURIComponent(q)%2B%27%26description%3D%27%2BencodeURIComponent(d)%2B%27%26title%3D%27%2BencodeURIComponent(p),%27Demotime%27,%27toolbar%3Dno,width%3D700,height%3D450%27))%3B">this bookmarklet</a> to your bookmarks bar to add a review from anywhere!</p>
+{% endblock %}

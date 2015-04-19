@@ -1,17 +1,9 @@
-{% extends 'base.html' %}
-
-{% block styles %}
-{{ block.super }}
-<style>
-    label[for="id_email"] {
-        margin-top:60px;
-    }
-</style>
-{% endblock %}
+{% extends 'layout-marketing.html' %}
 
 {% block content %}
-    <h1>Registration Successful</h1>
+    <h1>You've registered your account!</h1>
     <section>
-        <p>Thanks for joining DemoTime! You should receive an email shortly detailing how to complete the registration process.</p>
+        <p>Thanks for joining DemoTime! You should receive an email shortly
+        detailing how to complete the registration process.</p>
     </section>
 {% endblock %}

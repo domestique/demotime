@@ -15,9 +15,11 @@ a.button-link {
 a.button-link:hover {
     text-decoration:none;
 }
+button.alert,
 a.button-link.alert {
     background:#E03743;
 }
+button.confirm,
 a.button-link.confirm {
     background:#09BEFF;
 }
@@ -40,6 +42,7 @@ a.button-link.confirm {
 }
 .attachment-card img {
     max-width:100%;
+    height:auto;
 }
 
 .summary a {
@@ -82,5 +85,7 @@ a.button-link.confirm {
 }
 
 .icon-highlight:before {
-    color:yellow;
+    transition:1s;
+    background:#E03743;
+    padding:2px;
 }

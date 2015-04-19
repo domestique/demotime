@@ -1,27 +1,72 @@
-{% extends "base.html" %}
+{% extends "layout-marketing.html" %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    button,
+    .heading {
+        margin:0;
+    }
+    .heading {
+        line-height:28px;
+    }
+    .signup {
+        margin-top:-10px;
+        color:#fff;
+        background:#FF499E url(/static/images/rupee.gif) 50% 100% no-repeat;
+        background-size:100%;
+        padding-bottom:160px;
+    }
+    @media screen and (max-width:680px) {
+        .signup {
+            background-image:none;
+            padding-bottom:2em;
+        }
+    }
+    .signup button {
+        width:100%;
+        font-size:1.4em;
+        margin:10px 0 0;
+        opacity:0.8;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-    <div class="main-content">
-        <h1>Welcome to DemoTime</h1>
-        {% if form.errors %}
-            <p>Your username and password didn't match. Please try again.</p>
-        {% endif %}
+    <h1>Welcome to DemoTime</h1>
+    <div class="split~680 by:2/1 with-gap:5">
+        <div class="cel">
+            <h2 class="heading">Have an account? Sign in here.</h2>
 
-        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="id_username">Username:</label>
-                <input id="id_username" maxlength="254" name="username" type="text" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label for="id_password">Password:</label>
-                <input id="id_password" name="password" type="password" class="form-control" />
-            </div>
-            <div class="form-group">
-                <input type="submit" class="btn btn-default" value="login" />
-                <input type="hidden" name="next" value="{{ next }}" />
-            </div>
-        </form>
-        <a href="{% url 'registration_register' %}"><button class="btn btn-default">Sign Up!</button></a>
+            {% if form.errors %}
+                <ul class="errorlist">
+                    <li>Your username and password didn't match. Please try again.</li>
+                </ul>
+            {% endif %}
+
+
+            <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_username">Username:</label>
+                    <input id="id_username" maxlength="254" name="username" type="text" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="id_password">Password:</label>
+                    <input id="id_password" name="password" type="password" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default" value="login" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+                </div>
+            </form>
+        </div>
+        <div class="cel">
+            <section class="signup">
+                <h2 class="heading">Want an account?</h2>
+                <p>Signing up is easy and free.</p>
+                <button class="confirm" data-href="{% url 'registration_register' %}">Sign Up!</button>
+            </section>
+        </div>
     </div>
 {% endblock %}

@@ -159,6 +159,10 @@ dl.messages-nav dd.current a {
         display:none;
     }
 }
+
+a.True {
+    font-weight:400;
+}
 </style>
 {% endblock %}
 
@@ -192,7 +196,7 @@ dl.messages-nav dd.current a {
                             {{ message.created }}
                         </div>
                         <div class="cel">
-                            <a href="{{ message.get_absolute_url }}">{{ message.title }}</a>
+                            <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
                         </div>
                     </div>
                 {% endfor %}
