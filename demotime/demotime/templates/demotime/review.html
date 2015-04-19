@@ -1,10 +1,39 @@
 {% extends 'base.html' %}
-{% load macros %}
+{% load macros django_markdown %}
 {% block title %} - {{ object.title }}{% endblock %}
 
 {% block styles %}
 {{ block.super }}
 <style>
+    .content .review section h1 {
+        background:none;
+        color:#333;
+        padding:0;
+        box-shadow:none;
+    }
+    .content .review section h1,
+    .content .review section h2,
+    .content .review section h3,
+    .content .review section h4,
+    .content .review section h5 {
+        text-transform:none;
+        margin:10px 0;
+    }
+    .content .review section h2 {
+        font-size:2em;
+    }
+    .content .review section h3 {
+        font-size:1.8em;
+    }
+    .content .review section h4 {
+        font-size:1.6em;
+    }
+    .content .review section h5 {
+        font-size:1.4em;
+    }
+    .content section h2 {
+        font-size:2em;
+    }
     .review-overview ol {
         margin:0;
         padding-left:20px;
@@ -139,9 +168,9 @@
     <h3 class="icon icon-lightbulb">Description</h3>
     <section>
         {% if revision.description %}
-            <p>{{ revision.description|safe|linebreaksbr }}</p>
+            <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
         {% else %}
-            <p>{{ object.description|safe|linebreaksbr }}</p>
+            <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
         {% endif %}
     </section>
 
