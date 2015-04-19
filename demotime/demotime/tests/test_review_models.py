@@ -1,3 +1,4 @@
+from django.core import mail
 from django.contrib.auth.models import User
 
 from demotime import models
@@ -7,6 +8,7 @@ from demotime.tests import BaseTestCase
 class TestReviewModels(BaseTestCase):
 
     def test_create_review(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
         assert obj.revision
         self.assertEqual(obj.creator, self.user)
@@ -21,10 +23,15 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(statuses.count(), 4)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 3)
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_update_review(self):
+        self.assertEqual(len(mail.outbox), 0)
         review_kwargs = self.default_review_kwargs.copy()
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
+
         models.UserReviewStatus.objects.filter(review=obj).update(read=True)
         review_kwargs.update({
             'review': obj.pk,
@@ -44,6 +51,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(statuses.count(), 4)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 3)
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_create_reviewer(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -74,7 +82,11 @@ class TestReviewModels(BaseTestCase):
         )
 
     def test_update_reviewer_state_approved(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
+
         obj.reviewer_set.update(status=models.reviews.APPROVED)
         models.UserReviewStatus.objects.update(read=True)
         changed, new_state = obj.update_reviewer_state()
@@ -91,9 +103,14 @@ class TestReviewModels(BaseTestCase):
                 read=False
             ).exists()
         )
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_update_reviewer_state_rejected(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
+
         obj.reviewer_set.update(status=models.reviews.REJECTED)
         models.UserReviewStatus.objects.update(read=True)
         changed, new_state = obj.update_reviewer_state()
@@ -110,9 +127,14 @@ class TestReviewModels(BaseTestCase):
                 read=False
             ).exists()
         )
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_update_reviewer_state_reviewing(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
+
         obj.reviewer_set.update(status=models.reviews.REJECTED)
         obj.reviewer_state = models.reviews.REJECTED
         obj.save(update_fields=['reviewer_state'])
@@ -134,6 +156,7 @@ class TestReviewModels(BaseTestCase):
                 read=False
             ).exists()
         )
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_update_reviewer_state_unchanged(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -146,7 +169,11 @@ class TestReviewModels(BaseTestCase):
         self.assertFalse(obj.update_state(models.reviews.OPEN))
 
     def test_review_state_change_closed(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
+
         models.UserReviewStatus.objects.update(read=True)
         self.assertTrue(obj.update_state(models.reviews.CLOSED))
         # refresh it
@@ -166,9 +193,13 @@ class TestReviewModels(BaseTestCase):
             ).exclude(user=self.user).count(),
             3
         )
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_review_state_change_aborted(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
         models.UserReviewStatus.objects.update(read=True)
         self.assertTrue(obj.update_state(models.reviews.ABORTED))
         # refresh it
@@ -189,9 +220,14 @@ class TestReviewModels(BaseTestCase):
             ).exclude(user=self.user).count(),
             3
         )
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_review_state_change_closed_to_open(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
+
         obj.state = models.reviews.CLOSED
         obj.save(update_fields=['state'])
         models.UserReviewStatus.objects.update(read=True)
@@ -212,9 +248,14 @@ class TestReviewModels(BaseTestCase):
             ).exclude(user=self.user).count(),
             3
         )
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_review_state_change_aborted_to_open(self):
+        self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 3)
+        mail.outbox = []
+
         obj.state = models.reviews.ABORTED
         obj.save(update_fields=['state'])
         models.UserReviewStatus.objects.update(read=True)
@@ -235,3 +276,4 @@ class TestReviewModels(BaseTestCase):
             ).exclude(user=self.user).count(),
             3
         )
+        self.assertEqual(len(mail.outbox), 3)

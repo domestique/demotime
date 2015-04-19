@@ -8,11 +8,13 @@ class BaseTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='test_user')
         self.user.set_password('testing')
+        self.user.email = 'test_user@example.com'
         self.user.save()
         self.system_user = User.objects.get(username='demotime_sys')
         for x in range(0, 3):
             u = User.objects.create_user(username='test_user_{}'.format(x))
             u.set_password('testing')
+            u.email = '{}@example.com'.format(u.username)
             u.save()
 
         self.test_users = User.objects.filter(username__startswith="test_user_")
