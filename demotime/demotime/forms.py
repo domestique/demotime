@@ -9,7 +9,6 @@ from demotime import models
 class ReviewForm(forms.ModelForm):
 
     description = forms.CharField(
-        #widget=forms.Textarea(attrs={'rows': 5}),
         widget=MarkdownWidget(),
     )
 
@@ -35,6 +34,9 @@ class CommentForm(forms.ModelForm):
         queryset=models.CommentThread.objects.none(),
         widget=forms.widgets.HiddenInput(),
         required=False
+    )
+    comment = forms.CharField(
+        widget=MarkdownWidget()
     )
 
     def __init__(self, thread=None, *args, **kwargs):
@@ -111,6 +113,7 @@ class ReviewStateForm(forms.Form):
 
 class UserProfileForm(forms.ModelForm):
 
+    bio = forms.CharField(required=False, widget=MarkdownWidget())
     email = forms.EmailField()
     password_one = forms.CharField(
         required=False,
