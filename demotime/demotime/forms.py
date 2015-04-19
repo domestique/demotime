@@ -1,13 +1,16 @@
 from django import forms
 from django.contrib.auth.models import User
 
+from django_markdown.widgets import MarkdownWidget
+
 from demotime import models
 
 
 class ReviewForm(forms.ModelForm):
 
     description = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 5})
+        #widget=forms.Textarea(attrs={'rows': 5}),
+        widget=MarkdownWidget(),
     )
 
     def __init__(self, user, *args, **kwargs):

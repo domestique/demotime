@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     # Third Party Libs
     'macros',
     'registration',
+    'django_markdown',
     # Our libs
     'demotime',
 )
@@ -122,6 +123,15 @@ NOSE_ARGS = [
 # ACCOUNT SETTINGS
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_ACTIVATION_DAYS = 7
+
+# MARKDOWN SETTINGS
+MARKDOWN_EDITOR_SKIN = 'simple'
+MARKDOWN_EXTENSIONS = 'extra', 'codehilite'
+MARKDOWN_EXTENSION_CONFIGS = {
+    'codehilite': {
+        'linenums': False,
+    }
+}
 
 if os.environ.get('DT_PROD'):
     try:
