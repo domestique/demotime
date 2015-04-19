@@ -60,6 +60,9 @@ body.bookmarklet h1 {
     padding:0;
     display:inline-block;
 }
+.navbar ul.navbar-nav {
+    line-height:71px;
+}
 .navbar ul li {
     margin-left:20px;
     padding:5px 10px;
