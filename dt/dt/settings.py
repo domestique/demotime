@@ -120,6 +120,9 @@ NOSE_ARGS = [
     '--logging-filter=-django.db.backends.schema',
 ]
 
+# MAIL_SETTINGS
+DEFAULT_FROM_EMAIL = 'system@demotyme.com'
+
 # ACCOUNT SETTINGS
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_ACTIVATION_DAYS = 7
