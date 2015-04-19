@@ -1,6 +1,7 @@
 import json
 from StringIO import StringIO
 
+from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import BytesIO, File
@@ -37,6 +38,8 @@ class TestReviewViews(BaseTestCase):
                 },
             ],
         )
+        # Reset out mail queue
+        mail.outbox = []
 
     def test_get_index(self):
         response = self.client.get(reverse('index'))
@@ -117,6 +120,7 @@ class TestReviewViews(BaseTestCase):
         fh = StringIO('testing')
         fh.name = 'test_file_1'
         title = 'Test Title Create Review POST'
+        self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(reverse('create-review'), {
             'creator': self.user,
             'title': title,
@@ -149,11 +153,13 @@ class TestReviewViews(BaseTestCase):
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_post_update_review(self):
         fh = StringIO('testing')
         fh.name = 'test_file_1'
         title = 'Test Title Update Review POST'
+        self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(reverse('edit-review', args=[self.review.pk]), {
             'creator': self.user,
             'title': title,
@@ -188,6 +194,7 @@ class TestReviewViews(BaseTestCase):
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_post_create_review_with_errors(self):
         response = self.client.post(reverse('create-review'), {
@@ -204,6 +211,7 @@ class TestReviewViews(BaseTestCase):
     def test_comment_on_review(self):
         fh = StringIO('testing')
         fh.name = 'test_file_1'
+        self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
             'comment': "Oh nice demo!",
             'attachment': fh,
@@ -231,14 +239,17 @@ class TestReviewViews(BaseTestCase):
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_reply_to_comment(self):
+        self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
             'comment': "Oh nice demo!",
         })
         rev = self.review.revision
         self.assertStatusCode(response, 302)
         self.assertEqual(rev.commentthread_set.count(), 1)
+        self.assertEqual(len(mail.outbox), 3)
 
         thread = rev.commentthread_set.get()
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
@@ -250,6 +261,7 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(rev.commentthread_set.count(), 1)
         self.assertEqual(thread.comment_set.count(), 2)
         self.assertTrue(thread.comment_set.filter(comment='Reply!').exists())
+        self.assertEqual(len(mail.outbox), 6)
 
     def test_create_second_thread(self):
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
@@ -330,6 +342,7 @@ class TestReviewViews(BaseTestCase):
         })
 
     def test_update_reviewer_status_state_change(self):
+        self.assertEqual(len(mail.outbox), 0)
         self.review.reviewer_set.update(status=models.reviews.APPROVED)
         user = User.objects.get(username='test_user_0')
         self.client.logout()
@@ -360,6 +373,7 @@ class TestReviewViews(BaseTestCase):
             'success': True,
             'errors': {},
         })
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_update_reviewer_status_failure_wrong_user(self):
         reviewer = models.Reviewer.objects.get(
@@ -377,6 +391,7 @@ class TestReviewViews(BaseTestCase):
         self.assertStatusCode(response, 404)
 
     def test_update_review_state_closed(self):
+        self.assertEqual(len(mail.outbox), 0)
         url = reverse('update-review-state', args=[self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -394,6 +409,7 @@ class TestReviewViews(BaseTestCase):
             models.Message.objects.filter(title=title).count(),
             3
         )
+        self.assertEqual(len(mail.outbox), 3)
 
     def test_update_review_state_aborted(self):
         url = reverse('update-review-state', args=[self.review.pk])
