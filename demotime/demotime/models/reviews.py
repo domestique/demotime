@@ -101,9 +101,8 @@ class Review(BaseModel):
             )
         for reviewer in reviewers:
             Reviewer.create_reviewer(obj, reviewer)
-            UserReviewStatus.objects.create(
-                review=obj,
-                user=reviewer
+            UserReviewStatus.create_user_review_status(
+                obj, reviewer
             )
 
         # Creator UserReviewStatus, set read to True, cuz they just created it
@@ -142,7 +141,7 @@ class Review(BaseModel):
                 Reviewer.create_reviewer(obj, reviewer)
 
         # Update UserReviewStatuses
-        UserReviewStatus.objects.filter(review=review).exclude(
+        UserReviewStatus.objects.filter(review=obj).exclude(
             user=creator
         ).update(read=False)
 
@@ -157,6 +156,9 @@ class Review(BaseModel):
         previous_state = self.get_reviewer_state_display()
         self.reviewer_state = state
         self.save(update_fields=['reviewer_state'])
+        UserReviewStatus.objects.filter(review=self, user=self.creator).update(
+            read=False
+        )
         if state == APPROVED:
             Message.send_system_message(
                 '"{}" has been Approved!'.format(self.title),
@@ -237,17 +239,29 @@ class Review(BaseModel):
 
         return True
 
-    def update_state(self, new_state):
-        if self.state == OPEN and new_state == CLOSED:
-            return self._close_review(new_state)
-        elif self.state == OPEN and new_state == ABORTED:
-            return self._close_review(new_state)
-        elif self.state == CLOSED and new_state == OPEN:
-            return self._reopen_review(new_state)
-        elif self.state == ABORTED and new_state == OPEN:
-            return self._reopen_review(new_state)
+    def _common_state_change(self, state):
+        ''' General purpose state change things '''
+        UserReviewStatus.objects.filter(
+            review=self
+        ).exclude(user=self.creator).update(
+            read=False
+        )
 
-        return False
+    def update_state(self, new_state):
+        state_changed = False
+        if self.state == OPEN and new_state == CLOSED:
+            state_changed = self._close_review(new_state)
+        elif self.state == OPEN and new_state == ABORTED:
+            state_changed = self._close_review(new_state)
+        elif self.state == CLOSED and new_state == OPEN:
+            state_changed = self._reopen_review(new_state)
+        elif self.state == ABORTED and new_state == OPEN:
+            state_changed = self._reopen_review(new_state)
+
+        if state_changed:
+            self._common_state_change(new_state)
+
+        return state_changed
 
     @property
     def revision(self):

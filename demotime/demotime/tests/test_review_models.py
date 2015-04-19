@@ -76,6 +76,7 @@ class TestReviewModels(BaseTestCase):
     def test_update_reviewer_state_approved(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.reviewer_set.update(status=models.reviews.APPROVED)
+        models.UserReviewStatus.objects.update(read=True)
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.APPROVED)
@@ -83,10 +84,18 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.APPROVED)
+        self.assertTrue(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                user=self.user,
+                read=False
+            ).exists()
+        )
 
     def test_update_reviewer_state_rejected(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.reviewer_set.update(status=models.reviews.REJECTED)
+        models.UserReviewStatus.objects.update(read=True)
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
@@ -94,6 +103,13 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" has been Rejected'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REJECTED)
+        self.assertTrue(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                user=self.user,
+                read=False
+            ).exists()
+        )
 
     def test_update_reviewer_state_reviewing(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -103,6 +119,7 @@ class TestReviewModels(BaseTestCase):
         undecided_person = obj.reviewer_set.all()[0]
         undecided_person.status = models.reviews.REVIEWING
         undecided_person.save()
+        models.UserReviewStatus.objects.update(read=True)
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
@@ -110,6 +127,13 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REVIEWING)
+        self.assertTrue(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                user=self.user,
+                read=False
+            ).exists()
+        )
 
     def test_update_reviewer_state_unchanged(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -123,6 +147,7 @@ class TestReviewModels(BaseTestCase):
 
     def test_review_state_change_closed(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
+        models.UserReviewStatus.objects.update(read=True)
         self.assertTrue(obj.update_state(models.reviews.CLOSED))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
@@ -134,9 +159,17 @@ class TestReviewModels(BaseTestCase):
             )
         )
         self.assertEqual(msgs.count(), 3)
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            3
+        )
 
     def test_review_state_change_aborted(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
+        models.UserReviewStatus.objects.update(read=True)
         self.assertTrue(obj.update_state(models.reviews.ABORTED))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
@@ -149,11 +182,19 @@ class TestReviewModels(BaseTestCase):
             )
         )
         self.assertEqual(msgs.count(), 3)
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            3
+        )
 
     def test_review_state_change_closed_to_open(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.state = models.reviews.CLOSED
         obj.save(update_fields=['state'])
+        models.UserReviewStatus.objects.update(read=True)
         self.assertTrue(obj.update_state(models.reviews.OPEN))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
@@ -164,11 +205,19 @@ class TestReviewModels(BaseTestCase):
             title='"{}" has been Reopened'.format(obj.title)
         )
         self.assertEqual(msgs.count(), 3)
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            3
+        )
 
     def test_review_state_change_aborted_to_open(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.state = models.reviews.ABORTED
         obj.save(update_fields=['state'])
+        models.UserReviewStatus.objects.update(read=True)
         self.assertTrue(obj.update_state(models.reviews.OPEN))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
@@ -179,3 +228,10 @@ class TestReviewModels(BaseTestCase):
             title='"{}" has been Reopened'.format(obj.title)
         )
         self.assertEqual(msgs.count(), 3)
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            3
+        )
