@@ -89,3 +89,19 @@ a.button-link.confirm {
     background:#E03743;
     padding:2px;
 }
+
+/* Markdown */
+.markItUp,
+..markItUpEditor {
+    width:100% !important;
+}
+.markItUpHeader {
+    display:none !important;
+}
+.mdhelper {
+    text-align:right;
+    padding-bottom:5px;
+}
+.mdhelper a {
+    font-size:.8em;
+}

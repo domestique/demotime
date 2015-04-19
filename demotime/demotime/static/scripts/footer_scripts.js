@@ -19,4 +19,6 @@ $(document).ready(function() {
             window.location.href = $(this).data('href');
         }
     });
+
+    $('.markItUpEditor').before('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
 });

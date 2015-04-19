@@ -70,6 +70,10 @@ section section {
     background:#fff;
 }
 
+p, li {
+    line-height:1.8em;
+}
+
 .content h1 {
     color:#aaa;
     text-transform:uppercase;
