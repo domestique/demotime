@@ -55,3 +55,4 @@ class Attachment(BaseModel):
             ('content_type', 'object_id'),
         ]
         app_label = 'demotime'
+        get_latest_by = 'created'
