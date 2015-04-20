@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
+from django.core.urlresolvers import reverse_lazy
 
 
 # General
@@ -35,4 +36,31 @@ urlpatterns += patterns('',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login', name='logout'),
     url(r'^accounts/profile/(?P<pk>[\d]+)/$', 'demotime.views.users.profile_view', name='profile'),
     url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', 'demotime.views.users.edit_profile_view', name='edit-profile'),
+    url(
+        r'^accounts/password/reset/$',
+        'django.contrib.auth.views.password_reset',
+        {
+            'template_name': 'registration/password_reset_request.html',
+            'post_reset_redirect': reverse_lazy('password_reset_done'),
+        },
+        name='password-reset'
+    ),
+    url(
+        r'^accounts/password/reset/done/$',
+        'django.contrib.auth.views.password_reset_done',
+        {'template_name': 'registration/password_reset_submitted.html'},
+        name='password_reset_done'
+    ),
+    url(
+        r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+        'django.contrib.auth.views.password_reset_confirm',
+        {'template_name': 'registration/password_reset_confirmation.html'},
+        name='password_reset_confirm'
+    ),
+    url(
+        r'^accounts/password/reset/complete/$',
+        'django.contrib.auth.views.password_reset_complete',
+        {'template_name': 'registration/password_reset_completed.html'},
+        name='password_reset_complete'
+    ),
 )
