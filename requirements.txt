@@ -5,3 +5,4 @@ ipython==2.3.1
 django-macros==0.3.3
 Pillow==2.8.1
 django-registration-redux==1.1
+django-markdown==0.8.4

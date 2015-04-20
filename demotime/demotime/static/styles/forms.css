@@ -103,6 +103,9 @@ select[multiple="multiple"]:focus {
 .form-group {
     margin-top:2em;
 }
+.form-group input {
+    margin-right:15px;
+}
 
 .errorlist {
     margin:10px 0;
