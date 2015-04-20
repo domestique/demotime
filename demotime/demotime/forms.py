@@ -131,3 +131,27 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = models.UserProfile
         fields = ('display_name', 'bio', 'avatar')
+
+
+class BulkMessageUpdateForm(forms.Form):
+
+    READ = 'read'
+    UNREAD = 'unread'
+    DELETED = 'delete'
+    UNDELETED = 'undelete'
+
+    messages = forms.ModelMultipleChoiceField(
+        queryset=models.Message.objects.none()
+    )
+    action = forms.ChoiceField(choices=(
+        (READ, READ.capitalize()),
+        (UNREAD, UNREAD.capitalize()),
+        (DELETED, DELETED.capitalize()),
+        (UNDELETED, UNDELETED.capitalize()),
+    ))
+
+    def __init__(self, user, *args, **kwargs):
+        super(BulkMessageUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['messages'].queryset = models.Message.objects.filter(
+            receipient=user
+        )

@@ -3,7 +3,7 @@ from django.views.generic import DetailView, ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from demotime import models
+from demotime import forms, models
 
 
 class InboxView(ListView):
@@ -13,6 +13,24 @@ class InboxView(ListView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(InboxView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = forms.BulkMessageUpdateForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            messages = form.cleaned_data['messages']
+            action = form.cleaned_data['action']
+            if action == form.READ:
+                messages.update(read=True)
+            elif action == form.UNREAD:
+                messages.update(read=False)
+            elif action == form.DELETED:
+                messages.update(deleted=True)
+            elif action == form.UNDELETED:
+                messages.update(deleted=False)
+
+            return redirect('inbox')
+        else:
+            return self.get(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = models.Message.objects.filter(receipient=self.request.user)
@@ -31,6 +49,12 @@ class InboxView(ListView):
             queryset = queryset.order_by('created')
 
         return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(InboxView, self).get_context_data(*args, **kwargs)
+        context['form'] = forms.BulkMessageUpdateForm(user=self.request.user)
+
+        return context
 
 
 class MessageDetailView(DetailView):

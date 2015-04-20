@@ -201,6 +201,14 @@ a.True {
                     </div>
                 {% endfor %}
             </div>
+            {# Bulk Message Form #}
+            {% comment %}
+            <form method='post' action=''>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type='submit' value='Submit'>
+            </form>
+            {% endcomment %}
         </section>
     {% else %}
         There's nothing here. Enjoy your life.
