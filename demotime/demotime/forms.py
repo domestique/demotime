@@ -161,3 +161,17 @@ class BulkMessageUpdateForm(forms.Form):
         self.fields['messages'].queryset = models.Message.objects.filter(
             receipient=user
         )
+
+
+class UpdateCommentForm(CommentForm, AttachmentForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateCommentForm, self).__init__(*args, **kwargs)
+        self.fields['attachment_type'].required = False
+
+    def clean_attachment_type(self):
+        data = self.cleaned_data
+        if data.get('attachment') and not data.get('attachment_type'):
+            raise forms.ValidationError('Attachments require an Attachment Type')
+
+        return data['attachment_type']

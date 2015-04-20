@@ -23,6 +23,12 @@ urlpatterns += patterns('demotime.views.reviews',
         name='update-reviewer-status',
     ),
     url(r'review/(?P<pk>[\d]+)/update-state/$', 'review_state_view', name='update-review-state'),
+    url(r'comment/update/(?P<pk>[\d]+)/$', 'update_comment_view', name='update-comment'),
+    url(
+        r'comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
+        'delete_comment_attachment_view',
+        name='update-comment-attachment'
+    ),
 )
 
 # Messages

@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
 from django.views.generic import TemplateView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.contenttypes.models import ContentType
 
 from demotime import forms, models
 from . import JsonView
@@ -223,7 +225,78 @@ class ReviewStateView(JsonView):
                 'errors': form.errors,
             }
 
+
+class DeleteCommentAttachmentView(JsonView):
+
+    status = 200
+
+    def post(self, request, *args, **kwargs):
+        ct = ContentType.objects.get(app_label='demotime', model='comment')
+        attachment_pk = kwargs['attachment_pk']
+        comment_pk = kwargs['comment_pk']
+        comment = get_object_or_404(
+            models.Comment, pk=comment_pk, commenter=request.user
+        )
+        attachment = get_object_or_404(
+            models.Attachment, pk=attachment_pk,
+            content_type=ct, object_id=comment.pk
+        )
+        if request.POST.get('delete') == 'true':
+            attachment.delete()
+            return {
+                'success': True,
+            }
+
+        return {}
+
+
+class UpdateCommentView(JsonView):
+
+    status = 200
+
+    def post(self, *args, **kwargs):
+        comment_pk = kwargs['pk']
+        comment = get_object_or_404(
+            models.Comment, pk=comment_pk, commenter=self.request.user
+        )
+        form = forms.UpdateCommentForm(
+            instance=comment,
+            data=self.request.POST,
+            files=self.request.FILES,
+        )
+        if form.is_valid():
+            data = form.cleaned_data
+            comment.comment = data['comment']
+            comment.save(update_fields=['comment'])
+            attachment_url = ''
+            if data.get('attachment'):
+                attachment = models.Attachment.objects.create(
+                    attachment=data['attachment'],
+                    attachment_type=data['attachment_type'],
+                    description=data.get('description', ''),
+                    content_object=comment,
+                )
+                attachment_url = '{}{}'.format(
+                    settings.MEDIA_URL, attachment.attachment.name
+                ),
+            return {
+                'success': True,
+                'errors': {},
+                'comment': comment.comment,
+                'attachment_url': attachment_url,
+            }
+        else:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {},
+                'comment': comment.comment,
+                'attachment_url': ''
+            }
+
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
 review_state_view = ReviewStateView.as_view()
+update_comment_view = UpdateCommentView.as_view()
+delete_comment_attachment_view = DeleteCommentAttachmentView.as_view()
