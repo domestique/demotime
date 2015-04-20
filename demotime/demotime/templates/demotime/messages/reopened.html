@@ -1,6 +1,6 @@
 Hello {{ reviewer }},
 
-The review, <a href="{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're reviewing has changed from {{ prev_state }} to {{ review.state.get_state_display }} and is now reopned for review. Please give it another look! 
+The review, <a href="//{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're reviewing has changed from {{ prev_state }} to {{ review.state.get_state_display }} and is now reopned for review. Please give it another look! 
 
 Thanks,
 {{ sender }}

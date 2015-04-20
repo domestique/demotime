@@ -1,6 +1,6 @@
 Hello {{ review.creator }},
 
-Your demo, <a href="{{ review.get_absolute_url }}">{{ review.title }}</a>, has been approved! You can now proceed to close this demo, or add further content to it if you wish! 
+Your demo, <a href="//{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, has been approved! You can now proceed to close this demo, or add further content to it if you wish! 
 
 Thanks,
     {{ sender }}

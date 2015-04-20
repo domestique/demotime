@@ -3,6 +3,7 @@ from django.forms import formset_factory
 from django.views.generic import TemplateView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib.sites.shortcuts import get_current_site
 
 from demotime import forms, models
 from . import JsonView
@@ -26,6 +27,7 @@ class ReviewDetail(DetailView):
         )
         self.attachment_form = None
         self.comment_form = None
+        self.site = get_current_site(request)
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

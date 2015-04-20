@@ -46,7 +46,10 @@ class Message(BaseModel):
             revision=None, thread=None, email=True
     ):
         system_user = User.objects.get(username='demotime_sys')
-        context_dict['sender'] = system_user
+        context_dict.update({
+            'sender': system_user,
+            'dt_url': settings.SERVER_URL,
+        })
         msg_text = loader.get_template(
             template_name
         ).render(Context(context_dict))

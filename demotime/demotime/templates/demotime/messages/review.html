@@ -1,9 +1,9 @@
 Hello {{ reviewer }},
 
 {% if update %}
-    There has been an update to <a href="{{ url }}">{{ title }}</a>.
+There has been an update to <a href="//{{ dt_url }}{{ url }}">{{ title }}</a>.
 {% else %}
-    A new review has been created and assigned to you: <a href="{{ url }}">{{ title }}</a>.
+A new review has been created and assigned to you: <a href="//{{ dt_url }}{{ url }}">{{ title }}</a>.
 {% endif %}
 
 Thanks,

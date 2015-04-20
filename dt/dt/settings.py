@@ -126,6 +126,9 @@ DEFAULT_FROM_EMAIL = 'system@demotyme.com'
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_ACTIVATION_DAYS = 7
 
+# SERVER SETTINGS
+SERVER_URL = os.environ.get('DT_URL', 'localhost:8000')
+
 if os.environ.get('DT_PROD'):
     try:
         from prod_settings import *
