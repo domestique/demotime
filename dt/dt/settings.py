@@ -113,7 +113,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 # TEST SETTINGS
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
-    'demotime',
     '--with-coverage',
     '--cover-package=demotime',
     '--logging-filter=-django.db.backends.schema',

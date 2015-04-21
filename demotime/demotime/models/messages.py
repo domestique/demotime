@@ -60,6 +60,7 @@ class Message(BaseModel):
             review_revision=revision,
             message=msg_text,
             thread=thread,
+            email=email,
         )
         return obj
 

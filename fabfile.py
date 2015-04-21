@@ -6,16 +6,23 @@ from fabric import api
 from fabric.api import env
 
 REMOTE_ROOT = '/usr/local/demotime'
-BUILD_DIR = '{}/builds'.format(REMOTE_ROOT)
+REMOTE_BUILD_DIR = '{}/builds'.format(REMOTE_ROOT)
+
+LOCAL_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 env.roledefs = {
     'local': ['localhost'],
     'prod': ['demotime@45.33.113.50'],
 }
 
-# TODO: set STATIC_ROOT for collectstatic
-# Setup nginx
-# Solidify gunicorn
+
+@api.roles('local')
+def run_tests(test_module='demotime'):
+    api.local('echo "Cleaning out pycs"')
+    api.local('find . -type f -name \*.pycs -delete')
+    with api.lcd(os.path.join(LOCAL_ROOT, 'dt')):
+        api.local('echo "Running DemoTime tests"')
+        return api.local('python manage.py test {}'.format(test_module))
 
 
 @api.roles('prod')
@@ -30,7 +37,7 @@ def deploy(branch='master'):
     dir_name = ''
     package_url = 'https://github.com/f4nt/demotime/archive/{}.zip'.format(branch)
     # Place our code and install reqs
-    with api.cd(BUILD_DIR):
+    with api.cd(REMOTE_BUILD_DIR):
         dir_name = 'demotime-{}'.format(uuid)
         api.run('wget {}'.format(package_url))
         api.run('unzip {}.zip'.format(branch))
@@ -45,10 +52,10 @@ def deploy(branch='master'):
 
     # Create our symlinks
     with api.cd(REMOTE_ROOT):
-        api.run('ln -s {}/{} demotime-current'.format(BUILD_DIR, dir_name))
+        api.run('ln -s {}/{} demotime-current'.format(REMOTE_BUILD_DIR, dir_name))
 
     # App setup stuff
-    with api.cd(os.path.join(BUILD_DIR, dir_name, 'dt')):
+    with api.cd(os.path.join(REMOTE_BUILD_DIR, dir_name, 'dt')):
         api.run('cd dt && ln -s {}/prod_settings.py .'.format(REMOTE_ROOT))
         api.run('{}/bin/python manage.py collectstatic --noinput'.format(REMOTE_ROOT))
         api.run('{}/bin/python manage.py migrate'.format(REMOTE_ROOT))
