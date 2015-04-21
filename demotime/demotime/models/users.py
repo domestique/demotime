@@ -12,11 +12,24 @@ def avatar_field(instance, filename):
 
 class UserProfile(BaseModel):
 
+    USER = 'user'
+    SYSTEM = 'system'
+
+    USER_TYPE_CHOICES = (
+        (USER, USER.capitalize()),
+        (SYSTEM, SYSTEM.capitalize()),
+    )
+
     user = models.OneToOneField('auth.User')
     avatar = models.ImageField(upload_to=avatar_field, null=True, blank=True)
     bio = models.TextField()
     display_name = models.CharField(
         max_length=2048, blank=True, null=True, unique=True
+    )
+    user_type = models.CharField(
+        max_length=1024,
+        choices=USER_TYPE_CHOICES,
+        default=USER,
     )
 
     def __unicode__(self):
