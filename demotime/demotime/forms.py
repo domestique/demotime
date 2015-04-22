@@ -26,6 +26,35 @@ class ReviewForm(forms.ModelForm):
         )
 
 
+class ReviewFilterForm(forms.Form):
+
+    state = forms.ChoiceField(
+        required=False,
+        choices=models.Review.STATUS_CHOICES
+    )
+    reviewer_state = forms.ChoiceField(
+        required=False,
+        choices=models.Review.REVIEWER_STATE_CHOICES,
+    )
+    creator = forms.ModelChoiceField(
+        required=False,
+        queryset=User.objects.exclude(
+            userprofile__user_type=models.UserProfile.SYSTEM
+        )
+    )
+    reviewer = forms.ModelChoiceField(
+        required=False,
+        queryset=User.objects.exclude(
+            userprofile__user_type=models.UserProfile.SYSTEM
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(ReviewFilterForm, self).__init__(*args, **kwargs)
+        for key, value in self.fields.iteritems():
+            self.fields[key].widget.attrs['class'] = 'form-control'
+
+
 class CommentForm(forms.ModelForm):
 
     thread = forms.ModelChoiceField(

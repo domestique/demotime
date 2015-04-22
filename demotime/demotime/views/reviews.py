@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
-from django.views.generic import TemplateView, DetailView
+from django.views.generic import TemplateView, DetailView, ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.sites.shortcuts import get_current_site
@@ -166,6 +166,25 @@ class CreateReviewView(TemplateView):
         return context
 
 
+class ReviewListView(ListView):
+
+    template_name = 'demotime/demo_list.html'
+    paginate_by = 15
+    model = models.Review
+
+    def get_queryset(self):
+        qs = super(ReviewListView, self).get_queryset()
+        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(ReviewListView, self).get_context_data(**kwargs)
+        context.update({
+            'form': forms.ReviewFilterForm(),
+        })
+        return context
+
+
 class ReviewerStatusView(JsonView):
 
     status = 200
@@ -227,3 +246,4 @@ review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
 review_state_view = ReviewStateView.as_view()
+review_list_view = ReviewListView.as_view()
