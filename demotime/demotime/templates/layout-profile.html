@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load demo_tags %}
 
 {% block styles %}
 {{ block.super }}
@@ -9,8 +10,14 @@
     }
     .reviews-list section {
         min-height:150px;
+        padding:20px 10px;
+    }
+    .reviews-list section,
+    .reviews-list section a {
+        color:#fff;
     }
     .reviews-list ul {
+        list-style:none;
         margin:0;
         padding:0;
     }
@@ -29,10 +36,6 @@
         background-size:50%;
         background-position:50% 50%;
     }
-    .content section,
-    .content section a {
-        color:#fff;
-    }
 </style>
 {% endblock %}
 
@@ -49,7 +52,7 @@
                             {% if open_demos %}
                                 <ul>
                                     {% for demo in open_demos %}
-                                        <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
+                                        <li class="icon icon-{{ demo.reviewer_state }}"><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
@@ -64,7 +67,7 @@
                             {% if open_reviews %}
                                 <ul>
                                     {% for demo in open_reviews %}
-                                        <li><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
+                                        <li class="icon icon-{% review_status demo request %}"><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
@@ -79,7 +82,7 @@
                             {% if updated_demos %}
                                 <ul>
                                     {% for demo in updated_demos %}
-                                        <li><a href="{{ demo.review.get_absolute_url }}">{{ demo.review.title }}</a></li>
+                                        <li class="icon icon-{{ demo.review.reviewer_state }} }}"><a href="{{ demo.review.get_absolute_url }}">{{ demo.review.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
