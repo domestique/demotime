@@ -7,6 +7,7 @@ def unread_message_count(request):
             'unread_message_count': models.Message.objects.filter(
                 receipient=request.user,
                 read=False,
+                deleted=False,
             ).count()
         }
     else:
@@ -18,7 +19,8 @@ def has_unread_messages(request):
         return {
             'has_unread_messages': models.Message.objects.filter(
                 receipient=request.user,
-                read=False
+                read=False,
+                deleted=False,
             ).exists()
         }
     else:
