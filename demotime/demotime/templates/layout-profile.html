@@ -67,7 +67,13 @@
                             {% if open_reviews %}
                                 <ul>
                                     {% for demo in open_reviews %}
-                                        <li class="icon icon-{% review_status demo request %}"><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
+                                        {% if object.user %}
+                                            {# We're in a Profile view, let's use the UserProfile.user object #}
+                                            <li class="icon icon-{% reviewer_status demo object.user %}"><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
+                                        {% else %}
+                                            {# We're not in a Profile view, let's use request.user #}
+                                            <li class="icon icon-{% reviewer_status demo request.user %}"><a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a></li>
+                                        {% endif %}
                                     {% endfor %}
                                 </ul>
                             {% endif %}

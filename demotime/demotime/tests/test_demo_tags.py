@@ -1,5 +1,3 @@
-from mock import Mock
-
 from django.contrib.auth.models import User
 from django.template import Context, Template
 
@@ -13,20 +11,20 @@ class TestDemoTags(BaseTestCase):
     def setUp(self):
         super(TestDemoTags, self).setUp()
         self.review = models.Review.create_review(**self.default_review_kwargs)
-        self.request = Mock()
-        self.request.user = User.objects.get(username='test_user_0')
+        # Grab our reviewer
+        self.user = User.objects.get(username='test_user_0')
 
     def test_review_status(self):
         self.assertEqual(
-            demo_tags.review_status(self.review, self.request),
+            demo_tags.reviewer_status(self.review, self.user),
             models.reviews.REVIEWING.capitalize()
         )
 
     def test_review_status_render(self):
         template = Template(
-            "{% load demo_tags %}{% review_status review request %}"
+            "{% load demo_tags %}{% reviewer_status review user %}"
         )
         content = template.render(
-            Context({'review': self.review, 'request': self.request})
+            Context({'review': self.review, 'user': self.user})
         )
         self.assertEqual(content, models.reviews.REVIEWING.capitalize())

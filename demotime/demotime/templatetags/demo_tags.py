@@ -6,11 +6,11 @@ register = template.Library()
 
 
 @register.simple_tag
-def review_status(review, request):
+def reviewer_status(review, user):
     if isinstance(review, models.ReviewRevision):
         review = review.review
 
     return models.Reviewer.objects.get(
         review=review,
-        reviewer=request.user
+        reviewer=user
     ).get_status_display()
