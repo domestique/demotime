@@ -6,3 +6,4 @@ django-macros==0.3.3
 Pillow==2.8.1
 django-registration-redux==1.1
 Fabric==1.10.1
+django-markdown==0.8.4

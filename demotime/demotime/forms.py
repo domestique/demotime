@@ -1,13 +1,15 @@
 from django import forms
 from django.contrib.auth.models import User
 
+from django_markdown.widgets import MarkdownWidget
+
 from demotime import models
 
 
 class ReviewForm(forms.ModelForm):
 
     description = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 5})
+        widget=MarkdownWidget(),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -32,6 +34,9 @@ class CommentForm(forms.ModelForm):
         queryset=models.CommentThread.objects.none(),
         widget=forms.widgets.HiddenInput(),
         required=False
+    )
+    comment = forms.CharField(
+        widget=MarkdownWidget()
     )
 
     def __init__(self, thread=None, *args, **kwargs):
@@ -108,6 +113,7 @@ class ReviewStateForm(forms.Form):
 
 class UserProfileForm(forms.ModelForm):
 
+    bio = forms.CharField(required=False, widget=MarkdownWidget())
     email = forms.EmailField()
     password_one = forms.CharField(
         required=False,
@@ -131,3 +137,41 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = models.UserProfile
         fields = ('display_name', 'bio', 'avatar')
+
+
+class BulkMessageUpdateForm(forms.Form):
+
+    READ = 'read'
+    UNREAD = 'unread'
+    DELETED = 'delete'
+    UNDELETED = 'undelete'
+
+    messages = forms.ModelMultipleChoiceField(
+        queryset=models.Message.objects.none()
+    )
+    action = forms.ChoiceField(choices=(
+        (READ, READ.capitalize()),
+        (UNREAD, UNREAD.capitalize()),
+        (DELETED, DELETED.capitalize()),
+        (UNDELETED, UNDELETED.capitalize()),
+    ))
+
+    def __init__(self, user, *args, **kwargs):
+        super(BulkMessageUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['messages'].queryset = models.Message.objects.filter(
+            receipient=user
+        )
+
+
+class UpdateCommentForm(CommentForm, AttachmentForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateCommentForm, self).__init__(*args, **kwargs)
+        self.fields['attachment_type'].required = False
+
+    def clean_attachment_type(self):
+        data = self.cleaned_data
+        if data.get('attachment') and not data.get('attachment_type'):
+            raise forms.ValidationError('Attachments require an Attachment Type')
+
+        return data['attachment_type']

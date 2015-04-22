@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-from demotime import models
+from demotime import forms, models
 from demotime.tests import BaseTestCase
 
 
@@ -126,3 +126,55 @@ class TestMessageViews(BaseTestCase):
         self.assertFalse(msg.read)
         response = self.client.get(msg.get_absolute_url())
         self.assertStatusCode(response, 404)
+
+    def test_mark_messages_read(self):
+        models.Message.objects.filter(receipient=self.user).update(read=False)
+        response = self.client.get(reverse('inbox'), {
+            'messages': models.Message.objects.filter(
+                receipient=self.user).values_list('pk', flat=True),
+            'action': forms.BulkMessageUpdateForm.READ,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user, read=True).count(),
+            models.Message.objects.filter(receipient=self.user).count(),
+        )
+
+    def test_mark_messages_unread(self):
+        models.Message.objects.filter(receipient=self.user).update(read=True)
+        response = self.client.get(reverse('inbox'), {
+            'messages': models.Message.objects.filter(
+                receipient=self.user).values_list('pk', flat=True),
+            'action': forms.BulkMessageUpdateForm.UNREAD,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user, read=False).count(),
+            models.Message.objects.filter(receipient=self.user).count(),
+        )
+
+    def test_mark_messages_deleted(self):
+        models.Message.objects.filter(receipient=self.user).update(deleted=False)
+        response = self.client.get(reverse('inbox'), {
+            'messages': models.Message.objects.filter(
+                receipient=self.user).values_list('pk', flat=True),
+            'action': forms.BulkMessageUpdateForm.DELETED,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user, deleted=True).count(),
+            models.Message.objects.filter(receipient=self.user).count(),
+        )
+
+    def test_mark_messages_undeleted(self):
+        models.Message.objects.filter(receipient=self.user).update(deleted=True)
+        response = self.client.get(reverse('inbox'), {
+            'messages': models.Message.objects.filter(
+                receipient=self.user).values_list('pk', flat=True),
+            'action': forms.BulkMessageUpdateForm.UNDELETED,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user, deleted=False).count(),
+            models.Message.objects.filter(receipient=self.user).count(),
+        )
