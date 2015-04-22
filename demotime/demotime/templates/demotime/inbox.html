@@ -4,6 +4,9 @@
 {% block styles %}
 {{ block.super }}
 <style>
+.messages section {
+    overflow:hidden;
+}
 dl.messages-nav {
     border:1px solid #415E73;
     display:table;
@@ -163,6 +166,11 @@ dl.messages-nav dd.current a {
 a.True {
     font-weight:400;
 }
+
+.messages-delete_all {
+    float:right;
+    margin-top:2em;
+}
 </style>
 {% endblock %}
 
@@ -201,9 +209,35 @@ a.True {
                     </div>
                 {% endfor %}
             </div>
+            {# Bulk Message Form #}
+            <form method='post' action=''>
+                <div style="display:none">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="messages-delete_all">Delete all messages</button>
+            </form>
         </section>
     {% else %}
         There's nothing here. Enjoy your life.
     {% endif %}
 </div>
+{% endblock %}
+
+{% block footer_scripts %}
+{{ block.super }}
+<script>
+    $('.messages-delete_all').click(function() {
+        var form = $(this).parents('form');
+
+        var r = confirm('Delete all messages?');
+        if (r == true) {
+            form.find('#id_messages option').prop('selected', true);
+            form.find('#id_action').val('delete');
+            form.submit();
+        } else {
+            return false;
+        }
+    });
+</script>
 {% endblock %}
