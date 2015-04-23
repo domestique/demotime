@@ -14,7 +14,7 @@
     <section>
         <form action="" method="get">
             {% for form in form %}
-                <label>{{ form.label }}</label>
+                <label style="display: inline;">{{ form.label }}</label>
                 {{ form.errors }}
                 {{ form }}
             {% endfor %}

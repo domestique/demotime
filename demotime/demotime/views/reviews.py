@@ -174,13 +174,34 @@ class ReviewListView(ListView):
 
     def get_queryset(self):
         qs = super(ReviewListView, self).get_queryset()
-        import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
-        return qs
+        form = forms.ReviewFilterForm(self.request.GET)
+        if form.is_valid():
+            data = form.cleaned_data
+            if data.get('reviewer'):
+                qs = qs.filter(reviewer__reviewer=data['reviewer'])
+
+            if data.get('creator'):
+                qs = qs.filter(creator=data['creator'])
+
+            if data.get('state'):
+                qs = qs.filter(state=data['state'])
+
+            if data.get('reviewer_state'):
+                qs = qs.filter(reviewer_state=data['reviewer_state'])
+
+            if data.get('sort_by'):
+                sorting = data['sort_by']
+                if sorting == 'newest':
+                    qs = qs.order_by('-modified')
+                elif sorting == 'oldest':
+                    qs = qs.order_by('modified')
+
+        return qs.distinct()
 
     def get_context_data(self, **kwargs):
         context = super(ReviewListView, self).get_context_data(**kwargs)
         context.update({
-            'form': forms.ReviewFilterForm(),
+            'form': forms.ReviewFilterForm(initial=self.request.GET),
         })
         return context
 

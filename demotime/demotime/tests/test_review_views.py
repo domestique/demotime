@@ -468,3 +468,125 @@ class TestReviewViews(BaseTestCase):
                 'review': ['Select a valid choice. That choice is not one of the available choices.']
             },
         })
+
+    def test_review_list(self):
+        response = self.client.get(reverse('review-list'))
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+
+    def test_review_list_filter_by_creator(self):
+        response = self.client.get(reverse('review-list'), {
+            'creator': self.user.pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.creator, self.user)
+
+        # Let's show that filtering works the other way too
+        response = self.client.get(reverse('review-list'), {
+            'creator': User.objects.get(username='test_user_0').pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+        self.assertIn('form', response.context)
+
+    def test_review_list_filter_by_reviewer(self):
+        test_user = User.objects.get(username='test_user_0')
+        response = self.client.get(reverse('review-list'), {
+            'reviewer': test_user.pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.creator, self.user)
+        self.assertIn(test_user, obj.reviewers.all())
+
+        # Let's show that filtering works the other way too
+        response = self.client.get(reverse('review-list'), {
+            'reviewer': self.user.pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+        self.assertIn('form', response.context)
+
+    def test_review_list_filter_by_state(self):
+        response = self.client.get(reverse('review-list'), {
+            'state': models.reviews.OPEN,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.state, models.reviews.OPEN)
+
+        # Let's show that filtering works the other way too
+        response = self.client.get(reverse('review-list'), {
+            'state': models.reviews.CLOSED,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+        self.assertIn('form', response.context)
+
+    def test_review_list_filter_by_reviewer_state(self):
+        response = self.client.get(reverse('review-list'), {
+            'reviewer_state': models.reviews.REVIEWING,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.state, models.reviews.OPEN)
+
+        # Let's show that filtering works the other way too
+        response = self.client.get(reverse('review-list'), {
+            'reviewer_state': models.reviews.APPROVED,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+        self.assertIn('form', response.context)
+
+    def test_review_list_all_the_filters(self):
+        test_user = User.objects.get(username='test_user_0')
+        response = self.client.get(reverse('review-list'), {
+            'reviewer': test_user.pk,
+            'creator': self.user.pk,
+            'state': models.reviews.OPEN,
+            'reviewer_state': models.reviews.REVIEWING,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
+        self.assertIn(test_user, obj.reviewers.all())
+
+    def test_review_list_sort_by_newest(self):
+        review_kwargs = self.default_review_kwargs.copy()
+        review_kwargs['title'] = 'Newer Review'
+        newer_review = models.Review.create_review(**review_kwargs)
+        response = self.client.get(reverse('review-list'), {
+            'sort_by': 'newest'
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 2)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.pk, newer_review.pk)
+
+    def test_review_list_sort_by_oldest(self):
+        self.default_review_kwargs['title'] = 'Newer Review'
+        models.Review.create_review(**self.default_review_kwargs)
+        response = self.client.get(reverse('review-list'), {
+            'sort_by': 'oldest'
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 2)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.pk, self.review.pk)
