@@ -29,6 +29,7 @@ urlpatterns += patterns('demotime.views.reviews',
         'delete_comment_attachment_view',
         name='update-comment-attachment'
     ),
+    url(r'review/list/$', 'review_list_view', name='review-list'),
 )
 
 # Messages

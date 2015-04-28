@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
-from django.views.generic import TemplateView, DetailView
+from django.views.generic import TemplateView, DetailView, ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.sites.shortcuts import get_current_site
@@ -168,6 +168,46 @@ class CreateReviewView(TemplateView):
         return context
 
 
+class ReviewListView(ListView):
+
+    template_name = 'demotime/demo_list.html'
+    paginate_by = 15
+    model = models.Review
+
+    def get_queryset(self):
+        qs = super(ReviewListView, self).get_queryset()
+        form = forms.ReviewFilterForm(self.request.GET)
+        if form.is_valid():
+            data = form.cleaned_data
+            if data.get('reviewer'):
+                qs = qs.filter(reviewer__reviewer=data['reviewer'])
+
+            if data.get('creator'):
+                qs = qs.filter(creator=data['creator'])
+
+            if data.get('state'):
+                qs = qs.filter(state=data['state'])
+
+            if data.get('reviewer_state'):
+                qs = qs.filter(reviewer_state=data['reviewer_state'])
+
+            if data.get('sort_by'):
+                sorting = data['sort_by']
+                if sorting == 'newest':
+                    qs = qs.order_by('-modified')
+                elif sorting == 'oldest':
+                    qs = qs.order_by('modified')
+
+        return qs.distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super(ReviewListView, self).get_context_data(**kwargs)
+        context.update({
+            'form': forms.ReviewFilterForm(initial=self.request.GET),
+        })
+        return context
+
+
 class ReviewerStatusView(JsonView):
 
     status = 200
@@ -300,3 +340,4 @@ reviewer_status_view = ReviewerStatusView.as_view()
 review_state_view = ReviewStateView.as_view()
 update_comment_view = UpdateCommentView.as_view()
 delete_comment_attachment_view = DeleteCommentAttachmentView.as_view()
+review_list_view = ReviewListView.as_view()

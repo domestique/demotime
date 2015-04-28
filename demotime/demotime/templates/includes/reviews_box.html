@@ -32,5 +32,8 @@
                 </li>
             {% endfor %}
         </ul>
+        {% if type = "demos" %}
+            <a href="{% url 'review-list' %}?creator={{ user.pk }}">View all demos</a>
+        {% endif %}
     {% endif %}
 </section>

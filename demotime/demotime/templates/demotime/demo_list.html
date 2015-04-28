@@ -1,0 +1,29 @@
+{% extends 'layout-marketing.html' %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    input[type="submit"] {
+        margin-top:2em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Review List</h1>
+    <section>
+        <form action="" method="get">
+            {% for form in form %}
+                <label style="display: inline;">{{ form.label }}</label>
+                {{ form.errors }}
+                {{ form }}
+            {% endfor %}
+            <input type="submit" value="Filter Reviews">
+        </form>
+        <ul>
+            {% for obj in object_list %}
+                <li><a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock %}
