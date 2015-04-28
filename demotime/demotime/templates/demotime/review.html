@@ -5,35 +5,6 @@
 {% block styles %}
 {{ block.super }}
 <style>
-    .content .review section h1 {
-        background:none;
-        color:#333;
-        padding:0;
-        box-shadow:none;
-    }
-    .content .review section h1,
-    .content .review section h2,
-    .content .review section h3,
-    .content .review section h4,
-    .content .review section h5 {
-        text-transform:none;
-        margin:10px 0;
-    }
-    .content .review section h2 {
-        font-size:2em;
-    }
-    .content .review section h3 {
-        font-size:1.8em;
-    }
-    .content .review section h4 {
-        font-size:1.6em;
-    }
-    .content .review section h5 {
-        font-size:1.4em;
-    }
-    .content section h2 {
-        font-size:2em;
-    }
     .review-overview ol {
         margin:0;
         padding-left:20px;
@@ -73,9 +44,6 @@
         background:#fff;
         color:#222;
     }
-    .comments h4 {
-        margin-top:2.5em;
-    }
     .comments-reply {
         font-size:0.8em;
     }
@@ -95,10 +63,13 @@
     .comments-reply_new textarea {
         height:80px;
     }
-    .comments-reply h4 {
+    .comments-reply .heading {
+        clear:both;
         text-align:right;
         color:#aaa;
         margin:0;
+        font-size:1.1em;
+        margin-top:3em;
     }
     .comments-reply_new input[type="submit"] {
         float:right;
@@ -109,11 +80,8 @@
             float:none;
         }
     }
-    .comments h4 {
-        clear:both;
-        margin-top:3em;
-    }
     .comments .collapser {
+        margin:1em 0 1em;
         cursor:pointer;
     }
 </style>
@@ -137,15 +105,15 @@
     </div>
 
     <div class="main-content">
-        <h1>{{ object.title }}</h1>
+        <h1 class="heading">{{ object.title }}</h1>
     </div>
 
     <div class="split~680 by:3 review-overview">
         <div class="cel">
-            <h4>Case Link:</h4> <a href="{{ object.case_link }}">{{ object.case_link }}</a>
+            <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}">{{ object.case_link }}</a>
         </div>
         <div class="cel reviewers">
-            <h4>Reviewers:</h4>
+            <h4 class="heading">Reviewers:</h4>
             <ul class="list-inline">
             {% for reviewer in object.reviewer_set.all %}
                 <li>{{ reviewer.reviewer.username }}: {{ reviewer.get_status_display }}</li>
@@ -153,7 +121,7 @@
             </ul>
         </div>
         <div class="cel">
-            <h4>
+            <h4 class="heading">
                 Revisions:
                 <span class="tooltip" title="Every time you update a demo, it's revision # increases. This way you can go back and reference old revisions if need be."></span>
             </h4>
@@ -175,7 +143,7 @@
     </section>
 
     {% if not revision.attachments.exists %}
-        <h3>Attachments</h3>
+        <h3 class="heading">Attachments</h3>
         <section>
             <p>No attachments exist</p>
         </section>
@@ -226,25 +194,25 @@
             {% endmacro %}
 
             {% for thread in revision.commentthread_set.all %}
-                {% for comment in thread.comment_set.all %}
-                    {% if forloop.first %}
-                        <h4 class="icon collapser icon-minus-squared-alt">New comment by {{ comment.commenter }} @ {{ comment.created }}</h4>
-                        <div class="collapseable">
-                        <blockquote>
-                            <p>{{ comment.comment|safe|linebreaksbr }}</p>
-                        </blockquote>
-                        {% use_macro attachments %}
-                    {% else %}
-                        <div class="comments-reply">
-                            <div><blockquote>
-                                <p>{{ comment.comment|safe|linebreaksbr }}</p>
-                                <h4>Reply by {{ comment.commenter }} @ {{ comment.created }}</h4>
+                <div class="collapseable">
+                    {% for comment in thread.comment_set.all %}
+                        {% if forloop.first %}
+                            <label class="icon collapser icon-minus-squared-alt">New comment by {{ comment.commenter }} @ {{ comment.created }}</label>
+                            <blockquote>
+                                <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
                             </blockquote>
                             {% use_macro attachments %}
-                        </div>
-                    {% endif %}
-                    </div>
-                {% endfor %}
+                        {% else %}
+                            <div class="comments-reply">
+                                <blockquote>
+                                    <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                    <h5 class="heading">Reply by {{ comment.commenter }} @ {{ comment.created }}</h5>
+                                </blockquote>
+                                {% use_macro attachments %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
                 <div class="comments-reply_new">
                     {% use_macro form %}
                 </div>
@@ -269,15 +237,15 @@
 // Expand collapse top level comments
 $('.collapser').click(function() {
     var collapser = $(this);
-    collapser.next('.collapseable').slideToggle(function() {
+    collapser.parents('.collapseable').find('blockquote').slideToggle(function() {
         if ($(this).is(":visible")) {
             collapser.removeClass('icon-plus-squared-alt');
             collapser.addClass('icon-minus-squared-alt');
-            $(this).next('.comments-reply_new').slideDown('fast');
+            collapser.parents('.collapseable').next('.comments-reply_new').slideDown('fast');
         } else {
             collapser.addClass('icon-plus-squared-alt');
             collapser.removeClass('icon-minus-squared-alt');
-            $(this).next('.comments-reply_new').slideUp('fast');
+            collapser.parents('.collapseable').next('.comments-reply_new').slideUp('fast');
         }
     });
 });

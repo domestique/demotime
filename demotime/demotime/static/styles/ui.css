@@ -105,6 +105,35 @@ a.button-link.confirm {
 .mdhelper a {
     font-size:.8em;
 }
+.content h1:not(.heading) {
+    background:none;
+    color:#333;
+    padding:0;
+    box-shadow:none;
+}
+.content section h1:not(.heading),
+.content section h2:not(.heading),
+.content section h3:not(.heading),
+.content section h4:not(.heading),
+.content section h5:not(.heading) {
+    text-transform:none;
+    margin:10px 0;
+}
+.content section h2:not(.heading) {
+    font-size:2em;
+}
+.content section h3:not(.heading) {
+    font-size:1.8em;
+}
+.content section h4:not(.heading) {
+    font-size:1.6em;
+}
+.content section h5:not(.heading) {
+    font-size:1.4em;
+}
+.content section h2 {
+    font-size:2em;
+}
 
 /* Reviews list (profile/dashboard) */
 .reviews-list h3 {
