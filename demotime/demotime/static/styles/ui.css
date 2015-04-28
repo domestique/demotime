@@ -95,7 +95,8 @@ a.button-link.confirm {
 ..markItUpEditor {
     width:100% !important;
 }
-.markItUpHeader {
+.markItUpHeader,
+.markItUpFooter {
     display:none !important;
 }
 .mdhelper {

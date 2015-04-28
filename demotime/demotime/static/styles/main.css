@@ -51,6 +51,11 @@ section {
     padding:2em;
     box-shadow:4px 4px 0 #ccc;
 }
+@media screen and (max-width:680px) {
+    section {
+        padding:1em;
+    }
+}
 section > h2:first-child,
 section > h3:first-child,
 section > h4:first-child,
@@ -59,15 +64,16 @@ section > h5:first-child {
 }
 section blockquote {
     background:#fff;
+    box-shadow:0 0 5px #ccc;
     margin:0;
-    padding:1em;
-    box-shadow:4px 4px 0 #ccc;
+    padding:.5em 1em;
 }
 section blockquote p:first-child {
     margin:0;
 }
 section section {
-    background:#fff;
+    background:#fdfdfd;
+    box-shadow:0 0 5px #ccc;
 }
 
 p, li {

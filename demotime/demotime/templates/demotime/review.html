@@ -53,9 +53,17 @@
     .attachment-card h3 {
         font-size:1em;
     }
-    .comments-reply,
+    .comments-reply {
+        margin:1em 0 0 1em;
+    }
     .comments-reply_new {
-        margin:2em 0 1em 2em;
+        margin:2em 0 0 1em;
+    }
+    @media screen and (max-width:680px) {
+        .comments-reply,
+        .comments-reply_new {
+            margin:.5em 0 .5em .5em;
+        }
     }
     .comments-reply_new {
         overflow:hidden;
@@ -83,6 +91,14 @@
     .comments .collapser {
         margin:1em 0 1em;
         cursor:pointer;
+    }
+    @media screen and (max-width:680px) {
+        .comments .collapser {
+            font-size:0.9em;
+        }
+    }
+    section section {
+        padding:1em;
     }
 </style>
 {% endblock %}
@@ -116,7 +132,7 @@
             <h4 class="heading">Reviewers:</h4>
             <ul class="list-inline">
             {% for reviewer in object.reviewer_set.all %}
-                <li>{{ reviewer.reviewer.username }}: {{ reviewer.get_status_display }}</li>
+                <li><a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }}</li>
             {% endfor %}
             </ul>
         </div>
@@ -194,10 +210,10 @@
             {% endmacro %}
 
             {% for thread in revision.commentthread_set.all %}
-                <div class="collapseable">
+                <section class="collapseable">
                     {% for comment in thread.comment_set.all %}
                         {% if forloop.first %}
-                            <label class="icon collapser icon-minus-squared-alt">New comment by {{ comment.commenter }} @ {{ comment.created }}</label>
+                            <label class="icon collapser icon-minus-squared-alt">New comment by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}</label>
                             <blockquote>
                                 <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
                             </blockquote>
@@ -206,16 +222,16 @@
                             <div class="comments-reply">
                                 <blockquote>
                                     <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
-                                    <h5 class="heading">Reply by {{ comment.commenter }} @ {{ comment.created }}</h5>
+                                    <h5 class="heading">Reply by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}</h5>
                                 </blockquote>
                                 {% use_macro attachments %}
                             </div>
                         {% endif %}
                     {% endfor %}
-                </div>
-                <div class="comments-reply_new">
-                    {% use_macro form %}
-                </div>
+                    <div class="comments-reply_new">
+                        {% use_macro form %}
+                    </div>
+                </section>
             {% endfor %}
         {% else %}
             No comments
@@ -237,15 +253,13 @@
 // Expand collapse top level comments
 $('.collapser').click(function() {
     var collapser = $(this);
-    collapser.parents('.collapseable').find('blockquote').slideToggle(function() {
+    collapser.parents('.collapseable').find('blockquote, .comments-reply_new').slideToggle(function() {
         if ($(this).is(":visible")) {
             collapser.removeClass('icon-plus-squared-alt');
             collapser.addClass('icon-minus-squared-alt');
-            collapser.parents('.collapseable').next('.comments-reply_new').slideDown('fast');
         } else {
             collapser.addClass('icon-plus-squared-alt');
             collapser.removeClass('icon-minus-squared-alt');
-            collapser.parents('.collapseable').next('.comments-reply_new').slideUp('fast');
         }
     });
 });
