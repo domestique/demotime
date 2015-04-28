@@ -19,10 +19,10 @@
     </h3>
 {% endif %}
 
-<section class="{{ type }} {% if not review %}done{% endif %}">
-    {% if review %}
+<section class="{{ type }} {% if not reviews %}done{% endif %}">
+    {% if reviews %}
         <ul>
-            {% for demo in review %}
+            {% for demo in reviews %}
                 <li class="icon icon-{# reviewer_status demo user #}">
                     <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
                 </li>

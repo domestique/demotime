@@ -17,13 +17,13 @@
 
 <div class="split~680 by:3 with-gap:3 reviews-list">
     <div class="cel">
-        {% include "includes/reviews_box.html" with review=open_demos type="demos" %}
+        {% include "includes/reviews_box.html" with reviews=open_demos user=request.user type="demos" %}
     </div>
     <div class="cel">
-        {% include "includes/reviews_box.html" with review=open_reviews type="reviews" %}
+        {% include "includes/reviews_box.html" with reviews=open_reviews user=request.user type="reviews" %}
     </div>
     <div class="cel">
-        {% include "includes/reviews_box.html" with review=updated_demos type="updates" %}
+        {% include "includes/reviews_box.html" with reviews=updated_demos user=request.user type="updates" %}
     </div>
 </div>
 {% endblock %}
