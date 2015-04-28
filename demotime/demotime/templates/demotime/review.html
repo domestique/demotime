@@ -182,7 +182,6 @@
                     {% csrf_token %}
                     <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
                     {{ comment_form.comment }}
-                    {% markdown_media %}
                     {{ comment_form.comment.errors }}
                     <div class="summary">
                         <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
@@ -231,6 +230,8 @@
         {% use_macro form %}
     </section>
 </div>
+{% markdown_media %}
+{% markdown_editor "textarea" %}
 {% endblock %}
 
 {% block footer_scripts %}
