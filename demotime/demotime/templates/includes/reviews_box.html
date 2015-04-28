@@ -3,6 +3,7 @@
 {% if type = "demos" %}
     <h3 class="icon icon-calendar">
         Open Demos
+        <a href="{% url 'review-list' %}?creator={{ user.pk }}">(View all)</a>
     </h3>
 {% elif type = "reviews" %}
     <h3 class="icon icon-inbox">
@@ -32,8 +33,5 @@
                 </li>
             {% endfor %}
         </ul>
-        {% if type = "demos" %}
-            <a href="{% url 'review-list' %}?creator={{ user.pk }}">View all demos</a>
-        {% endif %}
     {% endif %}
 </section>

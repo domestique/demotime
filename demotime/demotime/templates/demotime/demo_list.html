@@ -1,29 +1,60 @@
-{% extends 'layout-marketing.html' %}
+{% extends 'base.html' %}
 
 {% block styles %}
 {{ block.super }}
 <style>
-    input[type="submit"] {
+    section section {
+        overflow:hidden;
+        text-align:center;
+    }
+    .filters select {
+        margin-right:1.5em;
+        margin-bottom:1em;
+    }
+    .filters input[type="submit"] {
         margin-top:2em;
+        margin-left:1em;
+        width:50%;
+    }
+    @media screen and (max-width:680px) {
+        .filters select {
+            width:100%;
+            margin-bottom:2em;
+        }
+        .filters input[type="submit"] {
+            float:none;
+            margin:1em 0;
+            width:100%;
+            display:block;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <h1>Review List</h1>
+    <h1 class="heading">Created Demo List</h1>
     <section>
-        <form action="" method="get">
-            {% for form in form %}
-                <label style="display: inline;">{{ form.label }}</label>
-                {{ form.errors }}
-                {{ form }}
-            {% endfor %}
-            <input type="submit" value="Filter Reviews">
-        </form>
+        <section>
+            <form action="" method="get" class="filters">
+                {% for form in form %}
+                    <label style="display: inline;">{{ form.label }}</label>
+                    {{ form.errors }}
+                    {{ form }}
+                {% endfor %}
+                <input type="submit" value="Filter Reviews">
+            </form>
+        </section>
         <ul>
-            {% for obj in object_list %}
-                <li><a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a></li>
-            {% endfor %}
+            {% if object_list %}
+                {% for obj in object_list %}
+                    <li>
+                        <a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a> <span class="icon icon-{{ obj.state }}"></span>
+                        <small>(Created by <a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a>)</small>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>No demos found matching your search.</li>
+            {% endif %}
         </ul>
     </section>
 {% endblock %}
