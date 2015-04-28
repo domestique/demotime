@@ -1,19 +1,9 @@
-{% extends 'layout-profile.html' %}
+{% extends 'base.html' %}
 {% load demo_tags %}
 
 {% block styles %}
 {{ block.super }}
 <style>
-    .reviews-list[class~='by:3'][class~='with-gap:3']>.cel {
-        display:block;
-        width:100%;
-    }
-    .reviews-list section {
-        min-height:0;
-    }
-    .reviews-list section.done {
-        background-image:none;
-    }
     .avatar {
         width:100%;
         height:auto;
@@ -38,14 +28,15 @@
 </style>
 {% endblock %}
 
-{% block page_title %}
+{% block content %}
+<h1 class="heading">
     {% if owner_viewing %}Your Profile{% else %}{{ object }}'s Profile{% endif %}
     {% if owner_viewing %}
         <a href="{% url 'edit-profile' object.pk %}">(edit)</a>
     {% endif %}
-{% endblock %}
+</h1>
 
-{% block main %}
+<div class="split by:2/1 with-gap:5">
     <div class="cel">
         {% if object.avatar.name %}
             <img src="{{ MEDIA_URL }}{{ object.avatar.name }}" width="475" height="370" class="avatar">
@@ -76,5 +67,17 @@
         {% if owner_viewing %}
             <a href="{% url 'edit-profile' object.pk %}">Edit Your Profile</a>
         {% endif %}
+    </div>
+    <div class="cel reviews-list">
+        {% if request.user %}
+            {% include "includes/reviews_box.html" with review=open_demos user=request.user type="demos" %}
+            {% include "includes/reviews_box.html" with review=open_reviews user=request.user type="reviews" %}
+            {% include "includes/reviews_box.html" with review=updated_demos user=request.user type="updates" %}
+        {% else %}
+            {% include "includes/reviews_box.html" with review=open_demos user=object.user type="demos" %}
+            {% include "includes/reviews_box.html" with review=open_reviews user=object.user type="reviews" %}
+            {% include "includes/reviews_box.html" with review=updated_demos user=object.user type="updates" %}
+        {% endif %}
+
     </div>
 {% endblock %}

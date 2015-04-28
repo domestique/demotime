@@ -1,0 +1,32 @@
+{% load demo_tags %}
+
+{% if type = "demos" %}
+    <h3 class="icon icon-calendar">
+        Open Demos
+    </h3>
+{% elif type = "reviews" %}
+    <h3 class="icon icon-inbox">
+        Open Reviews
+        <span class="tooltip" title="Reviews are demos that have been assigned
+            to you to review. You can leave feedback and ultimately approve or
+            reject a demo."></span>
+    </h3>
+{% elif type = "updates" %}
+    <h3 class="icon icon-mail">
+        Updated Demos
+        <span class="tooltip" title="Demos owned by others that have been
+            updated since you last reviewed them will appear here."></span>
+    </h3>
+{% endif %}
+
+<section class="{{ type }} {% if not review %}done{% endif %}">
+    {% if review %}
+        <ul>
+            {% for demo in review %}
+                <li class="icon icon-{# reviewer_status demo user #}">
+                    <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
