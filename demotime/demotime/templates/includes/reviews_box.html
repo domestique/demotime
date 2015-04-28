@@ -23,7 +23,11 @@
     {% if reviews %}
         <ul>
             {% for demo in reviews %}
-                <li class="icon icon-{# reviewer_status demo user #}">
+                {% ifnotequal user demo.creator %}
+                    <li class="icon icon-{% reviewer_status demo user %}">
+                {% else %}
+                    <li class="icon icon-{{ demo.state }}">
+                {% endifnotequal %}
                     <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
                 </li>
             {% endfor %}
