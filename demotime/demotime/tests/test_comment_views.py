@@ -127,13 +127,16 @@ class TestCommentViews(BaseTestCase):
             new_thread.comment_set.filter(comment='New Comment!').exists()
         )
 
+    def test_get_update_comment_view(self):
+        response = self.client.get(reverse('update-comment', kwargs={'pk': self.comment.pk}))
+        self.assertStatusCode(response, 200)
+        self.assertIn('form', response.context)
+
     def test_update_comment(self):
         response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
             'comment': 'This is an update'
         })
-        self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data['comment'], 'This is an update')
+        self.assertStatusCode(response, 302)
         comment = models.Comment.objects.get(pk=self.comment.pk)
         self.assertEqual(comment.comment, 'This is an update')
 
@@ -147,9 +150,7 @@ class TestCommentViews(BaseTestCase):
             'attachment_type': 'photo',
             'description': 'Test Comment Edit Description',
         })
-        self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data['comment'], 'This is an attachment update')
+        self.assertStatusCode(response, 302)
         comment = models.Comment.objects.get(pk=self.comment.pk)
         self.assertEqual(comment.comment, 'This is an attachment update')
         self.assertEqual(self.comment.attachments.count(), 2)

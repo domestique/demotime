@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load django_markdown %}
+
+{% block styles %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h1 class="heading">Edit Comment</h1>
+    <section>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% markdown_media %}
+            <input type="submit" value="Update Comment">
+        </form>
+    </section>
+{% endblock %}
+

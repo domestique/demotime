@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
 from django.views.generic import TemplateView, DetailView, ListView
@@ -270,6 +269,10 @@ class DeleteCommentAttachmentView(JsonView):
 
     status = 200
 
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(DeleteCommentAttachmentView, self).dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         ct = ContentType.objects.get(app_label='demotime', model='comment')
         attachment_pk = kwargs['attachment_pk']
@@ -290,49 +293,53 @@ class DeleteCommentAttachmentView(JsonView):
         return {}
 
 
-class UpdateCommentView(JsonView):
+class UpdateCommentView(DetailView):
 
-    status = 200
+    model = models.Comment
+    template_name = 'demotime/edit_comment.html'
 
-    def post(self, *args, **kwargs):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
         comment_pk = kwargs['pk']
-        comment = get_object_or_404(
+        self.comment = get_object_or_404(
             models.Comment, pk=comment_pk, commenter=self.request.user
         )
-        form = forms.UpdateCommentForm(
-            instance=comment,
-            data=self.request.POST,
-            files=self.request.FILES,
-        )
-        if form.is_valid():
-            data = form.cleaned_data
-            comment.comment = data['comment']
-            comment.save(update_fields=['comment'])
-            attachment_url = ''
+        return super(UpdateCommentView, self).dispatch(request, *args, **kwargs)
+
+    def init_form(self, data=None, files=None):
+        kwargs = {}
+        if data:
+            kwargs['data'] = data
+        if files:
+            kwargs['files'] = files
+        return forms.UpdateCommentForm(instance=self.comment, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateCommentView, self).get_context_data(**kwargs)
+        context['form'] = self.comment_form
+        return context
+
+    def get(self, *args, **kwargs):
+        if not hasattr(self, 'comment_form'):
+            self.comment_form = self.init_form()
+        return super(UpdateCommentView, self).get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        self.comment_form = self.init_form(self.request.POST, self.request.FILES)
+        if self.comment_form.is_valid():
+            data = self.comment_form.cleaned_data
+            self.comment.comment = data['comment']
+            self.comment.save(update_fields=['comment'])
             if data.get('attachment'):
-                attachment = models.Attachment.objects.create(
+                models.Attachment.objects.create(
                     attachment=data['attachment'],
                     attachment_type=data['attachment_type'],
                     description=data.get('description', ''),
-                    content_object=comment,
+                    content_object=self.comment,
                 )
-                attachment_url = '{}{}'.format(
-                    settings.MEDIA_URL, attachment.attachment.name
-                ),
-            return {
-                'success': True,
-                'errors': {},
-                'comment': comment.comment,
-                'attachment_url': attachment_url,
-            }
+            return redirect(self.comment.thread.review_revision.get_absolute_url())
         else:
-            self.status = 400
-            return {
-                'success': False,
-                'errors': {},
-                'comment': comment.comment,
-                'attachment_url': ''
-            }
+            return self.get(*args, **kwargs)
 
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
