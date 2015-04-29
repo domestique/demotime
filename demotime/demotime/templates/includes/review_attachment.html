@@ -1,5 +1,7 @@
 <div class="attachment-card {{ attachment.attachment_type }}">
-    <form style="display:none" class="delete_attachment_form" action="{% url 'update-comment-attachment' comment.pk attachment.pk %}"></form>
+    {% if comment.commenter == request.user %}
+        <form style="display:none" class="delete_attachment_form" action="{% url 'update-comment-attachment' comment.pk attachment.pk %}"></form>
+    {% endif %}
     <section data-id="{{ attachment.pk }}" {% if comment %}data-comment="{{ comment.pk }}"{% endif %}>
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
@@ -7,27 +9,30 @@
         </h3>
         {% if attachment.attachment_type == "audio" %}
             <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-            <small>(<a href="#" class="delete_attachment">delete</a>)</small>
         {% endif %}
         {% if attachment.attachment_type == "video" %}
             <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
-            <small>(<a href="#" class="delete_attachment">delete</a>)</small>
         {% endif %}
         {% if attachment.attachment_type == "photo" %}
             <span class="attachment-photo">
                 <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="lightboxed">
                     <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
                 </a>
-                <a href="#" class="delete_attachment">x</a>
+                {% if comment.commenter == request.user %}
+                    <a href="#" class="delete_attachment">x</a>
+                {% endif %}
             </span>
         {% endif %}
         {% if attachment.attachment_type == "document" %}
             <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
-            <small>(<a href="#" class="delete_attachment">delete</a>)</small>
         {% endif %}
         {% if attachment.attachment_type == "other" %}
             <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
-            <small>(<a href="#" class="delete_attachment">delete</a>)</small>
+        {% endif %}
+        {% if attachment.attachment_type != "photo" %}
+            {% if comment.commenter == request.user %}
+                <small>(<a href="#" class="delete_attachment">delete</a>)</small>
+            {% endif %}
         {% endif %}
     </section>
 </div>
