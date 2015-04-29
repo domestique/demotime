@@ -44,6 +44,23 @@ a.button-link.confirm {
     max-width:100%;
     height:auto;
 }
+.attachment-card .attachment-photo {
+    position:relative;
+}
+.attachment-card .attachment-photo .delete_attachment {
+    position:absolute;
+    top:0;
+    right:0;
+    display:none;
+    background:#fff;
+    padding:5px 10px;
+    font-size:2em;
+    color:#000;
+    box-shadow:0 0 3px #ccc;
+}
+.attachment-photo:hover .delete_attachment {
+    display:inline-block;
+}
 
 .summary a {
     font-size:0.8em;

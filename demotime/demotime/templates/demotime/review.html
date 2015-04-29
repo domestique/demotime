@@ -51,7 +51,7 @@
         margin:-13px 0;
     }
     .attachment-card h3 {
-        font-size:1em;
+        font-size:1.6em;
     }
     .comments-reply {
         margin:1em 0 0 1em;
@@ -71,7 +71,7 @@
     .comments-reply_new textarea {
         height:80px;
     }
-    .comments-reply .heading {
+    .comments-reply h5.heading {
         clear:both;
         text-align:right;
         color:#aaa;
@@ -194,8 +194,8 @@
                 <form action="" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
-                    {{ comment_form.comment }}
                     {{ comment_form.comment.errors }}
+                    {{ comment_form.comment }}
                     <div class="summary">
                         <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
                     </div>
@@ -358,8 +358,24 @@ $('.manage-review a').click(function(event) {
         });
     }
 });
-{% endif %}
 
+// Delete attachment
+$('.delete_attachment').click(function(event) {
+    event.preventDefault();
+
+    var attachment = $(this).parents('.attachment-card'),
+        form = attachment.find('.delete_attachment_form');
+
+    var post = $.post(form.attr('action'), {
+        delete: true
+    });
+    post.done(function(data) {
+        attachment.slideUp(function() {
+            $(this).remove();
+        });
+    });
+});
+{% endif %}
 
 </script>
 {% endblock %}

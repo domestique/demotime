@@ -20,5 +20,5 @@ $(document).ready(function() {
         }
     });
 
-    $('.markItUpEditor').before('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
+    $('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
 });
