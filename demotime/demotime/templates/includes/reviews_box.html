@@ -25,7 +25,7 @@
         <ul>
             {% for demo in reviews %}
                 {% ifnotequal user demo.creator %}
-                    <li class="icon icon-{% reviewer_status demo user %}">
+                    <li class="icon icon-{# reviewer_status demo user #}">
                 {% else %}
                     <li class="icon icon-{{ demo.state }}">
                 {% endifnotequal %}
