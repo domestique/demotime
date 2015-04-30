@@ -109,7 +109,7 @@ a.button-link.confirm {
 
 /* Markdown */
 .markItUp,
-..markItUpEditor {
+.markItUpEditor {
     width:100% !important;
 }
 .markItUpHeader,
