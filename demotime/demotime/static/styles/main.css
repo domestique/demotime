@@ -71,6 +71,12 @@ section blockquote {
 section blockquote p:first-child {
     margin:0;
 }
+section .blockquote-footer {
+    margin-top:5px;
+    padding:5px 10px;
+    background:#eee;
+    text-align:right;
+}
 section section {
     background:#fdfdfd;
     box-shadow:0 0 5px #ccc;

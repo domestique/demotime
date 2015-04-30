@@ -5,7 +5,9 @@
     <section data-id="{{ attachment.pk }}" {% if comment %}data-comment="{{ comment.pk }}"{% endif %}>
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
-            <span class="tooltip alert" title="Reviewer note: {{ attachment.description }}"></span>
+            {% if attachment.description %}
+                <span class="tooltip alert" title="Reviewer note: {{ attachment.description }}"></span>
+            {% endif %}
         </h3>
         {% if attachment.attachment_type == "audio" %}
             <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
