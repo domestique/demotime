@@ -1,3 +1,5 @@
+from socket import error as socket_error
+
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -29,14 +31,18 @@ class Message(BaseModel):
 
     def _send_email(self, recipient, title, msg_text):
         if recipient.email:
-            return send_mail(
-                title,
-                msg_text,
-                settings.DEFAULT_FROM_EMAIL,
-                [recipient.email],
-                html_message=msg_text,
-                fail_silently=True,
-            )
+            try:
+                return send_mail(
+                    title,
+                    msg_text,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [recipient.email],
+                    html_message=msg_text,
+                    fail_silently=True,
+                )
+            except socket_error:
+                if settings.DT_PROD:
+                    raise
 
         return 0
 

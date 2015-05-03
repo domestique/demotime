@@ -138,7 +138,9 @@ MARKDOWN_EXTENSION_CONFIGS = {
     }
 }
 
-if os.environ.get('DT_PROD'):
+DT_PROD = os.environ.get('DT_PROD', '').lower() == 'true'
+
+if DT_PROD:
     try:
         from prod_settings import *
     except ImportError:
