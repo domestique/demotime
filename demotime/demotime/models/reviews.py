@@ -6,6 +6,7 @@ from .attachments import Attachment
 from .base import BaseModel
 from .messages import Message
 from .users import UserReviewStatus
+from .reminders import Reminder
 
 REVIEWING = 'reviewing'
 REJECTED = 'rejected'
@@ -111,7 +112,12 @@ class Review(BaseModel):
             obj, obj.creator, True
         )
 
+        # Messages
         obj._send_revision_messages()
+
+        # Reminders
+        Reminder.create_reminders_for_review(obj)
+
         return obj
 
     @classmethod
@@ -149,7 +155,12 @@ class Review(BaseModel):
         # TODO: Send a message here?
         Reviewer.objects.exclude(reviewer__in=reviewers).delete()
 
+        # Messages
         obj._send_revision_messages()
+
+        # Reminders
+        Reminder.update_reminders_for_review(obj)
+
         return obj
 
     def _change_reviewer_state(self, state):
@@ -220,6 +231,8 @@ class Review(BaseModel):
                 revision=self.revision,
             )
 
+        Reminder.update_reminder_activity_for_review(self, True)
+
         return True
 
     def _close_review(self, state):
@@ -236,6 +249,8 @@ class Review(BaseModel):
                 reviewer,
                 revision=self.revision,
             )
+
+        Reminder.update_reminder_activity_for_review(self)
 
         return True
 
@@ -294,6 +309,9 @@ class Reviewer(BaseModel):
     def set_status(self, status):
         self.status = status
         self.save(update_fields=['status'])
+
+        reminder_active = status == REVIEWING
+        Reminder.set_activity(self.review, self.reviewer, reminder_active)
         return self.review.update_reviewer_state()
 
 
