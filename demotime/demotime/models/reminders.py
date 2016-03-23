@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from .base import BaseModel
+from .messages import Message
 
 
 def get_reminder_days():
@@ -103,6 +104,21 @@ class Reminder(BaseModel):
             )
         else:
             cls.objects.filter(review=review, user=user).update(active=active)
+
+    def send_reminder(self):
+        context = {
+            'reminder': self,
+            'url': self.review.get_absolute_url(),
+        }
+        title = 'Reminder: {}'.format(self.review.title)
+        Message.send_system_message(
+            title,
+            'demotime/messages/reminder.html',
+            context,
+            self.user,
+        )
+        self.remind_at = get_reminder_days()
+        self.save(update_fields=['remind_at'])
 
     class Meta:
         unique_together = (

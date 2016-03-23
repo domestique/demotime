@@ -1,5 +1,5 @@
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from freezegun import freeze_time
 from django.contrib.auth.models import User
@@ -128,3 +128,31 @@ class TestReminderModel(BaseTestCase):
             review=self.review, user=self.review.creator
         )
         self.assertFalse(reminder.active)
+
+    def test_send_reminder(self):
+        models.Reminder.create_reminders_for_review(self.review)
+        yesterday = timezone.now() - timedelta(days=1)
+        models.Reminder.objects.update(remind_at=yesterday)
+        for reminder in models.Reminder.objects.all():
+            reminder.send_reminder()
+
+        self.assertEqual(
+            models.Reminder.objects.count(),
+            models.Message.objects.filter(title__startswith='Reminder:').count()
+        )
+        # Creator Reminder
+        self.assertEqual(
+            models.Message.objects.filter(
+                message__contains='getting stale'
+            ).count(),
+            1
+        )
+        # Reviewer Reminders
+        self.assertEqual(
+            models.Message.objects.filter(
+                title__startswith='Reminder'
+            ).exclude(
+                message__contains='getting stale'
+            ).distinct().count(),
+            3
+        )

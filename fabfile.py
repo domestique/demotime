@@ -19,7 +19,7 @@ env.roledefs = {
 @api.roles('local')
 def run_tests(test_module='demotime'):
     api.local('echo "Cleaning out pycs"')
-    api.local('find . -type f -name \*.pycs -delete')
+    api.local('find . -type f -name \*.pyc -delete')
     with api.lcd(os.path.join(LOCAL_ROOT, 'dt')):
         api.local('echo "Running DemoTime tests"')
         return api.local('python manage.py test {}'.format(test_module))
@@ -29,7 +29,7 @@ def run_tests(test_module='demotime'):
 def deploy(branch='master'):
     uuid = str(uuid4())
     with api.settings(warn_only=True):
-        api.run('rm -f {}/demotime-previous')
+        api.run('rm -f {}/demotime-previous'.format(REMOTE_ROOT))
         api.run('mv {}/demotime-current {}/demotime-previous'.format(
             REMOTE_ROOT, REMOTE_ROOT)
         )
