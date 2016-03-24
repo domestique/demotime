@@ -101,7 +101,7 @@ a.button-link.confirm {
     }
 }
 
-.icon-highlight:before {
+.state-highlight:before {
     transition:1s;
     background:#E03743;
     padding:2px;

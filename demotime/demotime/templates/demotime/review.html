@@ -39,10 +39,13 @@
     .manage-review a {
         color:#fff;
     }
-    .manage-review .icon-highlight:before {
+    .manage-review li.state-highlight a:before {
         font-size:1.5em;
         background:#fff;
         color:#222;
+    }
+    li.open.state-highlight {
+        display: none;
     }
     .comments-reply {
         font-size:0.8em;
@@ -119,13 +122,13 @@
     <div class="manage-review">
         <ul>
             {% if request.user == object.creator %}
-                <li><a href="{% url 'edit-review' object.pk %}" class="updated button-link icon icon-pencil">Update demo</a></li>
-                <li><a data-type="open" href="#" class="open button-link icon icon-eye">Open demo</a></li>
-                <li><a data-type="closed" href="#" class="closed button-link confirm icon icon-ok">Close demo</a></li>
+                <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Update demo</a></li>
+                <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
+                <li class="closed"><a data-type="closed" href="#" class="button-link confirm icon icon-ok">Close demo</a></li>
             {% else %}
                 {% if reviewer %}
-                    <li><a data-type="approved" href="#" class="approved button-link icon icon-thumbs-up-1">Accept demo</a></li>
-                    <li><a data-type="rejected" href="#" class="rejected button-link alert icon icon-thumbs-down">Reject demo</a></li>
+                    <li class="approved"><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Accept demo</a></li>
+                    <li class="rejected"><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
                 {% endif %}
             {% endif %}
         </ul>
@@ -310,16 +313,16 @@ function check_review_status() {
             }
         {% endif %}
     });
-    req.error(function(error) {
+    req.always(function(status) {
         {% if reviewer %}
-            var error = error.responseJSON.reviewer_status;
+            var status = status.responseJSON.reviewer_status;
         {% endif %}
         {% if request.user == object.creator %}
-            var error = error.responseJSON.state;
+            var status = status.responseJSON.state;
         {% endif %}
 
-        $('a.icon-highlight').removeClass('icon-highlight');
-        $('a.' + error).addClass('icon-highlight');
+        $('li.state-highlight').removeClass('state-highlight');
+        $('li.' + status).addClass('state-highlight');
     });
 }
 
