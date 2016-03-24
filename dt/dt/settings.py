@@ -138,7 +138,9 @@ MARKDOWN_EXTENSION_CONFIGS = {
     }
 }
 
+# DemoTime Specific Settings
 DT_PROD = os.environ.get('DT_PROD', '').lower() == 'true'
+DEFAULT_REMINDER_DAYS = 2
 
 if DT_PROD:
     try:

@@ -12,14 +12,14 @@ LOCAL_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 env.roledefs = {
     'local': ['localhost'],
-    'prod': ['demotime@45.33.113.50'],
+    'prod': ['analyte@izapa.analytemedia.com'],
 }
 
 
 @api.roles('local')
 def run_tests(test_module='demotime'):
     api.local('echo "Cleaning out pycs"')
-    api.local('find . -type f -name \*.pycs -delete')
+    api.local('find . -type f -name \*.pyc -delete')
     with api.lcd(os.path.join(LOCAL_ROOT, 'dt')):
         api.local('echo "Running DemoTime tests"')
         return api.local('python manage.py test {}'.format(test_module))
@@ -29,7 +29,7 @@ def run_tests(test_module='demotime'):
 def deploy(branch='master'):
     uuid = str(uuid4())
     with api.settings(warn_only=True):
-        api.run('rm -f {}/demotime-previous')
+        api.run('rm -f {}/demotime-previous'.format(REMOTE_ROOT))
         api.run('mv {}/demotime-current {}/demotime-previous'.format(
             REMOTE_ROOT, REMOTE_ROOT)
         )
@@ -46,7 +46,7 @@ def deploy(branch='master'):
         api.run('{}/bin/pip install -r {}/prod_requirements.txt'.format(REMOTE_ROOT, dir_name))
         # Uninstall and reinstall demotime
         api.run('{}/bin/pip uninstall demotime -y'.format(REMOTE_ROOT))
-        api.run('{}/bin/python {}/demotime/setup.py install'.format(REMOTE_ROOT, dir_name))
+        api.run('{}/bin/pip install {}/demotime'.format(REMOTE_ROOT, dir_name))
         # Cleanup
         api.run('rm -f {}.zip'.format(branch))
 
@@ -59,6 +59,4 @@ def deploy(branch='master'):
         api.run('cd dt && ln -s {}/prod_settings.py .'.format(REMOTE_ROOT))
         api.run('{}/bin/python manage.py collectstatic --noinput'.format(REMOTE_ROOT))
         api.run('{}/bin/python manage.py migrate'.format(REMOTE_ROOT))
-        # Restart seems finicky
-        api.run('sudo stop demotime')
-        api.run('sudo start demotime')
+        api.run('touch --no-dereference /etc/uwsgi/sites/demotime.ini')

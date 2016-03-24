@@ -154,6 +154,10 @@ class TestReviewViews(BaseTestCase):
             models.Message.objects.filter(receipient=self.user).exists()
         )
         self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            4
+        )
 
     def test_post_update_review(self):
         fh = StringIO('testing')
@@ -195,6 +199,10 @@ class TestReviewViews(BaseTestCase):
             models.Message.objects.filter(receipient=self.user).exists()
         )
         self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            4
+        )
 
     def test_post_create_review_with_errors(self):
         response = self.client.post(reverse('create-review'), {
