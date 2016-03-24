@@ -13,8 +13,8 @@ h1, h2, h3, h4, h5 {
     font-weight:300;
 }
 h1 a, h2 a, h3 a {
-    font-size:14px;
-    margin-left:20px;
+    font-size:13px;
+    margin-left:10px;
     vertical-align:middle;
 }
 ul {

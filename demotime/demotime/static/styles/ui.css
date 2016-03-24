@@ -21,7 +21,7 @@ a.button-link.alert {
 }
 button.confirm,
 a.button-link.confirm {
-    background:#09BEFF;
+    background:#335166;
 }
 
 .review-attachments {
@@ -156,7 +156,7 @@ a.button-link.confirm {
 /* Reviews list (profile/dashboard) */
 .reviews-list h3 {
     margin:0;
-    font-size:1.3em;
+    font-size:18px;
 }
 .reviews-list section {
     min-height:150px;

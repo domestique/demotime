@@ -2,21 +2,31 @@
 
 {% if type = "demos" %}
     <h3 class="icon icon-calendar">
-        Open Demos
+        {% if request.user.pk == user.pk %}
+            Your
+        {% else %}
+            {{ user }}'s
+        {% endif %}
+        Active Demos
         <a href="{% url 'review-list' %}?creator={{ user.pk }}">(View all)</a>
     </h3>
 {% elif type = "reviews" %}
     <h3 class="icon icon-inbox">
-        Open Reviews
+        Reviews Assigned to
+        {% if request.user.pk == user.pk %}
+            You
+        {% else %}
+            {{ user }}
+        {% endif %}
         <span class="tooltip" title="Reviews are demos that have been assigned
             to you to review. You can leave feedback and ultimately approve or
             reject a demo."></span>
     </h3>
 {% elif type = "updates" %}
     <h3 class="icon icon-mail">
-        Updated Demos
+        Recently Updated Demos
         <span class="tooltip" title="Demos owned by others that have been
-            updated since you last reviewed them will appear here."></span>
+        updated since you last reviewed them will appear here."></span>
     </h3>
 {% endif %}
 
