@@ -1,19 +1,21 @@
-import os
-
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
+
+from demotime import urls as demotime_urls
+from registration.backends.default import urls as registration_urls
+from django_markdown import urls as django_markdown_urls
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     # DT needs to be on top, otherwise django-reg tramples some urls
-    url('', include('demotime.urls')),
+    url('', include(demotime_urls)),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^accounts/', include('registration.backends.default.urls')),
-    url('^markdown/', include('django_markdown.urls')),
-)
+    url(r'^accounts/', include(registration_urls)),
+    url('^markdown/', include(django_markdown_urls)),
+]
 
 if not settings.DT_PROD:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
