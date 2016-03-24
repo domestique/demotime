@@ -57,6 +57,6 @@ def deploy(branch='master'):
     # App setup stuff
     with api.cd(os.path.join(REMOTE_BUILD_DIR, dir_name, 'dt')):
         api.run('cd dt && ln -s {}/prod_settings.py .'.format(REMOTE_ROOT))
-        api.run('{}/bin/python manage.py collectstatic --noinput'.format(REMOTE_ROOT))
-        api.run('{}/bin/python manage.py migrate'.format(REMOTE_ROOT))
+        api.run('DT_PROD=true {}/bin/python manage.py collectstatic --noinput'.format(REMOTE_ROOT))
+        api.run('DT_PROD=true {}/bin/python manage.py migrate'.format(REMOTE_ROOT))
         api.run('touch --no-dereference /etc/uwsgi/sites/demotime.ini')
