@@ -341,8 +341,8 @@ function check_review_status() {
             var status = status.responseJSON.state;
         {% endif %}
 
-        $('li.state-highlight').removeClass('state-highlight');
-        $('li.' + status).addClass('state-highlight');
+        $('.manage-review li.state-highlight').removeClass('state-highlight');
+        $('.manage-review li.' + status).addClass('state-highlight');
     });
 }
 
