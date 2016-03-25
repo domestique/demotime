@@ -151,13 +151,6 @@ class Review(BaseModel):
             user=creator
         ).update(read=False)
 
-        # Drop people that were removed
-        # TODO: Send a message here?
-        Reviewer.objects.exclude(
-            review=obj,
-            reviewer__in=reviewers
-        ).delete()
-
         # Messages
         obj._send_revision_messages()
 
