@@ -182,6 +182,8 @@
 
         <div class="split~680 by:3 review-overview">
             <div class="cel">
+                <h4 class="heading">Owner:</h4>
+                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator }}</a><br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
