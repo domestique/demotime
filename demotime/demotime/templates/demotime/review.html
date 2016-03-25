@@ -155,6 +155,14 @@
     .new_comment label {
         display: none;
     }
+
+    .revision a {
+        font-weight: 400;
+    }
+    .revision.current a {
+        color: #555;
+        font-weight: 700;
+    }
 </style>
 {% endblock %}
 
@@ -196,14 +204,22 @@
             </div>
             <div class="cel">
                 <h4 class="heading">
-                    Revisions:
+                    Demo Revisions:
                     <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be."></span>
                 </h4>
-                <ol>
-                    {% for revision in object.reviewrevision_set.all %}
-                        <li><a href="{{ revision.get_absolute_url }}">Revision {{ forloop.revcounter }}</a></li>
-                    {% endfor %}
-                </ol>
+                {% for rev in object.reviewrevision_set.all %}
+                    <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
+                        <a href="{{ rev.get_absolute_url }}">Revision {{ forloop.revcounter }}</a>
+                        {% if rev.commentthread_set.count %}
+                        <small>({{ rev.commentthread_set.count }}
+                            {% if rev.commentthread_set.count > 1 %}
+                                comments)
+                            {% else %}
+                                comment)
+                            {% endif %}</small>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
 
