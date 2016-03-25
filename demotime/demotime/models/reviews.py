@@ -151,6 +151,9 @@ class Review(BaseModel):
             user=creator
         ).update(read=False)
 
+        # Drop Reviewers no longer assigned
+        obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers).delete()
+
         # Messages
         obj._send_revision_messages()
 
