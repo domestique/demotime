@@ -184,6 +184,8 @@ class ReviewListView(ListView):
 
             if data.get('state'):
                 qs = qs.filter(state=data['state'])
+            else:
+                qs = qs.filter(state=models.reviews.OPEN)
 
             if data.get('reviewer_state'):
                 qs = qs.filter(reviewer_state=data['reviewer_state'])
@@ -199,8 +201,10 @@ class ReviewListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ReviewListView, self).get_context_data(**kwargs)
+        initial = self.request.GET.copy()
+        initial['state'] = initial.get('state', models.reviews.OPEN)
         context.update({
-            'form': forms.ReviewFilterForm(initial=self.request.GET),
+            'form': forms.ReviewFilterForm(initial=initial)
         })
         return context
 

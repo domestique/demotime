@@ -46,7 +46,7 @@ class ReviewFilterForm(forms.Form):
 
     state = forms.ChoiceField(
         required=False,
-        choices=STATE_CHOICES
+        choices=STATE_CHOICES,
     )
     reviewer_state = forms.ChoiceField(
         required=False,
