@@ -12,7 +12,7 @@
         {% if attachment.attachment_type == "audio" %}
             <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
         {% endif %}
-        {% if attachment.attachment_type == "video" %}
+        {% if attachment.attachment_type == "movie" %}
             <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
         {% endif %}
         {% if attachment.attachment_type == "photo" %}
