@@ -5,6 +5,27 @@
 {% block styles %}
 {{ block.super }}
 <style>
+    .content h1 {
+        margin-top: 10px;
+        margin-bottom: 20px;
+        z-index: 10;
+        position: relative;
+        text-transform: normal;
+        font-size: 27px;
+        line-height: 40px;
+    }
+    .review ul br {
+        display: none;
+    }
+    .review p {
+        margin: 3px 0;
+    }
+    .review-overview {
+        padding: 40px 25px 20px;
+        background: #f2f2f2;
+        font-size: 14px;
+        margin-top: -40px;
+    }
     .review-overview ol {
         margin:0;
         padding-left:20px;
@@ -18,12 +39,12 @@
         margin:0;
     }
     .review h3 {
-        margin-top:3em;
+        margin:0 0 10px;
     }
     .manage-review {
         padding:10px;
         text-align:right;
-        margin:1em 0 4em;
+        margin:20px 0 40px;
     }
     .manage-review ul {
         margin:0;
@@ -39,10 +60,14 @@
     .manage-review a {
         color:#fff;
     }
-    .manage-review .icon-highlight:before {
+    .manage-review li.state-highlight a:before {
         font-size:1.5em;
         background:#fff;
         color:#222;
+    }
+    li.closed.state-highlight,
+    li.open.state-highlight {
+        display: none;
     }
     .comments-reply {
         font-size:0.8em;
@@ -111,6 +136,19 @@
     section section {
         padding:1em;
     }
+
+    article > section {
+        margin: 0;
+    }
+
+    article {
+        background: rgba(67, 177, 138, .2);
+        padding: 20px;
+        margin: 40px 0;
+    }
+    .review img {
+        max-width: 100%;
+    }
 </style>
 {% endblock %}
 
@@ -119,152 +157,162 @@
     <div class="manage-review">
         <ul>
             {% if request.user == object.creator %}
-                <li><a href="{% url 'edit-review' object.pk %}" class="updated button-link icon icon-pencil">Update demo</a></li>
-                <li><a data-type="open" href="#" class="open button-link icon icon-eye">Open demo</a></li>
-                <li><a data-type="closed" href="#" class="closed button-link confirm icon icon-ok">Close demo</a></li>
+                <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Update demo</a></li>
+                <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
+                <li class="closed"><a data-type="closed" href="#" class="button-link confirm icon icon-ok">Close demo</a></li>
             {% else %}
                 {% if reviewer %}
-                    <li><a data-type="approved" href="#" class="approved button-link icon icon-thumbs-up-1">Accept demo</a></li>
-                    <li><a data-type="rejected" href="#" class="rejected button-link alert icon icon-thumbs-down">Reject demo</a></li>
+                    <li class="approved"><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Accept demo</a></li>
+                    <li class="rejected"><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
                 {% endif %}
             {% endif %}
         </ul>
     </div>
 
     <div class="main-content">
-        <h1 class="heading">{{ object.title }}</h1>
-    </div>
+        <h1 class="heading">
+            {{ object.title }}
+        </h1>
 
-    <div class="split~680 by:3 review-overview">
-        <div class="cel">
-            <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}">{{ object.case_link }}</a>
-        </div>
-        <div class="cel reviewers">
-            <h4 class="heading">Reviewers:</h4>
-            <ul class="list-inline">
-            {% for reviewer in object.reviewer_set.all %}
-                <li><a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }}</li>
-            {% endfor %}
-            </ul>
-        </div>
-        <div class="cel">
-            <h4 class="heading">
-                Revisions:
-                <span class="tooltip" title="Every time you update a demo, it's revision # increases. This way you can go back and reference old revisions if need be."></span>
-            </h4>
-            <ol>
-                {% for revision in object.reviewrevision_set.all %}
-                    <li><a href="{{ revision.get_absolute_url }}">Revision {{ forloop.revcounter }}</a></li>
+        <div class="split~680 by:3 review-overview">
+            <div class="cel">
+                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
+            </div>
+            <div class="cel reviewers">
+                <h4 class="heading">Reviewers:</h4>
+                <ul class="list-inline">
+                {% for reviewer in object.reviewer_set.all %}
+                    <li><a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }}</li>
                 {% endfor %}
-            </ol>
+                </ul>
+            </div>
+            <div class="cel">
+                <h4 class="heading">
+                    Revisions:
+                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be."></span>
+                </h4>
+                <ol>
+                    {% for revision in object.reviewrevision_set.all %}
+                        <li><a href="{{ revision.get_absolute_url }}">Revision {{ forloop.revcounter }}</a></li>
+                    {% endfor %}
+                </ol>
+            </div>
         </div>
-    </div>
 
-    <h3 class="icon icon-lightbulb">Description</h3>
-    <section>
-        {% if revision.description %}
-            <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
-        {% else %}
-            <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
-        {% endif %}
-    </section>
+        <article>
+            <h3 class="icon icon-lightbulb">Description</h3>
+            <section>
+                {% if revision.description %}
+                    <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
+                {% else %}
+                    <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
+                {% endif %}
+            </section>
+        </article>
 
-    {% if not revision.attachments.exists %}
-        <h3 class="heading">Attachments</h3>
-        <section>
-            <p>No attachments exist</p>
-        </section>
-    {% else %}
-        <h3 class="icon icon-attach">Attachments</h3>
-        <section>
-            {% for attachment in revision.attachments.all %}
-                {% include "includes/review_attachment.html" with attachment=attachment %}
-            {% endfor %}
-        </section>
-    {% endif %}
-
-    <h3 class="icon icon-comment">Previous comments</h3>
-    <section class="comments">
-        {% if revision.commentthread_set.all %}
-            {% macro attachments %}
-                {% for attachment in comment.attachments.all %}
-                    {% include "includes/review_attachment.html" with attachment=attachment %}
-                {% endfor %}
-            {% endmacro %}
-
-            {% macro attachment %}
+        <article>
+            {% if not revision.attachments.exists %}
+                <h3 class="icon icon-attach">Attachments</h3>
                 <section>
-                    <div class="split~680 by:3 with-gap:3">
-                        {% include "includes/attachments_form.html" with form=attachment_form %}
-                    </div>
-                    {{ form.attachment.errors }}
+                    <p>No attachments exist</p>
                 </section>
-            {% endmacro %}
+            {% else %}
+                <h3 class="icon icon-attach">Attachments</h3>
+                <section>
+                    {% for attachment in revision.attachments.all %}
+                        {% include "includes/review_attachment.html" with attachment=attachment %}
+                    {% endfor %}
+                </section>
+            {% endif %}
+        </article>
 
-            {% macro form %}
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
-                    {{ comment_form.comment.errors }}
-                    {{ comment_form.comment }}
-                    <div class="summary">
-                        <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
-                    </div>
-                    <div class="toggled_text attachments">
-                        {% use_macro attachment %}
-                        <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
-                    </div>
-                    <div class="form-group">
-                        <input class="btn btn-primary btn-large" type="submit" value="Reply">
-                    </div>
-                </form>
-            {% endmacro %}
+        <article>
+            <h3 class="icon icon-comment">Previous comments</h3>
+            <section class="comments">
+                {% if revision.commentthread_set.all %}
+                    {% macro attachments %}
+                        {% for attachment in comment.attachments.all %}
+                            {% include "includes/review_attachment.html" with attachment=attachment %}
+                        {% endfor %}
+                    {% endmacro %}
 
-            {% for thread in revision.commentthread_set.all %}
-                <section class="collapseable">
-                    {% for comment in thread.comment_set.all %}
-                        {% if forloop.first %}
-                            <label class="icon collapser icon-minus-squared-alt">New comment by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}</label>
-                            <blockquote>
-                                <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
-                                {% if comment.commenter == request.user %}
-                                    <div class="blockquote-footer">
-                                        <a href="{% url 'update-comment' comment.pk %}">edit</a>
+                    {% macro attachment %}
+                        <section>
+                            <div class="split~680 by:3 with-gap:3">
+                                {% include "includes/attachments_form.html" with form=attachment_form %}
+                            </div>
+                            {{ form.attachment.errors }}
+                        </section>
+                    {% endmacro %}
+
+                    {% macro form %}
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
+                            {{ comment_form.comment.errors }}
+                            {{ comment_form.comment }}
+                            <div class="summary">
+                                <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
+                            </div>
+                            <div class="toggled_text attachments">
+                                {% use_macro attachment %}
+                                <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
+                            </div>
+                            <div class="form-group">
+                                <input class="btn btn-primary btn-large" type="submit" value="Reply">
+                            </div>
+                        </form>
+                    {% endmacro %}
+
+                    {% for thread in revision.commentthread_set.all %}
+                        <section class="collapseable">
+                            {% for comment in thread.comment_set.all %}
+                                {% if forloop.first %}
+                                    <label class="icon collapser icon-minus-squared-alt">New comment by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}</label>
+                                    <blockquote>
+                                        <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                        {% if comment.commenter == request.user %}
+                                            <div class="blockquote-footer">
+                                                <a href="{% url 'update-comment' comment.pk %}">edit</a>
+                                            </div>
+                                        {% endif %}
+                                    </blockquote>
+                                    {% use_macro attachments %}
+                                {% else %}
+                                    <div class="comments-reply">
+                                        <blockquote>
+                                            <div class="blockquote-header">
+                                                Reply by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}
+                                            </div>
+                                            <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                            {% if comment.commenter == request.user %}
+                                                <div class="blockquote-footer">
+                                                    <a href="{% url 'update-comment' comment.pk %}">edit</a>
+                                                </div>
+                                            {% endif %}
+                                        </blockquote>
+                                        {% use_macro attachments %}
                                     </div>
                                 {% endif %}
-                            </blockquote>
-                            {% use_macro attachments %}
-                        {% else %}
-                            <div class="comments-reply">
-                                <blockquote>
-                                    <div class="blockquote-header">
-                                        Reply by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}
-                                    </div>
-                                    <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
-                                    {% if comment.commenter == request.user %}
-                                        <div class="blockquote-footer">
-                                            <a href="{% url 'update-comment' comment.pk %}">edit</a>
-                                        </div>
-                                    {% endif %}
-                                </blockquote>
-                                {% use_macro attachments %}
+                            {% endfor %}
+                            <div class="comments-reply_new">
+                                {% use_macro form %}
                             </div>
-                        {% endif %}
+                        </section>
                     {% endfor %}
-                    <div class="comments-reply_new">
-                        {% use_macro form %}
-                    </div>
-                </section>
-            {% endfor %}
-        {% else %}
-            No comments
-        {% endif %}
-    </section>
+                {% else %}
+                    No comments
+                {% endif %}
+            </section>
+        </article>
 
-    <h3 class="icon icon-comment">Post a New Comment</h3>
-    <section>
-        {% use_macro form %}
-    </section>
+        <article>
+            <h3 class="heading">Post a New Comment</h3>
+            <section>
+                {% use_macro form %}
+            </section>
+        </article>
+    </div>
 </div>
 {% markdown_media %}
 {% markdown_editor "textarea" %}
@@ -310,16 +358,16 @@ function check_review_status() {
             }
         {% endif %}
     });
-    req.error(function(error) {
+    req.always(function(status) {
         {% if reviewer %}
-            var error = error.responseJSON.reviewer_status;
+            var status = status.responseJSON.reviewer_status;
         {% endif %}
         {% if request.user == object.creator %}
-            var error = error.responseJSON.state;
+            var status = status.responseJSON.state;
         {% endif %}
 
-        $('a.icon-highlight').removeClass('icon-highlight');
-        $('a.' + error).addClass('icon-highlight');
+        $('.manage-review li.state-highlight').removeClass('state-highlight');
+        $('.manage-review li.' + status).addClass('state-highlight');
     });
 }
 

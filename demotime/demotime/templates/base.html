@@ -41,7 +41,7 @@
         <nav class="navbar" role="navigation">
             <div class="container">
                 <div class="cradle">
-                    <div class="split by:1/4 with-gap:0">
+                    <div class="split by:1/3 with-gap:0">
                         <div class="cel">
                             <a class="navbar-logo" href="{% url 'index' %}"><strong>Demo</strong>time</a>
                         </div>
@@ -64,7 +64,7 @@
                                         </a>
                                         </li>
                                         <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
-                                        <li class="icon icon-mail {% if has_unread_messages %}icon-highlight{% endif %} {% if request.path == inbox_url %}active{% else %}{% endif %}"><a href="{{ inbox_url }}">Inbox{% if has_unread_messages %} ({{ unread_message_count }}){% endif %}</a></li>
+                                        <li class="icon icon-mail {% if has_unread_messages %}state-highlight{% endif %} {% if request.path == inbox_url %}active{% else %}{% endif %}"><a href="{{ inbox_url }}">Inbox{% if has_unread_messages %} ({{ unread_message_count }}){% endif %}</a></li>
                                         <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Logout</a></li>
                                     {% else %}
                                         {% if request.path != login_url %}
@@ -88,7 +88,7 @@
 
         <footer>
             <div class="footer container">
-                &copy; 2015
+                &copy; {% now "Y" %}
             </div>
         </footer>
 
