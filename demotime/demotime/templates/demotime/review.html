@@ -150,6 +150,11 @@
     .review img {
         max-width: 100%;
     }
+
+    /* No need showing 'reply' label for new comments */
+    .new_comment label {
+        display: none;
+    }
 </style>
 {% endblock %}
 
@@ -309,7 +314,7 @@
 
         <article>
             <h3 class="heading">Post a New Comment</h3>
-            <section>
+            <section class="new_comment">
                 {% use_macro form %}
             </section>
         </article>
