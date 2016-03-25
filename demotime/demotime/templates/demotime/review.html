@@ -176,7 +176,7 @@
 
         <div class="split~680 by:3 review-overview">
             <div class="cel">
-                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}">{{ object.case_link }}</a>
+                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
                 <h4 class="heading">Reviewers:</h4>
@@ -189,7 +189,7 @@
             <div class="cel">
                 <h4 class="heading">
                     Revisions:
-                    <span class="tooltip" title="Every time you update a demo, it's revision # increases. This way you can go back and reference old revisions if need be."></span>
+                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be."></span>
                 </h4>
                 <ol>
                     {% for revision in object.reviewrevision_set.all %}
