@@ -71,7 +71,10 @@ class Reminder(BaseModel):
         remind_at = get_reminder_days()
 
         # Creator Reminder
-        creator_reminder = cls.objects.get(review=review, user=review.creator)
+        try:
+            creator_reminder = cls.objects.get(review=review, user=review.creator)
+        except cls.DoesNotExist:
+            creator_reminder = cls(review=review, user=review.creator, reminder_type=cls.CREATOR)
         creator_reminder.remind_at = remind_at
         creator_reminder.active = True
         creator_reminder.save()
