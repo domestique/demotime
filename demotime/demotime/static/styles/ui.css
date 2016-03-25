@@ -171,18 +171,21 @@ a.button-link.confirm {
     margin:0;
     padding:0;
 }
-section.demos {
+.reviews-list section.demos {
     background:#54BB9C;
 }
-section.reviews {
+.reviews-list section.reviews {
     background:#469C9B;
 }
-section.updates {
+.reviews-list section.updates {
     background:#3A8B9B;
 }
-section.done {
+.reviews-list section.done {
     background-image:url(/static/images/done.png);
     background-repeat:no-repeat;
     background-size:50%;
     background-position:50% 50%;
+}
+.reviews-list img {
+    max-width: 100%;
 }
