@@ -33,8 +33,16 @@ class TestReviewModels(BaseTestCase):
     def test_update_review(self):
         self.assertEqual(len(mail.outbox), 0)
         review_kwargs = self.default_review_kwargs.copy()
+        # We had problems before where updating one review's reviewers updated
+        # the reviewer's for alllllll reviews. Let's not let that happen again
+        # (issue #55)
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Some Other Review'
         obj = models.Review.create_review(**self.default_review_kwargs)
-        self.assertEqual(len(mail.outbox), 3)
+        second_review = models.Review.create_review(**second_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(second_review.reviewers.count(), 3)
+        self.assertEqual(len(mail.outbox), 6)
         mail.outbox = []
 
         models.UserReviewStatus.objects.filter(review=obj).update(read=True)
@@ -53,18 +61,19 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_obj.description, 'Test Description')
         self.assertEqual(new_obj.revision.description, 'New Description')
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
-        # FIXME: Issue 55
-        #self.assertEqual(obj.reviewers.count(), 2)
-        #self.assertEqual(obj.reviewer_set.count(), 2)
+        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 2)
+        self.assertEqual(second_review.reviewers.count(), 3)
+        self.assertEqual(second_review.reviewer_set.count(), 3)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
         self.assertEqual(statuses.count(), 4)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 3)
-        #self.assertEqual(len(mail.outbox), 2)
-        #self.assertEqual(
-        #    models.Reminder.objects.filter(review=obj, active=True).count(),
-        #    3
-        #)
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            3
+        )
 
     def test_create_reviewer(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
