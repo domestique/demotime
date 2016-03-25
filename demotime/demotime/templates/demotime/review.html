@@ -14,7 +14,8 @@
         font-size: 27px;
         line-height: 40px;
     }
-    .review ul br {
+    .review ul br,
+    .review ol br {
         display: none;
     }
     .review p {
@@ -149,6 +150,19 @@
     .review img {
         max-width: 100%;
     }
+
+    /* No need showing 'reply' label for new comments */
+    .new_comment label {
+        display: none;
+    }
+
+    .revision a {
+        font-weight: 400;
+    }
+    .revision.current a {
+        color: #555;
+        font-weight: 700;
+    }
 </style>
 {% endblock %}
 
@@ -176,6 +190,8 @@
 
         <div class="split~680 by:3 review-overview">
             <div class="cel">
+                <h4 class="heading">Owner:</h4>
+                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator }}</a><br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
@@ -188,14 +204,22 @@
             </div>
             <div class="cel">
                 <h4 class="heading">
-                    Revisions:
+                    Demo Revisions:
                     <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be."></span>
                 </h4>
-                <ol>
-                    {% for revision in object.reviewrevision_set.all %}
-                        <li><a href="{{ revision.get_absolute_url }}">Revision {{ forloop.revcounter }}</a></li>
-                    {% endfor %}
-                </ol>
+                {% for rev in object.reviewrevision_set.all %}
+                    <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
+                        <a href="{{ rev.get_absolute_url }}">Revision {{ forloop.revcounter }}</a>
+                        {% if rev.commentthread_set.count %}
+                        <small>({{ rev.commentthread_set.count }}
+                            {% if rev.commentthread_set.count > 1 %}
+                                comments)
+                            {% else %}
+                                comment)
+                            {% endif %}</small>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -308,7 +332,7 @@
 
         <article>
             <h3 class="heading">Post a New Comment</h3>
-            <section>
+            <section class="new_comment">
                 {% use_macro form %}
             </section>
         </article>
