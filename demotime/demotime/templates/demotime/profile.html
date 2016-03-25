@@ -70,7 +70,5 @@
     </div>
     <div class="cel reviews-list">
         {% include "includes/reviews_box.html" with reviews=open_demos user=object.user type="demos" %}
-        {% include "includes/reviews_box.html" with reviews=open_reviews user=object.user type="reviews" %}
-        {% include "includes/reviews_box.html" with reviews=updated_demos user=object.user type="updates" %}
     </div>
 {% endblock %}
