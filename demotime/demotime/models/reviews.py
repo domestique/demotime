@@ -317,7 +317,7 @@ class Reviewer(BaseModel):
 class ReviewRevision(BaseModel):
 
     review = models.ForeignKey('Review')
-    description = models.TextField()
+    description = models.TextField(blank=True)
     attachments = GenericRelation(Attachment)
 
     def __unicode__(self):

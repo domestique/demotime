@@ -69,12 +69,14 @@
             <section>
                 <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
 
-                <div class="latest-revision-note">
-                    <h3 class="heading">Latest Revision Note</h3>
-                    <section>
-                        <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
-                    </section>
-                </div>
+                {% if revision.description %}
+                    <div class="latest-revision-note">
+                        <h3 class="heading">Latest Revision Note</h3>
+                        <section>
+                            <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
+                        </section>
+                    </div>
+                {% endif %}
             </section>
 
         </article>
