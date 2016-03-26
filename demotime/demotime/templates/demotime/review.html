@@ -39,7 +39,7 @@
                 <h4 class="heading">Reviewers:</h4>
                 <ul class="list-inline">
                     {% for reviewer in object.reviewer_set.all %}
-                        <li><a data-pk="{{ reviewer.reviewer.pk }}" href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} <small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small></li>
+                    <li><a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}</li>
                     {% endfor %}
                     <li>
                         <input type="text" id="add_reviewer" placeholder="add reviewer" maxlength="3">
