@@ -1,6 +1,61 @@
 {% extends 'layout-marketing.html' %}
 
-{% block content %}
-<h1>What's this then?</h1>
+{% block styles %}
+{{ block.super }}
+<style>
+h4 {
+    font-size: 30px;
+    margin: 0;
+    font-weight: 900;
+}
+.cel {
+    text-align: center;
+}
+.cel p {
+    margin: 0;
+}
 
+.how {
+    background:#f6f6f6;
+    padding: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>What's Demotime?</h2>
+
+<p>Demotime is a platform the enables teams to review completed work,
+leave feedback, and ultimately approve implemented work prior before entering,
+say, a formal QA/UAT process</p>
+
+<h3>Showing your work, made easy</h3>
+
+<div class="split how">
+    <div class="cel">
+        <h4>create</h4>
+        <img src="/static/images/create.svg">
+        <p>Share your work with your team</p>
+    </div>
+    <div class="cel">
+        <h4>collaborate</h4>
+        <img src="/static/images/collaborate.svg">
+        <p>Collaborate in real-time</p>
+    </div>
+    <div class="cel">
+        <h4>refine</h4>
+        <img src="/static/images/approve.svg">
+        <p>Refine your work and get approved</p>
+    </div>
+</div>
+
+<h3>New features all the time</h3>
+<ul>
+    <li>Rich web interface</li>
+    <li>Instant email notifications</li>
+    <li>Revision control</li>
+    <li>Integrated message center</li>
+    <li>Mobile friendly UI</li>
+    <li>Embed images, documents, movies and more</li>
+</ul>
 {% endblock %}
