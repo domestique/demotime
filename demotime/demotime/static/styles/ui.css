@@ -61,6 +61,10 @@ a.button-link.confirm {
 .attachment-photo:hover .delete_attachment {
     display:inline-block;
 }
+/* Fixing filename bleedthrough */
+.attachment-file {
+    overflow: hidden;
+}
 
 .summary a {
     font-size:0.8em;
@@ -189,3 +193,4 @@ section.updates {
     background-size:50%;
     background-position:50% 50%;
 }
+

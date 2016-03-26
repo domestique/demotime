@@ -1,4 +1,4 @@
-<div class="cel">
+<div class="attachment-type cel">
     <label>File type:</label>
     {% for select in form.attachment_type %}
         <div>
@@ -6,12 +6,12 @@
         </div>
     {% endfor %}
 </div>
-<div class="cel">
+<div class="attachment-file cel">
     <label>Attach your file:</label>
     {{ form.attachment }}
     {{ form.attachment.errors }}
 </div>
-<div class="cel">
+<div class="attachment-desc cel">
     <label>Short description:</label>
     {{ form.description }}
     {{ form.description.errors }}
