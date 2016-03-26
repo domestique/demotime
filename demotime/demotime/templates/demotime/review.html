@@ -132,7 +132,16 @@
                         <section class="collapseable">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
-                                    <label class="icon collapser icon-minus-squared-alt">New comment by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}</label>
+                                    <label id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}"
+                                        class="icon collapser icon-minus-squared-alt">
+                                            New comment by
+                                            <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                                {{ comment.commenter.userprofile }}
+                                            </a> @
+                                            <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                                {{ comment.created }}
+                                            </a>
+                                    </label>
                                     <blockquote>
                                         <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
                                         {% if comment.commenter == request.user %}
@@ -144,9 +153,15 @@
                                     {% use_macro attachments %}
                                 {% else %}
                                     <div class="comments-reply">
-                                        <blockquote>
+                                        <blockquote id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
                                             <div class="blockquote-header">
-                                                Reply by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}
+                                                Reply by
+                                                <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                                    {{ comment.commenter.userprofile }}
+                                                </a> @
+                                                <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                                    {{ comment.created }}
+                                                </a>
                                             </div>
                                             <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
                                             {% if comment.commenter == request.user %}
@@ -184,17 +199,19 @@
 {{ block.super }}
 <script>
 // Expand collapse top level comments
-$('.collapser').click(function() {
-    var collapser = $(this);
-    collapser.parents('.collapseable').find('blockquote, .comments-reply_new, .attachment-card').slideToggle(function() {
-        if ($(this).is(":visible")) {
-            collapser.removeClass('icon-plus-squared-alt');
-            collapser.addClass('icon-minus-squared-alt');
-        } else {
-            collapser.addClass('icon-plus-squared-alt');
-            collapser.removeClass('icon-minus-squared-alt');
-        }
-    });
+$('.collapser').click(function(e) {
+    if (e.target.tagName != "A") {
+        var collapser = $(this);
+        collapser.parents('.collapseable').find('blockquote, .comments-reply_new, .attachment-card').slideToggle(function() {
+            if ($(this).is(":visible")) {
+                collapser.removeClass('icon-plus-squared-alt');
+                collapser.addClass('icon-minus-squared-alt');
+            } else {
+                collapser.addClass('icon-plus-squared-alt');
+                collapser.removeClass('icon-minus-squared-alt');
+            }
+        });
+    }
 });
 
 // Set up function to check statuses and highlight the correct button
