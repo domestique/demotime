@@ -91,7 +91,8 @@ class Review(BaseModel):
         )
         rev = ReviewRevision.objects.create(
             review=obj,
-            description=obj.description
+            description=obj.description,
+            number=1,
         )
         for attachment in attachments:
             Attachment.objects.create(
@@ -129,9 +130,11 @@ class Review(BaseModel):
         obj.title = title
         obj.case_link = case_link
         obj.save()
+        rev_count = obj.reviewrevision_set.count()
         rev = ReviewRevision.objects.create(
             review=obj,
-            description=description
+            description=description,
+            number=rev_count + 1
         )
         for attachment in attachments:
             Attachment.objects.create(
@@ -319,6 +322,7 @@ class ReviewRevision(BaseModel):
     review = models.ForeignKey('Review')
     description = models.TextField(blank=True)
     attachments = GenericRelation(Attachment)
+    number = models.IntegerField(null=True)
 
     def __unicode__(self):
         return u'Review Revision: {}'.format(self.review)

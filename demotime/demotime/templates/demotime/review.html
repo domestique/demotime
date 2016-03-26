@@ -50,7 +50,7 @@
                 </h4>
                 {% for rev in object.reviewrevision_set.all %}
                     <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
-                        <a href="{{ rev.get_absolute_url }}">Revision {{ forloop.revcounter }}</a>
+                        <a href="{{ rev.get_absolute_url }}">Revision {{ rev.number }}</a>
                         {% if rev.commentthread_set.count %}
                         <small>({{ rev.commentthread_set.count }}
                             {% if rev.commentthread_set.count > 1 %}
