@@ -298,11 +298,34 @@ class Reviewer(BaseModel):
     )
 
     @classmethod
-    def create_reviewer(cls, review, reviewer):
-        return cls.objects.create(
+    def create_reviewer(cls, review, reviewer, non_revision=False):
+        obj = cls.objects.create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
+        )
+        if non_revision:
+            obj._send_reviewer_message()
+
+        return obj
+
+    def _send_reviewer_message(self, deleted=False):
+        title = '{} as reviewer on: {}'.format(
+            'Deleted' if deleted else 'Added',
+            self.review.title
+        )
+
+        context = {
+            'receipient': self.reviewer,
+            'url': self.review.get_absolute_url(),
+            'title': self.review.title,
+            'deleted': deleted,
+        }
+        Message.send_system_message(
+            title,
+            'demotime/messages/reviewer.html',
+            context,
+            self.reviewer,
         )
 
     def set_status(self, status):

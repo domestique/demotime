@@ -13,6 +13,7 @@ from django.contrib.auth.views import (
 from demotime.views import (
     index_view,
     reviews,
+    reviewers,
     messages,
     users
 )
@@ -43,6 +44,9 @@ urlpatterns += [
     ),
     url(r'review/(?P<pk>[\d]+)/update-state/$', reviews.review_state_view, name='update-review-state'),
     url(r'comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
+    url(r'review/(?P<pk>[\d]+)/reviewer-finder/$', reviewers.reviewer_finder, name='reviewer-finder'),
+    url(r'review/(?P<pk>[\d]+)/add-reviewer/$', reviewers.add_reviewer, name='add-reviewer'),
+    url(r'review/(?P<pk>[\d]+)/delete-reviewer/$', reviewers.delete_reviewer, name='delete-reviewer'),
     url(
         r'comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         reviews.delete_comment_attachment_view,
