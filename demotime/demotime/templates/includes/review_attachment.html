@@ -10,15 +10,15 @@
             {% endif %}
         </h3>
         {% if attachment.attachment_type == "audio" %}
-            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name|urlencode }}" controls="true">
         {% endif %}
         {% if attachment.attachment_type == "movie" %}
-            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name }}" controls="true">
+            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name|urlencode }}" controls="true">
         {% endif %}
         {% if attachment.attachment_type == "photo" %}
             <span class="attachment-photo">
-                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="lightboxed">
-                    <img src="{{ MEDIA_URL }}{{ attachment.attachment.name }}" class="img-thumbnail" height=300 width=300>
+                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="lightboxed">
+                    <img src="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="img-thumbnail" height=300 width=300>
                 </a>
                 {% if comment.commenter == request.user %}
                     <a href="#" class="delete_attachment">x</a>
@@ -26,10 +26,10 @@
             </span>
         {% endif %}
         {% if attachment.attachment_type == "document" %}
-            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Document: {{ attachment.pretty_name }}</a>
+            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}">Document: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
         {% if attachment.attachment_type == "other" %}
-            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name }}">Unknown File Type: {{ attachment.pretty_name }}</a>
+            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
         {% if attachment.attachment_type != "photo" %}
             {% if comment.commenter == request.user %}
