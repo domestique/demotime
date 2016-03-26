@@ -1,52 +1,71 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.views import (
+    login,
+    logout_then_login,
+    password_reset,
+    password_reset_complete,
+    password_reset_confirm,
+    password_reset_done,
+)
+
+from demotime.views import (
+    index_view,
+    reviews,
+    messages,
+    users
+)
 
 
 # General
-urlpatterns = patterns('demotime.views',
-    url('^$', 'index_view', name='index'),
+urlpatterns = [
+    url('^$', index_view, name='index'),
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^addons/$', TemplateView.as_view(template_name='addons.html'), name='addons'),
     url(r'^markdown/$', TemplateView.as_view(template_name='markdown.html'), name='markdown'),
-)
+]
 
 # Reviews
-urlpatterns += patterns('demotime.views.reviews',
-    url(r'^create/$', 'review_form_view', name='create-review'),
-    url(r'^review/(?P<pk>[\d]+)/$', 'review_detail', name='review-detail'),
-    url(r'^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$', 'review_detail', name='review-rev-detail'),
-    url(r'^review/(?P<pk>[\d]+)/edit/$', 'review_form_view', name='edit-review'),
+urlpatterns += [
+    url(r'^create/$', reviews.review_form_view, name='create-review'),
+    url(r'^review/(?P<pk>[\d]+)/$', reviews.review_detail, name='review-detail'),
+    url(
+        r'^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$',
+        reviews.review_detail,
+        name='review-rev-detail'
+    ),
+    url(r'^review/(?P<pk>[\d]+)/edit/$', reviews.review_form_view, name='edit-review'),
     url(
         r'^review/(?P<review_pk>[\d]+)/reviewer-status/(?P<reviewer_pk>[\d]+)/$',
-        'reviewer_status_view',
+        reviews.reviewer_status_view,
         name='update-reviewer-status',
     ),
-    url(r'review/(?P<pk>[\d]+)/update-state/$', 'review_state_view', name='update-review-state'),
-    url(r'comment/update/(?P<pk>[\d]+)/$', 'update_comment_view', name='update-comment'),
+    url(r'review/(?P<pk>[\d]+)/update-state/$', reviews.review_state_view, name='update-review-state'),
+    url(r'comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
     url(
         r'comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
-        'delete_comment_attachment_view',
+        reviews.delete_comment_attachment_view,
         name='update-comment-attachment'
     ),
-    url(r'review/list/$', 'review_list_view', name='review-list'),
-)
+    url(r'review/list/$', reviews.review_list_view, name='review-list'),
+]
 
 # Messages
-urlpatterns += patterns('demotime.views.messages',
-    url(r'^inbox/$', 'inbox_view', name='inbox'),
-    url(r'^message/(?P<pk>[\d]+)/$', 'msg_detail_view', name='message-detail'),
-)
+urlpatterns += [
+    url(r'^inbox/$', messages.inbox_view, name='inbox'),
+    url(r'^message/(?P<pk>[\d]+)/$', messages.msg_detail_view, name='message-detail'),
+]
 
 # Accounts
-urlpatterns += patterns('',
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout_then_login', name='logout'),
-    url(r'^accounts/profile/(?P<pk>[\d]+)/$', 'demotime.views.users.profile_view', name='profile'),
-    url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', 'demotime.views.users.edit_profile_view', name='edit-profile'),
+urlpatterns += [
+    url(r'^accounts/login/$', login, name='login'),
+    url(r'^accounts/logout/$', logout_then_login, name='logout'),
+    url(r'^accounts/profile/(?P<pk>[\d]+)/$', users.profile_view, name='profile'),
+    url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', users.edit_profile_view, name='edit-profile'),
     url(
         r'^accounts/password/reset/$',
-        'django.contrib.auth.views.password_reset',
+        password_reset,
         {
             'template_name': 'registration/password_reset_request.html',
             'post_reset_redirect': reverse_lazy('password_reset_done'),
@@ -55,20 +74,20 @@ urlpatterns += patterns('',
     ),
     url(
         r'^accounts/password/reset/done/$',
-        'django.contrib.auth.views.password_reset_done',
+        password_reset_done,
         {'template_name': 'registration/password_reset_submitted.html'},
         name='password_reset_done'
     ),
     url(
         r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm',
+        password_reset_confirm,
         {'template_name': 'registration/password_reset_confirmation.html'},
         name='password_reset_confirm'
     ),
     url(
         r'^accounts/password/reset/complete/$',
-        'django.contrib.auth.views.password_reset_complete',
+        password_reset_complete,
         {'template_name': 'registration/password_reset_completed.html'},
         name='password_reset_complete'
     ),
-)
+]

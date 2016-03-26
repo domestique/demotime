@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     # Third Party Libs
     'macros',
     'registration',
@@ -137,6 +138,7 @@ MARKDOWN_EXTENSION_CONFIGS = {
         'linenums': False,
     }
 }
+SITE_ID = 1
 
 # DemoTime Specific Settings
 DT_PROD = os.environ.get('DT_PROD', '').lower() == 'true'

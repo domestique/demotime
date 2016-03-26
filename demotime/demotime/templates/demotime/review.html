@@ -2,6 +2,11 @@
 {% load macros django_markdown %}
 {% block title %} - {{ object.title }}{% endblock %}
 
+{% block styles %}
+{{ block.super }}
+<link href="/static/styles/review.css" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <div class="review">
     <div class="manage-review">
@@ -26,7 +31,9 @@
 
         <div class="split~680 by:3 review-overview">
             <div class="cel">
-                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}">{{ object.case_link }}</a>
+                <h4 class="heading">Owner:</h4>
+                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator }}</a><br><br>
+                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
                 <h4 class="heading">Reviewers:</h4>
@@ -38,14 +45,22 @@
             </div>
             <div class="cel">
                 <h4 class="heading">
-                    Revisions:
-                    <span class="tooltip" title="Every time you update a demo, it's revision # increases. This way you can go back and reference old revisions if need be."></span>
+                    Demo Revisions:
+                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be."></span>
                 </h4>
-                <ol>
-                    {% for revision in object.reviewrevision_set.all %}
-                        <li><a href="{{ revision.get_absolute_url }}">Revision {{ forloop.revcounter }}</a></li>
-                    {% endfor %}
-                </ol>
+                {% for rev in object.reviewrevision_set.all %}
+                    <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
+                        <a href="{{ rev.get_absolute_url }}">Revision {{ forloop.revcounter }}</a>
+                        {% if rev.commentthread_set.count %}
+                        <small>({{ rev.commentthread_set.count }}
+                            {% if rev.commentthread_set.count > 1 %}
+                                comments)
+                            {% else %}
+                                comment)
+                            {% endif %}</small>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -64,26 +79,21 @@
 
         </article>
 
-        <article>
-            {% if not revision.attachments.exists %}
-                <h3 class="icon icon-attach">Attachments</h3>
-                <section>
-                    <p>No attachments exist</p>
-                </section>
-            {% else %}
+        {% if revision.attachments.exists %}
+            <article>
                 <h3 class="icon icon-attach">Attachments</h3>
                 <section>
                     {% for attachment in revision.attachments.all %}
                         {% include "includes/review_attachment.html" with attachment=attachment %}
                     {% endfor %}
                 </section>
-            {% endif %}
-        </article>
+            </article>
+        {% endif %}
 
-        <article>
-            <h3 class="icon icon-comment">Previous comments</h3>
-            <section class="comments">
-                {% if revision.commentthread_set.all %}
+        {% if revision.commentthread_set.all %}
+            <article>
+                <h3 class="icon icon-comment">Previous comments</h3>
+                <section class="comments">
                     {% macro attachments %}
                         {% for attachment in comment.attachments.all %}
                             {% include "includes/review_attachment.html" with attachment=attachment %}
@@ -154,15 +164,13 @@
                             </div>
                         </section>
                     {% endfor %}
-                {% else %}
-                    No comments
-                {% endif %}
-            </section>
-        </article>
+                </section>
+            </article>
+        {% endif %}
 
         <article>
             <h3 class="heading">Post a New Comment</h3>
-            <section>
+            <section class="new_comment">
                 {% use_macro form %}
             </section>
         </article>

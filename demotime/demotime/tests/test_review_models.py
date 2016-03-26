@@ -33,8 +33,16 @@ class TestReviewModels(BaseTestCase):
     def test_update_review(self):
         self.assertEqual(len(mail.outbox), 0)
         review_kwargs = self.default_review_kwargs.copy()
+        # We had problems before where updating one review's reviewers updated
+        # the reviewer's for alllllll reviews. Let's not let that happen again
+        # (issue #55)
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Some Other Review'
         obj = models.Review.create_review(**self.default_review_kwargs)
-        self.assertEqual(len(mail.outbox), 3)
+        second_review = models.Review.create_review(**second_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(second_review.reviewers.count(), 3)
+        self.assertEqual(len(mail.outbox), 6)
         mail.outbox = []
 
         models.UserReviewStatus.objects.filter(review=obj).update(read=True)
@@ -55,6 +63,8 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
         self.assertEqual(obj.reviewers.count(), 2)
         self.assertEqual(obj.reviewer_set.count(), 2)
+        self.assertEqual(second_review.reviewers.count(), 3)
+        self.assertEqual(second_review.reviewer_set.count(), 3)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
         self.assertEqual(statuses.count(), 4)
         self.assertEqual(statuses.filter(read=True).count(), 1)
@@ -111,7 +121,10 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.APPROVED)
-        msg = models.Message.objects.get(review=obj, receipient=obj.creator)
+        msg = models.Message.objects.get(
+            review=obj.reviewrevision_set.latest(),
+            receipient=obj.creator
+        )
         self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.APPROVED)
@@ -135,7 +148,10 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
-        msg = models.Message.objects.get(review=obj, receipient=obj.creator)
+        msg = models.Message.objects.get(
+            review=obj.reviewrevision_set.latest(),
+            receipient=obj.creator
+        )
         self.assertEqual(msg.title, '"{}" has been Rejected'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REJECTED)
@@ -164,7 +180,7 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
-        msg = models.Message.objects.get(review=obj, receipient=obj.creator)
+        msg = models.Message.objects.get(review=obj.reviewrevision_set.latest(), receipient=obj.creator)
         self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REVIEWING)
@@ -200,7 +216,7 @@ class TestReviewModels(BaseTestCase):
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.CLOSED)
         msgs = models.Message.objects.filter(
-            review=obj,
+            review=obj.reviewrevision_set.latest(),
             title='"{}" has been {}'.format(
                 obj.title, models.reviews.CLOSED.capitalize()
             )
@@ -230,9 +246,9 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.ABORTED)
-        msgs = models.Message.objects.filter(review=obj)
+        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
-            review=obj,
+            review=obj.reviewrevision_set.latest(),
             title='"{}" has been {}'.format(
                 obj.title, models.reviews.ABORTED.capitalize()
             )
@@ -265,9 +281,9 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
-        msgs = models.Message.objects.filter(review=obj)
+        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
-            review=obj,
+            review=obj.reviewrevision_set.latest(),
             title='"{}" has been Reopened'.format(obj.title)
         )
         self.assertEqual(msgs.count(), 3)
@@ -298,9 +314,9 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
-        msgs = models.Message.objects.filter(review=obj)
+        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
-            review=obj,
+            review=obj.reviewrevision_set.latest(),
             title='"{}" has been Reopened'.format(obj.title)
         )
         self.assertEqual(msgs.count(), 3)

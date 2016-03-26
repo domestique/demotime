@@ -3,7 +3,6 @@ from django.forms import formset_factory
 from django.views.generic import TemplateView, DetailView, ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.contenttypes.models import ContentType
 
 from demotime import forms, models
@@ -28,7 +27,6 @@ class ReviewDetail(DetailView):
         )
         self.attachment_form = None
         self.comment_form = None
-        self.site = get_current_site(request)
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -186,6 +184,8 @@ class ReviewListView(ListView):
 
             if data.get('state'):
                 qs = qs.filter(state=data['state'])
+            else:
+                qs = qs.filter(state=models.reviews.OPEN)
 
             if data.get('reviewer_state'):
                 qs = qs.filter(reviewer_state=data['reviewer_state'])
@@ -201,8 +201,10 @@ class ReviewListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ReviewListView, self).get_context_data(**kwargs)
+        initial = self.request.GET.copy()
+        initial['state'] = initial.get('state', models.reviews.OPEN)
         context.update({
-            'form': forms.ReviewFilterForm(initial=self.request.GET),
+            'form': forms.ReviewFilterForm(initial=initial)
         })
         return context
 
