@@ -39,7 +39,7 @@
                 {% else %}
                     <li class="icon icon-{{ demo.state }}">
                 {% endifnotequal %}
-                    <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
+                DT-{{ demo.pk }}: <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
                 </li>
             {% endfor %}
         </ul>

@@ -26,13 +26,13 @@
 
     <div class="main-content">
         <h1 class="heading">
-            {{ object.title }}
+            DT-{{ object.pk }}: {{ object.title }}
         </h1>
 
         <div class="split~680 by:3 review-meta">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
-                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator }}</a><br><br>
+                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
