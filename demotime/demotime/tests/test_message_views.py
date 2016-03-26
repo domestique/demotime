@@ -101,7 +101,7 @@ class TestMessageViews(BaseTestCase):
         self.assertStatusCode(response, 200)
         self.assertTrue(response.context['object'].read)
         self.assertTrue('next_msg' in response.context)
-        self.assertFalse(response.context['next_msg'])
+        self.assertFalse(response.context['next_msg'].read)
 
     def test_message_delete(self):
         self.assertFalse(self.first_message.deleted)

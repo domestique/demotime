@@ -38,7 +38,7 @@ class Review(BaseModel):
     )
     title = models.CharField(max_length=1024)
     description = models.TextField()
-    case_link = models.CharField(max_length=2048, blank=True)
+    case_link = models.CharField('Case URL', max_length=2048, blank=True)
     state = models.CharField(
         max_length=128, choices=STATUS_CHOICES,
         default=OPEN, db_index=True
