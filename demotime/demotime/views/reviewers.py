@@ -111,7 +111,11 @@ class DeleteReviewer(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        self.review = get_object_or_404(models.Review, pk=kwargs.get('pk'))
+        self.review = get_object_or_404(
+            models.Review,
+            pk=kwargs.get('pk'),
+            creator=self.request.user,
+        )
         return super(DeleteReviewer, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):

@@ -1,10 +1,8 @@
 import json
-from StringIO import StringIO
 
 from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import models
 from demotime.tests import BaseTestCase
@@ -236,3 +234,20 @@ class TestReviewerViews(BaseTestCase):
             'success': False,
             'errors': {'reviewer_pk': 'User not currently on review'}
         })
+
+    def test_delete_reviewer_not_owner(self):
+        ''' Test deleting a reviewer from a review you do not own '''
+        self.client.logout()
+        self.client.login(
+            username='test_user_2',
+            password='testing',
+        )
+        test_user_1 = User.objects.get(username='test_user_1')
+        self.assertEqual(self.review.reviewers.count(), 2)
+        response = self.client.post(
+            reverse('delete-reviewer', kwargs={'pk': self.review.pk}), {
+                'reviewer_pk': test_user_1.pk
+            }
+        )
+        self.assertStatusCode(response, 404)
+        self.assertEqual(self.review.reviewers.count(), 2)
