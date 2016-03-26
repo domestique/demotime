@@ -194,3 +194,7 @@ section.updates {
     background-position:50% 50%;
 }
 
+h3 small {
+    color:#aaa;
+    margin-left: 10px;
+}
