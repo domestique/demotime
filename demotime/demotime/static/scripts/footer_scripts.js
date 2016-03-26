@@ -212,6 +212,14 @@ DemoTime.Reviewers = Backbone.View.extend({
             self.$el.find('.reviewers ul li:first-child').before(template);
             self.$el.find('.reviewers input').val('');
         });
+        req.error(function(err) {
+            swal ({
+                title: 'Whoops',
+                type: 'error',
+                text: 'Your request was denied: ' + err,
+                html: true
+            });
+        });
     },
 
     delete: function(event) {
@@ -231,6 +239,15 @@ DemoTime.Reviewers = Backbone.View.extend({
 
         req.success(function() {
             $li.slideUp();
+        });
+
+        req.error(function(err) {
+            swal ({
+                title: 'Whoops',
+                type: 'error',
+                text: 'Your request was denied: ' + err,
+                html: true
+            });
         });
     }
 });
