@@ -129,18 +129,27 @@ DemoTime.Reviewers = Backbone.View.extend({
     events: {
         'keyup #add_reviewer': 'typing',
         'click .new_reviewer_click': 'add',
-        'click .reviewer_deleter': 'delete'
+        'click .reviewer_deleter': 'delete',
+        'click .cancel': 'cancel'
     },
 
     initialize: function(options) {
         this.options = options;
     },
 
+    cancel: function() {
+        this.$el.find('.reviewers input').val('');
+    },
+
     typing: function(event) {
         var $input = $(event.target),
             self = this;
 
-        if ($input.val().length > 2) {
+        if (event.keyCode == 27) {
+            $input.val('');
+        }
+
+        if ($input.val().length > 2 && String.fromCharCode(event.keyCode).match(/[a-zA-Z]/i)) {
             var req = $.ajax({
                 url: self.options.finder_url,
                 method: 'POST',
@@ -162,11 +171,13 @@ DemoTime.Reviewers = Backbone.View.extend({
                         title: "Add a reviewer",
                         text: template,
                         type: "success",
+                        showConfirmButton: false,
+                        showCancelButton: true,
                         html: true
                     });
                 } else {
                     sweetAlert("Sorry...", "No matches found.", "error");
-                    $input.select();
+                    $input.val('');
                 }
             });
         }
