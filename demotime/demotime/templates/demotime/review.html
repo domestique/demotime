@@ -29,7 +29,7 @@
             {{ object.title }}
         </h1>
 
-        <div class="split~680 by:3 review-overview">
+        <div class="split~680 by:3 review-meta">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator }}</a><br><br>
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <article>
+        <article class="review-overview">
             <h3 class="icon icon-lightbulb">Review Overview</h3>
             <section>
                 <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
@@ -308,6 +308,9 @@ $('.delete_attachment').click(function(event) {
         });
     });
 });
+
+// Spawn new windows for links
+$('.review-overview a').attr('target', '_blank');
 {% endif %}
 
 </script>

@@ -15,22 +15,22 @@
 .review p {
     margin: 3px 0;
 }
-.review-overview {
+.review-meta {
     padding: 40px 25px 20px;
     background: #f2f2f2;
     font-size: 14px;
     margin-top: -40px;
 }
-.review-overview ol {
+.review-meta ol {
     margin:0;
     padding-left:20px;
 }
-.review-overview ul {
+.review-meta ul {
     list-style:none;
     margin:0;
     padding:0;
 }
-.review-overview h4 {
+.review-meta h4 {
     margin:0;
 }
 .review h3 {
@@ -167,4 +167,11 @@ article {
     padding-top: 5px;
     padding-bottom: 5px;
     margin-bottom: 0;
+}
+
+a[target="_blank"] {
+    display: inline-block;
+    padding-right: 15px;
+    margin-right: 3px;
+    background:url(/static/images/new_window.png) 100% 20% no-repeat;
 }
