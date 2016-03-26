@@ -51,9 +51,9 @@ textarea {
 textarea:focus {
     outline:none;
 }
-input[type="submit"],
-input[type="button"],
-button {
+.container input[type="submit"],
+.container input[type="button"],
+.container button {
     display: inline-block;
     height: 36px;
     margin-bottom: 15px;
