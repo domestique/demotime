@@ -171,6 +171,10 @@ class ReviewListView(ListView):
     paginate_by = 15
     model = models.Review
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ReviewListView, self).dispatch(*args, **kwargs)
+
     def get_queryset(self):
         qs = super(ReviewListView, self).get_queryset()
         form = forms.ReviewFilterForm(self.request.GET)
@@ -213,6 +217,10 @@ class ReviewerStatusView(JsonView):
 
     status = 200
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ReviewerStatusView, self).dispatch(*args, **kwargs)
+
     def post(self, *args, **kwargs):
         reviewer_pk = kwargs['reviewer_pk']
         reviewer = get_object_or_404(
@@ -244,6 +252,10 @@ class ReviewerStatusView(JsonView):
 class ReviewStateView(JsonView):
 
     status = 200
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ReviewStateView, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):
         review_pk = kwargs['pk']

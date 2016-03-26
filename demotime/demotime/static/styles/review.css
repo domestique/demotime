@@ -21,6 +21,10 @@
     font-size: 14px;
     margin-top: -40px;
 }
+.review-meta h4 {
+    font-weight: 700;
+    font-size: 17px;
+}
 .review-meta ol {
     margin:0;
     padding-left:20px;
@@ -36,6 +40,14 @@
 .review h3 {
     margin:0 0 10px;
 }
+
+.reviewers li:hover small {
+    position: absolute;
+    margin-left: 10px;
+    display: inline-block !important;
+    cursor: pointer;
+}
+
 .manage-review {
     padding:10px;
     text-align:right;
@@ -174,4 +186,14 @@ a[target="_blank"] {
     padding-right: 15px;
     margin-right: 3px;
     background:url(/static/images/new_window.png) 100% 20% no-repeat;
+}
+
+#add_reviewer {
+    font-size: 11px;
+    margin-top: 0;
+    width: 50%;
+    background: #f7f7f7;
+    padding: 3px 10px;
+    height: 30px;
+    margin-top: 5px;
 }

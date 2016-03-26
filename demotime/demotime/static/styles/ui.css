@@ -194,6 +194,11 @@ section.updates {
     background-position:50% 50%;
 }
 
+.sweet-alert ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 h3 small {
     color:#aaa;
     margin-left: 10px;
