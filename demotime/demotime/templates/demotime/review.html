@@ -69,7 +69,7 @@
             <section>
                 <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
 
-                {% if revision.description %}
+                {% if revision.description and object.reviewrevision_set.all.count > 1 %}
                     <div class="latest-revision-note">
                         <h3 class="heading">Latest Revision Note</h3>
                         <section>

@@ -30,7 +30,6 @@ a.error {
             <div class="form-group">
                 <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}</h3>
                 {{ review_form.description }}
-                {% markdown_media %}
                 {{ review_form.description.errors }}
             </div>
             <div class="form-group">
