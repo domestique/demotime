@@ -122,6 +122,7 @@ NOSE_ARGS = [
 
 # MAIL_SETTINGS
 DEFAULT_FROM_EMAIL = 'system@demotyme.com'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # ACCOUNT SETTINGS
 LOGIN_REDIRECT_URL = '/'
