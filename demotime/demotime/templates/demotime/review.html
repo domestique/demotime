@@ -4,166 +4,7 @@
 
 {% block styles %}
 {{ block.super }}
-<style>
-    .content h1 {
-        margin-top: 10px;
-        margin-bottom: 20px;
-        z-index: 10;
-        position: relative;
-        text-transform: none;
-        font-size: 27px;
-        line-height: 40px;
-    }
-    .review ul br,
-    .review ol br {
-        display: none;
-    }
-    .review p {
-        margin: 3px 0;
-    }
-    .review-overview {
-        padding: 40px 25px 20px;
-        background: #f2f2f2;
-        font-size: 14px;
-        margin-top: -40px;
-    }
-    .review-overview ol {
-        margin:0;
-        padding-left:20px;
-    }
-    .review-overview ul {
-        list-style:none;
-        margin:0;
-        padding:0;
-    }
-    .review-overview h4 {
-        margin:0;
-    }
-    .review h3 {
-        margin:0 0 10px;
-    }
-    .manage-review {
-        padding:10px;
-        text-align:right;
-        margin:20px 0 40px;
-    }
-    .manage-review ul {
-        margin:0;
-        padding:0;
-        display:inline-block;
-    }
-    .manage-review ul li {
-        list-style:none;
-        display:inline-block;
-        margin-left:20px;
-        padding:1em 0 1em 1em;
-    }
-    .manage-review a {
-        color:#fff;
-    }
-    .manage-review li.state-highlight a:before {
-        font-size:1.5em;
-        background:#fff;
-        color:#222;
-    }
-    li.closed.state-highlight,
-    li.open.state-highlight {
-        display: none;
-    }
-    .comments-reply {
-        font-size:0.8em;
-    }
-    .comments .attachment-card {
-        margin:-13px 0;
-    }
-    .attachment-card h3 {
-        font-size:1.6em;
-    }
-    .comments-reply {
-        margin:1em 0 0 1em;
-    }
-    .comments-reply_new {
-        margin:2em 0 0 1em;
-    }
-    @media screen and (max-width:680px) {
-        .comments-reply,
-        .comments-reply_new {
-            margin:.5em 0 .5em .5em;
-        }
-    }
-    .comments-reply_new {
-        overflow:hidden;
-    }
-    .comments-reply_new textarea {
-        height:80px;
-    }
-    .blockquote-header {
-        clear:both;
-        text-align:left;
-        background:#E69B8D;
-        padding:5px 10px;
-        margin:0 0 5px;
-        color:#fff;
-        margin:0;
-        font-size:1.1em;
-    }
-    .blockquote-header a {
-        color:#fff;
-    }
-    .blockquote-footer {
-        margin-top:5px;
-        padding:5px 10px;
-        background:#eee;
-        text-align:right;
-    }
-    .comments-reply_new input[type="submit"] {
-        float:right;
-        margin-top:-10px;
-    }
-    @media screen and (max-width:680px) {
-        .comments-reply_new input[type="submit"] {
-            float:none;
-        }
-    }
-    .comments .collapser {
-        margin:1em 0 1em;
-        cursor:pointer;
-    }
-    @media screen and (max-width:680px) {
-        .comments .collapser {
-            font-size:0.9em;
-        }
-    }
-    section section {
-        padding:1em;
-    }
-
-    article > section {
-        margin: 0;
-    }
-
-    article {
-        background: rgba(67, 177, 138, .2);
-        padding: 20px;
-        margin: 40px 0;
-    }
-    .review img {
-        max-width: 100%;
-    }
-
-    /* No need showing 'reply' label for new comments */
-    .new_comment label {
-        display: none;
-    }
-
-    .revision a {
-        font-weight: 400;
-    }
-    .revision.current a {
-        color: #555;
-        font-weight: 700;
-    }
-</style>
+<link href="/static/styles/review.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -185,13 +26,13 @@
 
     <div class="main-content">
         <h1 class="heading">
-            {{ object.title }}
+            DT-{{ object.pk }}: {{ object.title }}
         </h1>
 
-        <div class="split~680 by:3 review-overview">
+        <div class="split~680 by:3 review-meta">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
-                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator }}</a><br><br>
+                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
@@ -223,37 +64,36 @@
             </div>
         </div>
 
-        <article>
-            <h3 class="icon icon-lightbulb">Description</h3>
+        <article class="review-overview">
+            <h3 class="icon icon-lightbulb">Review Overview</h3>
             <section>
-                {% if revision.description %}
-                    <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
-                {% else %}
-                    <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
-                {% endif %}
+                <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
+
+                <div class="latest-revision-note">
+                    <h3 class="heading">Latest Revision Note</h3>
+                    <section>
+                        <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
+                    </section>
+                </div>
             </section>
+
         </article>
 
-        <article>
-            {% if not revision.attachments.exists %}
-                <h3 class="icon icon-attach">Attachments</h3>
-                <section>
-                    <p>No attachments exist</p>
-                </section>
-            {% else %}
+        {% if revision.attachments.exists %}
+            <article>
                 <h3 class="icon icon-attach">Attachments</h3>
                 <section>
                     {% for attachment in revision.attachments.all %}
                         {% include "includes/review_attachment.html" with attachment=attachment %}
                     {% endfor %}
                 </section>
-            {% endif %}
-        </article>
+            </article>
+        {% endif %}
 
-        <article>
-            <h3 class="icon icon-comment">Previous comments</h3>
-            <section class="comments">
-                {% if revision.commentthread_set.all %}
+        {% if revision.commentthread_set.all %}
+            <article id="comments">
+                <h3 class="icon icon-comment">Previous comments</h3>
+                <section class="comments">
                     {% macro attachments %}
                         {% for attachment in comment.attachments.all %}
                             {% include "includes/review_attachment.html" with attachment=attachment %}
@@ -270,7 +110,7 @@
                     {% endmacro %}
 
                     {% macro form %}
-                        <form action="" method="post" enctype="multipart/form-data">
+                        <form action="#comments" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
                             {{ comment_form.comment.errors }}
@@ -292,7 +132,16 @@
                         <section class="collapseable">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
-                                    <label class="icon collapser icon-minus-squared-alt">New comment by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}</label>
+                                    <label id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}"
+                                        class="icon collapser icon-minus-squared-alt">
+                                            New comment by
+                                            <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                                {{ comment.commenter.userprofile }}
+                                            </a> @
+                                            <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                                {{ comment.created }}
+                                            </a>
+                                    </label>
                                     <blockquote>
                                         <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
                                         {% if comment.commenter == request.user %}
@@ -304,9 +153,15 @@
                                     {% use_macro attachments %}
                                 {% else %}
                                     <div class="comments-reply">
-                                        <blockquote>
+                                        <blockquote id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
                                             <div class="blockquote-header">
-                                                Reply by <a href="{{ comment.commenter.userprofile.get_absolute_url }}">{{ comment.commenter.userprofile }}</a> @ {{ comment.created }}
+                                                Reply by
+                                                <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                                    {{ comment.commenter.userprofile }}
+                                                </a> @
+                                                <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                                    {{ comment.created }}
+                                                </a>
                                             </div>
                                             <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
                                             {% if comment.commenter == request.user %}
@@ -324,11 +179,9 @@
                             </div>
                         </section>
                     {% endfor %}
-                {% else %}
-                    No comments
-                {% endif %}
-            </section>
-        </article>
+                </section>
+            </article>
+        {% endif %}
 
         <article>
             <h3 class="heading">Post a New Comment</h3>
@@ -346,17 +199,19 @@
 {{ block.super }}
 <script>
 // Expand collapse top level comments
-$('.collapser').click(function() {
-    var collapser = $(this);
-    collapser.parents('.collapseable').find('blockquote, .comments-reply_new, .attachment-card').slideToggle(function() {
-        if ($(this).is(":visible")) {
-            collapser.removeClass('icon-plus-squared-alt');
-            collapser.addClass('icon-minus-squared-alt');
-        } else {
-            collapser.addClass('icon-plus-squared-alt');
-            collapser.removeClass('icon-minus-squared-alt');
-        }
-    });
+$('.collapser').click(function(e) {
+    if (e.target.tagName != "A") {
+        var collapser = $(this);
+        collapser.parents('.collapseable').find('blockquote, .comments-reply_new, .attachment-card').slideToggle(function() {
+            if ($(this).is(":visible")) {
+                collapser.removeClass('icon-plus-squared-alt');
+                collapser.addClass('icon-minus-squared-alt');
+            } else {
+                collapser.addClass('icon-plus-squared-alt');
+                collapser.removeClass('icon-minus-squared-alt');
+            }
+        });
+    }
 });
 
 // Set up function to check statuses and highlight the correct button
@@ -470,6 +325,9 @@ $('.delete_attachment').click(function(event) {
         });
     });
 });
+
+// Spawn new windows for links
+$('.review-overview a').attr('target', '_blank');
 {% endif %}
 
 </script>

@@ -71,7 +71,7 @@ class Comment(BaseModel):
             context = {
                 'receipient': reviewer,
                 'sender': system_user,
-                'commenter': commenter,
+                'comment': obj,
                 'url': review.get_absolute_url(),
                 'title': review.review.title,
             }

@@ -1,6 +1,9 @@
-Hello {{ receipient }},
-
-There has been a new comment on <a href="//{{ dt_url }}{{ url }}">{{ title }}</a> by {{ commenter }}.
-
-Thanks,
-{{ sender }}
+Hello {{ receipient }},<br>
+<br>
+{{ comment.commenter|capfirst }} has added a comment to <a href="//{{ dt_url }}{{ url }}">{{ title }}</a>:<br>
+<br>
+----------<br>
+{{ comment.comment }}<br>
+----------<br>
+<br>
+- {{ sender }}

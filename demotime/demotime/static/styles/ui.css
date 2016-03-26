@@ -61,6 +61,10 @@ a.button-link.confirm {
 .attachment-photo:hover .delete_attachment {
     display:inline-block;
 }
+/* Fixing filename bleedthrough */
+.attachment-file {
+    overflow: hidden;
+}
 
 .summary a {
     font-size:0.8em;
@@ -111,6 +115,9 @@ a.button-link.confirm {
 .markItUp,
 .markItUpEditor {
     width:100% !important;
+}
+.markItUpEditor {
+    height:150px !important;
 }
 .markItUpHeader,
 .markItUpFooter {
@@ -171,14 +178,14 @@ a.button-link.confirm {
     margin:0;
     padding:0;
 }
-.reviews-list section.demos {
-    background:#54BB9C;
+section.demos {
+    background:rgba(84, 187, 156, 1);
 }
-.reviews-list section.reviews {
-    background:#469C9B;
+section.reviews {
+    background:rgba(84, 187, 156, .7);
 }
-.reviews-list section.updates {
-    background:#3A8B9B;
+section.updates {
+    background:rgba(84, 187, 156, .5);
 }
 .reviews-list section.done {
     background-image:url(/static/images/done.png);
@@ -186,3 +193,4 @@ a.button-link.confirm {
     background-size:50%;
     background-position:50% 50%;
 }
+
