@@ -107,8 +107,11 @@ $('.review form').submit(function(e) {
     var form = $(this),
         proceed = true;
 
-    $('.attachments select:visible').each(function() {
-        if (!$(this).val()) {
+    $('.attachment-container:visible').each(function() {
+        var select = $(this).find('.attachment-type select'),
+            file = $(this).find('.attachment-file input');
+
+        if (!select.val() && file.val()) {
             proceed = false;
         }
     });

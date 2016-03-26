@@ -104,9 +104,7 @@
 
                     {% macro attachment %}
                         <section>
-                            <div class="split~680 by:3 with-gap:3">
-                                {% include "includes/attachments_form.html" with form=attachment_form %}
-                            </div>
+                            {% include "includes/attachments_form.html" with form=attachment_form cols=3 %}
                             {{ form.attachment.errors }}
                         </section>
                     {% endmacro %}
