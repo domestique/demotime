@@ -131,6 +131,11 @@
             $('body').addClass('bookmarklet');
         </script>
         {% endif %}
+        <script>
+            setTimeout(function() {
+                $('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
+            }, 1);
+        </script>
     </body>
     <div id="patterns" style="display: none">
         {% block patterns %}{% endblock %}

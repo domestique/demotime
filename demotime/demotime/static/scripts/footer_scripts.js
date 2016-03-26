@@ -99,8 +99,6 @@ $('button').click(function() {
     }
 });
 
-$('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
-
 var ScrollToLinks = new DemoTime.ScrollToLink();
 
 $('.review form').submit(function(e) {

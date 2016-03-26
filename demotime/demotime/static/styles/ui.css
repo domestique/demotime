@@ -199,3 +199,7 @@ section.updates {
     margin: 0;
     padding: 0;
 }
+h3 small {
+    color:#aaa;
+    margin-left: 10px;
+}
