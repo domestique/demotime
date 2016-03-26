@@ -52,6 +52,16 @@
             <li>
                 <a href="{{ object.get_absolute_url }}?action=delete" class="button-link">Delete</a>
             </li>
+            {% if prev_msg %}
+                <li>
+                    <a href="{{ prev_msg.get_absolute_url }}" class="button-link">Previous Unread Message</a>
+                </li>
+            {% endif %}
+            {% if next_msg %}
+                <li>
+                    <a href="{{ next_msg.get_absolute_url }}" class="button-link">Next Unread Message</a>
+                </li>
+            {% endif %}
         </ul>
     </section>
 </div>

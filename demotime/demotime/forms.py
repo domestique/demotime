@@ -20,6 +20,9 @@ class ReviewForm(forms.ModelForm):
         for key, value in self.fields.iteritems():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
+        if self.instance.pk:
+            self.fields['description'].required = False
+
     class Meta:
         model = models.Review
         fields = (

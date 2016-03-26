@@ -30,7 +30,6 @@ a.error {
             <div class="form-group">
                 <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}</h3>
                 {{ review_form.description }}
-                {% markdown_media %}
                 {{ review_form.description.errors }}
             </div>
             <div class="form-group">
@@ -48,15 +47,7 @@ a.error {
                 {{ attachment_forms.management_form }}
                 {% for form in attachment_forms %}
                     <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
-                        <div class="split by:4 with-gap:3">
-                            {% include "includes/attachments_form.html" with form=form %}
-                            <div class="cel">
-                                {% if forloop.counter < attachment_forms|length %}
-                                    <label>&nbsp;</label>
-                                    <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
-                                {% endif %}
-                            </div>
-                        </div>
+                        {% include "includes/attachments_form.html" with form=form cols=4 %}
                         {{ form.attachment.errors }}
                     </section>
                 {% endfor %}

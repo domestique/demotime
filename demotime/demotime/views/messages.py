@@ -76,16 +76,16 @@ class MessageDetailView(DetailView):
             delete = True
             self.redirect = True
 
-        message = get_object_or_404(
+        self.message = get_object_or_404(
             models.Message,
             pk=self.kwargs.get(self.pk_url_kwarg),
             receipient=self.request.user
         )
-        message.read = read
-        message.deleted = delete
-        message.save(update_fields=['read', 'deleted'])
+        self.message.read = read
+        self.message.deleted = delete
+        self.message.save(update_fields=['read', 'deleted'])
 
-        return message
+        return self.message
 
     def get(self, *args, **kwargs):
         response = super(MessageDetailView, self).get(*args, **kwargs)
@@ -93,6 +93,29 @@ class MessageDetailView(DetailView):
             return redirect('inbox')
         else:
             return response
+
+    def get_context_data(self, **kwargs):
+        context = super(MessageDetailView, self).get_context_data(**kwargs)
+        msg = context['message']
+        try:
+            next_msg = msg.get_next_by_created(
+                receipient=self.message.receipient,
+                read=False
+            )
+        except models.Message.DoesNotExist:
+            next_msg = None
+
+        try:
+            prev_msg = msg.get_previous_by_created(
+                receipient=self.message.receipient,
+                read=False
+            )
+        except models.Message.DoesNotExist:
+            prev_msg = None
+
+        context['next_msg'] = next_msg
+        context['prev_msg'] = prev_msg
+        return context
 
 inbox_view = InboxView.as_view()
 msg_detail_view = MessageDetailView.as_view()

@@ -72,12 +72,14 @@
             <section>
                 <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
 
-                <div class="latest-revision-note">
-                    <h3 class="heading">Latest Revision Note</h3>
-                    <section>
-                        <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
-                    </section>
-                </div>
+                {% if revision.description and object.reviewrevision_set.all.count > 1 %}
+                    <div class="latest-revision-note">
+                        <h3 class="heading">Latest Revision Note</h3>
+                        <section>
+                            <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
+                        </section>
+                    </div>
+                {% endif %}
             </section>
 
         </article>
@@ -105,9 +107,7 @@
 
                     {% macro attachment %}
                         <section>
-                            <div class="split~680 by:3 with-gap:3">
-                                {% include "includes/attachments_form.html" with form=attachment_form %}
-                            </div>
+                            {% include "includes/attachments_form.html" with form=attachment_form cols=3 %}
                             {{ form.attachment.errors }}
                         </section>
                     {% endmacro %}

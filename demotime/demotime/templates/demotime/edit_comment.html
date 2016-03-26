@@ -17,9 +17,7 @@
             </div>
             <div class="toggled_text attachments">
                 <section>
-                    <div class="split~680 by:3 with-gap:3">
-                        {% include "includes/attachments_form.html" with form=form %}
-                    </div>
+                    {% include "includes/attachments_form.html" with form=form cols=3 %}
                     {{ form.attachment.errors }}
                 </section>
                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
