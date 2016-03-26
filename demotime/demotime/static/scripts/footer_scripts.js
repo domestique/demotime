@@ -140,7 +140,7 @@ DemoTime.Reviewers = Backbone.View.extend({
         var $input = $(event.target),
             self = this;
 
-        if ($input.val().length > 1) {
+        if ($input.val().length > 2) {
             var req = $.ajax({
                 url: self.options.finder_url,
                 method: 'POST',
@@ -161,9 +161,11 @@ DemoTime.Reviewers = Backbone.View.extend({
                     swal ({
                         title: "Add a reviewer",
                         text: template,
+                        type: "success",
                         html: true
                     });
                 } else {
+                    sweetAlert("Sorry...", "No matches found.", "error");
                     $input.select();
                 }
             });
