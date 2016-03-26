@@ -29,7 +29,7 @@
             DT-{{ object.pk }}: {{ object.title }}
         </h1>
 
-        <div class="split~680 by:3 review-meta">
+        <div class="split~680 by:3 review-meta with-gap:5">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
@@ -39,8 +39,11 @@
                 <h4 class="heading">Reviewers:</h4>
                 <ul class="list-inline">
                 {% for reviewer in object.reviewer_set.all %}
-                    <li><a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }}</li>
+                    <li><a data-pk="{{ reviewer.reviewer.pk }}" href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} <small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small></li>
                 {% endfor %}
+                    <li>
+                        <input type="text" id="add_reviewer" placeholder="add reviewer">
+                    </li>
                 </ul>
             </div>
             <div class="cel">
@@ -195,6 +198,20 @@
 {% markdown_editor "textarea" %}
 {% endblock %}
 
+{% block patterns %}
+{{ block.super }}
+<script type="text/x-pattern" id="new_reviewers">
+<ul>
+<% _.each(person, function(person) { %>
+    <li><a href="#" data-pk="<%= person.pk %>" class="new_reviewer_click"><%= person.name %></a></li>
+<% }) %>
+</ul>
+</script>
+<script type="text/x-pattern" id="added_reviewer">
+<li><%= person.attributes.reviewer_name %>: <%= person.attributes.reviewer_status %></a></li>
+</script>
+{% endblock %}
+
 {% block footer_scripts %}
 {{ block.super }}
 <script>
@@ -330,5 +347,10 @@ $('.delete_attachment').click(function(event) {
 $('.review-overview a').attr('target', '_blank');
 {% endif %}
 
+var ModifyReviewers = new DemoTime.Reviewers({
+    finder_url: '{% url 'reviewer-finder' review.pk %}',
+    adder_url: '{% url 'add-reviewer' review.pk %}',
+    deleter_url: '{% url 'delete-reviewer' review.pk %}'
+});
 </script>
 {% endblock %}
