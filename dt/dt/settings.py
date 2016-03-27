@@ -38,12 +38,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    # Our libs
+    'demotime',
     # Third Party Libs
     'macros',
     'registration',
     'django_markdown',
-    # Our libs
-    'demotime',
 )
 
 try:
