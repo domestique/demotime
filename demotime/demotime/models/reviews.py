@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -322,7 +323,7 @@ class ReviewRevision(BaseModel):
     review = models.ForeignKey('Review')
     description = models.TextField(blank=True)
     attachments = GenericRelation(Attachment)
-    number = models.IntegerField(null=True)
+    number = models.IntegerField()
 
     def __unicode__(self):
         return u'Review Revision: {}'.format(self.review)
@@ -332,6 +333,12 @@ class ReviewRevision(BaseModel):
             'pk': self.review.pk,
             'rev_pk': self.pk
         })
+
+    @property
+    def is_max_revision(self):
+        return self.number == self.review.reviewrevision_set.aggregate(
+            Max('number')
+        )['number__max']
 
     class Meta:
         get_latest_by = 'created'

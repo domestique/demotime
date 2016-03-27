@@ -71,7 +71,7 @@
 
                 {% if revision.description and object.reviewrevision_set.all.count > 1 %}
                     <div class="latest-revision-note">
-                        <h3 class="heading">Latest Revision Note</h3>
+                        <h3 class="heading">{% if revision.is_max_revision %}Latest Revision Note{% else %}Revision {{ revision.number }} Note{% endif %}</h3>
                         <section>
                             <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
                         </section>
