@@ -15,6 +15,9 @@
 .review p {
     margin: 3px 0;
 }
+.review-top {
+    overflow: hidden;
+}
 .review-meta {
     padding: 40px 25px 20px;
     background: #f2f2f2;
@@ -49,9 +52,8 @@
 }
 
 .manage-review {
-    padding:10px;
-    text-align:right;
-    margin:20px 0 40px;
+    padding:10px 0;
+    float: right;
 }
 .manage-review ul {
     margin:0;
@@ -71,6 +73,13 @@
     font-size:1.5em;
     background:#fff;
     color:#222;
+    position: relative;
+    top: 3px;
+    margin-right: 10px;
+}
+.main-content {
+    margin-top: 40px;
+    clear: both;
 }
 li.closed.state-highlight,
 li.open.state-highlight {
@@ -196,4 +205,28 @@ a[target="_blank"] {
     padding: 3px 10px;
     height: 30px;
     margin-top: 5px;
+}
+
+.your-status {
+    box-shadow:4px 4px 0 #ccc;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    padding: 20px;
+    float: left;
+    margin-top: 10px;
+}
+@media screen and (max-width:680px) {
+    .your-status {
+        width: 100%;
+        float: none;
+        box-sizing: border-box;
+        margin-bottom: 5px;
+    }
+}
+.your-status h3 {
+    margin: 0;
+}
+.your-status span {
+    color: #333;
+    font-weight: 900;
 }

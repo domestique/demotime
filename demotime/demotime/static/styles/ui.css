@@ -136,6 +136,11 @@ a.button-link.confirm {
     padding:0;
     box-shadow:none;
 }
+.content h1 small {
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-left: 10px;
+}
 .content section h1:not(.heading),
 .content section h2:not(.heading),
 .content section h3:not(.heading),
@@ -202,4 +207,14 @@ section.updates {
 h3 small {
     color:#aaa;
     margin-left: 10px;
+}
+
+.success {
+    color: green;
+}
+.failure {
+    color: red;
+}
+.alert {
+    color: #ffffe7
 }

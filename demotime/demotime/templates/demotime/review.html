@@ -9,24 +9,36 @@
 
 {% block content %}
 <div class="review">
-    <div class="manage-review">
-        <ul>
+    <div class="review-top">
+        <div class="your-status">
             {% if request.user == object.creator %}
-                <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Update demo</a></li>
-                <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
-                <li class="closed"><a data-type="closed" href="#" class="button-link confirm icon icon-ok">Close demo</a></li>
+                <h3>Demo status: <span id="status_msg"></span></h3>
             {% else %}
-                {% if reviewer %}
-                    <li class="approved"><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Accept demo</a></li>
-                    <li class="rejected"><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
-                {% endif %}
+                <h3>Your approval status: <span id="status_msg"></span></h3>
             {% endif %}
-        </ul>
+        </div>
+        <div class="manage-review">
+            <ul>
+                {% if request.user == object.creator %}
+                    <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Update demo</a></li>
+                    <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
+                    <li class="closed"><a data-type="closed" href="#" class="button-link confirm icon icon-ok">Close demo</a></li>
+                {% else %}
+                    {% if reviewer %}
+                        <li class="approved"><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Accept demo</a></li>
+                        <li class="rejected"><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+        </div>
     </div>
 
     <div class="main-content">
         <h1 class="heading">
             DT-{{ object.pk }}: {{ object.title }}
+            <small class="alert" style="display:none">
+                Viewing X of Y
+            </small>
         </h1>
 
         <div class="split~680 by:3 review-meta with-gap:5">
@@ -39,7 +51,14 @@
                 <h4 class="heading">Reviewers:</h4>
                 <ul class="list-inline">
                     {% for reviewer in object.reviewer_set.all %}
-                    <li><a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}</li>
+                        <li>
+                            {% if reviewer.get_status_display == "Approved" %}
+                                <span class="success">&#10003;</span>
+                            {% elif reviewer.get_status_display == "Rejected" %}
+                                <span class="failure">&#10008;</span>
+                            {% endif %}
+                            <a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}
+                        </li>
                     {% endfor %}
                     <li>
                         <input type="text" id="add_reviewer" placeholder="add reviewer" maxlength="3">
@@ -262,6 +281,7 @@ function check_review_status() {
             var status = status.responseJSON.state;
         {% endif %}
 
+        $('#status_msg').html(status);
         $('.manage-review li.state-highlight').removeClass('state-highlight');
         $('.manage-review li.' + status).addClass('state-highlight');
     });
@@ -303,10 +323,16 @@ $('.manage-review a').click(function(event) {
                     status:type
                 }
             });
+
+            req.success(function(msg) {
+                if (msg.success) {
+                    check_review_status();
+                }
+            });
         {% endif %}
         {% if request.user == object.creator %}
-            if (check_for_close_warning(type)) {
-                // Sets the new demo status
+            // Sets the new demo status
+            function finisher_ajax() {
                 var req = $.ajax({
                     url: '{% url "update-review-state" revision.review.pk %}',
                     method: 'POST',
@@ -316,13 +342,34 @@ $('.manage-review a').click(function(event) {
                         state: type
                     }
                 });
+
+                req.success(function(msg) {
+                    if (msg.success) {
+                        check_review_status();
+                    }
+                });
+            }
+            var reviewing = '{{ review.reviewer_state }}';
+            if ((type == 'closed' || type == 'aborted') && reviewing == 'reviewing') {
+                swal({
+                    title: "Are you sure?",
+                    text: "There are active reviewers. Are you sure you wish to change this review to " + type + "?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Confirm",
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        finisher_ajax();
+                         swal.close();
+                    }
+                });
+            } else {
+                finisher_ajax();
             }
         {% endif %}
-        req.success(function(msg) {
-            if (msg.success) {
-                check_review_status();
-            }
-        });
     }
 });
 
