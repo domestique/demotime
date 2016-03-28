@@ -1,6 +1,6 @@
 {% load demo_tags %}
 
-{% if type = "demos" %}
+{% if type == "demos" %}
     <h3 class="icon icon-calendar">
         {% if request.user.pk == user.pk %}
             Your
@@ -10,7 +10,7 @@
         Active Demos
         <a href="{% url 'review-list' %}?creator={{ user.pk }}">(View all)</a>
     </h3>
-{% elif type = "reviews" %}
+{% elif type == "reviews" %}
     <h3 class="icon icon-inbox">
         Reviews Assigned to
         {% if request.user.pk == user.pk %}
@@ -22,7 +22,7 @@
             to you to review. You can leave feedback and ultimately approve or
             reject a demo."></span>
     </h3>
-{% elif type = "updates" %}
+{% elif type == "updates" %}
     <h3 class="icon icon-mail">
         Recently Updated Demos
         <span class="tooltip" title="Demos owned by others that have been
@@ -39,7 +39,11 @@
                 {% else %}
                     <li class="icon icon-{{ demo.state }}">
                 {% endifnotequal %}
-                DT-{{ demo.pk }}: <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
+                {% if type == "updates" %}
+                        DT-{{ demo.review.pk }}: <a href="{{ demo.review.get_absolute_url }}">{{ demo.review.title }}</a>
+                {% else %}
+                    DT-{{ demo.pk }}: <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
+                {% endif %}
                 </li>
             {% endfor %}
         </ul>
