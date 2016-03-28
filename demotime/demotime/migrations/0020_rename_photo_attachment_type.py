@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations
+from django.db import migrations, models
 
 
 def update_photo_attachment_type(apps, schema_editor):
@@ -21,4 +21,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(update_photo_attachment_type),
+        migrations.AlterField(
+            model_name='attachment',
+            name='attachment_type',
+            field=models.CharField(choices=[(b'', b'-----'), (b'image', b'Image'), (b'document', b'Document'), (b'movie', b'Movie/Screencast'), (b'audio', b'Audio'), (b'other', b'Other')], db_index=True, max_length=128),
+        ),
     ]
