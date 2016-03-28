@@ -183,19 +183,19 @@ a.button-link.confirm {
     margin:0;
     padding:0;
 }
-section.demos {
+section.reviews {
     background:rgba(84, 187, 156, 1);
 }
-section.reviews {
-    background:rgba(84, 187, 156, .8);
-}
 section.updates {
+    background:rgba(84, 187, 156, 8);
+}
+section.demos {
     background:rgba(84, 187, 156, .65);
 }
 .reviews-list section.done {
     background-image:url(/static/images/done.png);
     background-repeat:no-repeat;
-    background-size:50%;
+    background-size:10%;
     background-position:50% 50%;
 }
 
