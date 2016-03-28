@@ -85,13 +85,13 @@ a.button-link.confirm {
 
 .tooltip {
     display:inline-block;
-    width:20px;
-    height:20px;
+    width:10px;
+    height:10px;
     background:url(/static/images/help.png) 0 0 no-repeat;
     background-size:100%;
     position:relative;
-    top:0;
-    left:5px;
+    top:-2px;
+    left:1px;
     cursor:pointer;
 }
 .tooltip.alert {

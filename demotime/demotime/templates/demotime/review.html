@@ -52,17 +52,22 @@
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
-                <h4 class="heading">Demo State:</h4>
-                {% if object.state == "closed" %}
-                    {{ object.state|capfirst }}
-                {% else %}
-                    {% if object.reviewer_state == "Approved" %}
-                        <span class="success">&#10003;</span>
-                    {% elif object.reviewer_state == "Rejected" %}
-                        <span class="failure">&#10008;</span>
-                    {% endif %}
-                    {{ object.reviewer_state|capfirst }}
+                <h4 class="heading">
+                    Reviewer State:
+                    <span class="tooltip" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
+                </h4>
+                {% if object.reviewer_state == "Approved" %}
+                    <span class="success">&#10003;</span>
+                {% elif object.reviewer_state == "Rejected" %}
+                    <span class="failure">&#10008;</span>
                 {% endif %}
+                {{ object.reviewer_state|capfirst }}
+                <br><br>
+                <h4 class="heading">
+                    Demo State:
+                    <span class="tooltip" title="The demo state is the state of the actual review itself (Open, closed, etc)">
+                </h4>
+                {{ object.state|capfirst }}
                 <br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
