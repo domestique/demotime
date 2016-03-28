@@ -38,8 +38,13 @@
     <div class="main-content">
         <h1 class="heading">
             DT-{{ object.pk }}: {{ object.title }}
-            <small class="alert" style="display:none">
-                Viewing X of Y
+                <small class="alert">
+                Viewing
+                {% if revision.is_max_revision %}
+                    latest revision
+                {% else %}
+                    revision {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
+                {% endif %}
             </small>
         </h1>
 
