@@ -40,7 +40,7 @@
                     <li class="icon icon-{{ demo.state }}">
                 {% endifnotequal %}
                 {% if type == "updates" %}
-                        DT-{{ demo.review.pk }}: <a href="{{ demo.review.get_absolute_url }}">{{ demo.review.title }}</a>
+                    DT-{{ demo.review.pk }}: <a href="{{ demo.review.get_absolute_url }}">{{ demo.review.title }}</a>
                 {% else %}
                     DT-{{ demo.pk }}: <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
                 {% endif %}
