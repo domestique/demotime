@@ -27,12 +27,12 @@ class TestCommentViews(BaseTestCase):
             attachments=[
                 {
                     'attachment': File(BytesIO('test_file_1')),
-                    'attachment_type': 'photo',
+                    'attachment_type': 'image',
                     'description': 'Testing',
                 },
                 {
                     'attachment': File(BytesIO('test_file_2')),
-                    'attachment_type': 'photo',
+                    'attachment_type': 'image',
                     'description': 'Testing',
                 },
             ],
@@ -42,7 +42,7 @@ class TestCommentViews(BaseTestCase):
             review=self.review.revision,
             comment='Test Comment',
             attachment=File(BytesIO('test_file_1')),
-            attachment_type='photo',
+            attachment_type='image',
             description='Test Description',
         )
         # Reset out mail queue
@@ -55,7 +55,7 @@ class TestCommentViews(BaseTestCase):
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
             'comment': "Oh nice demo!",
             'attachment': fh,
-            'attachment_type': 'photo',
+            'attachment_type': 'image',
             'description': 'Test Description',
         })
         self.assertStatusCode(response, 302)
@@ -70,7 +70,7 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(comment.comment, 'Oh nice demo!')
         self.assertEqual(comment.attachments.count(), 1)
         attachment = comment.attachments.get()
-        self.assertEqual(attachment.attachment_type, models.Attachment.PHOTO)
+        self.assertEqual(attachment.attachment_type, models.Attachment.IMAGE)
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
@@ -147,7 +147,7 @@ class TestCommentViews(BaseTestCase):
         response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
             'comment': 'This is an attachment update',
             'attachment': fh,
-            'attachment_type': 'photo',
+            'attachment_type': 'image',
             'description': 'Test Comment Edit Description',
         })
         self.assertStatusCode(response, 302)

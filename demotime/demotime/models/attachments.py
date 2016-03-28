@@ -19,7 +19,7 @@ def attachment_filename(instance, filename):
 
 class Attachment(BaseModel):
 
-    PHOTO = 'photo'
+    IMAGE = 'image'
     DOCUMENT = 'document'
     MOVIE = 'movie'
     AUDIO = 'audio'
@@ -27,7 +27,7 @@ class Attachment(BaseModel):
 
     ATTACHMENT_TYPE_CHOICES = (
         ('', '-----'),
-        (PHOTO, 'Photo'),
+        (IMAGE, 'Image'),
         (DOCUMENT, 'Document'),
         (MOVIE, 'Movie/Screencast'),
         (AUDIO, 'Audio'),

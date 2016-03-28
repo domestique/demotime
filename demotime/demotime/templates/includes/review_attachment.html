@@ -15,8 +15,8 @@
         {% if attachment.attachment_type == "movie" %}
             <video src="{{ MEDIA_URL}}{{ attachment.attachment.name|urlencode }}" controls="true">
         {% endif %}
-        {% if attachment.attachment_type == "photo" %}
-            <span class="attachment-photo">
+        {% if attachment.attachment_type == "image" %}
+            <span class="attachment-image">
                 <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="lightboxed">
                     <img src="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="img-thumbnail" height=300 width=300>
                 </a>
@@ -31,7 +31,7 @@
         {% if attachment.attachment_type == "other" %}
             <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
-        {% if attachment.attachment_type != "photo" %}
+        {% if attachment.attachment_type != "image" %}
             {% if comment.commenter == request.user %}
                 <small>(<a href="#" class="delete_attachment">delete</a>)</small>
             {% endif %}

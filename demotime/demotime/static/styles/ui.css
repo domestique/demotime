@@ -2,7 +2,7 @@
 .icon-audio:before { content: '\e816'; } /* '' */
 .icon-video:before { content: '\e808'; } /* '' */
 .icon-other:before { content: '\e805'; } /* '' */
-.icon-photo:before { content: '\e806'; } /* '' */
+.icon-image:before { content: '\e806'; } /* '' */
 .icon-document:before { content: '\e801'; } /* '' */
 
 a.button-link {
@@ -44,10 +44,10 @@ a.button-link.confirm {
     max-width:100%;
     height:auto;
 }
-.attachment-card .attachment-photo {
+.attachment-card .attachment-image {
     position:relative;
 }
-.attachment-card .attachment-photo .delete_attachment {
+.attachment-card .attachment-image .delete_attachment {
     position:absolute;
     top:0;
     right:0;
@@ -58,7 +58,7 @@ a.button-link.confirm {
     color:#000;
     box-shadow:0 0 3px #ccc;
 }
-.attachment-photo:hover .delete_attachment {
+.attachment-image:hover .delete_attachment {
     display:inline-block;
 }
 /* Fixing filename bleedthrough */
