@@ -40,19 +40,16 @@ $('.review form').submit(function(e) {
         }
     });
 
-    if (proceed) {
+    if (!proceed) {
+        e.preventDefault();
+        sweetAlert("Sorry...", "Please select an attachment type.", "error");
+    } else {
         swal ({
             title: "Updating review",
             text: "Just a sec...",
             type: "success",
             showConfirmButton: false
         });
-        setTimeout(function() {
-            form.submit();
-        }, 500);
-    } else {
-        e.preventDefault();
-        sweetAlert("Sorry...", "Please select an attachment type.", "error");
     }
 });
 
