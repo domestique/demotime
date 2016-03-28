@@ -10,13 +10,15 @@
 {% block content %}
 <div class="review">
     <div class="review-top">
-        <div class="your-status">
-            {% if request.user == object.creator %}
-                <h3>Demo status: <span id="status_msg"></span></h3>
-            {% else %}
-                <h3>Your approval status: <span id="status_msg"></span></h3>
-            {% endif %}
-        </div>
+        {% if reviewer %}
+            <div class="your-status">
+                {% if request.user == object.creator %}
+                    <h3>Demo status: <span id="status_msg"></span></h3>
+                {% else %}
+                    <h3>Your approval status: <span id="status_msg"></span></h3>
+                {% endif %}
+            </div>
+        {% endif %}
         <div class="manage-review">
             <ul>
                 {% if request.user == object.creator %}
@@ -45,6 +47,14 @@
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
+                <h4 class="heading">Demo State:</h4>
+                {% if object.reviewer_state == "Approved" %}
+                    <span class="success">&#10003;</span>
+                {% elif object.reviewer_state == "Rejected" %}
+                    <span class="failure">&#10008;</span>
+                {% endif %}
+                {{ object.reviewer_state|capfirst }}
+                <br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
@@ -281,7 +291,7 @@ function check_review_status() {
             var status = status.responseJSON.state;
         {% endif %}
 
-        $('#status_msg').html(status);
+        $('#status_msg').html(status.substr(0, 1).toUpperCase() + status.substr(1));
         $('.manage-review li.state-highlight').removeClass('state-highlight');
         $('.manage-review li.' + status).addClass('state-highlight');
     });
