@@ -53,12 +53,16 @@
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
                 <h4 class="heading">Demo State:</h4>
-                {% if object.reviewer_state == "Approved" %}
-                    <span class="success">&#10003;</span>
-                {% elif object.reviewer_state == "Rejected" %}
-                    <span class="failure">&#10008;</span>
+                {% if object.state == "closed" %}
+                    {{ object.state|capfirst }}
+                {% else %}
+                    {% if object.reviewer_state == "Approved" %}
+                        <span class="success">&#10003;</span>
+                    {% elif object.reviewer_state == "Rejected" %}
+                        <span class="failure">&#10008;</span>
+                    {% endif %}
+                    {{ object.reviewer_state|capfirst }}
                 {% endif %}
-                {{ object.reviewer_state|capfirst }}
                 <br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>

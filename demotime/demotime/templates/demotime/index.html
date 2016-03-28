@@ -7,6 +7,15 @@
     .state-highlight:before {
         font-size:1.5em;
     }
+    .reviews-list small {
+        color: #ffffe7;
+        text-transform: uppercase;
+        margin-left: 5px;
+        font-size: 11px;
+    }
+    .content h1 {
+        margin-bottom: 40px;
+    }
 </style>
 {% endblock %}
 
@@ -15,15 +24,20 @@
     Your dashboard
 </h1>
 
-<div class="split~680 by:3 with-gap:3 reviews-list">
-    <div class="cel">
-        {% include "includes/reviews_box.html" with reviews=open_demos user=request.user type="demos" %}
+<div class="reviews-list">
+    <div class="split~680 by:2 with-gap:3">
+        <div class="cel">
+            {% include "includes/reviews_box.html" with reviews=open_reviews user=request.user type="reviews" %}
+        </div>
+        <div class="cel">
+            {% include "includes/reviews_box.html" with reviews=updated_demos user=request.user type="updates" %}
+        </div>
     </div>
-    <div class="cel">
-        {% include "includes/reviews_box.html" with reviews=open_reviews user=request.user type="reviews" %}
-    </div>
-    <div class="cel">
-        {% include "includes/reviews_box.html" with reviews=updated_demos user=request.user type="updates" %}
-    </div>
+    {% include "includes/reviews_box.html" with reviews=open_demos user=request.user type="demos" %}
 </div>
+
+<div class="tip">
+    <strong>Power tip</strong>: Mouse over a Demo title to get a real-time snapshot of who's assigned and their status.
+</div>
+
 {% endblock %}

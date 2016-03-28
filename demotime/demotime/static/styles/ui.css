@@ -172,7 +172,7 @@ a.button-link.confirm {
 }
 .reviews-list section {
     min-height:150px;
-    padding:20px 10px;
+    padding:10px;
 }
 .reviews-list section,
 .reviews-list section a {
@@ -187,10 +187,10 @@ section.demos {
     background:rgba(84, 187, 156, 1);
 }
 section.reviews {
-    background:rgba(84, 187, 156, .7);
+    background:rgba(84, 187, 156, .8);
 }
 section.updates {
-    background:rgba(84, 187, 156, .5);
+    background:rgba(84, 187, 156, .65);
 }
 .reviews-list section.done {
     background-image:url(/static/images/done.png);
@@ -217,4 +217,11 @@ h3 small {
 }
 .alert {
     color: #ffffe7
+}
+
+.tip {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 30px;
 }

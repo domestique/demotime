@@ -3,12 +3,11 @@
 {% if type == "demos" %}
     <h3 class="icon icon-calendar">
         {% if request.user.pk == user.pk %}
-            Your
+            Active Demos You've Created
+            <a href="{% url 'review-list' %}?creator={{ user.pk }}">(View all)</a>
         {% else %}
-            {{ user }}'s
+            Demos {{ user.userprofile }} has created
         {% endif %}
-        Active Demos
-        <a href="{% url 'review-list' %}?creator={{ user.pk }}">(View all)</a>
     </h3>
 {% elif type == "reviews" %}
     <h3 class="icon icon-inbox">
@@ -25,8 +24,8 @@
 {% elif type == "updates" %}
     <h3 class="icon icon-mail">
         Recently Updated Demos
-        <span class="tooltip" title="Demos owned by others that have been
-        updated since you last reviewed them will appear here."></span>
+        <span class="tooltip" title="Demos that are either owned by you
+        or are assigned to you that have been updated since you last reviewed them will appear here."></span>
     </h3>
 {% endif %}
 
@@ -34,16 +33,34 @@
     {% if reviews %}
         <ul>
             {% for demo in reviews %}
-                {% ifnotequal user demo.creator %}
-                    <li class="icon icon-{# reviewer_status demo user #}">
-                {% else %}
-                    <li class="icon icon-{{ demo.state }}">
-                {% endifnotequal %}
-                {% if type == "updates" %}
-                    DT-{{ demo.review.pk }}: <a href="{{ demo.review.get_absolute_url }}">{{ demo.review.title }}</a>
-                {% else %}
-                    DT-{{ demo.pk }}: <a href="{{ demo.get_absolute_url }}">{{ demo.title }}</a>
-                {% endif %}
+                <li>
+                    {% if type == "updates" %}
+                    DT-{{ demo.review.pk }}: <a href="{{ demo.review.get_absolute_url }}" title="{% for reviewer in demo.review.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">{{ demo.review.title }}</a>
+                        <small>
+                            {% if demo.review.state == "closed" %}
+                                {{ demo.review.state }}
+                            {% else %}
+                                {% if demo.review.reviewer_state == "reviewing" %}
+                                    Under review
+                                {% else %}
+                                    {{ demo.review.reviewer_state }}
+                                {% endif %}
+                            {% endif %}
+                        </small>
+                    {% else %}
+                        DT-{{ demo.pk }}: <a href="{{ demo.get_absolute_url }}" title="{% for reviewer in demo.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">{{ demo.title }}</a>
+                        <small>
+                            {% if demo.state == "closed" %}
+                                {{ demo.state }}
+                            {% else %}
+                                {% if demo.reviewer_state == "reviewing" %}
+                                    Under review
+                                {% else %}
+                                    {{ demo.reviewer_state }}
+                                {% endif %}
+                            {% endif %}
+                        </small>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
