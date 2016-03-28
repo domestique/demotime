@@ -19,14 +19,14 @@ class TestCommentModels(BaseTestCase):
             review=review.revision,
             comment='Test Comment',
             attachment=File(BytesIO('test_file_1')),
-            attachment_type='photo',
+            attachment_type='image',
             description='Test Description',
         )
         self.assertEqual(comment.thread.review_revision, review.revision)
         self.assertEqual(comment.attachments.count(), 1)
         attachment = comment.attachments.get()
         self.assertEqual(attachment.description, 'Test Description')
-        self.assertEqual(attachment.attachment_type, 'photo')
+        self.assertEqual(attachment.attachment_type, 'image')
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(
@@ -51,7 +51,7 @@ class TestCommentModels(BaseTestCase):
             review=review.revision,
             comment='Test Comment',
             attachment=File(BytesIO('test_file_1')),
-            attachment_type='photo',
+            attachment_type='image',
             description='Test Description',
             thread=thread,
         )
@@ -60,7 +60,7 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(comment.attachments.count(), 1)
         attachment = comment.attachments.get()
         self.assertEqual(attachment.description, 'Test Description')
-        self.assertEqual(attachment.attachment_type, 'photo')
+        self.assertEqual(attachment.attachment_type, 'image')
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(

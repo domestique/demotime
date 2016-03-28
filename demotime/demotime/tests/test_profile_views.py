@@ -29,12 +29,12 @@ class TestProfileViews(BaseTestCase):
             attachments=[
                 {
                     'attachment': File(BytesIO('test_file_1')),
-                    'attachment_type': 'photo',
+                    'attachment_type': 'image',
                     'description': 'Testing',
                 },
                 {
                     'attachment': File(BytesIO('test_file_2')),
-                    'attachment_type': 'photo',
+                    'attachment_type': 'image',
                     'description': 'Testing',
                 },
             ],
