@@ -167,7 +167,7 @@ article {
 }
 
 /* No need showing 'reply' label for new comments */
-.new_comment label {
+.new_comment label.icon-comment {
     display: none;
 }
 
