@@ -27,13 +27,13 @@
 <div class="reviews-list">
     <div class="split~680 by:2 with-gap:3">
         <div class="cel">
-            {% include "includes/reviews_box.html" with reviews=open_reviews user=request.user type="reviews" %}
+            {% include "includes/reviews_box.html" with reviews=open_reviews user=request.user %}
         </div>
         <div class="cel">
-            {% include "includes/reviews_box.html" with reviews=updated_demos user=request.user type="updates" %}
+            {% include "includes/updates_box.html" with reviews=updated_demos user=request.user %}
         </div>
     </div>
-    {% include "includes/reviews_box.html" with reviews=open_demos user=request.user type="demos" %}
+    {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
 </div>
 
 <div class="tip">

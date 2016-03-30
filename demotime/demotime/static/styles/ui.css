@@ -178,19 +178,21 @@ a.button-link.confirm {
 .reviews-list section a {
     color:#fff;
 }
+span.icon-Approved a { font-weight: 200; color: #aaa; }
+
 .reviews-list ul {
     list-style:none;
     margin:0;
     padding:0;
 }
 section.reviews {
-    background:rgba(84, 187, 156, 1);
+    background:rgba(48, 48, 48, 1);
 }
 section.updates {
-    background:rgba(84, 187, 156, 8);
+    background:rgba(48, 48, 48, .8);
 }
 section.demos {
-    background:rgba(84, 187, 156, .65);
+    background:rgba(48, 48, 48, .6);
 }
 .reviews-list section.done {
     background-image:url(/static/images/done.png);

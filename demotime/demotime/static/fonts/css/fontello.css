@@ -50,14 +50,9 @@
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-.icon-approved:before,
-.icon-Approved:before { content: '\e81d'; } /* '' */
-.icon-rejected:before,
-.icon-Rejected:before { content: '\e81e'; } /* '' */
-.icon-closed:before { content: '\e81f'; }
-.icon-Reviewing:before,
-.icon-reviewing:before,
-.icon-open:before { content: '\e80a'; } /* '' */
+span.icon-Approved:before { content: '\e80c'; color: #13CD04; } /* '' */
+span.icon-Rejected:before { content: '\e81e'; color: red; } /* '' */
+/*span.icon-Reviewing:before { content: '\e827'; } */
 
 .icon-search:before { content: '\e800'; } /* '' */
 .icon-mail:before { content: '\e801'; } /* '' */
