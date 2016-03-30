@@ -35,7 +35,10 @@
             {% for demo in reviews %}
                 <li>
                     {% if type == "updates" %}
-                    DT-{{ demo.review.pk }}: <a href="{{ demo.review.get_absolute_url }}" title="{% for reviewer in demo.review.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">{{ demo.review.title }}</a>
+                        {% if request.user.pk == user.pk %}
+                            {% reviewer_status demo.review user %}
+                        {% endif %}
+                        DT-{{ demo.review.pk }}: <a href="{{ demo.review.get_absolute_url }}" title="{% for reviewer in demo.review.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">{{ demo.review.title }}</a>
                         <small>
                             {% if demo.review.state == "closed" %}
                                 {{ demo.review.state }}
@@ -48,6 +51,9 @@
                             {% endif %}
                         </small>
                     {% else %}
+                        {% if request.user.pk == user.pk %}
+                            {% reviewer_status demo user %}
+                        {% endif %}
                         DT-{{ demo.pk }}: <a href="{{ demo.get_absolute_url }}" title="{% for reviewer in demo.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">{{ demo.title }}</a>
                         <small>
                             {% if demo.state == "closed" %}
