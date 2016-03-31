@@ -208,13 +208,13 @@
                                                 <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
                                                     {{ comment.created }}
                                                 </a>
+                                                {% if comment.commenter == request.user %}
+                                                    (<a href="{% url 'update-comment' comment.pk %}">edit this reply</a>)
+                                                {% endif %}
                                             </div>
-                                            <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
-                                            {% if comment.commenter == request.user %}
-                                                <div class="blockquote-footer">
-                                                    <a href="{% url 'update-comment' comment.pk %}">edit</a>
-                                                </div>
-                                            {% endif %}
+                                            <div class="blockquote-body">
+                                                <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                            </div>
                                         </blockquote>
                                         {% use_macro attachments %}
                                     </div>

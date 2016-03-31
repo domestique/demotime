@@ -1,0 +1,50 @@
+/* Reviews list (profile/dashboard) */
+.reviews-list h3 {
+    margin:0;
+    font-size:18px;
+}
+.reviews-list section {
+    min-height:150px;
+    padding:10px;
+}
+.reviews-list section li {
+    color: #ccc;
+}
+.reviews-list section,
+.reviews-list section a {
+    color:#fff;
+    font-weight: 400;
+}
+span.icon-Approved { color: #777; }
+span.icon-Approved a { font-weight: 200; color: #aaa; }
+
+.reviews-list ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+section.reviews {
+    background:rgba(48, 48, 48, 1);
+}
+section.updates {
+    background:rgba(48, 48, 48, .8);
+}
+section.demos {
+    background:rgba(48, 48, 48, .6);
+}
+.reviews-list section.done {
+    background-image:url(/static/images/done.png);
+    background-repeat:no-repeat;
+    background-size:10%;
+    background-position:50% 50%;
+}
+
+.state-highlight:before {
+    font-size:1.5em;
+}
+.reviews-list small {
+    color: #ffffe7;
+    text-transform: uppercase;
+    margin-left: 5px;
+    font-size: 11px;
+}
