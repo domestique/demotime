@@ -11,7 +11,7 @@
         <ul>
             {% for demo in reviews %}
                 {% if forloop.counter <= 5 %}
-                    <li>
+                    <li {% if demo.read == True %}class="de-emphasize"{% endif %}>
                         <span>
                             DT-{{ demo.review.pk }}:
                             <a href="{{ demo.review.get_absolute_url }}"

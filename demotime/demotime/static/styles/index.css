@@ -15,8 +15,10 @@
     color:#fff;
     font-weight: 400;
 }
-span.icon-Approved { color: #777; }
-span.icon-Approved a { font-weight: 200; color: #aaa; }
+li.de-emphasize span,
+span.icon-Approved { color: #999; }
+li.de-emphasize a,
+span.icon-Approved a { font-weight: 200; color: #ccc; }
 
 .reviews-list ul {
     list-style:none;
