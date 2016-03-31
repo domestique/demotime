@@ -1,7 +1,7 @@
 {# Recently updated demos #}
 
 <h3 class="icon icon-mail">
-    Recently Updated Demos
+    Most Recently Updated Demos
     <span class="tooltip" title="Demos that are either owned by you
     or are assigned to you that have been updated since you last reviewed them will appear here."></span>
 </h3>
@@ -10,26 +10,28 @@
     {% if reviews %}
         <ul>
             {% for demo in reviews %}
-                <li>
-                    <span>
-                        DT-{{ demo.review.pk }}:
-                        <a href="{{ demo.review.get_absolute_url }}"
-                            title="{% for reviewer in demo.review.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">
-                                {{ demo.review.title }}
-                        </a>
-                    </span>
-                    <small>
-                        {% if demo.review.state == "closed" %}
-                            {{ demo.review.state }}
-                        {% else %}
-                            {% if demo.review.reviewer_state == "reviewing" %}
-                                Under review
+                {% if forloop.counter <= 5 %}
+                    <li {% if demo.read == True %}class="de-emphasize"{% endif %}>
+                        <span>
+                            DT-{{ demo.review.pk }}:
+                            <a href="{{ demo.review.get_absolute_url }}"
+                                title="{% for reviewer in demo.review.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+                                    {{ demo.review.title }}
+                            </a>
+                        </span>
+                        <small>
+                            {% if demo.review.state == "closed" %}
+                                {{ demo.review.state }}
                             {% else %}
-                                {{ demo.review.reviewer_state }}
+                                {% if demo.review.reviewer_state == "reviewing" %}
+                                    Under review
+                                {% else %}
+                                    {{ demo.review.reviewer_state }}
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    </small>
-                </li>
+                        </small>
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% endif %}

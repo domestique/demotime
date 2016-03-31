@@ -67,15 +67,29 @@ section blockquote {
     background:#fff;
     box-shadow:0 0 5px #ccc;
     margin:0;
-    padding:.5em 1em;
+    padding:15px;
 }
 section blockquote p:first-child {
     margin:0;
 }
+.blockquote-header {
+    clear:both;
+    text-align:left;
+    background:#f0f0f0;
+    padding:10px;
+    margin:0 0 5px;
+    color:#666;
+    margin:0;
+    font-size:1.1em;
+}
+.blockquote-body {
+    padding: 10px;
+    font-size: 14px;
+}
 section .blockquote-footer {
     margin-top:5px;
     padding:5px 10px;
-    background:#eee;
+    background:#fafafa;
     text-align:right;
 }
 section section {
