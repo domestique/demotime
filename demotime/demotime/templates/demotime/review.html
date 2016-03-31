@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load macros django_markdown %}
-{% block title %} - {{ object.title }}{% endblock %}
+{% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
 {% block styles %}
 {{ block.super }}
