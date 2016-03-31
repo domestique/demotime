@@ -13,9 +13,9 @@
         {% if reviewer %}
             <div class="your-status">
                 {% if request.user == object.creator %}
-                    <h3>Demo status: <span id="status_msg"></span></h3>
+                    <h3>Demo State: <strong>{{ object.state|capfirst }}</strong></h3>
                 {% else %}
-                    <h3>Your approval status: <span id="status_msg"></span></h3>
+                    <h3>Your approval status: <strong>{{ reviewer.status|capfirst }}</strong></h3>
                 {% endif %}
             </div>
         {% endif %}
@@ -23,12 +23,23 @@
             <ul>
                 {% if request.user == object.creator %}
                     <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Update demo</a></li>
-                    <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
-                    <li class="closed"><a data-type="closed" href="#" class="button-link confirm icon icon-ok">Close demo</a></li>
+                    {% if object.state == 'closed' %}
+                        <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
+                    {% else %}
+                        <li class="closed"><a data-type="closed" href="#" class="button-link icon icon-ok">Close demo</a></li>
+                    {% endif %}
                 {% else %}
                     {% if reviewer %}
-                        <li class="approved"><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Approve demo</a></li>
-                        <li class="rejected"><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
+                        {% if reviewer.status == 'approved' %}
+                            <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up-1">Unapprove demo</a></li>
+                        {% else %}
+                            <li><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Approve demo</a></li>
+                        {% endif %}
+                        {% if reviewer.status == 'rejected' %}
+                            <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="button-link alert icon icon-thumbs-down">Unreject demo</a></li>
+                        {% else %}
+                            <li><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             </ul>
@@ -76,12 +87,7 @@
                 <ul class="list-inline">
                     {% for reviewer in object.reviewer_set.all %}
                         <li>
-                            {% if reviewer.get_status_display == "Approved" %}
-                                <span class="success">&#10003;</span>
-                            {% elif reviewer.get_status_display == "Rejected" %}
-                                <span class="failure">&#10008;</span>
-                            {% endif %}
-                            <a href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}
+                            <a class="icon icon-{{ reviewer.get_status_display }}" href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}
                         </li>
                     {% endfor %}
                     <li>
@@ -274,148 +280,107 @@ $('.collapser').click(function(e) {
     }
 });
 
-// Set up function to check statuses and highlight the correct button
 {% if reviewer or request.user == object.creator %}
-function check_review_status() {
-    var req = $.ajax({
-        {% if reviewer %}
-            url: '{% url "update-reviewer-status" revision.review.pk reviewer.pk %}',
-            method: 'POST',
-            data: {
-                review: {{ revision.review.pk }},
-                reviewer: {{ reviewer.pk }},
-                status:''
+    function check_for_close_warning(type) {
+        var reviewing = '{{ review.reviewer_state }}';
+        if ((type == 'closed' || type == 'aborted') && reviewing == 'reviewing') {
+            var r = confirm("There are active reviewers. Are you sure you wish to change this review to " + type + "?");
+            if (r == true) {
+                return true;
+            } else {
+                return false;
             }
-        {% endif %}
-        {% if request.user == object.creator %}
-            url: '{% url "update-review-state" revision.review.pk %}',
-            method: 'POST',
-            data: {
-                review: {{ revision.review.pk }},
-                reviewer: {{ object.creator.pk }},
-                state: ''
-            }
-        {% endif %}
-    });
-    req.always(function(status) {
-        {% if reviewer %}
-            var status = status.responseJSON.reviewer_status;
-        {% endif %}
-        {% if request.user == object.creator %}
-            var status = status.responseJSON.state;
-        {% endif %}
-
-        $('#status_msg').html(status.substr(0, 1).toUpperCase() + status.substr(1));
-        $('.manage-review li.state-highlight').removeClass('state-highlight');
-        $('.manage-review li.' + status).addClass('state-highlight');
-    });
-}
-
-check_review_status(); // Run this onload to set the button state
-
-function check_for_close_warning(type) {
-    var reviewing = '{{ review.reviewer_state }}';
-    if ((type == 'closed' || type == 'aborted') && reviewing == 'reviewing') {
-        var r = confirm("There are active reviewers. Are you sure you wish to change this review to " + type + "?");
-        if (r == true) {
-            return true;
         } else {
-            return false;
+            return true;
         }
-    } else {
-        return true;
     }
 
-}
+    $('.manage-review a').click(function(event) {
+        var type = $(this).data('type');
 
-$('.manage-review a').click(function(event) {
-    var type = $(this).data('type');
+        if (type) {
+            event.preventDefault();
 
-    if (type) {
-        event.preventDefault();
-
-        {% if reviewer %}
-            $('.reviewers').css('opacity', '0.5').find('h4').html('Reviewers (refresh to see updates)');
-
-            // Sets the new reviewer status
-            var req = $.ajax({
-                url: '{% url "update-reviewer-status" revision.review.pk reviewer.pk %}',
-                method: 'POST',
-                data: {
-                    review: {{ revision.review.pk }},
-                    reviewer: {{ reviewer.pk }},
-                    status:type
-                }
-            });
-
-            req.success(function(msg) {
-                if (msg.success) {
-                    check_review_status();
-                }
-            });
-        {% endif %}
-        {% if request.user == object.creator %}
-            // Sets the new demo status
-            function finisher_ajax() {
+            {% if reviewer %}
+                // Sets the new reviewer status
                 var req = $.ajax({
-                    url: '{% url "update-review-state" revision.review.pk %}',
+                    url: '{% url "update-reviewer-status" revision.review.pk reviewer.pk %}',
                     method: 'POST',
                     data: {
                         review: {{ revision.review.pk }},
-                        reviewer: {{ object.creator.pk }},
-                        state: type
+                        reviewer: {{ reviewer.pk }},
+                        status:type
                     }
                 });
 
                 req.success(function(msg) {
                     if (msg.success) {
-                        check_review_status();
+                        window.location.reload();
                     }
                 });
-            }
-            var reviewing = '{{ review.reviewer_state }}';
-            if ((type == 'closed' || type == 'aborted') && reviewing == 'reviewing') {
-                swal({
-                    title: "Are you sure?",
-                    text: "There are active reviewers. Are you sure you wish to change this review to " + type + "?",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Confirm",
-                    closeOnConfirm: false
-                },
-                function (isConfirm) {
-                    if (isConfirm) {
-                        finisher_ajax();
-                         swal.close();
-                    }
-                });
-            } else {
-                finisher_ajax();
-            }
-        {% endif %}
-    }
-});
+            {% endif %}
+            {% if request.user == object.creator %}
+                // Sets the new demo status
+                function finisher_ajax() {
+                    var req = $.ajax({
+                        url: '{% url "update-review-state" revision.review.pk %}',
+                        method: 'POST',
+                        data: {
+                            review: {{ revision.review.pk }},
+                            reviewer: {{ object.creator.pk }},
+                            state: type
+                        }
+                    });
 
-// Delete attachment
-$('.delete_attachment').click(function(event) {
-    event.preventDefault();
-
-    var attachment = $(this).parents('.attachment-card'),
-        form = attachment.find('.delete_attachment_form');
-
-    var post = $.post(form.attr('action'), {
-        delete: true
+                    req.success(function(msg) {
+                        if (msg.success) {
+                            window.location.reload();
+                        }
+                    });
+                }
+                var reviewing = '{{ review.reviewer_state }}';
+                if ((type == 'closed' || type == 'aborted') && reviewing == 'reviewing') {
+                    swal({
+                        title: "Are you sure?",
+                        text: "There are active reviewers. Are you sure you wish to change this review to " + type + "?",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Confirm",
+                        closeOnConfirm: false
+                    },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            finisher_ajax();
+                            swal.close();
+                        }
+                    });
+                } else {
+                    finisher_ajax();
+                }
+            {% endif %}
+        }
     });
-    post.done(function(data) {
-        attachment.slideUp(function() {
-            $(this).remove();
+
+    // Delete attachment
+    $('.delete_attachment').click(function(event) {
+        event.preventDefault();
+
+        var attachment = $(this).parents('.attachment-card'),
+            form = attachment.find('.delete_attachment_form');
+
+        var post = $.post(form.attr('action'), {
+            delete: true
+        });
+        post.done(function(data) {
+            attachment.slideUp(function() {
+                $(this).remove();
+            });
         });
     });
-});
 
-// Spawn new windows for links
-$('.review-overview a').attr('target', '_blank');
+    // Spawn new windows for links
+    $('.review-overview a').attr('target', '_blank');
 {% endif %}
 
 var ModifyReviewers = new DemoTime.Reviewers({

@@ -50,8 +50,8 @@
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 
-span.icon-Approved:before { content: '\e80c'; color: #13CD04; } /* '' */
-span.icon-Rejected:before { content: '\e81e'; color: red; } /* '' */
+.icon-Approved:before { content: '\e80c'; color: #13CD04; } /* '' */
+.icon-Rejected:before { content: '\e81e'; color: red; } /* '' */
 /*span.icon-Reviewing:before { content: '\e827'; } */
 
 .icon-search:before { content: '\e800'; } /* '' */
