@@ -13,15 +13,13 @@
         margin-left: 5px;
         font-size: 11px;
     }
-    .content h1 {
-        margin-bottom: 40px;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <h1 class="heading">
-    Your dashboard
+    Dashboard
+    <small><a href="{% url 'review-list' %}">View all open demos</a></small>
 </h1>
 
 <div class="reviews-list">
