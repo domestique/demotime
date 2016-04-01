@@ -18,6 +18,7 @@ class TestMessageModels(BaseTestCase):
             message='Test Message'
         )
         self.assertEqual(msg.receipient, self.user)
+        self.assertEqual(msg.receipient, msg.bundle.receipient)
         self.assertEqual(msg.sender, self.system_user)
         self.assertEqual(msg.review, review.revision)
         self.assertEqual(msg.title, 'Test Create Message')
@@ -39,6 +40,7 @@ class TestMessageModels(BaseTestCase):
             email=False,
         )
         self.assertEqual(msg.receipient, self.user)
+        self.assertEqual(msg.receipient, msg.bundle.receipient)
         self.assertEqual(msg.sender, self.system_user)
         self.assertEqual(msg.review, review.revision)
         self.assertEqual(msg.title, 'Test Create Message')
@@ -58,6 +60,7 @@ class TestMessageModels(BaseTestCase):
             revision=review.revision,
         )
         self.assertEqual(msg.review, review.revision)
+        self.assertEqual(msg.receipient, msg.bundle.receipient)
         self.assertEqual(msg.sender.username, 'demotime_sys')
         self.assertIn('http://example.org', msg.message)
         self.assertEqual(msg.title, 'Test System Message')
@@ -76,6 +79,7 @@ class TestMessageModels(BaseTestCase):
             email=False,
         )
         self.assertEqual(msg.review, review.revision)
+        self.assertEqual(msg.receipient, msg.bundle.receipient)
         self.assertEqual(msg.sender.username, 'demotime_sys')
         self.assertIn('http://example.org', msg.message)
         self.assertEqual(msg.title, 'Test System Message')

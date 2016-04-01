@@ -10,6 +10,18 @@ from django.core.mail import send_mail
 from .base import BaseModel
 
 
+class MessageBundle(BaseModel):
+
+    review = models.ForeignKey('Review', null=True)
+    owner = models.ForeignKey('auth.User')
+
+    class Meta:
+        ordering = ['-created']
+        unique_together = (
+            ('review', 'owner')
+        )
+
+
 class Message(BaseModel):
 
     receipient = models.ForeignKey('auth.User', related_name='receipient')
@@ -20,6 +32,7 @@ class Message(BaseModel):
     message = models.TextField(blank=True)
     read = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
+    bundle = models.ForeignKey('MessageBundle')
 
     def __unicode__(self):
         return u'Message for {}, From {}'.format(
@@ -75,6 +88,10 @@ class Message(BaseModel):
             cls, receipient, sender, title,
             review_revision, thread, message, email=True,
     ):
+        bundle, _ = MessageBundle.objects.get_or_create(
+            receipient=receipient,
+            review=review_revision.review
+        )
         obj = cls.objects.create(
             receipient=receipient,
             sender=sender,
@@ -82,6 +99,7 @@ class Message(BaseModel):
             review=review_revision,
             thread=thread,
             message=message,
+            bundle=bundle,
         )
         if email:
             obj._send_email(receipient, title, message)

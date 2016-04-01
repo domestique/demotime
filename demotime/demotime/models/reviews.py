@@ -330,6 +330,7 @@ class Reviewer(BaseModel):
             'demotime/messages/reviewer.html',
             context,
             self.reviewer,
+            revision=self.review.revision,
         )
 
     def set_status(self, status):
