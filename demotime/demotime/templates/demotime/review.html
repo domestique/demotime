@@ -10,7 +10,7 @@
 {% block content %}
 <div class="review">
     <div class="review-top">
-        {% if reviewer %}
+        {% if reviewer and object.state != "closed" %}
             <div class="your-status">
                 {% if request.user == object.creator %}
                     <h3>Demo State: <strong>{{ object.state|capfirst }}</strong></h3>
@@ -29,7 +29,7 @@
                         <li class="closed"><a data-type="closed" href="#" class="button-link icon icon-ok">Close demo</a></li>
                     {% endif %}
                 {% else %}
-                    {% if reviewer %}
+                    {% if reviewer and object.state != "closed" %}
                         {% if reviewer.status == 'approved' %}
                             <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up-1">Unapprove demo</a></li>
                         {% else %}
