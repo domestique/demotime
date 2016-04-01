@@ -1,9 +1,9 @@
 Hello {{ user }},
 
 {% if reminder.reminder_type == "creator" %}
-Reminder! Your review, <a href="//{{ dt_url }}{{ url }}">{{ reminder.review.title }}</a>, is getting stale. It might be a good time to send a comment to your reviewers to reminder them to finish reviewing your demo.
+Reminder! Your review, <a href="http://{{ dt_url }}{{ url }}">{{ reminder.review.title }}</a>, is getting stale. It might be a good time to send a comment to your reviewers to reminder them to finish reviewing your demo.
 {% else %}
-Reminder! You're a reviewer on <a href="//{{ dt_url }}{{ url }}">{{ reminder.review.title }}</a> and your review decision is now overdue. Please take a look at this demo review at your earliest convenience.
+Reminder! You're a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ reminder.review.title }}</a> and your review decision is now overdue. Please take a look at this demo review at your earliest convenience.
 {% endif %}
 
 Thanks,
