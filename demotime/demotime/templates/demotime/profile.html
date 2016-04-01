@@ -25,6 +25,10 @@
         display:none;
     }
     {% endif %}
+    h3 {
+        font-size: 16px;
+        font-weight: 700;
+    }
 </style>
 {% endblock %}
 
@@ -68,7 +72,9 @@
             <a href="{% url 'edit-profile' object.pk %}">Edit Your Profile</a>
         {% endif %}
     </div>
-    <div class="cel reviews-list">
-        {% include "includes/demos_box.html" with reviews=open_demos user=object.user %}
-    </div>
+    {% if open_demos %}
+        <div class="cel reviews-list">
+            {% include "includes/demos_box.html" with reviews=open_demos user=object.user %}
+        </div>
+    {% endif %}
 {% endblock %}
