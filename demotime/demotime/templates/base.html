@@ -10,7 +10,7 @@
         <!--meta name="author" content=""-->
         <link rel="icon" href="/static/favicon.ico">
 
-        <title>DemoTime!{% block title %}{% endblock %}</title>
+        <title>Demotime {% block title %}{% endblock %}</title>
 
         {# Had to move this up here to make the markdown editor work #}
         <script src="/static/scripts/library/jquery-2.1.3.min.js"></script>
@@ -55,7 +55,7 @@
                                     {% url 'inbox' as inbox_url %}
                                     {% url 'profile' request.user.userprofile.pk as profile_url %}
                                     {% if request.user.is_authenticated %}
-                                        <li class="icon icon-user" {% if request.path == profile_url %}active{% else %}{% endif %}>Logged in as:
+                                        <li class="icon icon-user" {% if request.path == profile_url %}active{% else %}{% endif %}>
                                         <a href="{{ request.user.userprofile.get_absolute_url }}" style="text-decoration:underline">
                                             {% if request.user.userprofile.display_name %}
                                                 {{ request.user.userprofile.display_name }}
@@ -66,7 +66,7 @@
                                         </li>
                                         <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
                                         <li class="icon icon-mail {% if has_unread_messages %}state-highlight{% endif %} {% if request.path == inbox_url %}active{% else %}{% endif %}"><a href="{{ inbox_url }}">Inbox{% if has_unread_messages %} ({{ unread_message_count }}){% endif %}</a></li>
-                                        <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Logout</a></li>
+                                        <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Log out</a></li>
                                     {% else %}
                                         {% if request.path != login_url %}
                                             <li><a href="{% url 'login' %}">Login</a></li>
@@ -117,6 +117,10 @@
 
         {# alerts #}
         <script src="/static/scripts/library/swal.js"></script>
+
+        {# keyboard #}
+        <script src="/static/scripts/library/mousetrap.js"></script>
+        <script src="/static/scripts/shortcuts.js"></script>
 
         {# Backbone / Underscore #}
         <script src="/static/scripts/library/underscore.js"></script>

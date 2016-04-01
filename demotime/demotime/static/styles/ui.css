@@ -116,8 +116,11 @@ a.button-link.confirm {
 .markItUpEditor {
     width:100% !important;
 }
+/* ugly wysiwyg overrides */
 .markItUpEditor {
     height:150px !important;
+    font: 14px 'Roboto', Arial, sans-serif !important;
+    font-weight: 300 !important;
 }
 .markItUpHeader,
 .markItUpFooter {
@@ -135,11 +138,6 @@ a.button-link.confirm {
     color:#333;
     padding:0;
     box-shadow:none;
-}
-.content h1 small {
-    text-transform: uppercase;
-    font-size: 12px;
-    margin-left: 10px;
 }
 .content section h1:not(.heading),
 .content section h2:not(.heading),
@@ -163,40 +161,6 @@ a.button-link.confirm {
 }
 .content section h2 {
     font-size:2em;
-}
-
-/* Reviews list (profile/dashboard) */
-.reviews-list h3 {
-    margin:0;
-    font-size:18px;
-}
-.reviews-list section {
-    min-height:150px;
-    padding:10px;
-}
-.reviews-list section,
-.reviews-list section a {
-    color:#fff;
-}
-.reviews-list ul {
-    list-style:none;
-    margin:0;
-    padding:0;
-}
-section.reviews {
-    background:rgba(84, 187, 156, 1);
-}
-section.updates {
-    background:rgba(84, 187, 156, 8);
-}
-section.demos {
-    background:rgba(84, 187, 156, .65);
-}
-.reviews-list section.done {
-    background-image:url(/static/images/done.png);
-    background-repeat:no-repeat;
-    background-size:10%;
-    background-position:50% 50%;
 }
 
 .sweet-alert ul {
