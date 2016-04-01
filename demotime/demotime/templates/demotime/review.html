@@ -63,17 +63,18 @@
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
-                <h4 class="heading">
-                    Reviewer State:
-                    <span class="tooltip" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
-                </h4>
-                {% if object.reviewer_state == "Approved" %}
-                    <span class="success">&#10003;</span>
-                {% elif object.reviewer_state == "Rejected" %}
-                    <span class="failure">&#10008;</span>
+                {% if object.state != "closed" %}
+                    <h4 class="heading">
+                        Reviewer State:
+                        <span class="tooltip" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
+                    </h4>
+                    {% if object.reviewer_state == "Approved" %}
+                    <span class="icon-{{ object.reviewer_state }}">
+                    {% endif %}
+                        {{ object.reviewer_state|capfirst }}
+                    </span>
+                    <br><br>
                 {% endif %}
-                {{ object.reviewer_state|capfirst }}
-                <br><br>
                 <h4 class="heading">
                     Demo State:
                     <span class="tooltip" title="The demo state is the state of the actual review itself (Open, closed, etc)">
@@ -90,9 +91,11 @@
                             <a class="icon icon-{{ reviewer.get_status_display }}" href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}
                         </li>
                     {% endfor %}
-                    <li>
-                        <input type="text" id="add_reviewer" placeholder="add reviewer" maxlength="3">
-                    </li>
+                    {% if object.state != "closed" %}
+                        <li>
+                            <input type="text" id="add_reviewer" placeholder="add reviewer" maxlength="3">
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
             <div class="cel">
