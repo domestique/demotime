@@ -16,6 +16,11 @@ $('.attachment-add').click(function(event) {
     $(this).parents('section').next().slideDown();
 });
 
+// Linkify URLs
+$('blockquote p, .review-overview li, .review-overview p').linkify({
+    target: "_blank"
+});
+
 // Initialize tooltips
 $('.tooltip').tooltipster();
 
