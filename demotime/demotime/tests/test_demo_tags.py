@@ -28,3 +28,12 @@ class TestDemoTags(BaseTestCase):
             Context({'review': self.review, 'user': self.user})
         )
         self.assertEqual(content, models.reviews.REVIEWING.capitalize())
+
+    def test_review_status_revision(self):
+        template = Template(
+            "{% load demo_tags %}{% reviewer_status review.revision user %}"
+        )
+        content = template.render(
+            Context({'review': self.review, 'user': self.user})
+        )
+        self.assertEqual(content, models.reviews.REVIEWING.capitalize())
