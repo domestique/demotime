@@ -86,16 +86,17 @@ input[type="button"]:hover {
 }
 
 select[multiple="multiple"]{
-    padding:10px;
-    min-width:50%;
-    font-size:1.4em;
-    border:1px solid #eee;
-    box-shadow:4px 4px 0 #ccc;
+    padding: 10px;
+    min-width: 30%;
+    font-size: 1.4em;
+    border: 1px solid #eee;
+    box-shadow: 4px 4px 0 #ccc;
+    min-height: 300px;
 }
 select[multiple="multiple"] option {
-    color:#666;
-    background:#fafafa;
-    margin:5px 0;
+    color: #666;
+    background: #fafafa;
+    margin: 5px 0;
 }
 select[multiple="multiple"]:focus {
     outline:none;
