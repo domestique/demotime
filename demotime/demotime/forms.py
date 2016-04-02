@@ -50,6 +50,7 @@ class ReviewFilterForm(forms.Form):
         ('oldest', 'Oldest'),
     )
 
+    title = forms.CharField(required=False)
     state = forms.ChoiceField(
         required=False,
         choices=STATE_CHOICES,
