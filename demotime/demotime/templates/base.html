@@ -53,6 +53,7 @@
                                     {% url 'create-review' as create_review_url %}
                                     {% url 'login' as login_url %}
                                     {% url 'inbox' as inbox_url %}
+                                    {% url 'help' as help_url %}
                                     {% url 'profile' request.user.userprofile.pk as profile_url %}
                                     {% if request.user.is_authenticated %}
                                         <li class="icon icon-user" {% if request.path == profile_url %}active{% else %}{% endif %}>
@@ -65,8 +66,11 @@
                                         </a>
                                         </li>
                                         <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
-                                        <li class="icon icon-mail {% if has_unread_messages %}state-highlight{% endif %} {% if request.path == inbox_url %}active{% else %}{% endif %}"><a href="{{ inbox_url }}">Inbox{% if has_unread_messages %} ({{ unread_message_count }}){% endif %}</a></li>
                                         <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Log out</a></li>
+                                        <li class="{% if request.path == help_url %}active{% endif %}"><a class="icon icon-help-circled-alt" href="{% url 'help' %}">Help</a></li>
+                                        {% if has_unread_messages %}
+                                            <li><span class="unread_notification"><a href="{{ inbox_url }}">{{ unread_message_count }}</a></span></li>
+                                        {% endif %}
                                     {% else %}
                                         {% if request.path != login_url %}
                                             <li><a href="{% url 'login' %}">Login</a></li>

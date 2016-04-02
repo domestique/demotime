@@ -257,6 +257,12 @@
       "css": "money",
       "code": 59416,
       "src": "linecons"
+    },
+    {
+      "uid": "3e02a8849305ac80a0e36302f461f265",
+      "css": "help-circled-alt",
+      "code": 59434,
+      "src": "mfglabs"
     }
   ]
 }
