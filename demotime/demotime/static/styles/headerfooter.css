@@ -72,7 +72,7 @@ body.bookmarklet h1 {
 .navbar ul li.active {
     background:#618A55;
 }
-.navbar .unread_notification {
+.navbar .unread_notification a {
     background: #E03743;
     color: white;
     font-weight: 700;
