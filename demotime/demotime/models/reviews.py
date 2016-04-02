@@ -301,6 +301,10 @@ class Reviewer(BaseModel):
         default='reviewing', db_index=True
     )
 
+    @property
+    def reviewer_display_name(self):
+        return self.reviewer.userprofile.display_name or self.reviewer.username
+
     @classmethod
     def create_reviewer(cls, review, reviewer, non_revision=False):
         obj = cls.objects.create(
@@ -334,11 +338,37 @@ class Reviewer(BaseModel):
         )
 
     def set_status(self, status):
+        old_status = self.status
         self.status = status
         self.save(update_fields=['status'])
 
         reminder_active = status == REVIEWING
         Reminder.set_activity(self.review, self.reviewer, reminder_active)
+
+        # Send a message
+        if status != old_status:
+            status_display = '{} {}'.format(
+                'resumed' if status == REVIEWING else 'has',
+                self.status,
+            )
+            title = '{} {} your review: {}'.format(
+                self.reviewer_display_name,
+                status_display,
+                self.review.title
+            )
+            context = {
+                'reviewer': self,
+                'creator': self.review.creator,
+                'url': self.review.get_absolute_url(),
+                'title': self.review.title,
+            }
+            Message.send_system_message(
+                title,
+                'demotime/messages/reviewer_status_change.html',
+                context,
+                self.review.creator,
+                revision=self.review.revision
+            )
         return self.review.update_reviewer_state()
 
 
