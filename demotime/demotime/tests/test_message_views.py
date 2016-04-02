@@ -1,3 +1,5 @@
+import json
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
@@ -198,3 +200,26 @@ class TestMessageViews(BaseTestCase):
             models.MessageBundle.objects.filter(owner=self.user, deleted=False).count(),
             models.MessageBundle.objects.filter(owner=self.user).count(),
         )
+
+    def test_message_count_json_with_review(self):
+        models.MessageBundle.objects.filter(read=True)
+        last_bundle = models.MessageBundle.objects.filter(
+            owner=self.user
+        ).last()
+        last_bundle.read = False
+        last_bundle.save()
+        response = self.client.get(
+            reverse('message-count-json', kwargs={'review_pk': self.review.pk})
+        )
+        self.assertEqual(json.loads(response.content), {
+            'message_count': 1
+        })
+
+    def test_message_count_json_without_review(self):
+        msg_count = models.MessageBundle.objects.filter(
+            owner=self.user
+        ).update(read=False, deleted=False)
+        response = self.client.get(reverse('message-count-json'))
+        self.assertEqual(json.loads(response.content), {
+            'message_count': msg_count
+        })

@@ -136,7 +136,7 @@ class MessageCountJsonView(JsonView):
     def _get_review_message_count(self):
         # Should only ever be one bundle, but lets keep our signatures
         # consistent eh?
-        bundles = models.MessageBundle.objects.get(
+        bundles = models.MessageBundle.objects.filter(
             review=self.review,
             owner=self.request.user,
             read=False,
@@ -147,7 +147,6 @@ class MessageCountJsonView(JsonView):
 
     def _get_message_count(self):
         bundles = models.MessageBundle.objects.filter(
-            review=self.review,
             owner=self.request.user,
             read=False
         ).count()
