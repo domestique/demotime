@@ -10,6 +10,42 @@ from django.core.mail import send_mail
 from .base import BaseModel
 
 
+class MessageBundle(BaseModel):
+
+    review = models.ForeignKey('Review', null=True)
+    owner = models.ForeignKey('auth.User')
+    read = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created']
+
+    def get_absolute_url(self):
+        return reverse('message-detail', args=[self.pk])
+
+    @property
+    def title(self):
+        if self.review:
+            return self.review.title
+        else:
+            return self.message_set.get().title
+
+    @classmethod
+    def create_message_bundle(cls, owner, review=None):
+        if review:
+            bundle, _ = cls.objects.get_or_create(
+                review=review,
+                owner=owner
+            )
+        else:
+            bundle = cls.objects.create(
+                review=review,
+                owner=owner
+            )
+
+        return bundle
+
+
 class Message(BaseModel):
 
     receipient = models.ForeignKey('auth.User', related_name='receipient')
@@ -18,16 +54,12 @@ class Message(BaseModel):
     review = models.ForeignKey('ReviewRevision', null=True)
     thread = models.ForeignKey('CommentThread', null=True)
     message = models.TextField(blank=True)
-    read = models.BooleanField(default=False)
-    deleted = models.BooleanField(default=False)
+    bundle = models.ForeignKey('MessageBundle')
 
     def __unicode__(self):
         return u'Message for {}, From {}'.format(
             self.receipient.username, self.sender.username
         )
-
-    def get_absolute_url(self):
-        return reverse('message-detail', args=[self.pk])
 
     def _send_email(self, recipient, title, msg_text):
         if recipient.email:
@@ -75,6 +107,10 @@ class Message(BaseModel):
             cls, receipient, sender, title,
             review_revision, thread, message, email=True,
     ):
+        bundle = MessageBundle.create_message_bundle(
+            review=review_revision.review if review_revision else None,
+            owner=receipient,
+        )
         obj = cls.objects.create(
             receipient=receipient,
             sender=sender,
@@ -82,6 +118,7 @@ class Message(BaseModel):
             review=review_revision,
             thread=thread,
             message=message,
+            bundle=bundle,
         )
         if email:
             obj._send_email(receipient, title, message)

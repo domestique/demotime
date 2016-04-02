@@ -4,8 +4,8 @@ from demotime import models
 def unread_message_count(request):
     if request.user.is_authenticated():
         return {
-            'unread_message_count': models.Message.objects.filter(
-                receipient=request.user,
+            'unread_message_count': models.MessageBundle.objects.filter(
+                owner=request.user,
                 read=False,
                 deleted=False,
             ).count()
@@ -17,8 +17,8 @@ def unread_message_count(request):
 def has_unread_messages(request):
     if request.user.is_authenticated():
         return {
-            'has_unread_messages': models.Message.objects.filter(
-                receipient=request.user,
+            'has_unread_messages': models.MessageBundle.objects.filter(
+                owner=request.user,
                 read=False,
                 deleted=False,
             ).exists()
