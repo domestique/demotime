@@ -31,6 +31,9 @@ $('button').click(function() {
     }
 });
 
+// Smooth scroll to links
+var ScrollToLink = new DemoTime.ScrollToLink();
+
 // Handle review form submits (some light validation on attachments)
 $('.review form').submit(function(e) {
     var form = $(this),

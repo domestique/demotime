@@ -32,7 +32,7 @@ body.bookmarklet h1 {
 }
 .navbar .navbar-nav {
     text-align:right;
-    line-height:60px;
+    line-height:70px;
 }
 @media screen and (max-width:1000px) {
     .navbar .navbar-nav {
@@ -64,13 +64,19 @@ body.bookmarklet h1 {
     line-height:71px;
 }
 .navbar ul li {
-    margin-left:20px;
+    margin-left:10px;
     padding:5px 10px;
     border-radius:10px;
     display:inline-block;
 }
 .navbar ul li.active {
     background:#618A55;
+}
+.navbar .unread_notification {
+    background: red;
+    color: white;
+    font-weight: 700;
+    padding: 5px 10px;
 }
 
 footer {

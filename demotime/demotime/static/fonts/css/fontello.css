@@ -1,10 +1,11 @@
 @font-face {
   font-family: 'fontello';
-  src: url('../font/fontello.eot?15292531');
-  src: url('../font/fontello.eot?15292531#iefix') format('embedded-opentype'),
-       url('../font/fontello.woff?15292531') format('woff'),
-       url('../font/fontello.ttf?15292531') format('truetype'),
-       url('../font/fontello.svg?15292531#fontello') format('svg');
+  src: url('../font/fontello.eot?77893655');
+  src: url('../font/fontello.eot?77893655#iefix') format('embedded-opentype'),
+       url('../font/fontello.woff2?77893655') format('woff2'),
+       url('../font/fontello.woff?77893655') format('woff'),
+       url('../font/fontello.ttf?77893655') format('truetype'),
+       url('../font/fontello.svg?77893655#fontello') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -14,46 +15,46 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'fontello';
-    src: url('../font/fontello.svg?15292531#fontello') format('svg');
+    src: url('../font/fontello.svg?77893655#fontello') format('svg');
   }
 }
 */
-
+ 
  [class^="icon-"]:before, [class*=" icon-"]:before {
   font-family: "fontello";
   font-style: normal;
   font-weight: normal;
   speak: none;
-
+ 
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
   margin-right: .2em;
   text-align: center;
   /* opacity: .8; */
-
+ 
   /* For safety - reset parent styles, that can break glyph codes*/
   font-variant: normal;
   text-transform: none;
-
+ 
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
-
+ 
   /* Animation center compensation - margins should be symmetric */
   /* remove if not needed */
   margin-left: .2em;
-
+ 
   /* you can be more comfortable with increased icons size */
   /* font-size: 120%; */
-
+ 
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+ 
   /* Uncomment for 3D effect */
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
-
-.icon-Approved:before { content: '\e80c'; color: #13CD04; } /* '' */
-.icon-Rejected:before { content: '\e81e'; color: red; } /* '' */
-/*span.icon-Reviewing:before { content: '\e827'; } */
-
+ 
 .icon-search:before { content: '\e800'; } /* '' */
 .icon-mail:before { content: '\e801'; } /* '' */
 .icon-heart:before { content: '\e802'; } /* '' */
@@ -96,3 +97,4 @@
 .icon-attention:before { content: '\e827'; } /* '' */
 .icon-attention-circled:before { content: '\e828'; } /* '' */
 .icon-link-ext:before { content: '\e829'; } /* '' */
+.icon-help-circled-alt:before { content: '\e82a'; } /* '' */
