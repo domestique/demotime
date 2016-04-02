@@ -1,0 +1,6 @@
+Hello {{ creator }},
+
+{{ reviewer.reviewer_display_name }} {% if reviewer.status == 'reviewing' %}resumed{% else %}has{% endif %} {{ reviewer.status }} your review, <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+
+Thanks,
+{{ sender }}
