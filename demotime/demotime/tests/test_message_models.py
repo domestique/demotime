@@ -121,3 +121,22 @@ class TestMessageModels(BaseTestCase):
             owner=user
         )
         self.assertNotEqual(bundle, new_bundle)
+
+    def test_create_message_bundle_marks_unread_undeleted(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        bundle = models.MessageBundle.create_message_bundle(
+            review=review,
+            owner=review.creator
+        )
+        self.assertFalse(bundle.read)
+        self.assertFalse(bundle.deleted)
+        bundle.read = True
+        bundle.deleted = True
+        bundle.save()
+
+        bundle = models.MessageBundle.create_message_bundle(
+            review=review,
+            owner=review.creator
+        )
+        self.assertFalse(bundle.read)
+        self.assertFalse(bundle.deleted)

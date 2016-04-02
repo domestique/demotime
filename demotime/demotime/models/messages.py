@@ -18,7 +18,7 @@ class MessageBundle(BaseModel):
     deleted = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-created']
+        ordering = ['-modified']
 
     def get_absolute_url(self):
         return reverse('message-detail', args=[self.pk])
@@ -43,6 +43,9 @@ class MessageBundle(BaseModel):
                 owner=owner
             )
 
+        bundle.read = False
+        bundle.deleted = False
+        bundle.save(update_fields=['read', 'deleted'])
         return bundle
 
 
