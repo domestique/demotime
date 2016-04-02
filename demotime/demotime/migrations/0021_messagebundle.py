@@ -13,13 +13,13 @@ def create_message_bundles(apps, schema_editor):
     User = apps.get_model('auth', 'User')
 
     for user in User.objects.all():
-        for msg in user.receipient.filter(review__isnull=False):
-            if msg.bundle or not msg.review:
+        for msg in user.receipient.all():
+            if msg.bundle:
                 continue
 
             if not msg.review:
                 bundle = MessageBundle.objects.create(
-                    review=msg.review.review,
+                    review=None,
                     owner=msg.receipient,
                 )
                 msg.bundle = bundle
