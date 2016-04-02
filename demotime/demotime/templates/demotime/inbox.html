@@ -8,7 +8,7 @@
     overflow:hidden;
 }
 dl.messages-nav {
-    border:1px solid #415E73;
+    border:1px solid #eee;
     display:table;
     width:auto;
     margin:0 auto 2em;
@@ -22,7 +22,7 @@ dl.messages-nav dd {
     text-align:center;
     display:table-cell;
     box-sizing:border-box;
-    border-right:1px solid #415E73;
+    border-right:1px solid #eee;
 }
 dl.messages-nav dd a {
     display:inline-block;
@@ -136,6 +136,17 @@ dl.messages-nav dd.current a {
     }
 }
 
+section.no_email {
+    background:#E8B951 url(/static/images/sunshine.gif) 50% 0 no-repeat;
+    min-height: 200px;
+    background-size: 30%;
+}
+@media screen and (max-width:680px) {
+    section.no_email {
+        min-height:80px;
+    }
+}
+
 .messages-list {
     border:1px solid #ddd;
 }
@@ -214,11 +225,13 @@ a.True {
                     {% csrf_token %}
                     {{ form.as_p }}
                 </div>
-                <button type="submit" class="messages-archive_all">Archive all messages</button>
+                {% if request.GET.filter != 'read' %}
+                    <button type="submit" class="messages-archive_all">Archive all messages</button>
+                {% endif %}
             </form>
         </section>
     {% else %}
-        There's nothing here. Enjoy your life.
+        <section class="no_email"></section>
     {% endif %}
 </div>
 {% endblock %}
