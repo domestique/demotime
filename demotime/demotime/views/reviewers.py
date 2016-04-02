@@ -14,7 +14,9 @@ class ReviewerFinder(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        self.review = get_object_or_404(models.Review, pk=kwargs.get('pk'))
+        self.review = None
+        if 'pk' in kwargs:
+            self.review = get_object_or_404(models.Review, pk=kwargs.get('pk'))
         return super(ReviewerFinder, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):
@@ -28,24 +30,30 @@ class ReviewerFinder(JsonView):
             }
 
         name = post_data.get('reviewer_name')
-        existing_reviewers = self.review.reviewer_set.values_list(
-            'reviewer', flat=True
-        )
-        reviewers = User.objects.exclude(
-            pk__in=existing_reviewers
-        ).exclude(
-            pk=self.review.creator.pk
-        ).filter(
+        if self.review:
+            existing_reviewers = self.review.reviewer_set.values_list(
+                'reviewer', flat=True
+            )
+            eligible_reviewers = User.objects.exclude(
+                pk__in=existing_reviewers
+            ).exclude(
+                pk=self.review.creator.pk
+            )
+        else:
+            sys_user = User.objects.get(username='demotime_sys')
+            eligible_reviewers = User.objects.exclude(
+                pk__in=(self.request.user.pk, sys_user.pk)
+            )
+
+        reviewers = eligible_reviewers.filter(
             Q(username__icontains=name) |
             Q(userprofile__display_name__icontains=name)
         )
-        json_data = {'reviewers': []}
+        json_data = {'reviewers': [], 'success': True, 'errors': {}}
         for reviewer in reviewers:
             json_data['reviewers'].append({
                 'name': reviewer.userprofile.__unicode__(),
                 'pk': reviewer.pk,
-                'success': True,
-                'errors': {},
             })
         return json_data
 

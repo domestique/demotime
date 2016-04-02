@@ -36,10 +36,22 @@ class TestReviewerViews(BaseTestCase):
             'reviewers': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.username,
-                'errors': {},
-                'success': True,
-            }]
+            }],
+            'errors': {},
+            'success': True,
         })
+
+    def test_reviewer_finder_no_review(self):
+        response = self.client.post(reverse('reviewer-finder'), {
+            'reviewer_name': 'test_user'
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertTrue(data['success'])
+        self.assertEqual(data['errors'], {})
+        self.assertEqual(len(data['reviewers']), 3)
+        for user in data['reviewers']:
+            assert 'test_user_' in user['name']
 
     def test_reviewer_finder_display_name(self):
         self.test_user_2.userprofile.display_name = 'Tinker Tom'
@@ -54,9 +66,9 @@ class TestReviewerViews(BaseTestCase):
             'reviewers': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.userprofile.display_name,
-                'errors': {},
-                'success': True,
-            }]
+            }],
+            'errors': {},
+            'success': True,
         })
 
     def test_reviewer_finder_excludes_creator(self):
@@ -70,9 +82,9 @@ class TestReviewerViews(BaseTestCase):
             'reviewers': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.username,
-                'errors': {},
-                'success': True,
-            }]
+            }],
+            'errors': {},
+            'success': True,
         })
 
     def test_reviewer_finder_missing_name(self):
