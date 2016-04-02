@@ -1,0 +1,173 @@
+{% extends 'layout-marketing.html' %}
+
+{% block title %} Documentation{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+h4 {
+    font-size: 30px;
+    margin: 0;
+    font-weight: 900;
+}
+.cel {
+    text-align: center;
+}
+.cel p {
+    margin: 0;
+}
+
+.how {
+    background:#f6f6f6;
+    padding: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>Demotime Documentation</h2>
+
+<p>Welcome to the Demotime documenation! If you don't find the help you need 
+here please feel free to reach out to us via <a href="https://www.github.com/f4nt/demotime/issues/">GitHub</a>!
+</p>
+
+<b>Table of Contents</b>
+<ul>
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#creating-a-demo">Creating a Demo</a></li>
+    <li><a href="#demo-flow">Demo Flow</a></li>
+    <li><a href="#completing-a-demo">Completing A Demo</a></li>
+    <li><a href="#reviewing">Reviewing a Demo</a></li>
+</ul>
+
+<h3 id="how-it-works">How it Works</h3>
+
+<p>Here at Demotime we set out to emulate the demo process that we experienced 
+on a routine basis as part of an Agile software development workflow. What we 
+found is the demo process for software development is pretty similar to showing 
+off any piece of work you have to share with others. Perhaps it's a new logo, 
+a short marketing blurb, a new screen cast to share with your customers, or heck, 
+maybe it is code after all!
+</p>
+
+<p>As a result, we tried to keep the process as simple as we can, while still 
+ensuring an experience that meets the needs of both the stakeholders that are 
+reviewing a piece of content, and the needs of the content creator. The 
+general process works like so:
+</p>
+
+<ul>
+    <li>Content creator creates content</li>
+    <li>Content creator creates a demo and assigns Reviewers to the Demo</li>
+    <li>Reviewers leave feedback via comments</li>
+    <ul>
+        <li>If necessary the Content Creator uploads new revisions after receiving feedback</li>
+    </ul>
+    <li>Reviewers approve Demo</li>
+    <li>Content creator closes Demo</li>
+    <li>Celebrations!</li>
+</ul>
+
+<h3 id="creating-a-demo">Creating A Demo</h3>
+
+<p>Creating a demo is a fairly straightforward process (we hope!). As a Demo creator 
+all you need to do is create some static files that you can upload that shows off your 
+work. We support video, audio, images, documents and whatever else you may wish to 
+upload to share with others (though video, audio and images are the nicest). 
+</p>
+
+<p>Once you're ready create a demo, just follow these easy steps:</p>
+
+<ol>
+    <li>You create a piece of content, let's call it a new logo.</li>
+    <li>Click <a href="{% url 'create-review' %}">Create a Demo</a></li>
+    <li>Insert a meaningful title</li>
+    <li>Link back to your ticketing system where the work was requested</li>
+    <li>Provide a brief description of the work performed</li>
+    <li>Attach your new logo, or as many files as you need!</li>
+    <li>Pick the people that need to see and approve your new work</li>
+    <li>Create the demo!</li>
+</ol>
+
+<p>Now you should be looking at a scene similar to this:</p>
+
+<a href="/static/images/demotime_created_review.png" class="lightboxed">
+    <img src="/static/images/demotime_created_review.png" width=300 height=300 class="img-thumbnail">
+</a>
+
+<p>Let's start off by explaining what a few of the things on this screen mean: </p>
+
+<ul>
+    <li>Owner: This is the person who has created and thus owns the review</li>
+    <li>Reviewer State: This represents the overall state of the people assigned to review this Demo. If all of them have approved the Demo, then it will state 'Approved'. If there's a mix, 'Reviewing', and if everyone's rejected it, the state will be 'Rejected'.</li>
+    <li>Demo State: This reflects if the Demo is 'Open', 'Closed', or 'Aborted'. Aborted occurs when a Demo Owner closes a Demo before it has reach a full approval status.</li>
+    <li>Case Link: The link to request for work, likely in your company's issue track</li>
+    <li>Reviewers: This section lists the people assigned to review your Demo, and their state. Also if you or others need to add more reviewers, there's a handy box there for that as well! We allow non-owners to add Reviewers to a Demo, because it's a common use case. Maybe Samantha in QA realizes that Jennifer in Product needs to see the Demo as well! We're an inclusive bunch.</li>
+    <li>Demo Revisions: We'll come back to this one shortly, it deserves more words than a bullet can hold</li>
+</ul>
+
+<h3 id="demo-flow">The Demo Flow</h3>
+
+<p>Alright, now we have demo out there for people to view, and we've received 
+a bit of feedback from our users via the comments system. It turns out they didn't 
+like the color blue that you chose. First, know that you have our sympathy because 
+that color blue was actually fantastic as far we're concerned. Second though, you'll 
+probably want to listen to your employer and pick the <i>correct</i> blue.</p>
+
+<p>Now you've updated your work, and you've captured a new screen shot of your logo 
+with the proper color of blue. Simply go to your Demo and click "Update Demo" at 
+the top. You'll notice this form looks a <i>lot</i> like the form you filled out 
+earlier, and we assure you it's for good reason!</p>
+
+<p>What you're doing now is creating a new Revision of your Demo. We consider 
+each Revision as a conversation about a particular piece of work. What happened with 
+the wrong color blue is now in the past. Now we want to talk about your new asset 
+that has incorporated the feedback of others. You can enter something to that effect 
+in the "Revision Description" field if you wish, or you can leave it blank. Most 
+important on this screen is to upload your new logo for the Reviewers to look at.</p>
+
+<p>Afterwards you'll be on a screen similar to what you saw earlier except you'll 
+now notice that there are 2 Revisions in the "Demo Revisions" section. You can 
+still go back and discuss the last Revision if necessary, but more than likely 
+you'll mostly be talking about the new and updated revision. We like history though, 
+and that's why we've opted to preserve it, while focusing everyone on a new 
+conversation about a new asset.</p>
+
+<p>Finally, all reviewers are reset to 'Reviewing' after a new Revision has been 
+added. This ensures that everyone gets a chance to view the new item that is being 
+Demoed. Otherwise, this flow is the same as your standard Demo flow.</p>
+
+<h3 id="completing-a-demo">Completing a Demo</h3>
+
+<p>We consider a Demo to be complete once all Reviewers assigned to it have reached 
+a consensus. Once everyone has moved to "Accepted" or "Rejected" a Demo is 
+"complete". It is however still Open until the Demo Owner clicks the "Close Demo" 
+button located at the top of the review.</p>
+
+<p>We leave this power in the Demo Owner's hands because ultimately, we don't think 
+that anything should <i>ever</i> end in a state of rejection. Remember, a Demo is a 
+conversation, and in general it's good practice to not leave a conversation unresolved 
+or angry! A state of Rejection to us implies that more Revisions are needed to 
+complete the work that was agreed upon from the outset.</p>
+
+<p>Once a demo is closed, it <i>can</i> be reopened, but more often than not we feel 
+you'll likely prefer to simply create a new Demo after it's been reworked a bit. We're 
+still learning from our users though, so perhaps you can inform of us of stronger 
+user cases. We do love feedback!</p>
+
+<h3 id="reviewing">Reviewing a Demo</h3>
+
+<p>We've strived to make life as easy as possible on Reviewers, and as such, we 
+hope that Reviewers will find their job to be fairly simple. Here's how the flow 
+looks to a typical reviewer:</p>
+
+<ul>
+    <li>Receive an email that you've been added to a review</li>
+    <li>Go and view the Demo</li>
+    <li>Review the assets, description, reviewers and other comments</li>
+    <li>Feel free to add more Reviewers if you find people are missing</li>
+    <li>If you're not satisified with what is being presented, comment and let the owner know</li>
+    <li>When you're satisfied, click the "Approve" button.</li>
+    <li>Celebrate!</li>
+</ul>
+{% endblock %}
