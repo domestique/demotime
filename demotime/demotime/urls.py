@@ -60,6 +60,11 @@ urlpatterns += [
 urlpatterns += [
     url(r'^inbox/$', messages.inbox_view, name='inbox'),
     url(r'^message/(?P<pk>[\d]+)/$', messages.msg_detail_view, name='message-detail'),
+    url(
+        r'^message-count/(?P<review_pk>[\d]+)/$',
+        messages.message_count_json_view,
+        name='message-count-json'
+    ),
 ]
 
 # Accounts
