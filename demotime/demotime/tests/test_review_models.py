@@ -40,6 +40,7 @@ class TestReviewModels(BaseTestCase):
         second_review_kwargs = self.default_review_kwargs.copy()
         second_review_kwargs['title'] = 'Some Other Review'
         obj = models.Review.create_review(**self.default_review_kwargs)
+        first_rev = obj.revision
         second_review = models.Review.create_review(**second_review_kwargs)
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.revision.number, 1)
@@ -56,6 +57,7 @@ class TestReviewModels(BaseTestCase):
             'reviewers': self.test_users.exclude(username='test_user_0'),
         })
         new_obj = models.Review.update_review(**review_kwargs)
+        second_rev = new_obj.revision
         self.assertEqual(obj.pk, new_obj.pk)
         self.assertEqual(new_obj.title, 'New Title')
         self.assertEqual(new_obj.case_link, 'http://badexample.org')
@@ -77,6 +79,12 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             3
+        )
+        # Since we didn't supply attachments in the update, they should be
+        # copied over
+        self.assertEqual(
+            first_rev.attachments.count(),
+            second_rev.attachments.count()
         )
 
     def test_create_reviewer(self):

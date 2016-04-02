@@ -131,6 +131,7 @@ class Review(BaseModel):
         obj.title = title
         obj.case_link = case_link
         obj.save()
+        prev_revision = obj.revision
         rev_count = obj.reviewrevision_set.count()
         rev = ReviewRevision.objects.create(
             review=obj,
@@ -144,6 +145,14 @@ class Review(BaseModel):
                 description=attachment['description'],
                 content_object=rev,
             )
+
+        # No attachments, we'll copy them over
+        if not attachments:
+            for attachment in prev_revision.attachments.all():
+                attachment.content_object = rev
+                attachment.pk = None
+                attachment.save()
+
         for reviewer in reviewers:
             try:
                 Reviewer.objects.get(review=obj, reviewer=reviewer)
