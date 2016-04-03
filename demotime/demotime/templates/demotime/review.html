@@ -391,5 +391,10 @@ var ModifyReviewers = new DemoTime.Reviewers({
     adder_url: '{% url 'add-reviewer' review.pk %}',
     deleter_url: '{% url 'delete-reviewer' review.pk %}'
 });
+
+// set up background tasks (new messages, comments etc)
+var NewComments = new DemoTime.BackgroundTasks({
+    comments_url: '{% url "message-count-json" review.pk %}'
+});
 </script>
 {% endblock %}

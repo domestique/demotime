@@ -24,6 +24,7 @@
 
         {# Contextual help #}
         <link rel="stylesheet" href="/static/styles/library/tooltipster.css">
+        <link rel="stylesheet" href="/static/styles/library/animate.css">
         <link rel="stylesheet" href="/static/styles/library/swal.css">
 
         {# Lightbox #}
@@ -68,7 +69,7 @@
                                         <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
                                         <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Log out</a></li>
                                         <li class="{% if request.path == help_url %}active{% endif %}"><a class="icon icon-help-circled-alt" href="{% url 'help' %}">Help</a></li>
-                                        <li><span class="{% if has_unread_messages %}un{% endif %}read_notification"><a href="{{ inbox_url }}">{{ unread_message_count }}</a></span></li>
+                                        <li><span class="msg_notifier {% if has_unread_messages %}un{% endif %}read_notification"><a href="{{ inbox_url }}">{{ unread_message_count }}</a></span></li>
                                     {% else %}
                                         {% if request.path != login_url %}
                                             <li><a href="{% url 'login' %}">Login</a></li>
@@ -120,6 +121,9 @@
         {# alerts #}
         <script src="/static/scripts/library/swal.js"></script>
 
+        {# notifications #}
+        <script src="/static/scripts/library/jquery.noty.packaged.min.js"></script>
+
         {# linkify plain urls #}
         <script src="/static/scripts/library/linkify.min.js"></script>
         <script src="/static/scripts/library/linkify-jquery.min.js"></script>
@@ -135,6 +139,7 @@
         <script> var DemoTime = [] </script>
         <script src="/static/scripts/ScrollToLink.js"></script>
         <script src="/static/scripts/Reviewers.js"></script>
+        <script src="/static/scripts/BackgroundTasks.js"></script>
 
         {% block footer_scripts %}
             <script src="/static/scripts/footer_scripts.js"></script>
@@ -145,6 +150,15 @@
             $('body').addClass('bookmarklet');
         </script>
         {% endif %}
+
+        <script>
+        {% if request.user %}
+            // set up background tasks (new messages, comments etc)
+            var BackgroundTasks = new DemoTime.BackgroundTasks({
+                messages_url: '{% url "message-count-json" %}'
+            });
+        {% endif %}
+        </script>
     </body>
     <div id="patterns" style="display: none">
         {% block patterns %}{% endblock %}
