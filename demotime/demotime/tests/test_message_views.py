@@ -202,7 +202,7 @@ class TestMessageViews(BaseTestCase):
         )
 
     def test_message_count_json_with_review(self):
-        models.MessageBundle.objects.filter(read=True)
+        models.MessageBundle.objects.update(read=True)
         last_bundle = models.MessageBundle.objects.filter(
             owner=self.user
         ).last()

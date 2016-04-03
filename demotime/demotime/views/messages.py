@@ -140,6 +140,7 @@ class MessageCountJsonView(JsonView):
             review=self.review,
             owner=self.request.user,
             read=False,
+            deleted=False,
         ).count()
         return {
             'message_count': bundles,
@@ -148,7 +149,8 @@ class MessageCountJsonView(JsonView):
     def _get_message_count(self):
         bundles = models.MessageBundle.objects.filter(
             owner=self.request.user,
-            read=False
+            read=False,
+            deleted=False,
         ).count()
         return {
             'message_count': bundles,
