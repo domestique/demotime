@@ -394,7 +394,7 @@ var ModifyReviewers = new DemoTime.Reviewers({
 
 // set up background tasks (new messages, comments etc)
 var NewComments = new DemoTime.BackgroundTasks({
-    comments_url: '{% url "message-count-json" review.pk %}'
+    comments_url: '{% url "messages-json" review.pk %}'
 });
 </script>
 {% endblock %}

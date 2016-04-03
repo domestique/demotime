@@ -119,7 +119,7 @@ class MessageDetailView(DetailView):
         return context
 
 
-class MessageCountJsonView(JsonView):
+class MessagesJsonView(JsonView):
 
     status = 200
 
@@ -131,7 +131,7 @@ class MessageCountJsonView(JsonView):
                 models.Review,
                 pk=kwargs.get('review_pk'),
             )
-        return super(MessageCountJsonView, self).dispatch(*args, **kwargs)
+        return super(MessagesJsonView, self).dispatch(*args, **kwargs)
 
     def _format_json(self, bundles):
         json_data = {'message_count': bundles.count(), 'bundles': []}
@@ -194,6 +194,25 @@ class MessageCountJsonView(JsonView):
 
         return self._get_messages()
 
+    def post(self, *args, **kwargs):
+        form = forms.BulkMessageUpdateForm(
+            user=self.request.user,
+            data=self.request.POST
+        )
+        if form.is_valid():
+            messages = form.cleaned_data['messages']
+            action = form.cleaned_data['action']
+            if action == form.READ:
+                messages.update(read=True)
+            elif action == form.UNREAD:
+                messages.update(read=False)
+            elif action == form.DELETED:
+                messages.update(deleted=True)
+            elif action == form.UNDELETED:
+                messages.update(deleted=False)
+
+        return self._get_messages()
+
 inbox_view = InboxView.as_view()
 msg_detail_view = MessageDetailView.as_view()
-message_count_json_view = MessageCountJsonView.as_view()
+messages_json_view = MessagesJsonView.as_view()

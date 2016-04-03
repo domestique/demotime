@@ -202,7 +202,7 @@ class TestMessageViews(BaseTestCase):
             models.MessageBundle.objects.filter(owner=self.user).count(),
         )
 
-    def test_message_count_json_with_review(self):
+    def test_messages_json_with_review(self):
         models.MessageBundle.objects.update(read=True)
         last_bundle = models.MessageBundle.objects.filter(
             owner=self.user
@@ -213,7 +213,7 @@ class TestMessageViews(BaseTestCase):
         msg.created = datetime.now()
         msg.save()
         response = self.client.get(
-            reverse('message-count-json', kwargs={'review_pk': self.review.pk})
+            reverse('messages-json', kwargs={'review_pk': self.review.pk})
         )
         self.assertEqual(json.loads(response.content), {
             u'message_count': 1,
@@ -232,7 +232,7 @@ class TestMessageViews(BaseTestCase):
             }],
         })
 
-    def test_message_count_json_without_review(self):
+    def test_messages_json_without_review(self):
         models.MessageBundle.objects.filter(
             owner=self.user
         ).update(read=False, deleted=False)
@@ -244,7 +244,7 @@ class TestMessageViews(BaseTestCase):
         msg = last_bundle.message_set.last()
         msg.created = datetime.now()
         msg.save()
-        response = self.client.get(reverse('message-count-json'))
+        response = self.client.get(reverse('messages-json'))
         self.assertEqual(json.loads(response.content), {
             u'message_count': 1,
             u'bundles': [{
@@ -260,4 +260,24 @@ class TestMessageViews(BaseTestCase):
                     u'message_pk': msg.pk,
                 }],
             }],
+        })
+
+    def test_messages_post_bulk_update(self):
+        bundles = models.MessageBundle.objects.filter(
+            owner=self.user
+        )
+        bundles.update(read=False, deleted=False)
+        assert bundles.count() > 0
+        response = self.client.get(reverse('messages-json'))
+        self.assertEqual(
+            json.loads(response.content)['message_count'],
+            bundles.count()
+        )
+        response = self.client.post(reverse('messages-json'), {
+            'messages': list(bundles.values_list('pk', flat=True)),
+            'action': 'read',
+        })
+        self.assertEqual(json.loads(response.content), {
+            'message_count': 0,
+            'bundles': [],
         })

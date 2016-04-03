@@ -60,11 +60,11 @@ urlpatterns += [
 urlpatterns += [
     url(r'^inbox/$', messages.inbox_view, name='inbox'),
     url(r'^message/(?P<pk>[\d]+)/$', messages.msg_detail_view, name='message-detail'),
-    url(r'^message-count/$', messages.message_count_json_view, name='message-count-json'),
+    url(r'^messages/$', messages.messages_json_view, name='messages-json'),
     url(
-        r'^message-count/(?P<review_pk>[\d]+)/$',
-        messages.message_count_json_view,
-        name='message-count-json'
+        r'^messages/(?P<review_pk>[\d]+)/$',
+        messages.messages_json_view,
+        name='messages-json'
     ),
 ]
 

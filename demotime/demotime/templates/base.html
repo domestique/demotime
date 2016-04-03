@@ -155,7 +155,7 @@
         {% if request.user %}
             // set up background tasks (new messages, comments etc)
             var BackgroundTasks = new DemoTime.BackgroundTasks({
-                messages_url: '{% url "message-count-json" %}'
+                messages_url: '{% url "messages-json" %}'
             });
         {% endif %}
         </script>
