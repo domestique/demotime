@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -208,18 +209,55 @@ class TestMessageViews(BaseTestCase):
         ).last()
         last_bundle.read = False
         last_bundle.save()
+        msg = last_bundle.message_set.last()
+        msg.created = datetime.now()
+        msg.save()
         response = self.client.get(
             reverse('message-count-json', kwargs={'review_pk': self.review.pk})
         )
         self.assertEqual(json.loads(response.content), {
-            'message_count': 1
+            u'message_count': 1,
+            u'bundles': [{
+                u'bundle_pk': last_bundle.pk,
+                u'messages': [{
+                    u'review_pk': msg.review.review.pk,
+                    u'review_url': msg.review.review.get_absolute_url(),
+                    u'thread_pk': msg.thread.pk if msg.thread else u'',
+                    u'is_comment': msg.thread != None,
+                    u'review_title': msg.review.review.title,
+                    u'message_title': msg.title,
+                    u'message': msg.message,
+                    u'message_pk': msg.pk,
+                }],
+            }],
         })
 
     def test_message_count_json_without_review(self):
-        msg_count = models.MessageBundle.objects.filter(
+        models.MessageBundle.objects.filter(
             owner=self.user
         ).update(read=False, deleted=False)
+        last_bundle = models.MessageBundle.objects.filter(
+            owner=self.user
+        ).last()
+        last_bundle.read = False
+        last_bundle.save()
+        msg = last_bundle.message_set.last()
+        msg.created = datetime.now()
+        msg.save()
         response = self.client.get(reverse('message-count-json'))
         self.assertEqual(json.loads(response.content), {
-            'message_count': msg_count
+            u'message_count': 1,
+            u'bundles': [{
+                u'bundle_pk': last_bundle.pk,
+                u'messages': [{
+                    u'review_pk': msg.review.review.pk,
+                    u'review_url': msg.review.review.get_absolute_url(),
+                    u'thread_pk': msg.thread.pk if msg.thread else u'',
+                    u'is_comment': msg.thread != None,
+                    u'review_title': msg.review.review.title,
+                    u'message_title': msg.title,
+                    u'message': msg.message,
+                    u'message_pk': msg.pk,
+                }],
+            }],
         })

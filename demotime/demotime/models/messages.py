@@ -43,9 +43,18 @@ class MessageBundle(BaseModel):
                 owner=owner
             )
 
-        bundle.read = False
-        bundle.deleted = False
-        bundle.save(update_fields=['read', 'deleted'])
+        needs_save = False
+        if bundle.read:
+            bundle.read = False
+            needs_save = True
+
+        if bundle.deleted:
+            bundle.deleted = False
+            needs_save = True
+
+        if needs_save:
+            bundle.save(update_fields=['read', 'deleted', 'modified'])
+
         return bundle
 
 

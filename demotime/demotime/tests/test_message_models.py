@@ -140,3 +140,35 @@ class TestMessageModels(BaseTestCase):
         )
         self.assertFalse(bundle.read)
         self.assertFalse(bundle.deleted)
+
+    def test_create_message_bundle_only_saves_when_needed(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        bundle = models.MessageBundle.create_message_bundle(
+            review=review,
+            owner=review.creator
+        )
+        self.assertFalse(bundle.read)
+        self.assertFalse(bundle.deleted)
+        modified_time = bundle.modified
+
+        # No save, because no changes
+        new_bundle = models.MessageBundle.create_message_bundle(
+            review=review,
+            owner=review.creator
+        )
+        self.assertEqual(bundle.pk, new_bundle.pk)
+        self.assertEqual(modified_time, new_bundle.modified)
+        # Updates modified time
+        new_bundle.read = True
+        new_bundle.save()
+        self.assertNotEqual(new_bundle.modified, modified_time)
+        new_modified_time = new_bundle.modified
+
+        # Updates modified time again, for the flip on read
+        saved_bundle = models.MessageBundle.create_message_bundle(
+            review=review,
+            owner=review.creator
+        )
+        self.assertEqual(saved_bundle.pk, bundle.pk)
+        self.assertFalse(saved_bundle.read)
+        self.assertNotEqual(new_modified_time, saved_bundle.modified)

@@ -133,7 +133,43 @@ class MessageCountJsonView(JsonView):
             )
         return super(MessageCountJsonView, self).dispatch(*args, **kwargs)
 
-    def _get_review_message_count(self):
+    def _format_json(self, bundles):
+        json_data = {'message_count': bundles.count(), 'bundles': []}
+        for bundle in bundles:
+            msgs = bundle.message_set.filter(created__gte=bundle.modified)
+            bundle_dict = {
+                'bundle_pk': bundle.pk,
+                'messages': [],
+            }
+            for msg in msgs:
+                review_title = ''
+                review_url = ''
+                review_pk = ''
+                is_comment = False
+                thread_pk = ''
+                if msg.review:
+                    review_title = msg.review.review.title
+                    review_url = msg.review.review.get_absolute_url()
+                    review_pk = msg.review.review.pk
+
+                if msg.thread:
+                    is_comment = True
+                    thread_pk = msg.thread.pk
+
+                bundle_dict['messages'].append({
+                    'review_url': review_url,
+                    'review_title': review_title,
+                    'review_pk': review_pk,
+                    'is_comment': is_comment,
+                    'thread_pk': thread_pk,
+                    'message': msg.message,
+                    'message_title': msg.title,
+                    'message_pk': msg.pk,
+                })
+            json_data['bundles'].append(bundle_dict)
+        return json_data
+
+    def _get_review_messages(self):
         # Should only ever be one bundle, but lets keep our signatures
         # consistent eh?
         bundles = models.MessageBundle.objects.filter(
@@ -141,26 +177,22 @@ class MessageCountJsonView(JsonView):
             owner=self.request.user,
             read=False,
             deleted=False,
-        ).count()
-        return {
-            'message_count': bundles,
-        }
+        )
+        return self._format_json(bundles)
 
-    def _get_message_count(self):
+    def _get_messages(self):
         bundles = models.MessageBundle.objects.filter(
             owner=self.request.user,
             read=False,
             deleted=False,
-        ).count()
-        return {
-            'message_count': bundles,
-        }
+        )
+        return self._format_json(bundles)
 
     def get(self, *args, **kwargs):
         if self.review:
-            return self._get_review_message_count()
+            return self._get_review_messages()
 
-        return self._get_message_count()
+        return self._get_messages()
 
 inbox_view = InboxView.as_view()
 msg_detail_view = MessageDetailView.as_view()
