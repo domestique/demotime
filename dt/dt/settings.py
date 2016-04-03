@@ -22,8 +22,6 @@ SECRET_KEY = 'zf3o4tx%22pzoauflj+z2=$l2@g&$656!7d5ir)hdj4g!mv8$%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -91,21 +89,29 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# CUSTOM DJANGO SETTINGS
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.core.context_processors.tz',
-    'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages',
-    'demotime.context_processors.has_unread_messages',
-    'demotime.context_processors.unread_message_count',
-)
-
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            # insert your TEMPLATE_DIRS here
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.core.context_processors.debug',
+                'django.core.context_processors.i18n',
+                'django.core.context_processors.media',
+                'django.core.context_processors.static',
+                'django.core.context_processors.tz',
+                'django.core.context_processors.request',
+                'django.contrib.messages.context_processors.messages',
+                'demotime.context_processors.has_unread_messages',
+                'demotime.context_processors.unread_message_count',
+            ],
+        },
+    },
+]
 
 # MEDIA SETTINGS
 STATIC_URL = '/static/'

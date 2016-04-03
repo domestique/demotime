@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from demotime import forms, models
+from . import JsonView
 
 
 class InboxView(ListView):
@@ -33,7 +34,7 @@ class InboxView(ListView):
             return self.get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = models.Message.objects.filter(receipient=self.request.user)
+        queryset = models.MessageBundle.objects.filter(owner=self.request.user)
         _filter = self.request.GET.get('filter')
         sort = self.request.GET.get('sort')
         if _filter == 'read':
@@ -77,9 +78,9 @@ class MessageDetailView(DetailView):
             self.redirect = True
 
         self.message = get_object_or_404(
-            models.Message,
+            models.MessageBundle,
             pk=self.kwargs.get(self.pk_url_kwarg),
-            receipient=self.request.user
+            owner=self.request.user
         )
         self.message.read = read
         self.message.deleted = delete
@@ -96,26 +97,69 @@ class MessageDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(MessageDetailView, self).get_context_data(**kwargs)
-        msg = context['message']
+        msg = context['object']
         try:
             next_msg = msg.get_next_by_created(
-                receipient=self.message.receipient,
+                owner=self.message.owner,
                 read=False
             )
-        except models.Message.DoesNotExist:
+        except models.MessageBundle.DoesNotExist:
             next_msg = None
 
         try:
             prev_msg = msg.get_previous_by_created(
-                receipient=self.message.receipient,
+                owner=self.message.owner,
                 read=False
             )
-        except models.Message.DoesNotExist:
+        except models.MessageBundle.DoesNotExist:
             prev_msg = None
 
         context['next_msg'] = next_msg
         context['prev_msg'] = prev_msg
         return context
 
+
+class MessageCountJsonView(JsonView):
+
+    status = 200
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.review = None
+        if 'review_pk' in kwargs:
+            self.review = get_object_or_404(
+                models.Review,
+                pk=kwargs.get('review_pk'),
+            )
+        return super(MessageCountJsonView, self).dispatch(*args, **kwargs)
+
+    def _get_review_message_count(self):
+        # Should only ever be one bundle, but lets keep our signatures
+        # consistent eh?
+        bundles = models.MessageBundle.objects.filter(
+            review=self.review,
+            owner=self.request.user,
+            read=False,
+        ).count()
+        return {
+            'message_count': bundles,
+        }
+
+    def _get_message_count(self):
+        bundles = models.MessageBundle.objects.filter(
+            owner=self.request.user,
+            read=False
+        ).count()
+        return {
+            'message_count': bundles,
+        }
+
+    def get(self, *args, **kwargs):
+        if self.review:
+            return self._get_review_message_count()
+
+        return self._get_message_count()
+
 inbox_view = InboxView.as_view()
 msg_detail_view = MessageDetailView.as_view()
+message_count_json_view = MessageCountJsonView.as_view()

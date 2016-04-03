@@ -124,7 +124,8 @@ class TestReviewerViews(BaseTestCase):
         self.assertTrue(
             models.Message.objects.filter(
                 title='Added as reviewer on: {}'.format(self.review.title),
-                receipient=self.test_user_2
+                receipient=self.test_user_2,
+                review=reviewer.review.revision,
             ).exists()
         )
 

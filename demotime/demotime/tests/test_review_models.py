@@ -98,19 +98,43 @@ class TestReviewModels(BaseTestCase):
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             models.reviews.APPROVED
         )
+        msg_bundle = models.MessageBundle.objects.get(
+            review=obj,
+            owner=obj.creator
+        )
+        self.assertEqual(
+            msg_bundle.message_set.first().title,
+            '{} has approved your review: {}'.format(
+                reviewer.reviewer_display_name, obj.title
+            )
+        )
         self.assertFalse(models.Reminder.objects.get(pk=reminder.pk).active)
         models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
+
         reviewer.set_status(models.reviews.REJECTED)
         self.assertEqual(
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             models.reviews.REJECTED
         )
+        self.assertEqual(
+            msg_bundle.message_set.first().title,
+            '{} has rejected your review: {}'.format(
+                reviewer.reviewer_display_name, obj.title
+            )
+        )
         self.assertFalse(models.Reminder.objects.get(pk=reminder.pk).active)
         models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
+
         reviewer.set_status(models.reviews.REVIEWING)
         self.assertEqual(
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             models.reviews.REVIEWING
+        )
+        self.assertEqual(
+            msg_bundle.message_set.first().title,
+            '{} resumed reviewing your review: {}'.format(
+                reviewer.reviewer_display_name, obj.title
+            )
         )
         self.assertTrue(models.Reminder.objects.get(pk=reminder.pk).active)
 

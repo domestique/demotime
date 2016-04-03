@@ -68,9 +68,7 @@
                                         <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
                                         <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Log out</a></li>
                                         <li class="{% if request.path == help_url %}active{% endif %}"><a class="icon icon-help-circled-alt" href="{% url 'help' %}">Help</a></li>
-                                        {% if has_unread_messages %}
-                                            <li><span class="unread_notification"><a href="{{ inbox_url }}">{{ unread_message_count }}</a></span></li>
-                                        {% endif %}
+                                        <li><span class="{% if has_unread_messages %}un{% endif %}read_notification"><a href="{{ inbox_url }}">{{ unread_message_count }}</a></span></li>
                                     {% else %}
                                         {% if request.path != login_url %}
                                             <li><a href="{% url 'login' %}">Login</a></li>

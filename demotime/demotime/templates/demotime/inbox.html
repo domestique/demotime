@@ -8,7 +8,7 @@
     overflow:hidden;
 }
 dl.messages-nav {
-    border:1px solid #415E73;
+    border:1px solid #eee;
     display:table;
     width:auto;
     margin:0 auto 2em;
@@ -22,7 +22,7 @@ dl.messages-nav dd {
     text-align:center;
     display:table-cell;
     box-sizing:border-box;
-    border-right:1px solid #415E73;
+    border-right:1px solid #eee;
 }
 dl.messages-nav dd a {
     display:inline-block;
@@ -136,6 +136,17 @@ dl.messages-nav dd.current a {
     }
 }
 
+section.no_email {
+    background:#E8B951 url(/static/images/sunshine.gif) 50% 0 no-repeat;
+    min-height: 200px;
+    background-size: 30%;
+}
+@media screen and (max-width:680px) {
+    section.no_email {
+        min-height:80px;
+    }
+}
+
 .messages-list {
     border:1px solid #ddd;
 }
@@ -167,7 +178,7 @@ a.True {
     font-weight:400;
 }
 
-.messages-delete_all {
+.messages-archive_all {
     float:right;
     margin-top:2em;
 }
@@ -179,8 +190,7 @@ a.True {
     <h1 class="heading">Your Inbox</h1>
     <dl class="messages-nav">
         <dt>Menu</dt>
-        <dd class="first {% if request.path == inbox_url and not request.GET.filter %}current{% endif %}"><a href="{% url 'inbox' %}">New Messages</a></dd>
-        <dd {% if request.GET.filter == 'deleted' %}class="current"{% endif %}><a href="{% url 'inbox' %}?filter=deleted">Deleted Messages</a></dd>
+        <dd class="first {% if request.path == inbox_url and not request.GET.filter %}current{% endif %}"><a href="{% url 'inbox' %}">Inbox</a></dd>
         <dd class="last {% if request.GET.filter == 'read' %}current{% endif %}"><a href="{% url 'inbox' %}?filter=read">View Archive</a></dd>
     </dl>
     {% if object_list %}
@@ -215,11 +225,13 @@ a.True {
                     {% csrf_token %}
                     {{ form.as_p }}
                 </div>
-                <button type="submit" class="messages-delete_all">Delete all messages</button>
+                {% if request.GET.filter != 'read' %}
+                    <button type="submit" class="messages-archive_all">Archive all messages</button>
+                {% endif %}
             </form>
         </section>
     {% else %}
-        There's nothing here. Enjoy your life.
+        <section class="no_email"></section>
     {% endif %}
 </div>
 {% endblock %}
@@ -227,13 +239,13 @@ a.True {
 {% block footer_scripts %}
 {{ block.super }}
 <script>
-    $('.messages-delete_all').click(function() {
+    $('.messages-archive_all').click(function() {
         var form = $(this).parents('form');
 
-        var r = confirm('Delete all messages?');
+        var r = confirm('Archive all messages?');
         if (r == true) {
             form.find('#id_messages option').prop('selected', true);
-            form.find('#id_action').val('delete');
+            form.find('#id_action').val('read');
             form.submit();
         } else {
             return false;

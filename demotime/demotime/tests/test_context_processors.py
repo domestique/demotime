@@ -28,7 +28,7 @@ class TestContextProcessors(BaseTestCase):
         )
 
     def test_has_unread_messages_excludes_deleted_mail(self):
-        models.Message.objects.filter(receipient=self.user).update(
+        models.MessageBundle.objects.filter(owner=self.user).update(
             read=False,
             deleted=True
         )
@@ -37,7 +37,7 @@ class TestContextProcessors(BaseTestCase):
         )
 
     def test_unread_message_count_excludes_deleted_mail(self):
-        models.Message.objects.filter(receipient=self.user).update(
+        models.MessageBundle.objects.filter(owner=self.user).update(
             read=False,
             deleted=True
         )

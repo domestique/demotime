@@ -302,7 +302,7 @@ class TestReviewViews(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
 
     def test_update_reviewer_status_failure_wrong_user(self):
         reviewer = models.Reviewer.objects.get(
@@ -478,6 +478,23 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(len(response.context['object_list']), 0)
         self.assertIn('form', response.context)
 
+    def test_review_list_search_title(self):
+        response = self.client.get(reverse('review-list'), {
+            'title': 'test'
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.title, 'Test Title')
+
+        # Bad Search
+        response = self.client.get(reverse('review-list'), {
+            'title': 'IASIP'
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+
     def test_review_list_all_the_filters(self):
         test_user = User.objects.get(username='test_user_0')
         response = self.client.get(reverse('review-list'), {
@@ -485,6 +502,7 @@ class TestReviewViews(BaseTestCase):
             'creator': self.user.pk,
             'state': models.reviews.OPEN,
             'reviewer_state': models.reviews.REVIEWING,
+            'title': 'test',
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 1)
@@ -494,6 +512,7 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
         self.assertIn(test_user, obj.reviewers.all())
+        self.assertEqual(obj.title, 'Test Title')
 
     def test_review_list_sort_by_newest(self):
         review_kwargs = self.default_review_kwargs.copy()

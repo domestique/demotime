@@ -188,11 +188,12 @@ class ReviewListView(ListView):
 
             if data.get('state'):
                 qs = qs.filter(state=data['state'])
-            else:
-                qs = qs.filter(state=models.reviews.OPEN)
 
             if data.get('reviewer_state'):
                 qs = qs.filter(reviewer_state=data['reviewer_state'])
+
+            if data.get('title'):
+                qs = qs.filter(title__icontains=data['title'])
 
             if data.get('sort_by'):
                 sorting = data['sort_by']

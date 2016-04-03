@@ -37,33 +37,36 @@
     <h1 class="heading">{{ object.title }}</h1>
     <ul class="message-nav">
         <li>
-            <a href="{% url 'inbox' %}" class="button-link">Back to Inbox</a>
+            <a href="{% url 'inbox' %}" class="button-link">Back to inbox</a>
         </li>
         <li>
-            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open {{ object.review.review.title }}</a>
+            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open this case</a>
         </li>
     </ul>
-    <section>
-        {{ object.message|safe|linebreaksbr }}
-        <ul class="message-nav">
+    {% for msg in object.message_set.all %}
+        <section>
+            <p>
+                From: {{ msg.sender }}<br>
+                Sent: {{ msg.created }}
+            </p>
+            {{ msg.message|safe|linebreaksbr }}
+        </section>
+    {% endfor %}
+    <ul class="message-nav">
+        <li>
+            <a href="{{ object.get_absolute_url }}?action=mark-unread" class="button-link">Mark Unread</a>
+        </li>
+        {% if prev_msg %}
             <li>
-                <a href="{{ object.get_absolute_url }}?action=mark-unread" class="button-link">Mark Unread</a>
+                <a href="{{ prev_msg.get_absolute_url }}" class="button-link">Previous Unread Message</a>
             </li>
+        {% endif %}
+        {% if next_msg %}
             <li>
-                <a href="{{ object.get_absolute_url }}?action=delete" class="button-link">Delete</a>
+                <a href="{{ next_msg.get_absolute_url }}" class="button-link">Next Unread Message</a>
             </li>
-            {% if prev_msg %}
-                <li>
-                    <a href="{{ prev_msg.get_absolute_url }}" class="button-link">Previous Unread Message</a>
-                </li>
-            {% endif %}
-            {% if next_msg %}
-                <li>
-                    <a href="{{ next_msg.get_absolute_url }}" class="button-link">Next Unread Message</a>
-                </li>
-            {% endif %}
-        </ul>
-    </section>
+        {% endif %}
+    </ul>
 </div>
 {% endblock %}
 

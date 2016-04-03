@@ -64,7 +64,6 @@ body.bookmarklet h1 {
     line-height:71px;
 }
 .navbar ul li {
-    margin-left:10px;
     padding:5px 10px;
     border-radius:10px;
     display:inline-block;
@@ -72,7 +71,13 @@ body.bookmarklet h1 {
 .navbar ul li.active {
     background:#618A55;
 }
-.navbar .unread_notification {
+.navbar .read_notification a {
+    background: #777;
+    color: white;
+    font-weight: 400;
+    padding: 5px 10px;
+}
+.navbar .unread_notification a {
     background: #E03743;
     color: white;
     font-weight: 700;

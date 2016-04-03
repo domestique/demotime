@@ -1,3 +1,5 @@
+import json
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
@@ -12,11 +14,11 @@ class TestMessageViews(BaseTestCase):
         self.review = models.Review.create_review(**self.default_review_kwargs)
         self.user = User.objects.get(username='test_user_0')
         self.first_message = models.Message.objects.get(receipient=self.user)
-        system_user = User.objects.get(username='demotime_sys')
+        self.system_user = User.objects.get(username='demotime_sys')
         for x in range(0, 20):
             models.Message.create_message(
                 receipient=self.user,
-                sender=system_user,
+                sender=self.system_user,
                 title='Test Title {}'.format(x),
                 review_revision=self.review.revision,
                 thread=None,
@@ -28,6 +30,15 @@ class TestMessageViews(BaseTestCase):
         )
 
     def test_inbox(self):
+        for x in range(0, 20):
+            models.Message.create_message(
+                receipient=self.user,
+                sender=self.system_user,
+                title='Inbox Testing',
+                message='Inbox Message',
+                review_revision=None,
+                thread=None,
+            )
         response = self.client.get(reverse('inbox'))
         self.assertStatusCode(response, 200)
         object_list = response.context['object_list']
@@ -58,14 +69,14 @@ class TestMessageViews(BaseTestCase):
             {'filter': 'read', 'sort': 'newest'},
             {'filter': 'read', 'sort': 'oldest'},
         )
-        models.Message.objects.filter(
-            pk__in=models.Message.objects.filter(
-                receipient=self.user
+        models.MessageBundle.objects.filter(
+            pk__in=models.MessageBundle.objects.filter(
+                owner=self.user
             ).values_list('pk', flat=True)[0:5]
         ).update(deleted=True)
-        models.Message.objects.filter(
-            pk__in=models.Message.objects.filter(
-                receipient=self.user
+        models.MessageBundle.objects.filter(
+            pk__in=models.MessageBundle.objects.filter(
+                owner=self.user
             ).values_list('pk', flat=True)[5:10]
         ).update(read=True)
         for combo in testing_matrix:
@@ -96,87 +107,119 @@ class TestMessageViews(BaseTestCase):
                         assert item.created > object_list[count + 1].created
 
     def test_message_detail(self):
-        self.assertFalse(self.first_message.read)
-        response = self.client.get(self.first_message.get_absolute_url())
+        self.assertFalse(self.first_message.bundle.read)
+        second_msg = models.Message.create_message(
+            receipient=self.user,
+            sender=self.system_user,
+            title='Inbox Testing',
+            message='Inbox Message',
+            review_revision=None,
+            thread=None,
+        )
+        response = self.client.get(self.first_message.bundle.get_absolute_url())
         self.assertStatusCode(response, 200)
         self.assertTrue(response.context['object'].read)
         self.assertTrue('next_msg' in response.context)
         self.assertFalse(response.context['next_msg'].read)
+        self.assertEqual(response.context['next_msg'], second_msg.bundle)
 
     def test_message_delete(self):
-        self.assertFalse(self.first_message.deleted)
-        response = self.client.get(self.first_message.get_absolute_url(), {
+        self.assertFalse(self.first_message.bundle.deleted)
+        response = self.client.get(self.first_message.bundle.get_absolute_url(), {
             'action': 'delete'
         })
         self.assertRedirects(response, reverse('inbox'))
         self.first_message = models.Message.objects.get(pk=self.first_message.pk)
-        self.assertTrue(self.first_message.deleted)
+        self.assertTrue(self.first_message.bundle.deleted)
 
     def test_mark_message_unread(self):
         self.first_message.deleted = True
         self.first_message.save()
-        response = self.client.get(self.first_message.get_absolute_url(), {
+        response = self.client.get(self.first_message.bundle.get_absolute_url(), {
             'action': 'mark-unread'
         })
         self.assertRedirects(response, reverse('inbox'))
         self.first_message = models.Message.objects.get(pk=self.first_message.pk)
-        self.assertFalse(self.first_message.read)
+        self.assertFalse(self.first_message.bundle.read)
 
     def test_message_detail_wrong_user(self):
         """ Test asserting that you can't view another person's messages """
-        msg = models.Message.objects.get(receipient__username='test_user_1')
+        msg = models.MessageBundle.objects.get(owner__username='test_user_1')
         self.assertFalse(msg.read)
         response = self.client.get(msg.get_absolute_url())
         self.assertStatusCode(response, 404)
 
     def test_mark_messages_read(self):
-        models.Message.objects.filter(receipient=self.user).update(read=False)
-        response = self.client.get(reverse('inbox'), {
-            'messages': models.Message.objects.filter(
-                receipient=self.user).values_list('pk', flat=True),
+        models.MessageBundle.objects.filter(owner=self.user).update(read=False)
+        response = self.client.post(reverse('inbox'), {
+            'messages': models.MessageBundle.objects.filter(
+                owner=self.user).values_list('pk', flat=True),
             'action': forms.BulkMessageUpdateForm.READ,
         })
-        self.assertStatusCode(response, 200)
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user, read=True).count(),
-            models.Message.objects.filter(receipient=self.user).count(),
+        self.assertStatusCode(response, 302)
+        self.assertEqual(
+            models.MessageBundle.objects.filter(owner=self.user, read=True).count(),
+            models.MessageBundle.objects.filter(owner=self.user).count(),
         )
 
     def test_mark_messages_unread(self):
-        models.Message.objects.filter(receipient=self.user).update(read=True)
-        response = self.client.get(reverse('inbox'), {
-            'messages': models.Message.objects.filter(
-                receipient=self.user).values_list('pk', flat=True),
+        models.MessageBundle.objects.filter(owner=self.user).update(read=True)
+        response = self.client.post(reverse('inbox'), {
+            'messages': models.MessageBundle.objects.filter(
+                owner=self.user).values_list('pk', flat=True),
             'action': forms.BulkMessageUpdateForm.UNREAD,
         })
-        self.assertStatusCode(response, 200)
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user, read=False).count(),
-            models.Message.objects.filter(receipient=self.user).count(),
+        self.assertStatusCode(response, 302)
+        self.assertEqual(
+            models.MessageBundle.objects.filter(owner=self.user, read=False).count(),
+            models.MessageBundle.objects.filter(owner=self.user).count(),
         )
 
     def test_mark_messages_deleted(self):
-        models.Message.objects.filter(receipient=self.user).update(deleted=False)
-        response = self.client.get(reverse('inbox'), {
-            'messages': models.Message.objects.filter(
-                receipient=self.user).values_list('pk', flat=True),
+        models.MessageBundle.objects.filter(owner=self.user).update(deleted=False)
+        response = self.client.post(reverse('inbox'), {
+            'messages': models.MessageBundle.objects.filter(
+                owner=self.user).values_list('pk', flat=True),
             'action': forms.BulkMessageUpdateForm.DELETED,
         })
-        self.assertStatusCode(response, 200)
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user, deleted=True).count(),
-            models.Message.objects.filter(receipient=self.user).count(),
+        self.assertStatusCode(response, 302)
+        self.assertEqual(
+            models.MessageBundle.objects.filter(owner=self.user, deleted=True).count(),
+            models.MessageBundle.objects.filter(owner=self.user).count(),
         )
 
     def test_mark_messages_undeleted(self):
-        models.Message.objects.filter(receipient=self.user).update(deleted=True)
-        response = self.client.get(reverse('inbox'), {
-            'messages': models.Message.objects.filter(
-                receipient=self.user).values_list('pk', flat=True),
+        models.MessageBundle.objects.filter(owner=self.user).update(deleted=True)
+        response = self.client.post(reverse('inbox'), {
+            'messages': models.MessageBundle.objects.filter(
+                owner=self.user).values_list('pk', flat=True),
             'action': forms.BulkMessageUpdateForm.UNDELETED,
         })
-        self.assertStatusCode(response, 200)
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user, deleted=False).count(),
-            models.Message.objects.filter(receipient=self.user).count(),
+        self.assertStatusCode(response, 302)
+        self.assertEqual(
+            models.MessageBundle.objects.filter(owner=self.user, deleted=False).count(),
+            models.MessageBundle.objects.filter(owner=self.user).count(),
         )
+
+    def test_message_count_json_with_review(self):
+        models.MessageBundle.objects.filter(read=True)
+        last_bundle = models.MessageBundle.objects.filter(
+            owner=self.user
+        ).last()
+        last_bundle.read = False
+        last_bundle.save()
+        response = self.client.get(
+            reverse('message-count-json', kwargs={'review_pk': self.review.pk})
+        )
+        self.assertEqual(json.loads(response.content), {
+            'message_count': 1
+        })
+
+    def test_message_count_json_without_review(self):
+        msg_count = models.MessageBundle.objects.filter(
+            owner=self.user
+        ).update(read=False, deleted=False)
+        response = self.client.get(reverse('message-count-json'))
+        self.assertEqual(json.loads(response.content), {
+            'message_count': msg_count
+        })

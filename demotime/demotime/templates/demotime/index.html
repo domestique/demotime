@@ -12,6 +12,10 @@
     <small><a href="{% url 'review-list' %}">View all open demos</a></small>
 </h1>
 
+<form action="{% url 'review-list' %}" method="get" class="quickfind">
+    <input class="form-control" id="id_title" name="title" type="text" placeholder="Quickly find a demo by keyword">
+</form>
+
 <div class="reviews-list">
     <div class="split~680 by:2 with-gap:3">
         <div class="cel">
