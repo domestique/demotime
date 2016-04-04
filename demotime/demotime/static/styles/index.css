@@ -2,8 +2,8 @@
 h1.heading {
     margin-bottom: 10px;
 }
-form.quickfind {
-    margin-bottom: 20px;
+.quickfind {
+    margin: 20px 0;
 }
 .reviews-list h3 {
     margin:0;
