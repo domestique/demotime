@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
-from django.views.generic import TemplateView, DetailView, ListView
+from django.views.generic import TemplateView, DetailView, ListView, RedirectView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.contenttypes.models import ContentType
@@ -356,6 +356,20 @@ class UpdateCommentView(DetailView):
         else:
             return self.get(*args, **kwargs)
 
+
+class DTRedirectView(RedirectView):
+
+    permanent = True
+    query_string = True
+    pattern_name = 'review-detail'
+
+    def get_redirect_url(self, *args, **kwargs):
+        get_object_or_404(
+            models.Review,
+            pk=kwargs.get('pk')
+        )
+        return super(DTRedirectView, self).get_redirect_url(*args, **kwargs)
+
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
@@ -363,3 +377,4 @@ review_state_view = ReviewStateView.as_view()
 update_comment_view = UpdateCommentView.as_view()
 delete_comment_attachment_view = DeleteCommentAttachmentView.as_view()
 review_list_view = ReviewListView.as_view()
+dt_redirect_view = DTRedirectView.as_view()

@@ -538,3 +538,22 @@ class TestReviewViews(BaseTestCase):
         self.assertIn('form', response.context)
         obj = response.context['object_list'][0]
         self.assertEqual(obj.pk, self.review.pk)
+
+    def test_review_redirect_view(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        response = self.client.get(
+            reverse('dt-redirect', kwargs={'pk': review.pk})
+        )
+        self.assertStatusCode(response, 301)
+        self.assertRedirects(
+            response,
+            reverse('review-detail', kwargs={'pk': review.pk}),
+            status_code=301,
+        )
+
+    def test_review_redirect_view_not_found(self):
+        self.assertFalse(models.Review.objects.filter(pk=10000).exists())
+        response = self.client.get(
+            reverse('dt-redirect', kwargs={'pk': 10000})
+        )
+        self.assertStatusCode(response, 404)

@@ -32,6 +32,7 @@ urlpatterns = [
 urlpatterns += [
     url(r'^create/$', reviews.review_form_view, name='create-review'),
     url(r'^review/(?P<pk>[\d]+)/$', reviews.review_detail, name='review-detail'),
+    url(r'^(?i)DT-(?P<pk>[\d]+)/$', reviews.dt_redirect_view, name='dt-redirect'),
     url(
         r'^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$',
         reviews.review_detail,
