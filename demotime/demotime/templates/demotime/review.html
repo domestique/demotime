@@ -164,7 +164,7 @@
                         </section>
                     {% endmacro %}
 
-                    {% macro form %}
+                    {% macro form button_text %}
                         <form action="#comments" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
@@ -178,7 +178,7 @@
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <div class="form-group">
-                                <input class="btn btn-primary btn-large" type="submit" value="Reply">
+                                <input class="btn btn-primary btn-large" type="submit" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
                             </div>
                         </form>
                     {% endmacro %}
@@ -230,7 +230,7 @@
                                 {% endif %}
                             {% endfor %}
                             <div class="comments-reply_new">
-                                {% use_macro form %}
+                                {% use_macro form 'Reply' %}
                             </div>
                         </section>
                     {% endfor %}
