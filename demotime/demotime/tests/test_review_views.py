@@ -514,6 +514,38 @@ class TestReviewViews(BaseTestCase):
         self.assertIn(test_user, obj.reviewers.all())
         self.assertEqual(obj.title, 'Test Title')
 
+    def test_review_json_no_match(self):
+        response = self.client.post(reverse('reviews-json'), {
+            'title': 'zxy'
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content), {
+            'count': 0,
+            'reviews': []
+        })
+
+    def test_review_json_all_the_filters(self):
+        test_user = User.objects.get(username='test_user_0')
+        response = self.client.post(reverse('reviews-json'), {
+            'reviewer': test_user.pk,
+            'creator': self.user.pk,
+            'state': models.reviews.OPEN,
+            'reviewer_state': models.reviews.REVIEWING,
+            'title': 'test',
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        review_obj = models.Review.objects.get(pk=review['pk'])
+        self.assertEqual(review['title'], 'Test Title')
+        self.assertEqual(review['creator'], self.user.userprofile.name)
+        self.assertEqual(review['state'], models.reviews.OPEN)
+        self.assertEqual(review['reviewer_state'], models.reviews.REVIEWING)
+        self.assertEqual(review['url'], review_obj.get_absolute_url())
+        reviewers = review['reviewers']
+        self.assertIn(test_user.pk, [x['user_pk'] for x in reviewers])
+
     def test_review_list_sort_by_newest(self):
         review_kwargs = self.default_review_kwargs.copy()
         review_kwargs['title'] = 'Newer Review'
