@@ -98,7 +98,7 @@
                                href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
                                 {{ reviewer.reviewer.userprofile }}</a>:
                             <small>
-                                {{ reviewer.get_status_display }} {# since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }} #}
+                                {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                             </small>
                             {% if review.creator == request.user %}
                                 <small class="reviewer_deleter" style="display:none">
