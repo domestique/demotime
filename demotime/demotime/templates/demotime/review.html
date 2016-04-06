@@ -59,7 +59,7 @@
             </small>
         </h1>
 
-        <div class="split~680 by:3 review-meta with-gap:5">
+        <div class="review-meta with-gap:5">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
@@ -80,6 +80,12 @@
                     <span class="tooltip" title="The demo state is the state of the actual review itself (Open, closed, etc)">
                 </h4>
                 {{ object.state|capfirst }}
+                {% if object.state == 'closed' %}
+                    on {{ object.modified }}
+                {% else %}
+                    since {{ object.created|date:'M-d'}}, {{ object.created|date:'h:iA'|lower }}
+                {% endif %}
+
                 <br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
@@ -88,7 +94,17 @@
                 <ul class="list-inline">
                     {% for reviewer in object.reviewer_set.all %}
                         <li>
-                            <a class="icon icon-{{ reviewer.get_status_display }}" href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}
+                            <a class="icon icon-{{ reviewer.get_status_display }}"
+                               href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
+                                {{ reviewer.reviewer.userprofile }}</a>:
+                            <small>
+                                {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
+                            </small>
+                            {% if review.creator == request.user %}
+                                <small class="reviewer_deleter" style="display:none">
+                                    [<a data-pk="{{ reviewer.reviewer.pk }}">x</a>]
+                                </small>
+                            {% endif %}
                         </li>
                     {% endfor %}
                     {% if object.state != "closed" %}
@@ -101,18 +117,17 @@
             <div class="cel">
                 <h4 class="heading">
                     Demo Revisions:
-                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be."></span>
+                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be. Mouse over a revision to see when it was added."></span>
                 </h4>
                 {% for rev in object.reviewrevision_set.all %}
                     <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
-                        <a href="{{ rev.get_absolute_url }}">Revision {{ rev.number }}</a>
+                        <a title="{{ rev.modified }}" href="{{ rev.get_absolute_url }}">Revision {{ rev.number }}</a>
                         {% if rev.commentthread_set.count %}
-                        <small>({{ rev.commentthread_set.count }}
-                            {% if rev.commentthread_set.count > 1 %}
-                                comments)
-                            {% else %}
-                                comment)
-                            {% endif %}</small>
+                            <small>
+                                (<span class="icon icon-comment">
+                                    {{ rev.commentthread_set.count }}
+                                </span>)
+                            </small>
                         {% endif %}
                     </div>
                 {% endfor %}

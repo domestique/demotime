@@ -29,6 +29,29 @@
     background: #f2f2f2;
     font-size: 14px;
     margin-top: -40px;
+    overflow: hidden;
+}
+.review-meta .cel {
+    float: left;
+}
+.review-meta .cel:nth-child(1) {
+    width: 35%;
+}
+.review-meta .cel:nth-child(2) {
+    width: 40%;
+    margin-right: 15px;
+}
+.review-meta .cel:nth-child(3) {
+    width: 20%;
+}
+@media screen and (max-width:680px) {
+    .review-meta .cel:nth-child(1),
+    .review-meta .cel:nth-child(2),
+    .review-meta .cel:nth-child(3) {
+        width: 100%;
+        float: none;
+        margin-bottom: 20px;
+    }
 }
 .review-meta h4 {
     font-weight: 700;
@@ -50,9 +73,8 @@
     margin:0 0 10px;
 }
 
-.reviewers li:hover small {
-    position: absolute;
-    margin-left: 10px;
+.reviewers li:hover .reviewer_deleter {
+    margin-left: 2px;
     display: inline-block !important;
     cursor: pointer;
 }
