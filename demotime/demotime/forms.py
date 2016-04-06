@@ -81,6 +81,39 @@ class ReviewFilterForm(forms.Form):
         for key, value in self.fields.iteritems():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
+    def get_reviews(self, initial_qs=None):
+        ''' Retrieve all the reviews matching the critiera. Should be called
+        after is_valid()
+        '''
+        if self.errors:
+            return models.Review.objects.none()
+
+        qs = models.Review.objects.all() if not initial_qs else initial_qs
+        data = self.cleaned_data
+        if data.get('reviewer'):
+            qs = qs.filter(reviewer__reviewer=data['reviewer'])
+
+        if data.get('creator'):
+            qs = qs.filter(creator=data['creator'])
+
+        if data.get('state'):
+            qs = qs.filter(state=data['state'])
+
+        if data.get('reviewer_state'):
+            qs = qs.filter(reviewer_state=data['reviewer_state'])
+
+        if data.get('title'):
+            qs = qs.filter(title__icontains=data['title'])
+
+        if data.get('sort_by'):
+            sorting = data['sort_by']
+            if sorting == 'newest':
+                qs = qs.order_by('-modified')
+            elif sorting == 'oldest':
+                qs = qs.order_by('modified')
+
+        return qs.distinct()
+
 
 class CommentForm(forms.ModelForm):
 
