@@ -349,7 +349,7 @@ class Reviewer(BaseModel):
     def set_status(self, status):
         old_status = self.status
         self.status = status
-        self.save(update_fields=['status'])
+        self.save(update_fields=['status', 'modified'])
 
         reminder_active = status == REVIEWING
         Reminder.set_activity(self.review, self.reviewer, reminder_active)
