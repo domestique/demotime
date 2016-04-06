@@ -199,18 +199,17 @@
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section class="collapseable">
+                        <section class="comment_parent collapseable">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
-                                    <label id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}"
-                                        class="icon collapser icon-minus-squared-alt">
-                                            New comment by
-                                            <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
-                                                {{ comment.commenter.userprofile }}
-                                            </a> @
-                                            <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
-                                                {{ comment.created }}
-                                            </a>
+                                    <label data-comment id="{{ comment.pk }}" class="icon collapser icon-minus-squared-alt">
+                                        New comment by
+                                        <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                            {{ comment.commenter.userprofile }}
+                                        </a> @
+                                        <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
+                                            {{ comment.created }}
+                                        </a>
                                     </label>
                                     <blockquote>
                                         <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
@@ -223,13 +222,13 @@
                                     {% use_macro attachments %}
                                 {% else %}
                                     <div class="comments-reply">
-                                        <blockquote id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                        <blockquote id="{{ comment.pk }}">
                                             <div class="blockquote-header">
                                                 Reply by
                                                 <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
                                                     {{ comment.commenter.userprofile }}
                                                 </a> @
-                                                <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                                <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
                                                     {{ comment.created }}
                                                 </a>
                                                 {% if comment.commenter == request.user %}
@@ -296,6 +295,15 @@ $('.collapser').click(function(e) {
             }
         });
     }
+});
+
+// Attach comment pk's to form submits for
+// smooth scroll to comment after sending it
+$('[data-comment]').each(function() {
+    var comment = $(this),
+        form = comment.parents('.comment_parent').find('form');
+
+    form.attr('action', '#' + comment.prop('id'))
 });
 
 {% if reviewer or request.user == object.creator %}
