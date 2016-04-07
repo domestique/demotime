@@ -64,11 +64,16 @@ a.button-link.confirm {
     height:auto;
 }
 .attachment-card img {
+    width:auto;
     max-width:100%;
     height:auto;
+    max-height:200px;
+    margin: 0 auto;
 }
 .attachment-card .attachment-image {
     position:relative;
+    display: block;
+    text-align: center;
 }
 .attachment-card .attachment-image .delete_attachment {
     position:absolute;
