@@ -65,3 +65,12 @@ $('.review form').submit(function(e) {
 setTimeout(function() {
     $('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
 }, 1);
+
+$('textarea').keypress(function() {
+    window.addEventListener("beforeunload", function (e) {
+        var confirmationMessage = "You have unsaved work. Are you sure you want to close Demotime?";
+
+        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+        return confirmationMessage;                            //Webkit, Safari, Chrome
+    });
+});
