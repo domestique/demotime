@@ -40,6 +40,10 @@ a.button-link.confirm {
     width: 30%;
     float: left;
 }
+.comment_parent .attachment-card.image {
+    width: 100%;
+    float: none;
+}
 @media screen and (max-width:680px) {
     .attachment-card.image {
         width: 100%;
