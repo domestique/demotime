@@ -81,6 +81,9 @@
 .review h3 {
     margin:0 0 10px;
 }
+.review h3.collapser {
+    cursor: pointer;
+}
 
 .reviewers li:hover .reviewer_deleter {
     margin-left: 2px;

@@ -1,4 +1,4 @@
-<div class="attachment-card {{ attachment.attachment_type }}">
+<div class="attachment-card {{ attachment.attachment_type }} collapseable">
     {% if comment.commenter == request.user %}
         <form style="display:none" class="delete_attachment_form" action="{% url 'update-comment-attachment' comment.pk attachment.pk %}"></form>
     {% endif %}

@@ -36,7 +36,26 @@ a.button-link.confirm {
 .attachment-card {
     margin:10px;
 }
+.attachment-card.image {
+    width: 30%;
+    float: left;
+}
+@media screen and (max-width:680px) {
+    .attachment-card.image {
+        width: 100%;
+        float: none;
+    }
+}
+.attachment-card.movie,
+.attachment-card.document,
+.attachment-card.audio,
+.attachment-card.other {
+    clear: both;
+}
 .attachment-card video {
+    max-width: 100%;
+}
+.attachment-card.audio {
     width:100%;
     height:auto;
 }
@@ -73,6 +92,9 @@ a.button-link.confirm {
     display:none;
 }
 
+.attachments {
+    overflow: hidden;
+}
 .attachments section {
     padding:1em;
 }

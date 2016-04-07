@@ -134,9 +134,9 @@
             </div>
         </div>
 
-        <article class="review-overview">
-            <h3 class="icon icon-lightbulb">Review Overview</h3>
-            <section>
+        <article class="review-overview collapser_parent">
+            <h3 class="icon icon-lightbulb collapser">Review Overview</h3>
+            <section class="collapseable">
                 <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
 
                 {% if revision.description and object.reviewrevision_set.all.count > 1 %}
@@ -152,9 +152,9 @@
         </article>
 
         {% if revision.attachments.exists %}
-            <article>
-                <h3 class="icon icon-attach">Attachments</h3>
-                <section>
+            <article class="collapser_parent">
+                <h3 class="icon icon-attach collapser">Attachments</h3>
+                <section class="attachments collapseable">
                     {% for attachment in revision.attachments.all %}
                         {% include "includes/review_attachment.html" with attachment=attachment %}
                     {% endfor %}
@@ -164,7 +164,7 @@
 
         {% if revision.commentthread_set.all %}
             <article id="comments">
-                <h3 class="icon icon-comment">Previous comments</h3>
+                <h3 class="icon icon-comment collapser">Previous comments</h3>
                 <section class="comments">
                     {% macro attachments %}
                         {% for attachment in comment.attachments.all %}
@@ -199,7 +199,7 @@
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section class="comment_parent collapseable">
+                        <section class="comment_parent collapser_parent">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
                                     <label data-comment id="{{ comment.pk }}" class="icon collapser icon-minus-squared-alt">
@@ -211,7 +211,7 @@
                                             {{ comment.created }}
                                         </a>
                                     </label>
-                                    <blockquote>
+                                    <blockquote class="collapseable">
                                         <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
                                         {% if comment.commenter == request.user %}
                                             <div class="blockquote-footer">
@@ -221,7 +221,7 @@
                                     </blockquote>
                                     {% use_macro attachments %}
                                 {% else %}
-                                    <div class="comments-reply">
+                                    <div class="comments-reply collapseable">
                                         <blockquote id="{{ comment.pk }}">
                                             <div class="blockquote-header">
                                                 Reply by
@@ -243,7 +243,7 @@
                                     </div>
                                 {% endif %}
                             {% endfor %}
-                            <div class="comments-reply_new">
+                            <div class="comments-reply_new collapseable">
                                 {% use_macro form 'Reply' %}
                             </div>
                         </section>
@@ -285,13 +285,15 @@
 $('.collapser').click(function(e) {
     if (e.target.tagName != "A") {
         var collapser = $(this);
-        collapser.parents('.collapseable').find('blockquote, .comments-reply_new, .attachment-card').slideToggle(function() {
-            if ($(this).is(":visible")) {
-                collapser.removeClass('icon-plus-squared-alt');
-                collapser.addClass('icon-minus-squared-alt');
-            } else {
-                collapser.addClass('icon-plus-squared-alt');
-                collapser.removeClass('icon-minus-squared-alt');
+        collapser.parents('.collapser_parent').find('.collapseable').slideToggle(function() {
+            if (collapser.attr('class').match('squared')) {
+                if ($(this).is(":visible")) {
+                    collapser.removeClass('icon-plus-squared-alt');
+                    collapser.addClass('icon-minus-squared-alt');
+                } else {
+                    collapser.addClass('icon-plus-squared-alt');
+                    collapser.removeClass('icon-minus-squared-alt');
+                }
             }
         });
     }
