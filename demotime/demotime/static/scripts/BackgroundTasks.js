@@ -20,6 +20,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         }, 5000);
     },
 
+    // Update the header with any new messages
     fetch_new_messages: function() {
         var self = this;
 
@@ -34,6 +35,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         });
     },
 
+    // Show a balloon if there are updates to the review you are viewing.
     fetch_new_comments: function() {
         var self = this;
 
@@ -42,9 +44,10 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         });
 
         req.success(function(data) {
-            var update_obj = data.bundles[0].messages[0],
-                bundle_obj = data.bundles[0];
             if (data.message_count > 0 && !self.options.noty) {
+                var update_obj = data.bundles[0].messages[0],
+                    bundle_obj = data.bundles[0];
+
                 self.options.noty = noty({
                     text: update_obj.message_title + ' (click to refresh)',
                     layout: 'bottomRight',
@@ -58,29 +61,25 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                     callback: {
                         onCloseClick: function() {
                             // Mark message as read on balloon click
-                            var bundle_array = new Array();
-
-                            // Create an array from the bundle pk
-                            bundle_array.push(bundle_obj.bundle_pk);
-
                             // Send request to mark message as read
                             var req = $.ajax({
-                                url: self.options.messages_url,
+                                url: self.options.comments_url,
                                 method: 'POST',
                                 data: {
-                                    'messages': bundle_array,
+                                    'messages': bundle_obj.bundle_pk,
                                     'action': 'read'
                                 }
                             });
 
                             req.success(function(data) {
                                 // Redirect the user to the comment
-                                window.location.href = window.location.origin + window.location.pathname + '#' + update_obj.comment_pk;
+                                window.location.href = window.location.origin + window.location.pathname + '#comments';
+                                window.location.reload();
                             });
                         }
                     }
                 });
             }
         });
-    },
+    }
 });
