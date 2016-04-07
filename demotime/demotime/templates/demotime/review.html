@@ -303,7 +303,7 @@ $('[data-comment]').each(function() {
     var comment = $(this),
         form = comment.parents('.comment_parent').find('form');
 
-    form.attr('action', '#' + comment.prop('id'))
+    form.attr('action', '#' + comment.attr('id'))
 });
 
 {% if reviewer or request.user == object.creator %}
