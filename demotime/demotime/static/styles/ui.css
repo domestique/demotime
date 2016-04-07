@@ -36,8 +36,11 @@ a.button-link.confirm {
 .attachment-card {
     margin:10px;
 }
+.attachment-card section {
+    min-height: 250px;
+}
 .attachment-card.image {
-    width: 30%;
+    width: 47%;
     float: left;
 }
 .comment_parent .attachment-card.image {
