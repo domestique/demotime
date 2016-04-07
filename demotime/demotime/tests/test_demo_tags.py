@@ -37,3 +37,10 @@ class TestDemoTags(BaseTestCase):
             Context({'review': self.review, 'user': self.user})
         )
         self.assertEqual(content, models.reviews.REVIEWING.capitalize())
+
+    def test_review_status_no_reviewer(self):
+        self.review.reviewer_set.filter(reviewer=self.user).delete()
+        self.assertEqual(
+            demo_tags.reviewer_status(self.review, self.user),
+            ''
+        )
