@@ -2,7 +2,7 @@
     {% if comment.commenter == request.user %}
         <form style="display:none" class="delete_attachment_form" action="{% url 'update-comment-attachment' comment.pk attachment.pk %}"></form>
     {% endif %}
-    <section data-id="{{ attachment.pk }}">
+    <section>
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
             {% if attachment.description %}
