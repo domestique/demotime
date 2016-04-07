@@ -4,7 +4,7 @@ DemoTime.Reviewers = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'keyup #add_reviewer': 'typing',
+        'keyup #find_reviewer': 'typing',
         'click .new_reviewer_click': 'add',
         'click .reviewer_deleter': 'delete',
         'click .cancel': 'cancel'
@@ -15,7 +15,7 @@ DemoTime.Reviewers = Backbone.View.extend({
     },
 
     cancel: function() {
-        this.$el.find('.reviewers input').val('');
+        this.$el.find('#find_reviewer').val('');
     },
 
     typing: function(event) {
@@ -45,7 +45,7 @@ DemoTime.Reviewers = Backbone.View.extend({
                     template = template({ person: self.people.get('reviewers') });
 
                     swal ({
-                        title: "Add a reviewer",
+                        title: "Found matches",
                         text: template,
                         type: "success",
                         showConfirmButton: false,

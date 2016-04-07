@@ -32,6 +32,7 @@ urlpatterns = [
 urlpatterns += [
     url(r'^create/$', reviews.review_form_view, name='create-review'),
     url(r'^review/(?P<pk>[\d]+)/$', reviews.review_detail, name='review-detail'),
+    url(r'^(?i)DT-(?P<pk>[\d]+)/$', reviews.dt_redirect_view, name='dt-redirect'),
     url(
         r'^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$',
         reviews.review_detail,
@@ -43,17 +44,19 @@ urlpatterns += [
         reviews.reviewer_status_view,
         name='update-reviewer-status',
     ),
-    url(r'review/(?P<pk>[\d]+)/update-state/$', reviews.review_state_view, name='update-review-state'),
-    url(r'comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
-    url(r'review/(?P<pk>[\d]+)/reviewer-finder/$', reviewers.reviewer_finder, name='reviewer-finder'),
-    url(r'review/(?P<pk>[\d]+)/add-reviewer/$', reviewers.add_reviewer, name='add-reviewer'),
-    url(r'review/(?P<pk>[\d]+)/delete-reviewer/$', reviewers.delete_reviewer, name='delete-reviewer'),
+    url(r'^review/(?P<pk>[\d]+)/update-state/$', reviews.review_state_view, name='update-review-state'),
+    url(r'^comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
+    url(r'^review/reviewer-finder/$', reviewers.reviewer_finder, name='reviewer-finder'),
+    url(r'^review/(?P<pk>[\d]+)/reviewer-finder/$', reviewers.reviewer_finder, name='reviewer-finder'),
+    url(r'^review/(?P<pk>[\d]+)/add-reviewer/$', reviewers.add_reviewer, name='add-reviewer'),
+    url(r'^review/(?P<pk>[\d]+)/delete-reviewer/$', reviewers.delete_reviewer, name='delete-reviewer'),
     url(
-        r'comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
+        r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         reviews.delete_comment_attachment_view,
         name='update-comment-attachment'
     ),
-    url(r'review/list/$', reviews.review_list_view, name='review-list'),
+    url(r'^review/list/$', reviews.review_list_view, name='review-list'),
+    url(r'^review/search/$', reviews.review_json_view, name='reviews-json'),
 ]
 
 # Messages

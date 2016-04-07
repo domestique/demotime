@@ -12,11 +12,19 @@
     <small><a href="{% url 'review-list' %}">View all open demos</a></small>
 </h1>
 
-<form action="{% url 'review-list' %}" method="get" class="quickfind">
-    <input class="form-control" id="id_title" name="title" type="text" placeholder="Quickly find a demo by keyword">
-</form>
-
 <div class="reviews-list">
+
+    <div class="quickfind split~680 by:2 with-gap:3">
+        <div class="cel">
+            <form action="{% url 'review-list' %}#results" method="get">
+                <input class="form-control" id="id_title" name="title" type="text" placeholder="Quickly find a demo by keyword  ex. Params [enter]">
+            </form>
+        </div>
+        <div class="cel">
+            <input type="text" id="find_reviewer" placeholder="Quickly find a user" maxlength="3">
+        </div>
+    </div>
+
     <div class="split~680 by:2 with-gap:3">
         <div class="cel">
             {% include "includes/reviews_box.html" with reviews=open_reviews user=request.user %}
@@ -31,5 +39,24 @@
 <div class="tip">
     <strong>Power tip</strong>: Mouse over a Demo title to get a real-time snapshot of who's assigned and their status.
 </div>
+{% endblock %}
 
+{% block patterns %}
+{{ block.super }}
+<script type="text/x-pattern" id="new_reviewers">
+<ul>
+<% _.each(person, function(person) { %>
+    <li><a href="/accounts/profile/<%= person.pk %>"><%= person.name %></a></li>
+<% }) %>
+</ul>
+</script>
+{% endblock %}
+
+{% block footer_scripts %}
+{{ block.super }}
+<script>
+var ModifyReviewers = new DemoTime.Reviewers({
+    finder_url: '{% url 'reviewer-finder' %}'
+});
+</script>
 {% endblock %}

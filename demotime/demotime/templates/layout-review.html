@@ -20,7 +20,7 @@ a.error {
 {% block content %}
     <div class="review">
         <h1>{% block page_title %}{% endblock %}</h1>
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post" enctype="multipart/form-data" id="submit_review">
             {% csrf_token %}
             <div class="form-group">
                 <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>
@@ -28,7 +28,7 @@ a.error {
                 {{ review_form.title }}
             </div>
             <div class="form-group">
-                <h3 class="icon icon-link-ext">{{ review_form.case_link.label }} <small>ex. http://example.org/1234</small></h3>
+                <h3 class="icon icon-link-ext">{{ review_form.case_link.label }} <small>ex. https://someproject.tpondemand.com/entity/1234</small></h3>
                 {{ review_form.case_link.errors }}
                 {{ review_form.case_link }}
             </div>

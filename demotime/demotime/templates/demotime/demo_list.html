@@ -5,6 +5,7 @@
 <style>
     section section {
         overflow:hidden;
+        padding: 20px;
     }
     .filters select {
         margin-right:1.5em;
@@ -49,7 +50,7 @@
                 <input type="submit" value="Filter Reviews">
             </form>
         </section>
-        <ul>
+        <ul id="results">
             {% if object_list %}
                 {% for obj in object_list %}
                     <li>

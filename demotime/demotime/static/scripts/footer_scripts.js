@@ -39,6 +39,10 @@ $('.review form').submit(function(e) {
     var form = $(this),
         proceed = true;
 
+    // Remove dialog warning
+    $(window).unbind('beforeunload');
+    window.onbeforeunload = null;
+
     $('.attachment-container:visible').each(function() {
         var select = $(this).find('.attachment-type select'),
             file = $(this).find('.attachment-file input');
@@ -65,3 +69,8 @@ $('.review form').submit(function(e) {
 setTimeout(function() {
     $('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
 }, 1);
+$('textarea').keyup(function() {
+    window.onbeforeunload = function(e) {
+        return 'You have unsaved changes. Exit Demotime?.';
+    };
+});

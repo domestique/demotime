@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
-from django.views.generic import TemplateView, DetailView, ListView
+from django.views.generic import TemplateView, DetailView, ListView, RedirectView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.contenttypes.models import ContentType
@@ -179,30 +179,9 @@ class ReviewListView(ListView):
         qs = super(ReviewListView, self).get_queryset()
         form = forms.ReviewFilterForm(self.request.GET)
         if form.is_valid():
-            data = form.cleaned_data
-            if data.get('reviewer'):
-                qs = qs.filter(reviewer__reviewer=data['reviewer'])
+            return form.get_reviews(qs)
 
-            if data.get('creator'):
-                qs = qs.filter(creator=data['creator'])
-
-            if data.get('state'):
-                qs = qs.filter(state=data['state'])
-
-            if data.get('reviewer_state'):
-                qs = qs.filter(reviewer_state=data['reviewer_state'])
-
-            if data.get('title'):
-                qs = qs.filter(title__icontains=data['title'])
-
-            if data.get('sort_by'):
-                sorting = data['sort_by']
-                if sorting == 'newest':
-                    qs = qs.order_by('-modified')
-                elif sorting == 'oldest':
-                    qs = qs.order_by('modified')
-
-        return qs.distinct()
+        return models.Review.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super(ReviewListView, self).get_context_data(**kwargs)
@@ -356,10 +335,60 @@ class UpdateCommentView(DetailView):
         else:
             return self.get(*args, **kwargs)
 
+
+class ReviewJsonView(JsonView):
+
+    def post(self, *args, **kwargs):
+        form = forms.ReviewFilterForm(self.request.POST)
+        if form.is_valid():
+            reviews = form.get_reviews()
+            review_json_dict = {
+                'count': reviews.count(),
+                'reviews': [],
+            }
+            for review in reviews:
+                review_dict = {
+                    'title': review.title,
+                    'url': review.get_absolute_url(),
+                    'creator': review.creator.userprofile.name,
+                    'state': review.state,
+                    'reviewer_state': review.reviewer_state,
+                    'pk': review.pk,
+                    'reviewers': [],
+                }
+                for reviewer in review.reviewer_set.all():
+                    review_dict['reviewers'].append({
+                        'name': reviewer.reviewer.userprofile.name,
+                        'user_pk': reviewer.reviewer.pk,
+                        'reviewer_status': reviewer.status,
+                    })
+
+                review_json_dict['reviews'].append(review_dict)
+
+            return review_json_dict
+
+        return {'count': 0, 'reviews': []}
+
+
+class DTRedirectView(RedirectView):
+
+    permanent = True
+    query_string = True
+    pattern_name = 'review-detail'
+
+    def get_redirect_url(self, *args, **kwargs):
+        get_object_or_404(
+            models.Review,
+            pk=kwargs.get('pk')
+        )
+        return super(DTRedirectView, self).get_redirect_url(*args, **kwargs)
+
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
 review_state_view = ReviewStateView.as_view()
+review_json_view = ReviewJsonView.as_view()
 update_comment_view = UpdateCommentView.as_view()
 delete_comment_attachment_view = DeleteCommentAttachmentView.as_view()
 review_list_view = ReviewListView.as_view()
+dt_redirect_view = DTRedirectView.as_view()

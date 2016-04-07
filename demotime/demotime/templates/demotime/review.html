@@ -22,7 +22,7 @@
         <div class="manage-review">
             <ul>
                 {% if request.user == object.creator %}
-                    <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Update demo</a></li>
+                    <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Add revision</a></li>
                     {% if object.state == 'closed' %}
                         <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
                     {% else %}
@@ -59,7 +59,7 @@
             </small>
         </h1>
 
-        <div class="split~680 by:3 review-meta with-gap:5">
+        <div class="review-meta with-gap:5">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
@@ -80,6 +80,12 @@
                     <span class="tooltip" title="The demo state is the state of the actual review itself (Open, closed, etc)">
                 </h4>
                 {{ object.state|capfirst }}
+                {% if object.state == 'closed' %}
+                    on {{ object.modified }}
+                {% else %}
+                    since {{ object.created|date:'M-d'}}, {{ object.created|date:'h:iA'|lower }}
+                {% endif %}
+
                 <br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
@@ -88,12 +94,22 @@
                 <ul class="list-inline">
                     {% for reviewer in object.reviewer_set.all %}
                         <li>
-                            <a class="icon icon-{{ reviewer.get_status_display }}" href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">{{ reviewer.reviewer.userprofile }}</a>: {{ reviewer.get_status_display }} {% if review.creator == request.user %}<small style="display:none">[<a data-pk="{{ reviewer.reviewer.pk }}" class="reviewer_deleter">x</a>]</small>{% endif %}
+                            <a class="icon icon-{{ reviewer.get_status_display }}"
+                               href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
+                                {{ reviewer.reviewer.userprofile }}</a>:
+                            <small>
+                                {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
+                            </small>
+                            {% if review.creator == request.user %}
+                                <small class="reviewer_deleter" style="display:none">
+                                    [<a data-pk="{{ reviewer.reviewer.pk }}">x</a>]
+                                </small>
+                            {% endif %}
                         </li>
                     {% endfor %}
                     {% if object.state != "closed" %}
                         <li>
-                            <input type="text" id="add_reviewer" placeholder="add reviewer" maxlength="3">
+                            <input type="text" id="find_reviewer" placeholder="add reviewer" maxlength="3">
                         </li>
                     {% endif %}
                 </ul>
@@ -101,18 +117,17 @@
             <div class="cel">
                 <h4 class="heading">
                     Demo Revisions:
-                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be."></span>
+                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be. Mouse over a revision to see when it was added."></span>
                 </h4>
                 {% for rev in object.reviewrevision_set.all %}
                     <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
-                        <a href="{{ rev.get_absolute_url }}">Revision {{ rev.number }}</a>
+                        <a title="{{ rev.modified }}" href="{{ rev.get_absolute_url }}">Revision {{ rev.number }}</a>
                         {% if rev.commentthread_set.count %}
-                        <small>({{ rev.commentthread_set.count }}
-                            {% if rev.commentthread_set.count > 1 %}
-                                comments)
-                            {% else %}
-                                comment)
-                            {% endif %}</small>
+                            <small>
+                                (<span class="icon icon-comment">
+                                    {{ rev.commentthread_set.count }}
+                                </span>)
+                            </small>
                         {% endif %}
                     </div>
                 {% endfor %}
@@ -164,7 +179,7 @@
                         </section>
                     {% endmacro %}
 
-                    {% macro form %}
+                    {% macro form button_text %}
                         <form action="#comments" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
@@ -178,24 +193,23 @@
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <div class="form-group">
-                                <input class="btn btn-primary btn-large" type="submit" value="Reply">
+                                <input class="btn btn-primary btn-large" type="submit" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
                             </div>
                         </form>
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section class="collapseable">
+                        <section class="comment_parent collapseable">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
-                                    <label id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}"
-                                        class="icon collapser icon-minus-squared-alt">
-                                            New comment by
-                                            <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
-                                                {{ comment.commenter.userprofile }}
-                                            </a> @
-                                            <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
-                                                {{ comment.created }}
-                                            </a>
+                                    <label data-comment id="{{ comment.pk }}" class="icon collapser icon-minus-squared-alt">
+                                        New comment by
+                                        <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                            {{ comment.commenter.userprofile }}
+                                        </a> @
+                                        <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
+                                            {{ comment.created }}
+                                        </a>
                                     </label>
                                     <blockquote>
                                         <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
@@ -208,13 +222,13 @@
                                     {% use_macro attachments %}
                                 {% else %}
                                     <div class="comments-reply">
-                                        <blockquote id="{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                        <blockquote id="{{ comment.pk }}">
                                             <div class="blockquote-header">
                                                 Reply by
                                                 <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
                                                     {{ comment.commenter.userprofile }}
                                                 </a> @
-                                                <a href="{{ review.get_absolute_url }}#{{ comment.created|cut:' '|cut:'.'|cut:':'|cut:'-'|cut:'+' }}">
+                                                <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
                                                     {{ comment.created }}
                                                 </a>
                                                 {% if comment.commenter == request.user %}
@@ -230,7 +244,7 @@
                                 {% endif %}
                             {% endfor %}
                             <div class="comments-reply_new">
-                                {% use_macro form %}
+                                {% use_macro form 'Reply' %}
                             </div>
                         </section>
                     {% endfor %}
@@ -281,6 +295,15 @@ $('.collapser').click(function(e) {
             }
         });
     }
+});
+
+// Attach comment pk's to form submits for
+// smooth scroll to comment after sending it
+$('[data-comment]').each(function() {
+    var comment = $(this),
+        form = comment.parents('.comment_parent').find('form');
+
+    form.attr('action', '#' + comment.prop('id'))
 });
 
 {% if reviewer or request.user == object.creator %}

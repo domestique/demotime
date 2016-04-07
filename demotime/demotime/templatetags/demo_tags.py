@@ -9,8 +9,12 @@ register = template.Library()
 def reviewer_status(review, user):
     if isinstance(review, models.ReviewRevision):
         review = review.review
+    try:
+        status = models.Reviewer.objects.get(
+            review=review,
+            reviewer=user
+        ).get_status_display()
+    except models.Reviewer.DoesNotExist:
+        status = ''
 
-    return models.Reviewer.objects.get(
-        review=review,
-        reviewer=user
-    ).get_status_display()
+    return status

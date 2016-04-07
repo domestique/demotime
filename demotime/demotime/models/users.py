@@ -35,6 +35,10 @@ class UserProfile(BaseModel):
     def __unicode__(self):
         return u'{}'.format(self.display_name or self.user.username)
 
+    @property
+    def name(self):
+        return self.__unicode__()
+
     def get_absolute_url(self):
         return reverse('profile', args=[self.pk])
 
