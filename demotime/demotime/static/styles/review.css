@@ -16,7 +16,7 @@
     padding-top: 30px;
     padding-bottom: 30px;
 }
-.content .alert {
+h1 .alert {
     position: absolute;
     top: -2px;
     right: 10px;
