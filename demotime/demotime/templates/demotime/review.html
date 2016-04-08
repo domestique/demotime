@@ -210,14 +210,12 @@
                                         <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
                                             {{ comment.created }}
                                         </a>
+                                        {% if comment.commenter == request.user %}
+                                            (<a href="{% url 'update-comment' comment.pk %}">edit this reply</a>)
+                                        {% endif %}
                                     </label>
                                     <blockquote class="collapseable">
                                         <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
-                                        {% if comment.commenter == request.user %}
-                                            <div class="blockquote-footer">
-                                                <a href="{% url 'update-comment' comment.pk %}">edit</a>
-                                            </div>
-                                        {% endif %}
                                     </blockquote>
                                     {% use_macro attachments %}
                                 {% else %}
