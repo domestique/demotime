@@ -78,20 +78,6 @@ a.button-link.confirm {
     display: block;
     text-align: center;
 }
-.attachment-card .attachment-image .delete_attachment {
-    position:absolute;
-    top:0;
-    right:0;
-    display:none;
-    background:#fff;
-    padding:5px 10px;
-    font-size:2em;
-    color:#000;
-    box-shadow:0 0 3px #ccc;
-}
-.attachment-image:hover .delete_attachment {
-    display:inline-block;
-}
 /* Fixing filename bleedthrough */
 .attachment-file {
     overflow: hidden;

@@ -394,23 +394,6 @@ $('[data-comment]').each(function() {
         }
     });
 
-    // Delete attachment
-    $('.delete_attachment').click(function(event) {
-        event.preventDefault();
-
-        var attachment = $(this).parents('.attachment-card'),
-            form = attachment.find('.delete_attachment_form');
-
-        var post = $.post(form.attr('action'), {
-            delete: true
-        });
-        post.done(function(data) {
-            attachment.slideUp(function() {
-                $(this).remove();
-            });
-        });
-    });
-
     // Spawn new windows for links
     $('.review-overview a').attr('target', '_blank');
 {% endif %}

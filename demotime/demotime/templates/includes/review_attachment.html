@@ -1,7 +1,4 @@
 <div class="attachment-card {{ attachment.attachment_type }} collapseable">
-    {% if comment.commenter == request.user %}
-        <form style="display:none" class="delete_attachment_form" action="{% url 'update-comment-attachment' comment.pk attachment.pk %}"></form>
-    {% endif %}
     <section>
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
@@ -20,9 +17,6 @@
                 <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="lightboxed">
                     <img src="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="img-thumbnail" height=300 width=300>
                 </a>
-                {% if comment.commenter == request.user %}
-                    <a href="#" class="delete_attachment">x</a>
-                {% endif %}
             </span>
         {% endif %}
         {% if attachment.attachment_type == "document" %}
@@ -30,11 +24,6 @@
         {% endif %}
         {% if attachment.attachment_type == "other" %}
             <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
-        {% endif %}
-        {% if attachment.attachment_type != "image" %}
-            {% if comment.commenter == request.user %}
-                <small>(<a href="#" class="delete_attachment">delete</a>)</small>
-            {% endif %}
         {% endif %}
     </section>
 </div>
