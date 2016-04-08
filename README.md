@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/f4nt/demotime.svg?branch=master)](https://travis-ci.org/f4nt/demotime)
 
 Demotime application idea we're fleshing out
+[Trello Board](https://trello.com/b/k9PNajpl) - Our Issue Tracker
 
 Getting Started
 =====================================
