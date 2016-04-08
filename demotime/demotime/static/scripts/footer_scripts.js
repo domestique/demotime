@@ -71,6 +71,6 @@ setTimeout(function() {
 }, 1);
 $('textarea').keyup(function() {
     window.onbeforeunload = function(e) {
-        return 'You have unsaved changes. Exit Demotime?.';
+        return 'You have unsaved changes. Exit DemoTime?.';
     };
 });
