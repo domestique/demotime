@@ -235,6 +235,7 @@ h3 small {
     min-height: 0;
     width: 100%;
     box-sizing: border-box;
+    padding: 1em;
 }
 .review_info li span {
     font-size: 12px;
@@ -252,8 +253,7 @@ h3 small {
     font-size: 13px;
 }
 .review_info ul {
-    margin-top: 5px;
+    margin: 5px 0 0;
     list-style: none;
-    margin-left: 0;
     padding-left: 0
 }
