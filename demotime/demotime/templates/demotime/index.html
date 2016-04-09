@@ -15,11 +15,13 @@
 <div class="reviews-list">
 
     <div class="quickfind">
-        <input type="text" id="find_reviewer" placeholder="Quickly find a demo or user">
-        <div class="quickfind-results"><section>
-            <div class="quickfind-users"></div>
-            <div class="quickfind-reviews"></div>
-        </section></div>
+        <form action="{% url 'review-list' %}#results" method="get">
+            <input type="text" id="id_title" name="title" placeholder="Quickly find a demo or user">
+            <div class="quickfind-results"><section>
+                <div class="quickfind-users"></div>
+                <div class="quickfind-reviews"></div>
+            </section></div>
+        </form>
     </div>
 
     <div class="split~680 by:2 with-gap:3">
@@ -43,17 +45,25 @@
 <script type="text/x-pattern" id="reviewer_results">
 <strong>Users</strong>
 <ul>
-<% _.each(user, function(user) { %>
-    <li><a href="/accounts/profile/<%= user.pk %>"><%= user.name %></a></li>
-<% }) %>
+<% if (user.length) { %>
+    <% _.each(user, function(user) { %>
+        <li><a href="/accounts/profile/<%= user.pk %>"><%= user.name %></a></li>
+    <% }) %>
+<% } else { %>
+    <li>No matching users found</li>
+<% } %>
 </ul>
 </script>
 <script type="text/x-pattern" id="review_results">
 <strong>Demos</strong>
 <ul>
-<% _.each(reviews, function(review) { %>
-    <li><a href="<%= review.url %>"><%= review.title %></a>, by <%= review.creator %></li>
-<% }) %>
+<% if (reviews.length) { %>
+    <% _.each(reviews, function(review) { %>
+        <li><a href="<%= review.url %>"><%= review.title %></a>, by <%= review.creator %></li>
+    <% }) %>
+<% } else { %>
+    <li>No matching reviews found</li>
+<% } %>
 </ul>
 </script>
 {% endblock %}
