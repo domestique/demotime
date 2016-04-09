@@ -137,22 +137,20 @@ li.open.state-highlight {
     overflow: hidden;
     background: #555;
     color: #fff;
+    min-height: 0;
 }
 .comments .attachment-card h3 {
     font-size: 16px;
     color: #fff;
 }
 .comments .attachment-card.image {
-    max-height: 180px;
     overflow: hidden;
 }
 .comments .attachment-card.other,
 .comments .attachment-card.document {
-    max-height: 80px;
     overflow: hidden;
 }
 .comments .attachment-card.audio {
-    max-height: 100px;
     overflow: hidden;
 }
 .comments .attachment-card section img {
