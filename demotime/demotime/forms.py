@@ -63,13 +63,13 @@ class ReviewFilterForm(forms.Form):
         required=False,
         queryset=User.objects.exclude(
             userprofile__user_type=models.UserProfile.SYSTEM
-        )
+        ).order_by('username')
     )
     reviewer = forms.ModelChoiceField(
         required=False,
         queryset=User.objects.exclude(
             userprofile__user_type=models.UserProfile.SYSTEM
-        )
+        ).order_by('username')
     )
     sort_by = forms.ChoiceField(
         required=False,
