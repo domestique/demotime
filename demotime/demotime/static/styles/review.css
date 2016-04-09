@@ -10,18 +10,21 @@
     color:#aaa;
     background:#335166;
     color:#fff;
-    padding:.75em;
-    border-radius:30px 0 30px;
+    padding:25px;
+    border-radius: 15px 15px 0 0;
     box-shadow:4px 4px 0 #ccc;
-    padding-top: 30px;
+    padding-top: 40px;
     padding-bottom: 30px;
 }
 h1 .alert {
     position: absolute;
-    top: -2px;
-    right: 10px;
+    top: 0;
+    right: 0;
     font-size: 10px;
-    color: #EFEFEF;
+    color: #333;
+    background: #F9FAE4;
+    padding: 0 10px;
+    border-radius: 0 13px 0 0;
 }
 .review ul br,
 .review ol br {
