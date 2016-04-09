@@ -16,7 +16,7 @@
         <script src="/static/scripts/library/jquery-2.1.3.min.js"></script>
 
         {# Web fonts #}
-        <link href='//fonts.googleapis.com/css?family=Roboto:400,700,300,900' rel='stylesheet' type='text/css'>
+        <!--link href='//fonts.googleapis.com/css?family=Roboto:400,700,300,900' rel='stylesheet' type='text/css'-->
 
         {# Fontello #}
         <link rel="stylesheet" href="/static/fonts/css/fontello.css">
@@ -139,6 +139,7 @@
         <script> var DemoTime = [] </script>
         <script src="/static/scripts/ScrollToLink.js"></script>
         <script src="/static/scripts/Reviewers.js"></script>
+        <script src="/static/scripts/Info.js"></script>
         <script src="/static/scripts/BackgroundTasks.js"></script>
 
         {% block footer_scripts %}
@@ -157,10 +158,41 @@
             var BackgroundTasks = new DemoTime.BackgroundTasks({
                 messages_url: '{% url "messages-json" %}'
             });
+            var info = new DemoTime.Info({
+                review_url: '{% url 'reviews-json' %}'
+            });
         {% endif %}
         </script>
     </body>
     <div id="patterns" style="display: none">
+        <script type="text/x-pattern" id="review_info">
+        <article class="review_info">
+            <section>
+                <strong class="title">DT-<%= review.pk %>: <%= review.title %></strong>
+                <p>Created by <strong><%= review.creator %></strong>
+                <p>Reviewer State:
+                    <% if (review.reviewer_state == "approved") { %>
+                    <strong class="icon-<%= review.reviewer_state %>"><%= review.reviewer_state %></strong>
+                    <% } else { %>
+                        <strong><%= review.reviewer_state %></strong>
+                    <% } %>
+                </p>
+                <p>Demo State: <strong><%= review.state %></strong>
+                <ul>
+                    <% _.each(review.reviewers, function(reviewer) { %>
+                        <li>
+                            <span class="icon icon-<%= reviewer.reviewer_status %>">
+                                <%= reviewer.name %>
+                                <small>
+                                    <%= reviewer.reviewer_status %>
+                                </small>
+                            </span>
+                        </li>
+                    <% }) %>
+                </ul>
+            </section>
+        </article>
+        </script>
         {% block patterns %}{% endblock %}
     </div>
 </html>

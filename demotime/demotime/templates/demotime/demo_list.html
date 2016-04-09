@@ -54,7 +54,7 @@
             {% if object_list %}
                 {% for obj in object_list %}
                     <li>
-                        DT-{{ obj.pk }}: <a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a> <span class="icon icon-{{ obj.state }}"></span>
+                        DT-{{ obj.pk }}: <a data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">{{ obj.title }}</a> <span class="icon icon-{{ obj.state }}"></span>
                         <small>(Created by <a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a>)</small>
                     </li>
                 {% endfor %}

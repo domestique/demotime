@@ -14,9 +14,8 @@
                     <li {% if demo.read == True %}class="de-emphasize"{% endif %}>
                         <span>
                             DT-{{ demo.review.pk }}:
-                            <a href="{{ demo.review.get_absolute_url }}"
-                                title="{% for reviewer in demo.review.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">
-                                    {{ demo.review.title }}
+                            <a data-pk="{{ demo.review.pk }}" href="{{ demo.review.get_absolute_url }}">
+                                {{ demo.review.title }}
                             </a>
                         </span>
                         <small>

@@ -210,8 +210,6 @@ article > section {
 }
 
 article {
-    background: rgba(67, 177, 138, .2);
-    padding: 20px;
     margin: 40px 0;
 }
 .review img {
