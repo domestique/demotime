@@ -33,6 +33,13 @@ a.button-link.confirm {
 .attachment h4:first-child {
     margin-top:0;
 }
+.attachment-description {
+    background: #eee;
+    padding: 5px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    line-height: 22px;
+}
 .attachment-card {
     margin:10px;
 }

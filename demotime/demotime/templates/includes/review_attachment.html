@@ -2,10 +2,8 @@
     <section>
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
-            {% if attachment.description %}
-                <span class="tooltip alert" title="Reviewer note: {{ attachment.description }}"></span>
-            {% endif %}
         </h3>
+        <div class="attachment-description">{{ attachment.description }}</div>
         {% if attachment.attachment_type == "audio" %}
             <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name|urlencode }}" controls="true">
         {% endif %}
