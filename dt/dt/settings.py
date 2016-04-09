@@ -108,6 +108,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'demotime.context_processors.has_unread_messages',
                 'demotime.context_processors.unread_message_count',
+                'demotime.context_processors.site_settings',
             ],
         },
     },

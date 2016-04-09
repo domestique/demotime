@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from demotime import models
 
 
@@ -25,3 +27,7 @@ def has_unread_messages(request):
         }
     else:
         return {'has_unread_messages': False}
+
+
+def site_settings(request):
+    return {'site_settings': settings}
