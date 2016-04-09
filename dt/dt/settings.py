@@ -155,13 +155,14 @@ SUMMERNOTE_CONFIG = {
 
     # Change editor size
     'width': '100%',
-    'height': '480',
+    'height': '420',
 
     # Customize toolbar buttons
     'toolbar': [
-        ['style', ['style']],
-        ['style', ['bold', 'italic', 'underline', 'clear']],
-        ['para', ['ul', 'ol', 'height']],
+        ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
+        ['para', ['ul', 'ol']],
+        ['misc', ['undo', 'redo', 'codeview']],
+        ['insert', ['link', 'table']]
     ],
 }
 

@@ -65,11 +65,7 @@ $('.review form').submit(function(e) {
     }
 });
 
-// Attach 'markdown supported' links after wysiwyg boxes
-setTimeout(function() {
-    $('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
-}, 1);
-$('textarea, .review input').keyup(function() {
+$('.review input:not(#find_reviewer)').keyup(function() {
     window.onbeforeunload = function(e) {
         return 'You have unsaved changes. Exit DemoTime?.';
     };
