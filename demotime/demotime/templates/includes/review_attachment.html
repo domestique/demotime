@@ -1,4 +1,4 @@
-<div class="attachment-card {{ attachment.attachment_type }} collapseable">
+<div class="attachment-card {{ attachment.attachment_type }} {% if attachment.description %}taller{% endif %} collapseable">
     <section>
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
