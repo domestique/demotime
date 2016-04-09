@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load django_markdown %}
 
 {% block styles %}
 {{ block.super }}
@@ -35,7 +34,6 @@ a.error {
             <div class="form-group">
                 <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
                 {{ review_form.description }}
-                {% markdown_media %}
                 {{ review_form.description.errors }}
             </div>
             <div class="attachments">

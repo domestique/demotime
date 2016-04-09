@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from django_markdown.widgets import MarkdownWidget
+from django_summernote.widgets import SummernoteWidget
 
 from demotime import models
 
@@ -9,7 +9,7 @@ from demotime import models
 class ReviewForm(forms.ModelForm):
 
     description = forms.CharField(
-        widget=MarkdownWidget(),
+        widget=SummernoteWidget(),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -123,7 +123,7 @@ class CommentForm(forms.ModelForm):
         required=False
     )
     comment = forms.CharField(
-        widget=MarkdownWidget()
+        widget=SummernoteWidget()
     )
 
     def __init__(self, thread=None, *args, **kwargs):
@@ -200,7 +200,7 @@ class ReviewStateForm(forms.Form):
 
 class UserProfileForm(forms.ModelForm):
 
-    bio = forms.CharField(required=False, widget=MarkdownWidget())
+    bio = forms.CharField(required=False, widget=SummernoteWidget())
     email = forms.EmailField()
     password_one = forms.CharField(
         required=False,
