@@ -39,7 +39,8 @@ DemoTime.Info = Backbone.View.extend({
                     content: template,
                     contentAsHTML: true,
                     interactive: true,
-                    delay: 200,
+                    delay: 500,
+                    animation: 'grow',
                     onlyOne: true,
                     minWidth: 500
                 });
