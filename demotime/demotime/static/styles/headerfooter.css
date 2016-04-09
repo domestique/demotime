@@ -54,6 +54,9 @@ body.bookmarklet h1 {
         margin-left:2px;
     }
 }
+.navbar-nav small a {
+    color: #25C59E;
+}
 .navbar ul {
     list-style:none;
     margin:0;

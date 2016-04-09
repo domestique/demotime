@@ -58,13 +58,14 @@
                                     {% url 'profile' request.user.userprofile.pk as profile_url %}
                                     {% if request.user.is_authenticated %}
                                         <li class="icon icon-user" {% if request.path == profile_url %}active{% else %}{% endif %}>
-                                        <a href="{{ request.user.userprofile.get_absolute_url }}" style="text-decoration:underline">
-                                            {% if request.user.userprofile.display_name %}
-                                                {{ request.user.userprofile.display_name }}
-                                            {% else %}
-                                                {{ request.user.username }}
-                                            {% endif %}
-                                        </a>
+                                            <a href="{{ request.user.userprofile.get_absolute_url }}">
+                                                {% if request.user.userprofile.display_name %}
+                                                    {{ request.user.userprofile.display_name }}
+                                                {% else %}
+                                                    {{ request.user.username }}
+                                                {% endif %}
+                                            </a>
+                                            <small>(<a href="{% url 'edit-profile' request.user.pk %}">edit</a>)</small>
                                         </li>
                                         <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
                                         <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Log out</a></li>
