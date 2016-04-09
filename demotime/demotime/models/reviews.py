@@ -8,6 +8,7 @@ from .base import BaseModel
 from .messages import Message
 from .users import UserReviewStatus
 from .reminders import Reminder
+from .followers import Follower
 
 REVIEWING = 'reviewing'
 REJECTED = 'rejected'
@@ -77,10 +78,27 @@ class Review(BaseModel):
                 revision=self.revision,
             )
 
+        for follower in self.followers.all():
+            context = {
+                'receipient': follower,
+                'url': self.get_absolute_url(),
+                'update': update,
+                'title': self.title,
+                'is_follower': True,
+            }
+            Message.send_system_message(
+                title,
+                'demotime/messages/review.html',
+                context,
+                reviewer,
+                revision=self.revision,
+            )
+
     @classmethod
     def create_review(
             cls, creator, title, description,
-            case_link, reviewers, attachments=None):
+            case_link, reviewers, followers=None,
+            attachments=None):
         ''' Standard review creation method '''
         obj = cls.objects.create(
             creator=creator,
@@ -108,6 +126,9 @@ class Review(BaseModel):
                 obj, reviewer
             )
 
+        for follower in followers:
+            Follower.create_follower(obj, follower)
+
         # Creator UserReviewStatus, set read to True, cuz they just created it
         # so I'm assuming they read it
         UserReviewStatus.create_user_review_status(
@@ -125,7 +146,9 @@ class Review(BaseModel):
     @classmethod
     def update_review(
             cls, review, creator, title, description,
-            case_link, reviewers, attachments=None):
+            case_link, reviewers, followers=None,
+            attachments=None
+            ):
         ''' Standard update review method '''
         obj = cls.objects.get(pk=review)
         obj.title = title
@@ -158,6 +181,12 @@ class Review(BaseModel):
                 Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
                 Reviewer.create_reviewer(obj, reviewer)
+
+        for follower in followers:
+            try:
+                Follower.objects.get(review=obj, user=follower)
+            except Follower.DoesNotExist:
+                Follower.create_follower(review=obj, user=follower)
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
