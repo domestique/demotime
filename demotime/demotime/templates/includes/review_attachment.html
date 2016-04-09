@@ -3,7 +3,9 @@
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}:
         </h3>
-        <div class="attachment-description">{{ attachment.description }}</div>
+        {% if attachment.description %}
+            <div class="attachment-description">{{ attachment.description }}</div>
+        {% endif %}
         {% if attachment.attachment_type == "audio" %}
             <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name|urlencode }}" controls="true">
         {% endif %}
