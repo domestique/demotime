@@ -56,3 +56,25 @@ section.demos {
     margin-left: 5px;
     font-size: 11px;
 }
+
+.quickfind-results {
+    display: none;
+}
+.reviews-list .quickfind-results section li {
+    color: #999;
+}
+.quickfind-results section {
+    min-height: 0;
+}
+.quickfind-results strong {
+    display: block;
+    background: #ddd;
+    color: #555;
+    padding: 5px;
+}
+.quickfind-users {
+    margin-bottom: 15px;
+}
+.reviews-list .quickfind a {
+    color: #222;
+}
