@@ -14,15 +14,14 @@
 
 <div class="reviews-list">
 
-    <div class="quickfind split~680 by:2 with-gap:3">
-        <div class="cel">
-            <form action="{% url 'review-list' %}#results" method="get">
-                <input class="form-control" id="id_title" name="title" type="text" placeholder="Quickly find a demo by keyword  ex. Params [enter]">
-            </form>
-        </div>
-        <div class="cel">
-            <input type="text" id="find_reviewer" placeholder="Quickly find a user" maxlength="3">
-        </div>
+    <div class="quickfind">
+        <form action="{% url 'review-list' %}#results" method="get">
+            <input type="text" id="id_title" name="title" placeholder="Quickly find a demo or user">
+            <div class="quickfind-results"><section>
+                <div class="quickfind-reviews"></div>
+                <div class="quickfind-users"></div>
+            </section></div>
+        </form>
     </div>
 
     <div class="split~680 by:2 with-gap:3">
@@ -43,20 +42,39 @@
 
 {% block patterns %}
 {{ block.super }}
-<script type="text/x-pattern" id="new_reviewers">
+<script type="text/x-pattern" id="reviewer_results">
+<strong>Users</strong>
 <ul>
-<% _.each(person, function(person) { %>
-    <li><a href="/accounts/profile/<%= person.pk %>"><%= person.name %></a></li>
-<% }) %>
+<% if (user.length) { %>
+    <% _.each(user, function(user) { %>
+        <li><a href="/accounts/profile/<%= user.pk %>"><%= user.name %></a></li>
+    <% }) %>
+<% } else { %>
+    <li>No matching users found</li>
+<% } %>
+</ul>
+</script>
+<script type="text/x-pattern" id="review_results">
+<strong>Demos</strong>
+<ul>
+<% if (reviews.length) { %>
+    <% _.each(reviews, function(review) { %>
+        <li><a href="<%= review.url %>"><%= review.title %></a>, by <%= review.creator %></li>
+    <% }) %>
+<% } else { %>
+    <li>No matching reviews found</li>
+<% } %>
 </ul>
 </script>
 {% endblock %}
 
 {% block footer_scripts %}
+<script src="/static/scripts/Search.js"></script>
 {{ block.super }}
 <script>
-var ModifyReviewers = new DemoTime.Reviewers({
-    finder_url: '{% url 'reviewer-finder' %}'
+var search = new DemoTime.Search({
+    review_url: '{% url 'reviews-json' %}',
+    reviewer_url: '{% url 'reviewer-finder' %}'
 });
 </script>
 {% endblock %}

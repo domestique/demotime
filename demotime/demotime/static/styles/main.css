@@ -44,6 +44,13 @@ h3 {
     color:#555;
 }
 
+
+article {
+    background: rgba(67, 177, 138, .2);
+    padding: 20px;
+    margin: 40px 0;
+}
+
 section {
     background:#fafafa;
     margin-top:.75em;
@@ -92,7 +99,7 @@ section section {
 }
 
 p, li {
-    line-height:1.8em;
+    line-height: 23px;
 }
 
 .content h1 {

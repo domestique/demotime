@@ -69,10 +69,10 @@
                         <span class="tooltip" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
                     </h4>
                     {% if object.reviewer_state == "Approved" %}
-                    <span class="icon-{{ object.reviewer_state }}">
-                    {% endif %}
+                        <span class="icon-{{ object.reviewer_state }}">{{ object.reviewer_state|capfirst }}</span>
+                    {% else %}
                         {{ object.reviewer_state|capfirst }}
-                    </span>
+                    {% endif %}
                     <br><br>
                 {% endif %}
                 <h4 class="heading">

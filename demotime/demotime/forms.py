@@ -75,6 +75,11 @@ class ReviewFilterForm(forms.Form):
         required=False,
         choices=SORT_OPTIONS,
     )
+    pk = forms.IntegerField(
+        label='',
+        required=False,
+        widget=forms.HiddenInput
+    )
 
     def __init__(self, *args, **kwargs):
         super(ReviewFilterForm, self).__init__(*args, **kwargs)
@@ -111,6 +116,9 @@ class ReviewFilterForm(forms.Form):
                 qs = qs.order_by('-modified')
             elif sorting == 'oldest':
                 qs = qs.order_by('modified')
+
+        if data.get('pk'):
+            qs = qs.filter(pk=data['pk'])
 
         return qs.distinct()
 

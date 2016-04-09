@@ -21,9 +21,8 @@
                 <li>
                     <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}" title="Your approval status">
                         DT-{{ demo.pk }}:
-                        <a href="{{ demo.get_absolute_url }}"
-                            title="{% for reviewer in demo.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">
-                                {{ demo.title }}
+                        <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
+                            {{ demo.title|truncatechars:48 }}
                         </a>
                     </span>
                 </li>

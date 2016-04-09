@@ -38,7 +38,7 @@
                                     <a title="Your approval status" class="dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                                 {% endif %}
                             {% endif %}
-                            <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
+                            <a data-pk="{{ message.review.pk }}" class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
                         </div>
                         <div class="cel">
                             {{ message.created }}
