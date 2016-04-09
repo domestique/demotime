@@ -141,7 +141,7 @@ SERVER_URL = os.environ.get('DT_URL', 'localhost:8000')
 # SUMMERNOTE CONFIG
 SUMMERNOTE_CONFIG = {
     # Using SummernoteWidget - iframe mode
-    'iframe': True,  # or set False to use SummernoteInplaceWidget - no iframe mode
+    'iframe': False,  # or set False to use SummernoteInplaceWidget - no iframe mode
 
     # Using Summernote Air-mode
     'airMode': False,
@@ -155,7 +155,7 @@ SUMMERNOTE_CONFIG = {
 
     # Change editor size
     'width': '100%',
-    'height': '280',
+    'height': '250',
 
     # Customize toolbar buttons
     'toolbar': [
