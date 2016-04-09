@@ -41,7 +41,7 @@ INSTALLED_APPS = (
     # Third Party Libs
     'macros',
     'registration',
-    'django_markdown',
+    'django_summernote',
 )
 
 try:
@@ -138,14 +138,33 @@ ACCOUNT_ACTIVATION_DAYS = 7
 # SERVER SETTINGS
 SERVER_URL = os.environ.get('DT_URL', 'localhost:8000')
 
-# MARKDOWN SETTINGS
-MARKDOWN_EDITOR_SKIN = 'simple'
-MARKDOWN_EXTENSIONS = 'extra', 'codehilite'
-MARKDOWN_EXTENSION_CONFIGS = {
-    'codehilite': {
-        'linenums': False,
-    }
+# SUMMERNOTE CONFIG
+SUMMERNOTE_CONFIG = {
+    # Using SummernoteWidget - iframe mode
+    'iframe': True,  # or set False to use SummernoteInplaceWidget - no iframe mode
+
+    # Using Summernote Air-mode
+    'airMode': False,
+
+    # Use native HTML tags (`<b>`, `<i>`, ...) instead of style attributes
+    # (Firefox, Chrome only)
+    'styleWithTags': True,
+
+    # Set text direction : 'left to right' is default.
+    'direction': 'ltr',
+
+    # Change editor size
+    'width': '100%',
+    'height': '480',
+
+    # Customize toolbar buttons
+    'toolbar': [
+        ['style', ['style']],
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['para', ['ul', 'ol', 'height']],
+    ],
 }
+
 SITE_ID = 1
 
 # DemoTime Specific Settings

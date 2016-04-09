@@ -5,7 +5,7 @@ from django.conf.urls import include, url
 
 from demotime import urls as demotime_urls
 from registration.backends.default import urls as registration_urls
-from django_markdown import urls as django_markdown_urls
+from django_summernote import urls as summernote_urls
 
 admin.autodiscover()
 
@@ -14,7 +14,7 @@ urlpatterns = [
     url('', include(demotime_urls)),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(registration_urls)),
-    url('^markdown/', include(django_markdown_urls)),
+    url(r'^summernote/', include(summernote_urls)),
 ]
 
 if not settings.DT_PROD:

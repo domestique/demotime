@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load macros django_markdown %}
+{% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
 {% block styles %}
@@ -137,13 +137,13 @@
         <article class="review-overview collapser_parent">
             <h3 class="icon icon-lightbulb collapser">Review Overview</h3>
             <section class="collapseable">
-                <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
+                <p>{{ object.description|safe|linebreaksbr }}</p>
 
                 {% if revision.description and object.reviewrevision_set.all.count > 1 %}
                     <div class="latest-revision-note">
                         <h3 class="heading">{% if revision.is_max_revision %}Latest Revision Note{% else %}Revision {{ revision.number }} Note{% endif %}</h3>
                         <section>
-                            <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
+                            <p>{{ revision.description|safe|linebreaksbr }}</p>
                         </section>
                     </div>
                 {% endif %}
@@ -215,7 +215,7 @@
                                         {% endif %}
                                     </label>
                                     <blockquote class="collapseable">
-                                        <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                        <p>{{ comment.comment|safe|linebreaksbr }}</p>
                                     </blockquote>
                                     {% use_macro attachments %}
                                 {% else %}
@@ -234,7 +234,7 @@
                                                 {% endif %}
                                             </div>
                                             <div class="blockquote-body">
-                                                <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                                <p>{{ comment.comment|safe|linebreaksbr }}</p>
                                             </div>
                                         </blockquote>
                                         {% use_macro attachments %}
@@ -258,8 +258,6 @@
         </article>
     </div>
 </div>
-{% markdown_media %}
-{% markdown_editor "textarea" %}
 {% endblock %}
 
 {% block patterns %}

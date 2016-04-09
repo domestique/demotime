@@ -25,7 +25,6 @@ urlpatterns = [
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help'),
     url(r'^addons/$', TemplateView.as_view(template_name='addons.html'), name='addons'),
-    url(r'^markdown/$', TemplateView.as_view(template_name='markdown.html'), name='markdown'),
 ]
 
 # Reviews
