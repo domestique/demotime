@@ -26,7 +26,6 @@ DemoTime.Info = Backbone.View.extend({
             }
         });
         review_req.success(function(data) {
-            console.log(data);
             self.review = new InfoModel(data);
             if (self.review.get('reviews').length) {
                 console.log(self.review.get('reviews')[0]);
@@ -39,13 +38,16 @@ DemoTime.Info = Backbone.View.extend({
                     content: template,
                     contentAsHTML: true,
                     interactive: true,
-                    delay: 500,
                     animation: 'grow',
                     position: 'left',
                     onlyOne: true,
                     minWidth: 500
                 });
-                link.tooltipster('show');
+                setTimeout(function() {
+                    if (link.is(":hover")) {
+                        link.tooltipster('show');
+                    }
+                }, 500);
             }
         });
     },
