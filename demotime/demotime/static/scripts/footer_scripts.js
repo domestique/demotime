@@ -69,7 +69,7 @@ $('.review form').submit(function(e) {
 setTimeout(function() {
     $('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
 }, 1);
-$('textarea').keyup(function() {
+$('textarea, .review input').keyup(function() {
     window.onbeforeunload = function(e) {
         return 'You have unsaved changes. Exit DemoTime?.';
     };
