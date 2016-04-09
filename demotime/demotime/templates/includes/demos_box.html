@@ -20,12 +20,12 @@
                             {{ demo.title }}
                         </a>
                     </span>
-                    <small>
+                    <small class="{{ demo.reviewer_state }}">
                         {% if demo.state == "closed" %}
                             {{ demo.state }}
                         {% else %}
                             {% if demo.reviewer_state == "reviewing" %}
-                                Under review
+                                active
                             {% else %}
                                 {{ demo.reviewer_state }}
                             {% endif %}

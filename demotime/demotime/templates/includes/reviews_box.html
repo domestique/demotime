@@ -22,7 +22,7 @@
                     <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}" title="Your approval status">
                         DT-{{ demo.pk }}:
                         <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
-                            {{ demo.title }}
+                            {{ demo.title|truncatechars:48 }}
                         </a>
                     </span>
                 </li>

@@ -15,15 +15,15 @@
                         <span>
                             DT-{{ demo.review.pk }}:
                             <a data-pk="{{ demo.review.pk }}" href="{{ demo.review.get_absolute_url }}">
-                                {{ demo.review.title }}
+                                {{ demo.review.title|truncatechars:48 }}
                             </a>
                         </span>
-                        <small>
+                        <small class="{{ demo.review.reviewer_state }}">
                             {% if demo.review.state == "closed" %}
                                 {{ demo.review.state }}
                             {% else %}
                                 {% if demo.review.reviewer_state == "reviewing" %}
-                                    Under review
+                                    active
                                 {% else %}
                                     {{ demo.review.reviewer_state }}
                                 {% endif %}
