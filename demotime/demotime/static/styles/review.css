@@ -80,6 +80,10 @@ h1 .alert {
     display: inline-block !important;
     cursor: pointer;
 }
+.reviewers a {
+    line-height: 20px;
+    display: inline-block;
+}
 
 .manage-review {
     padding:10px 3px;
