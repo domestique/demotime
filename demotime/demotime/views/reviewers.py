@@ -58,6 +58,7 @@ class UserAPI(JsonView):
             self.status = 400
             return {
                 'follower_name': '',
+                'follower_user_pk': '',
                 'success': False,
                 'errors': {'user_pk': 'User identifier missing'}
             }
@@ -68,6 +69,7 @@ class UserAPI(JsonView):
             self.status = 400
             return {
                 'follower_name': '',
+                'follower_user_pk': '',
                 'success': False,
                 'errors': {'user_pk': 'User not found'}
             }
@@ -76,7 +78,7 @@ class UserAPI(JsonView):
             review=self.review,
             user=user
         )
-        is_reviewer = models.Reviwer.objects.filter(
+        is_reviewer = models.Reviewer.objects.filter(
             review=self.review,
             reviewer=user
         ).exists()
@@ -84,15 +86,17 @@ class UserAPI(JsonView):
             self.status = 400
             return {
                 'follower_name': '',
+                'follower_user_pk': '',
                 'success': False,
                 'errors': {'user_pk': 'User already on review'}
             }
         else:
-            follower = models.Follower.create_reviewer(
-                self.review, user, non_revision=True
+            follower = models.Follower.create_follower(
+                self.review, user, non_revision=True,
             )
             return {
                 'follower_name': follower.user.userprofile.name,
+                'follower_user_pk': follower.user.pk,
                 'success': True,
                 'errors': {},
             }
@@ -106,9 +110,13 @@ class UserAPI(JsonView):
                 success=False
             )
 
-        users = self.default_user_list.exclude(follower__review=self.review)
+        users = self.default_user_list.exclude(
+            follower__review=self.review,
+        ).exclude(
+            reviewer__review=self.review,
+        )
         if post_data.get('name'):
-            users = self._filter_users_by_name(post_data['name'])
+            users = self._filter_users_by_name(users, post_data['name'])
         return self._build_json(users, {})
 
     def _drop_follower(self, post_data):
@@ -129,10 +137,19 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User not found'}
             }
 
+        if self.request.user != self.review.creator and self.request.user != user:
+            self.status = 403
+            return {
+                'success': False,
+                'errors': {
+                    'user_pk': "Not allowed to remove others from a demo you don't own"
+                }
+            }
+
         try:
             follower = models.Follower.objects.get(
                 review=self.review,
-                reviewer=user
+                user=user
             )
         except models.Follower.DoesNotExist:
             self.status = 400
@@ -141,7 +158,6 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User not currently on review'}
             }
         else:
-            follower._send_reviewer_message(deleted=True)
             follower.delete()
             return {
                 'success': True,
@@ -153,6 +169,7 @@ class UserAPI(JsonView):
             self.status = 400
             return {
                 'reviewer_name': '',
+                'reviewer_user_pk': '',
                 'reviewer_status': '',
                 'success': False,
                 'errors': {'user_pk': 'User identifier missing'}
@@ -164,6 +181,7 @@ class UserAPI(JsonView):
             self.status = 400
             return {
                 'reviewer_name': '',
+                'reviewer_user_pk': '',
                 'reviewer_status': '',
                 'success': False,
                 'errors': {'user_pk': 'User not found'}
@@ -177,6 +195,7 @@ class UserAPI(JsonView):
             self.status = 400
             return {
                 'reviewer_name': '',
+                'reviewer_user_pk': '',
                 'reviewer_status': '',
                 'success': False,
                 'errors': {'user_pk': 'User already on review'}
@@ -187,6 +206,7 @@ class UserAPI(JsonView):
             )
             return {
                 'reviewer_name': reviewer.reviewer.userprofile.name,
+                'reviewer_user_pk': reviewer.reviewer.pk,
                 'reviewer_status': reviewer.status,
                 'success': True,
                 'errors': {},

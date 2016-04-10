@@ -20,7 +20,7 @@ class Follower(BaseModel):
         )
 
     @classmethod
-    def create_follower(cls, review, user, notify_creator=False, notify_follower=False):
+    def create_follower(cls, review, user, non_revision=False):
         existing_reviewer = review.reviewer_set.filter(reviewer=user)
         if existing_reviewer.exists():
             return existing_reviewer.get()
@@ -29,7 +29,29 @@ class Follower(BaseModel):
             review=review,
             user=user
         )
-        return user
+        if non_revision:
+            obj._send_follower_message()
+        return obj
+
+    def _send_follower_message(self):
+        title = '{} is now following {}'.format(
+            self.display_name,
+            self.review.title
+        )
+
+        context = {
+            'receipient': self.review.creator,
+            'url': self.review.get_absolute_url(),
+            'title': self.review.title,
+            'follower': self,
+        }
+        Message.send_system_message(
+            title,
+            'demotime/messages/follower.html',
+            context,
+            self.review.creator,
+            revision=self.review.revision,
+        )
 
     class Meta:
         unique_together = (

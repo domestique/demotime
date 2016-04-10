@@ -57,8 +57,6 @@ class Comment(BaseModel):
             )
 
         system_user = User.objects.get(username='demotime_sys')
-        users = list(review.review.reviewers.all())
-        users.append(review.review.creator)
         users = User.objects.filter(
             (
                 # Reviewers
@@ -68,9 +66,11 @@ class Comment(BaseModel):
                 # Creator
                 models.Q(pk=review.review.creator.pk)
             )
-        )
+        ).distinct()
         for user in users:
+            print user
             if user == commenter:
+                print "skipping {}".format(user)
                 continue
 
             UserReviewStatus.objects.filter(
