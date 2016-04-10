@@ -1,6 +1,6 @@
 // Dynamically add/remove reviewers
 DemoTime.Wysiwyg = Backbone.View.extend({
-    el: '.review',
+    el: 'body',
 
     events: {
         'click .add_emoji': 'add'
