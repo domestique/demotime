@@ -125,3 +125,42 @@ select[multiple="multiple"]:focus {
     width:100%;
     box-sizing: border-box;
 }
+
+.note-editor {
+    margin-bottom: 10px;
+}
+.note-editor button {
+    box-shadow: none;
+    border: 0 !important;
+    border-radius: 0;
+}
+.note-editor.note-frame {
+    border-color: #ddd;
+}
+.note-editor .panel-heading {
+    border-bottom: 1px solid #ddd;
+}
+.note-editor .note-btn-group {
+    margin: 0 3px;
+}
+.note-popover {
+    display: none;
+}
+.note-editable p {
+    margin: 2px 0;
+}
+
+.emoji_panel {
+    padding: 5px;
+    text-align: right;
+    background: #F5F5F5;
+}
+.emoji_panel img {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+.note-editor img {
+    max-width: 30px !important;
+    max-height: 30px !important;
+}
