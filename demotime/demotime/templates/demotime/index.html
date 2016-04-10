@@ -32,7 +32,9 @@
             {% include "includes/updates_box.html" with reviews=updated_demos user=request.user %}
         </div>
     </div>
-    {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
+    {% if open_demos %}
+        {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
+    {% endif %}
 </div>
 
 <div class="tip">

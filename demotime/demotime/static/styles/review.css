@@ -99,10 +99,6 @@ h1 .alert {
 .manage-review a {
     color:#fff;
 }
-.manage-review li.state-highlight a:before {
-    color:yellow;
-    font-weight: 800;
-}
 .main-content {
     clear: both;
 }
@@ -246,7 +242,10 @@ a[target="_blank"] {
     background: #fafafa;
     padding: 20px 25px;
     float: left;
-    margin-top: 10px;
+}
+.your-status img {
+    position: relative;
+    top: 6px;
 }
 @media screen and (max-width:680px) {
     .your-status {

@@ -3,7 +3,9 @@
 <h3 class="icon icon-calendar">
     {% if request.user.pk == user.pk %}
         Active Demos You've Created
-        <a href="{% url 'review-list' %}?creator={{ user.pk }}">(View all)</a>
+        <small>
+            <a href="{% url 'review-list' %}?creator={{ user.pk }}">View all</a>
+        </small>
     {% else %}
         Demos {{ user.userprofile }} has created
     {% endif %}

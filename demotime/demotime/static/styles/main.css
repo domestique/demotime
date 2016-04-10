@@ -127,3 +127,7 @@ p, li {
 .content a.icon:hover:before {
     text-decoration:none;
 }
+
+#patterns {
+    display: none;
+}

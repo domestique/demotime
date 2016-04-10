@@ -198,10 +198,6 @@ h3 small {
     margin-top: 30px;
 }
 
-.icon-Approved:before, .icon-approved:before { content: '\e80c'; color: #13CD04; } /* '<U+E81D>' */
-.icon-Rejected:before, .icon-rejected:before { content: '\e81e'; color: red; } /* '<U+E81E>' */
-/*span.icon-Reviewing:before { content: '\e827'; } */
-
 /* Review bubble */
 .review_info {
     margin: 0;
@@ -234,4 +230,21 @@ h3 small {
     margin: 5px 0 0;
     list-style: none;
     padding-left: 0
+}
+
+/* Custom icons */
+.icon-Approved:before, .icon-approved:before,
+.icon-Rejected:before, .icon-rejected:before {
+    display: none;
+}
+
+.icon-Approved, .icon-approved {
+    background: url(/static/images/emoji/smiley.png) 0 50% no-repeat;
+    padding-left: 20px;
+    background-size: 15px;
+}
+.icon-Rejected, .icon-rejected {
+    background: url(/static/images/emoji/frowning2.png) 0 50% no-repeat;
+    padding-left: 20px;
+    background-size: 15px;
 }

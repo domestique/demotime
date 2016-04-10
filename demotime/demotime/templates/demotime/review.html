@@ -15,11 +15,17 @@
                 {% if request.user == object.creator %}
                     <h3>Demo State: <strong>{{ object.state|capfirst }}</strong></h3>
                 {% else %}
-                    <h3>Your approval status: <strong>{{ reviewer.status|capfirst }}</strong></h3>
-                    {% if reviewer.status == 'approved' %}
-                        <canvas id="confetti" width="1" height="1"></canvas>
-                        <script type="text/javascript" src="/static/scripts/confetti.js"></script>
-                    {% endif %}
+                    <h3>
+                        Your approval status:
+                        {% if reviewer.status == 'approved' %}
+                            <canvas id="confetti" width="1" height="1"></canvas>
+                            <script type="text/javascript" src="/static/scripts/confetti.js"></script>
+                            <img src="/static/images/emoji/smiley.png" width="30" height="30">
+                        {% elif reviewer.status == 'rejected' %}
+                            <img src="/static/images/emoji/frowning2.png" width="30" height="30">
+                        {% endif %}
+                        <strong>{{ reviewer.status|capfirst }}</strong>
+                    </h3>
                 {% endif %}
             </div>
         {% endif %}
@@ -35,9 +41,9 @@
                 {% else %}
                     {% if reviewer and object.state != "closed" %}
                         {% if reviewer.status == 'approved' %}
-                            <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up-1">Unapprove demo</a></li>
+                            <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up">Unapprove demo</a></li>
                         {% else %}
-                            <li><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Approve demo</a></li>
+                            <li><a data-type="approved" href="#" class="button-link icon icon-thumbs-up">Approve demo</a></li>
                         {% endif %}
                         {% if reviewer.status == 'rejected' %}
                             <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="button-link alert icon icon-thumbs-down">Unreject demo</a></li>
