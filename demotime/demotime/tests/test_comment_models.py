@@ -31,7 +31,7 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
-            3
+            5
         )
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
@@ -65,7 +65,7 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
-            3
+            5
         )
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()

@@ -59,17 +59,27 @@ class Comment(BaseModel):
         system_user = User.objects.get(username='demotime_sys')
         users = list(review.review.reviewers.all())
         users.append(review.review.creator)
-        for reviewer in users:
-            if reviewer == commenter:
+        users = User.objects.filter(
+            (
+                # Reviewers
+                models.Q(reviewer__review=review.review) |
+                # Followers
+                models.Q(follower__review=review.review) |
+                # Creator
+                models.Q(pk=review.review.creator.pk)
+            )
+        )
+        for user in users:
+            if user == commenter:
                 continue
 
             UserReviewStatus.objects.filter(
                 review=review.review,
-                user=reviewer,
+                user=user,
             ).update(read=False)
 
             context = {
-                'receipient': reviewer,
+                'receipient': user,
                 'sender': system_user,
                 'comment': obj,
                 'url': review.get_absolute_url(),
@@ -79,7 +89,7 @@ class Comment(BaseModel):
                 'New Comment on {}'.format(review.review.title),
                 'demotime/messages/new_comment.html',
                 context,
-                reviewer,
+                user,
                 revision=review,
                 thread=thread,
             )

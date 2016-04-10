@@ -56,12 +56,12 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
-            6
+            10
         )
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
-        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(len(mail.outbox), 5)
 
     def test_reply_to_comment(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -71,7 +71,7 @@ class TestCommentViews(BaseTestCase):
         rev = self.review.revision
         self.assertStatusCode(response, 302)
         self.assertEqual(rev.commentthread_set.count(), 2)
-        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(len(mail.outbox), 5)
 
         thread = rev.commentthread_set.latest()
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
@@ -83,7 +83,7 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(rev.commentthread_set.count(), 2)
         self.assertEqual(thread.comment_set.count(), 2)
         self.assertTrue(thread.comment_set.filter(comment='Reply!').exists())
-        self.assertEqual(len(mail.outbox), 6)
+        self.assertEqual(len(mail.outbox), 10)
 
     def test_create_second_thread(self):
         response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
