@@ -138,34 +138,6 @@ ACCOUNT_ACTIVATION_DAYS = 7
 # SERVER SETTINGS
 SERVER_URL = os.environ.get('DT_URL', 'localhost:8000')
 
-# SUMMERNOTE CONFIG
-SUMMERNOTE_CONFIG = {
-    # Using SummernoteWidget - iframe mode
-    'iframe': False,  # or set False to use SummernoteInplaceWidget - no iframe mode
-
-    # Using Summernote Air-mode
-    'airMode': False,
-
-    # Use native HTML tags (`<b>`, `<i>`, ...) instead of style attributes
-    # (Firefox, Chrome only)
-    'styleWithTags': True,
-
-    # Set text direction : 'left to right' is default.
-    'direction': 'ltr',
-
-    # Change editor size
-    'width': '100%',
-    'height': '250',
-
-    # Customize toolbar buttons
-    'toolbar': [
-        ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
-        ['para', ['ul', 'ol']],
-        ['misc', ['undo', 'redo', 'codeview', 'link']],
-        ['insert', ['table']]
-    ],
-}
-
 SITE_ID = 1
 
 # DemoTime Specific Settings

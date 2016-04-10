@@ -1,5 +1,5 @@
 // Dynamically add/remove reviewers
-DemoTime.Emoji = Backbone.View.extend({
+DemoTime.Wysiwyg = Backbone.View.extend({
     el: '.review',
 
     events: {
@@ -7,6 +7,16 @@ DemoTime.Emoji = Backbone.View.extend({
     },
 
     initialize: function() {
+        $('textarea').summernote({
+            'width': '100%',
+            'height': '100',
+            toolbar: [
+                ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                ['para', ['ul', 'ol']],
+                ['misc', ['undo', 'redo', 'codeview', 'link']],
+                ['insert', ['table']]
+            ]
+        });
         this.render();
     },
 
@@ -24,6 +34,6 @@ DemoTime.Emoji = Backbone.View.extend({
 
     add: function(event) {
         var img = $(event.target);
-        $summernote.summernote('insertImage', img.attr('src'));
+        img.parents('.note-editor').prev('textarea').summernote('insertImage', img.attr('src'));
     }
 });

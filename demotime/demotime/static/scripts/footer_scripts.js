@@ -39,8 +39,7 @@ $('button').click(function() {
 // Smooth scroll to links
 var ScrollToLink = new DemoTime.ScrollToLink();
 
-// Emoji!
-var Emoji = new DemoTime.Emoji();
+var Wysiwyg = new DemoTime.Wysiwyg();
 
 // Handle review form submits (some light validation on attachments)
 $('.review form').submit(function(e) {

@@ -1,16 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from django_summernote.widgets import SummernoteInplaceWidget
-
 from demotime import models
 
 
 class ReviewForm(forms.ModelForm):
-
-    description = forms.CharField(
-        widget=SummernoteInplaceWidget(),
-    )
 
     def __init__(self, user, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
@@ -130,9 +124,6 @@ class CommentForm(forms.ModelForm):
         widget=forms.widgets.HiddenInput(),
         required=False
     )
-    comment = forms.CharField(
-        widget=SummernoteInplaceWidget()
-    )
 
     def __init__(self, thread=None, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
@@ -208,7 +199,6 @@ class ReviewStateForm(forms.Form):
 
 class UserProfileForm(forms.ModelForm):
 
-    bio = forms.CharField(required=False, widget=SummernoteInplaceWidget())
     email = forms.EmailField()
     password_one = forms.CharField(
         required=False,
