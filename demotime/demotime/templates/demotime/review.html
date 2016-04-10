@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="review">
+<div class="review" id="review">
     <div class="review-top">
         {% if reviewer and object.state != "closed" %}
             <div class="your-status">
@@ -16,6 +16,10 @@
                     <h3>Demo State: <strong>{{ object.state|capfirst }}</strong></h3>
                 {% else %}
                     <h3>Your approval status: <strong>{{ reviewer.status|capfirst }}</strong></h3>
+                    {% if reviewer.status == 'approved' %}
+                        <canvas id="confetti" width="1" height="1"></canvas>
+                        <script type="text/javascript" src="/static/scripts/confetti.js"></script>
+                    {% endif %}
                 {% endif %}
             </div>
         {% endif %}
@@ -343,6 +347,7 @@ $('[data-comment]').each(function() {
 
                 req.success(function(msg) {
                     if (msg.success) {
+                        window.location.hash = 'state_change';
                         window.location.reload();
                     }
                 });
@@ -362,6 +367,7 @@ $('[data-comment]').each(function() {
 
                     req.success(function(msg) {
                         if (msg.success) {
+                            window.location.hash = 'state_change';
                             window.location.reload();
                         }
                     });

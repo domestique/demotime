@@ -82,7 +82,7 @@ h1 .alert {
 }
 
 .manage-review {
-    padding:10px 0;
+    padding:10px 3px;
     float: right;
 }
 .manage-review ul {
@@ -100,12 +100,8 @@ h1 .alert {
     color:#fff;
 }
 .manage-review li.state-highlight a:before {
-    font-size:1.5em;
-    background:#fff;
-    color:#222;
-    position: relative;
-    top: 3px;
-    margin-right: 10px;
+    color:yellow;
+    font-weight: 800;
 }
 .main-content {
     clear: both;
@@ -248,7 +244,7 @@ a[target="_blank"] {
     box-shadow:4px 4px 0 #ccc;
     border: 1px solid #ddd;
     background: #fafafa;
-    padding: 20px;
+    padding: 20px 25px;
     float: left;
     margin-top: 10px;
 }
@@ -266,4 +262,12 @@ a[target="_blank"] {
 .your-status span {
     color: #333;
     font-weight: 900;
+}
+
+#confetti{
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
 }

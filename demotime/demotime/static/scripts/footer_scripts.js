@@ -2,7 +2,12 @@
 $('.lightboxed').fancybox();
 
 // Set focus on pageload
-$('.content input[type="text"]').first().focus();
+$('.content input[type="text"]:not(#find_reviewer)').first().focus();
+
+// Animate buttons
+$('button, .button-link, input[type="submit"]').click(function() {
+    $(this).addClass('animated pulse');
+});
 
 // Slide toggle summary boxes
 $('.summary a').click(function(event) {
