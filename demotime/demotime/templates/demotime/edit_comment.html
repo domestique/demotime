@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load django_markdown %}
 
 {% block styles %}
 {{ block.super }}
@@ -26,7 +25,6 @@
                 <input class="btn btn-primary btn-large" type="submit" value="Update reply">
             </div>
         </form>
-        {% markdown_media %}
     </section>
 {% endblock %}
 

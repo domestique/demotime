@@ -48,37 +48,39 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                 var update_obj = data.bundles[0].messages[0],
                     bundle_obj = data.bundles[0];
 
-                self.options.noty = noty({
-                    text: update_obj.message_title + ' (click to refresh)',
-                    layout: 'bottomRight',
-                    type: 'warning',
-                    animation: {
-                        open: 'animated flipInX',
-                        close: 'animated flipOutX',
-                        easing: 'swing', // easing
-                        speed: 500 // opening & closing animation speed
-                    },
-                    callback: {
-                        onCloseClick: function() {
-                            // Mark message as read on balloon click
-                            // Send request to mark message as read
-                            var req = $.ajax({
-                                url: self.options.comments_url,
-                                method: 'POST',
-                                data: {
-                                    'messages': bundle_obj.bundle_pk,
-                                    'action': 'read'
-                                }
-                            });
+                if (update_obj) {
+                    self.options.noty = noty({
+                        text: update_obj.message_title + ' (click to refresh)',
+                        layout: 'bottomRight',
+                        type: 'warning',
+                        animation: {
+                            open: 'animated flipInX',
+                            close: 'animated flipOutX',
+                            easing: 'swing', // easing
+                            speed: 500 // opening & closing animation speed
+                        },
+                        callback: {
+                            onCloseClick: function() {
+                                // Mark message as read on balloon click
+                                // Send request to mark message as read
+                                var req = $.ajax({
+                                    url: self.options.comments_url,
+                                    method: 'POST',
+                                    data: {
+                                        'messages': bundle_obj.bundle_pk,
+                                        'action': 'read'
+                                    }
+                                });
 
-                            req.success(function(data) {
-                                // Redirect the user to the comment
-                                window.location.href = window.location.origin + window.location.pathname + '#comments';
-                                window.location.reload();
-                            });
+                                req.success(function(data) {
+                                    // Redirect the user to the comment
+                                    window.location.href = window.location.origin + window.location.pathname + '#comments';
+                                    window.location.reload();
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
     }

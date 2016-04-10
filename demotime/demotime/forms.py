@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from django_markdown.widgets import MarkdownWidget
+from django_summernote.widgets import SummernoteWidget
 
 from demotime import models
 
@@ -9,7 +9,7 @@ from demotime import models
 class ReviewForm(forms.ModelForm):
 
     description = forms.CharField(
-        widget=MarkdownWidget(),
+        widget=SummernoteWidget(),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -75,6 +75,11 @@ class ReviewFilterForm(forms.Form):
         required=False,
         choices=SORT_OPTIONS,
     )
+    pk = forms.IntegerField(
+        label='',
+        required=False,
+        widget=forms.HiddenInput
+    )
 
     def __init__(self, *args, **kwargs):
         super(ReviewFilterForm, self).__init__(*args, **kwargs)
@@ -112,6 +117,9 @@ class ReviewFilterForm(forms.Form):
             elif sorting == 'oldest':
                 qs = qs.order_by('modified')
 
+        if data.get('pk'):
+            qs = qs.filter(pk=data['pk'])
+
         return qs.distinct()
 
 
@@ -123,7 +131,7 @@ class CommentForm(forms.ModelForm):
         required=False
     )
     comment = forms.CharField(
-        widget=MarkdownWidget()
+        widget=SummernoteWidget()
     )
 
     def __init__(self, thread=None, *args, **kwargs):
@@ -200,7 +208,7 @@ class ReviewStateForm(forms.Form):
 
 class UserProfileForm(forms.ModelForm):
 
-    bio = forms.CharField(required=False, widget=MarkdownWidget())
+    bio = forms.CharField(required=False, widget=SummernoteWidget())
     email = forms.EmailField()
     password_one = forms.CharField(
         required=False,

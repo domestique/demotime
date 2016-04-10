@@ -21,8 +21,6 @@
 <section>
     Power tools for power users
 </section>
-<h2>Markdown</h2>
-<p>Our textareas support Markdown, a syntax language for styling your text.  Examples of how to use Markdown <a href="{% url 'markdown' %}">are located here</a>.
 <h2>Bookmarklet</h2>
 <p>Click and drag <a class="bookmarklet" href="javascript:q%3Dlocation.href%3Bif(document.getSelection)%7Bd%3Ddocument.getSelection()%3B%7Delse%7Bd%3D%27%27%3B%7D%3Bp%3Ddocument.title%3Bvoid(open(%27http://{{ site_settings.SERVER_URL }}{% url 'create-review' %}?hide_header=true&url%3D%27%2BencodeURIComponent(q)%2B%27%26description%3D%27%2BencodeURIComponent(d)%2B%27%26title%3D%27%2BencodeURIComponent(p),%27Demotime%27,%27toolbar%3Dno,width%3D700,height%3D450%27))%3B">this bookmarklet</a> to your bookmarks bar to add a review from anywhere!</p>
 {% endblock %}

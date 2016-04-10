@@ -3,7 +3,9 @@
 <h3 class="icon icon-calendar">
     {% if request.user.pk == user.pk %}
         Active Demos You've Created
-        <a href="{% url 'review-list' %}?creator={{ user.pk }}">(View all)</a>
+        <small>
+            <a href="{% url 'review-list' %}?creator={{ user.pk }}">View all</a>
+        </small>
     {% else %}
         Demos {{ user.userprofile }} has created
     {% endif %}
@@ -16,17 +18,16 @@
                 <li>
                     <span>
                         DT-{{ demo.pk }}:
-                        <a href="{{ demo.get_absolute_url }}"
-                            title="{% for reviewer in demo.reviewer_set.all %}{{ reviewer.reviewer }}: {{ reviewer.get_status_display }}{% if not forloop.last %}, {% endif %}{% endfor %}">
-                                {{ demo.title }}
+                        <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
+                            {{ demo.title }}
                         </a>
                     </span>
-                    <small>
+                    <small class="{{ demo.reviewer_state }}">
                         {% if demo.state == "closed" %}
                             {{ demo.state }}
                         {% else %}
                             {% if demo.reviewer_state == "reviewing" %}
-                                Under review
+                                active
                             {% else %}
                                 {{ demo.reviewer_state }}
                             {% endif %}

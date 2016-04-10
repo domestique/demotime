@@ -506,6 +506,18 @@ class TestReviewViews(BaseTestCase):
             'reviews': []
         })
 
+    def test_review_json_by_pk(self):
+        response = self.client.post(reverse('reviews-json'), {
+            'pk': self.review.pk,
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        self.assertEqual(review['title'], self.review.title)
+        self.assertEqual(review['pk'], self.review.pk)
+        self.assertEqual(review['url'], self.review.get_absolute_url())
+
     def test_review_json_all_the_filters(self):
         test_user = User.objects.get(username='test_user_0')
         response = self.client.post(reverse('reviews-json'), {

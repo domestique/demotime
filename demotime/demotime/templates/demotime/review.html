@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load macros django_markdown %}
+{% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
 {% block styles %}
@@ -8,14 +8,24 @@
 {% endblock %}
 
 {% block content %}
-<div class="review">
+<div class="review" id="review">
     <div class="review-top">
         {% if reviewer and object.state != "closed" %}
             <div class="your-status">
                 {% if request.user == object.creator %}
                     <h3>Demo State: <strong>{{ object.state|capfirst }}</strong></h3>
                 {% else %}
-                    <h3>Your approval status: <strong>{{ reviewer.status|capfirst }}</strong></h3>
+                    <h3>
+                        Your approval status:
+                        {% if reviewer.status == 'approved' %}
+                            <canvas id="confetti" width="1" height="1"></canvas>
+                            <script type="text/javascript" src="/static/scripts/confetti.js"></script>
+                            <img src="/static/images/emoji/smiley.png" width="30" height="30">
+                        {% elif reviewer.status == 'rejected' %}
+                            <img src="/static/images/emoji/frowning2.png" width="30" height="30">
+                        {% endif %}
+                        <strong>{{ reviewer.status|capfirst }}</strong>
+                    </h3>
                 {% endif %}
             </div>
         {% endif %}
@@ -31,9 +41,9 @@
                 {% else %}
                     {% if reviewer and object.state != "closed" %}
                         {% if reviewer.status == 'approved' %}
-                            <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up-1">Unapprove demo</a></li>
+                            <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up">Unapprove demo</a></li>
                         {% else %}
-                            <li><a data-type="approved" href="#" class="button-link icon icon-thumbs-up-1">Approve demo</a></li>
+                            <li><a data-type="approved" href="#" class="button-link icon icon-thumbs-up">Approve demo</a></li>
                         {% endif %}
                         {% if reviewer.status == 'rejected' %}
                             <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="button-link alert icon icon-thumbs-down">Unreject demo</a></li>
@@ -48,7 +58,7 @@
 
     <div class="main-content">
         <h1 class="heading">
-            DT-{{ object.pk }}: {{ object.title }}
+            <strong>DT-{{ object.pk }}</strong>: {{ object.title }}
                 <small class="alert">
                 Viewing
                 {% if revision.is_max_revision %}
@@ -69,10 +79,10 @@
                         <span class="tooltip" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
                     </h4>
                     {% if object.reviewer_state == "Approved" %}
-                    <span class="icon-{{ object.reviewer_state }}">
-                    {% endif %}
+                        <span class="icon-{{ object.reviewer_state }}">{{ object.reviewer_state|capfirst }}</span>
+                    {% else %}
                         {{ object.reviewer_state|capfirst }}
-                    </span>
+                    {% endif %}
                     <br><br>
                 {% endif %}
                 <h4 class="heading">
@@ -137,13 +147,13 @@
         <article class="review-overview collapser_parent">
             <h3 class="icon icon-lightbulb collapser">Review Overview</h3>
             <section class="collapseable">
-                <p>{{ object.description|markdown|safe|linebreaksbr }}</p>
+                <p>{{ object.description|safe|linebreaksbr }}</p>
 
                 {% if revision.description and object.reviewrevision_set.all.count > 1 %}
                     <div class="latest-revision-note">
                         <h3 class="heading">{% if revision.is_max_revision %}Latest Revision Note{% else %}Revision {{ revision.number }} Note{% endif %}</h3>
                         <section>
-                            <p>{{ revision.description|markdown|safe|linebreaksbr }}</p>
+                            <p>{{ revision.description|safe|linebreaksbr }}</p>
                         </section>
                     </div>
                 {% endif %}
@@ -215,7 +225,7 @@
                                         {% endif %}
                                     </label>
                                     <blockquote class="collapseable">
-                                        <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                        <p>{{ comment.comment|safe|linebreaksbr }}</p>
                                     </blockquote>
                                     {% use_macro attachments %}
                                 {% else %}
@@ -234,7 +244,7 @@
                                                 {% endif %}
                                             </div>
                                             <div class="blockquote-body">
-                                                <p>{{ comment.comment|safe|markdown|linebreaksbr }}</p>
+                                                <p>{{ comment.comment|safe|linebreaksbr }}</p>
                                             </div>
                                         </blockquote>
                                         {% use_macro attachments %}
@@ -258,8 +268,6 @@
         </article>
     </div>
 </div>
-{% markdown_media %}
-{% markdown_editor "textarea" %}
 {% endblock %}
 
 {% block patterns %}
@@ -345,6 +353,7 @@ $('[data-comment]').each(function() {
 
                 req.success(function(msg) {
                     if (msg.success) {
+                        window.location.hash = 'state_change';
                         window.location.reload();
                     }
                 });
@@ -364,6 +373,7 @@ $('[data-comment]').each(function() {
 
                     req.success(function(msg) {
                         if (msg.success) {
+                            window.location.hash = 'state_change';
                             window.location.reload();
                         }
                     });

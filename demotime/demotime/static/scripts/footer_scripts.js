@@ -2,7 +2,12 @@
 $('.lightboxed').fancybox();
 
 // Set focus on pageload
-$('.content input[type="text"]').first().focus();
+$('.content input[type="text"]:not(#find_reviewer)').first().focus();
+
+// Animate buttons
+$('button, .button-link, input[type="submit"]').click(function() {
+    $(this).addClass('animated pulse');
+});
 
 // Slide toggle summary boxes
 $('.summary a').click(function(event) {
@@ -65,11 +70,7 @@ $('.review form').submit(function(e) {
     }
 });
 
-// Attach 'markdown supported' links after wysiwyg boxes
-setTimeout(function() {
-    $('.markItUpEditor').after('<div class="mdhelper"><a href="/markdown" target="_blank" class="mdhelper">Markdown supported</a></div>');
-}, 1);
-$('textarea, .review input').keyup(function() {
+$('.review input:not(#find_reviewer)').keyup(function() {
     window.onbeforeunload = function(e) {
         return 'You have unsaved changes. Exit DemoTime?.';
     };

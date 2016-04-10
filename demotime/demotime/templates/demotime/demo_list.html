@@ -34,6 +34,17 @@
         border: 1px solid #ddd;
         margin-bottom: 50px;
     }
+    table {
+        background: #fff;
+        border: 1px solid #ddd;
+    }
+    th, td {
+        font-size: 14px;
+        vertical-align: top;
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
 </style>
 {% endblock %}
 
@@ -50,17 +61,38 @@
                 <input type="submit" value="Filter Reviews">
             </form>
         </section>
-        <ul id="results">
+        <table id="results" cellspacing="0" cellpadding="0" width="100%">
             {% if object_list %}
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Demo</th>
+                        <th>Creator</th>
+                        <th>Reviewer State</th>
+                        <th>Demo State</th>
+                    </tr>
+                </thead>
                 {% for obj in object_list %}
-                    <li>
-                        DT-{{ obj.pk }}: <a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a> <span class="icon icon-{{ obj.state }}"></span>
-                        <small>(Created by <a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a>)</small>
-                    </li>
+                    <tr>
+                        <td>DT-{{ obj.pk }}</td>
+                        <td><a data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">{{ obj.title|truncatechars:65 }}</a></td>
+                        <td><a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a></td>
+                        <td>
+                            {% if obj.reviewer_state == "approved" %}
+                                <span class="icon-{{ obj.reviewer_state }}">{{ obj.reviewer_state|capfirst }}</span>
+                            {% else %}
+                                {{ obj.reviewer_state|capfirst }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ obj.state|capfirst }}
+                        </td>
+                    </tr>
                 {% endfor %}
             {% else %}
-                <li>No demos found matching your search.</li>
+                <tr><td>No demos found matching your search.</td></tr>
             {% endif %}
+        </table>
         </ul>
     </section>
 {% endblock %}
