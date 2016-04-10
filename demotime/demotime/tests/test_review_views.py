@@ -4,7 +4,6 @@ from StringIO import StringIO
 from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import models
 from demotime.tests import BaseTestCase
@@ -109,6 +108,7 @@ class TestReviewViews(BaseTestCase):
             'description': 'Test Description',
             'case_link': 'http://www.example.org',
             'reviewers': self.test_users.values_list('pk', flat=True),
+            'followers': self.followers.values_list('pk', flat=True),
             'form-TOTAL_FORMS': 4,
             'form-INITIAL_FORMS': 0,
             'form-MIN_NUM_FORMS': 0,
@@ -124,18 +124,19 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.description, 'Test Description'),
         self.assertEqual(obj.case_link, 'http://www.example.org')
         self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.followers.count(), 2)
         self.assertEqual(obj.revision.attachments.count(), 1)
         attachment = obj.revision.attachments.get()
         self.assertEqual(attachment.attachment_type, 'image')
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(
             models.Message.objects.filter(title__contains='POST').count(),
-            3
+            5
         )
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
-        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
@@ -152,6 +153,7 @@ class TestReviewViews(BaseTestCase):
             'description': 'Updated Description',
             'case_link': 'http://www.example.org/1/',
             'reviewers': self.test_users.values_list('pk', flat=True),
+            'followers': [],
             'form-TOTAL_FORMS': 4,
             'form-INITIAL_FORMS': 0,
             'form-MIN_NUM_FORMS': 0,
@@ -168,6 +170,7 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.revision.description, 'Updated Description'),
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
         self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.followers.count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 1)
         attachment = obj.revision.attachments.get()
         self.assertEqual(attachment.attachment_type, 'image')
@@ -175,12 +178,12 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.reviewrevision_set.count(), 2)
         self.assertEqual(
             models.Message.objects.filter(title__contains='Update Review POST').count(),
-            5
+            3
         )
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
-        self.assertEqual(len(mail.outbox), 5)
+        self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
@@ -517,6 +520,22 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(review['title'], self.review.title)
         self.assertEqual(review['pk'], self.review.pk)
         self.assertEqual(review['url'], self.review.get_absolute_url())
+        reviewers = json_data['reviews'][0]['reviewers']
+        followers = json_data['reviews'][0]['followers']
+        for follower in self.followers:
+            self.assertIn(
+                {'user_pk': follower.pk, 'name': follower.userprofile.name},
+                followers
+            )
+        for reviewer in self.test_users:
+            self.assertIn(
+                {
+                    'user_pk': reviewer.pk,
+                    'name': reviewer.userprofile.name,
+                    'reviewer_status': models.reviews.REVIEWING,
+                },
+                reviewers
+            )
 
     def test_review_json_all_the_filters(self):
         test_user = User.objects.get(username='test_user_0')

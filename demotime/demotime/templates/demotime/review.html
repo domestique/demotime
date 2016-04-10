@@ -124,6 +124,23 @@
                     {% endif %}
                 </ul>
             </div>
+            <div class="cel followers">
+                <h4 class="heading">Followers:</h4>
+                <ul class="list-inline">
+                    {% for follower in object.follower_set.all %}
+                        <li>
+                            <a class="icon icon-{{ reviewer.get_status_display }}"
+                               href="{{ follower.user.userprofile.get_absolute_url }}">
+                                {{ follower.user.userprofile }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if object.state != "closed" %}
+                        <li>
+                            <input type="text" id="find_reviewer" placeholder="add follower" maxlength="3">
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
             <div class="cel">
                 <h4 class="heading">
                     Demo Revisions:

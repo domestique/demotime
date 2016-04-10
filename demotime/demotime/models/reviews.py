@@ -39,6 +39,11 @@ class Review(BaseModel):
         related_name='reviewers',
         through='Reviewer'
     )
+    followers = models.ManyToManyField(
+        'auth.User',
+        related_name='followers',
+        through='Follower'
+    )
     title = models.CharField(max_length=1024)
     description = models.TextField()
     case_link = models.CharField('Case URL', max_length=2048, blank=True)
@@ -196,6 +201,7 @@ class Review(BaseModel):
 
         # Drop Reviewers no longer assigned
         obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers).delete()
+        obj.follower_set.exclude(review=obj, user__in=followers).delete()
 
         # Messages
         obj._send_revision_messages()

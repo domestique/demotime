@@ -3,7 +3,7 @@ Hello {{ receipient }},<br>
 {{ comment.commenter|capfirst }} has added a comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>:<br>
 <br>
 ----------<br>
-{{ comment.comment }}<br>
+{{ comment.comment|safe }}<br>
 ----------<br>
 <br>
 - {{ sender }}

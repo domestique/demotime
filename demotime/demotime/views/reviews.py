@@ -117,7 +117,6 @@ class CreateReviewView(TemplateView):
             data = self.review_form.cleaned_data
             data['creator'] = request.user
             data['attachments'] = []
-            data['followers'] = [] # TODO - Add to forms
             for form in self.attachment_forms.forms:
                 if form.cleaned_data:
                     data['attachments'].append({
@@ -356,12 +355,19 @@ class ReviewJsonView(JsonView):
                     'reviewer_state': review.reviewer_state,
                     'pk': review.pk,
                     'reviewers': [],
+                    'followers': [],
                 }
                 for reviewer in review.reviewer_set.all():
                     review_dict['reviewers'].append({
                         'name': reviewer.reviewer.userprofile.name,
                         'user_pk': reviewer.reviewer.pk,
                         'reviewer_status': reviewer.status,
+                    })
+
+                for follower in review.follower_set.all():
+                    review_dict['followers'].append({
+                        'name': follower.user.userprofile.name,
+                        'user_pk': follower.user.pk,
                     })
 
                 review_json_dict['reviews'].append(review_dict)

@@ -52,6 +52,11 @@ a.error {
                 {{ review_form.reviewers }}
             </div>
             <div class="form-group">
+                <h3 class="icon icon-user">{{ review_form.followers.label }} <small>Hold down 'cmd' to select multiple people</small></h3>
+                {{ review_form.followers.errors }}
+                {{ review_form.followers }}
+            </div>
+            <div class="form-group">
                 <input type="submit" value="{% block button_text %}{% endblock %}">
                 <input type="button" value="Cancel" onclick="javascript: history.go(-1)">
             </div>
