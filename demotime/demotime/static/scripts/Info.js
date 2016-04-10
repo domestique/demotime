@@ -28,7 +28,6 @@ DemoTime.Info = Backbone.View.extend({
         review_req.success(function(data) {
             self.review = new InfoModel(data);
             if (self.review.get('reviews').length) {
-                console.log(self.review.get('reviews')[0]);
                 // Grab the container template
                 var html = $('#review_info').html(),
                     template = _.template(html);
