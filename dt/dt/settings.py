@@ -40,8 +40,7 @@ INSTALLED_APPS = (
     'demotime',
     # Third Party Libs
     'macros',
-    'registration',
-    'django_summernote',
+    'registration'
 )
 
 try:
