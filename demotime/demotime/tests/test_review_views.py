@@ -19,25 +19,7 @@ class TestReviewViews(BaseTestCase):
             password='testing'
         )
         # Sample review
-        self.review = models.Review.create_review(
-            creator=self.user,
-            title='Test Title',
-            description='Test Description',
-            case_link='http://example.org/',
-            reviewers=self.test_users,
-            attachments=[
-                {
-                    'attachment': File(BytesIO('test_file_1')),
-                    'attachment_type': 'image',
-                    'description': 'Testing',
-                },
-                {
-                    'attachment': File(BytesIO('test_file_2')),
-                    'attachment_type': 'image',
-                    'description': 'Testing',
-                },
-            ],
-        )
+        self.review = models.Review.create_review(**self.default_review_kwargs)
         # Reset out mail queue
         mail.outbox = []
 
@@ -193,12 +175,12 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.reviewrevision_set.count(), 2)
         self.assertEqual(
             models.Message.objects.filter(title__contains='Update Review POST').count(),
-            3
+            5
         )
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
-        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
@@ -336,9 +318,9 @@ class TestReviewViews(BaseTestCase):
         title = '"{}" has been Closed'.format(self.review.title)
         self.assertEqual(
             models.Message.objects.filter(title=title).count(),
-            3
+            5
         )
-        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(len(mail.outbox), 5)
 
     def test_update_review_state_aborted(self):
         url = reverse('update-review-state', args=[self.review.pk])
@@ -356,7 +338,7 @@ class TestReviewViews(BaseTestCase):
         title = '"{}" has been Aborted'.format(self.review.title)
         self.assertEqual(
             models.Message.objects.filter(title=title).count(),
-            3
+            5
         )
 
     def test_update_review_state_reopened(self):
@@ -377,7 +359,7 @@ class TestReviewViews(BaseTestCase):
         title = '"{}" has been Reopened'.format(self.review.title)
         self.assertEqual(
             models.Message.objects.filter(title=title).count(),
-            3
+            5
         )
 
     def test_update_review_state_invalid(self):

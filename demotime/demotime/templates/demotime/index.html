@@ -56,7 +56,7 @@
 {{ block.super }}
 <script>
 var ModifyReviewers = new DemoTime.Reviewers({
-    finder_url: '{% url 'reviewer-finder' %}'
+    finder_url: '{% url 'user-api' %}'
 });
 </script>
 {% endblock %}

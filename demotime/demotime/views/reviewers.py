@@ -8,85 +8,165 @@ from demotime import models
 from . import JsonView
 
 
-class ReviewerFinder(JsonView):
+class UserAPI(JsonView):
 
     status = 200
+    ACTIONS = (
+        'search_users', 'add_follower', 'find_follower', 'drop_follower',
+        'add_reviewer', 'find_reviewer', 'drop_reviewer'
+    )
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.review = None
-        if 'pk' in kwargs:
-            self.review = get_object_or_404(models.Review, pk=kwargs.get('pk'))
-        return super(ReviewerFinder, self).dispatch(*args, **kwargs)
+        return super(UserAPI, self).dispatch(*args, **kwargs)
 
-    def post(self, *args, **kwargs):
-        post_data = self.request.POST.copy()
-        if 'reviewer_name' not in post_data:
-            self.status = 400
-            return {
-                'reviewers': [],
-                'success': False,
-                'errors': {'reviewer_name': 'Reviewer Name missing'}
-            }
+    @property
+    def default_user_list(self):
+        sys_user = User.objects.get(username='demotime_sys')
+        return User.objects.exclude(
+            pk__in=(self.request.user.pk, sys_user.pk)
+        )
 
-        name = post_data.get('reviewer_name')
-        if self.review:
-            existing_reviewers = self.review.reviewer_set.values_list(
-                'reviewer', flat=True
-            )
-            eligible_reviewers = User.objects.exclude(
-                pk__in=existing_reviewers
-            ).exclude(
-                pk=self.review.creator.pk
-            )
-        else:
-            sys_user = User.objects.get(username='demotime_sys')
-            eligible_reviewers = User.objects.exclude(
-                pk__in=(self.request.user.pk, sys_user.pk)
-            )
+    def _build_json(self, users, errors, success=True):
+        json_dict = {
+            'errors': errors,
+            'users': [],
+            'success': success
+        }
+        for user in users:
+            json_dict['users'].append({
+                'name': user.userprofile.name,
+                'pk': user.pk
+            })
 
-        reviewers = eligible_reviewers.filter(
+        return json_dict
+
+    def _filter_users_by_name(self, users, name):
+        return users.filter(
             Q(username__icontains=name) |
             Q(userprofile__display_name__icontains=name)
         )
-        json_data = {'reviewers': [], 'success': True, 'errors': {}}
-        for reviewer in reviewers:
-            json_data['reviewers'].append({
-                'name': reviewer.userprofile.__unicode__(),
-                'pk': reviewer.pk,
-            })
-        return json_data
 
+    def _search_users(self, post_data):
+        name = post_data.get('name')
+        users = self._filter_users_by_name(self.default_user_list, name)
+        return self._build_json(users, {})
 
-class AddReviewer(JsonView):
+    def _add_follower(self, post_data):
+        if 'user_pk' not in post_data:
+            self.status = 400
+            return {
+                'follower_name': '',
+                'success': False,
+                'errors': {'user_pk': 'User identifier missing'}
+            }
 
-    status = 200
+        try:
+            user = User.objects.get(pk=post_data['user_pk'])
+        except User.DoesNotExist:
+            self.status = 400
+            return {
+                'follower_name': '',
+                'success': False,
+                'errors': {'user_pk': 'User not found'}
+            }
 
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        self.review = get_object_or_404(models.Review, pk=kwargs.get('pk'))
-        return super(AddReviewer, self).dispatch(*args, **kwargs)
+        follower = models.Follower.objects.filter(
+            review=self.review,
+            user=user
+        )
+        is_reviewer = models.Reviwer.objects.filter(
+            review=self.review,
+            reviewer=user
+        ).exists()
+        if follower.exists() or is_reviewer or self.review.creator == user:
+            self.status = 400
+            return {
+                'follower_name': '',
+                'success': False,
+                'errors': {'user_pk': 'User already on review'}
+            }
+        else:
+            follower = models.Follower.create_reviewer(
+                self.review, user, non_revision=True
+            )
+            return {
+                'follower_name': follower.user.userprofile.name,
+                'success': True,
+                'errors': {},
+            }
 
-    def post(self, *args, **kwargs):
+    def _find_follower(self, post_data):
+        if not self.review:
+            self.status = 400
+            return self._build_json(
+                users=[],
+                errors={'review': 'Find follower requires a Review PK'},
+                success=False
+            )
+
+        users = self.default_user_list.exclude(follower__review=self.review)
+        if post_data.get('name'):
+            users = self._filter_users_by_name(post_data['name'])
+        return self._build_json(users, {})
+
+    def _drop_follower(self, post_data):
         post_data = self.request.POST.copy()
-        if 'reviewer_pk' not in post_data:
+        if 'user_pk' not in post_data:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {'user_pk': 'User identifier missing'}
+            }
+
+        try:
+            user = User.objects.get(pk=post_data['user_pk'])
+        except User.DoesNotExist:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {'user_pk': 'User not found'}
+            }
+
+        try:
+            follower = models.Follower.objects.get(
+                review=self.review,
+                reviewer=user
+            )
+        except models.Follower.DoesNotExist:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {'user_pk': 'User not currently on review'}
+            }
+        else:
+            follower._send_reviewer_message(deleted=True)
+            follower.delete()
+            return {
+                'success': True,
+                'errors': {},
+            }
+
+    def _add_reviewer(self, post_data):
+        if 'user_pk' not in post_data:
             self.status = 400
             return {
                 'reviewer_name': '',
                 'reviewer_status': '',
                 'success': False,
-                'errors': {'reviewer_pk': 'Reviewer identifier missing'}
+                'errors': {'user_pk': 'User identifier missing'}
             }
 
         try:
-            user = User.objects.get(pk=post_data['reviewer_pk'])
+            user = User.objects.get(pk=post_data['user_pk'])
         except User.DoesNotExist:
             self.status = 400
             return {
                 'reviewer_name': '',
                 'reviewer_status': '',
                 'success': False,
-                'errors': {'reviewer_pk': 'User not found'}
+                'errors': {'user_pk': 'User not found'}
             }
 
         reviewer = models.Reviewer.objects.filter(
@@ -99,49 +179,58 @@ class AddReviewer(JsonView):
                 'reviewer_name': '',
                 'reviewer_status': '',
                 'success': False,
-                'errors': {'reviewer_pk': 'User already on review'}
+                'errors': {'user_pk': 'User already on review'}
             }
         else:
             reviewer = models.Reviewer.create_reviewer(
                 self.review, user, non_revision=True
             )
             return {
-                'reviewer_name': reviewer.reviewer.userprofile.__unicode__(),
+                'reviewer_name': reviewer.reviewer.userprofile.name,
                 'reviewer_status': reviewer.status,
                 'success': True,
                 'errors': {},
             }
 
+    def _find_reviewer(self, post_data):
+        if not self.review:
+            self.status = 400
+            return self._build_json(
+                users=[],
+                errors={'review': 'Find reviewer requires a Review PK'},
+                success=False
+            )
 
-class DeleteReviewer(JsonView):
+        users = self.default_user_list.exclude(reviewer__review=self.review)
+        if post_data.get('name'):
+            users = self._filter_users_by_name(users, post_data['name'])
+        return self._build_json(users, {})
 
-    status = 200
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        self.review = get_object_or_404(
-            models.Review,
-            pk=kwargs.get('pk'),
-            creator=self.request.user,
-        )
-        return super(DeleteReviewer, self).dispatch(*args, **kwargs)
-
-    def post(self, *args, **kwargs):
+    def _drop_reviewer(self, post_data):
         post_data = self.request.POST.copy()
-        if 'reviewer_pk' not in post_data:
+        if 'user_pk' not in post_data:
             self.status = 400
             return {
                 'success': False,
-                'errors': {'reviewer_pk': 'Reviewer identifier missing'}
+                'errors': {'user_pk': 'User identifier missing'}
+            }
+
+        if self.request.user != self.review.creator:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {
+                    'user_pk': "Can not remove reviewers from reviews you don't own"
+                }
             }
 
         try:
-            user = User.objects.get(pk=post_data['reviewer_pk'])
+            user = User.objects.get(pk=post_data['user_pk'])
         except User.DoesNotExist:
             self.status = 400
             return {
                 'success': False,
-                'errors': {'reviewer_pk': 'User not found'}
+                'errors': {'user_pk': 'User not found'}
             }
 
         try:
@@ -153,7 +242,7 @@ class DeleteReviewer(JsonView):
             self.status = 400
             return {
                 'success': False,
-                'errors': {'reviewer_pk': 'User not currently on review'}
+                'errors': {'user_pk': 'User not currently on review'}
             }
         else:
             reviewer._send_reviewer_message(deleted=True)
@@ -162,6 +251,20 @@ class DeleteReviewer(JsonView):
                 'success': True,
                 'errors': {},
             }
-reviewer_finder = ReviewerFinder.as_view()
-add_reviewer = AddReviewer.as_view()
-delete_reviewer = DeleteReviewer.as_view()
+
+    def post(self, *args, **kwargs):
+        post_data = self.request.POST.copy()
+        action = post_data.get('action')
+        if 'review_pk' in post_data:
+            self.review = get_object_or_404(models.Review, pk=post_data['review_pk'])
+        if action in self.ACTIONS:
+            return getattr(self, '_{}'.format(action))(post_data)
+
+        self.status = 400
+        return {
+            'errors': {'action': 'Invalid Action'},
+            'users': [],
+            'success': False
+        }
+
+user_api = UserAPI.as_view()

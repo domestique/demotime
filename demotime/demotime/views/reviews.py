@@ -117,6 +117,7 @@ class CreateReviewView(TemplateView):
             data = self.review_form.cleaned_data
             data['creator'] = request.user
             data['attachments'] = []
+            data['followers'] = [] # TODO - Add to forms
             for form in self.attachment_forms.forms:
                 if form.cleaned_data:
                     data['attachments'].append({

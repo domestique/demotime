@@ -17,13 +17,21 @@ class BaseTestCase(TestCase):
             u.email = '{}@example.com'.format(u.username)
             u.save()
 
+        for x in range(0, 2):
+            u = User.objects.create_user(username='follower_{}'.format(x))
+            u.set_password('testing')
+            u.email = '{}@example.com'.format(u.username)
+            u.save()
+
         self.test_users = User.objects.filter(username__startswith="test_user_")
+        self.followers = User.objects.filter(username__startswith='follower_')
         self.default_review_kwargs = {
             'creator': self.user,
             'title': 'Test Title',
             'description': 'Test Description',
             'case_link': 'http://example.org/',
             'reviewers': self.test_users,
+            'followers': self.followers,
             'attachments': [
                 {
                     'attachment': File(BytesIO('test_file_1')),

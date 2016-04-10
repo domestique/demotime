@@ -18,25 +18,7 @@ class TestCommentViews(BaseTestCase):
             password='testing'
         )
         # Sample review
-        self.review = models.Review.create_review(
-            creator=self.user,
-            title='Test Title',
-            description='Test Description',
-            case_link='http://example.org/',
-            reviewers=self.test_users,
-            attachments=[
-                {
-                    'attachment': File(BytesIO('test_file_1')),
-                    'attachment_type': 'image',
-                    'description': 'Testing',
-                },
-                {
-                    'attachment': File(BytesIO('test_file_2')),
-                    'attachment_type': 'image',
-                    'description': 'Testing',
-                },
-            ],
-        )
+        self.review = models.Review.create_review(**self.default_review_kwargs)
         self.comment = models.Comment.create_comment(
             commenter=self.user,
             review=self.review.revision,

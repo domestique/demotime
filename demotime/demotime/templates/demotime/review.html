@@ -397,9 +397,9 @@ $('[data-comment]').each(function() {
 {% endif %}
 
 var ModifyReviewers = new DemoTime.Reviewers({
-    finder_url: '{% url 'reviewer-finder' review.pk %}',
-    adder_url: '{% url 'add-reviewer' review.pk %}',
-    deleter_url: '{% url 'delete-reviewer' review.pk %}'
+    finder_url: '{% url 'user-api' %}',
+    adder_url: '{% url 'user-api' %}',
+    deleter_url: '{% url 'user-api' %}'
 });
 
 // set up background tasks (new messages, comments etc)

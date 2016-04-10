@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Max
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.auth.models import User
 
 from .attachments import Attachment
 from .base import BaseModel
@@ -78,9 +79,9 @@ class Review(BaseModel):
                 revision=self.revision,
             )
 
-        for follower in self.followers.all():
+        for follower in self.follower_set.all():
             context = {
-                'receipient': follower,
+                'receipient': follower.user,
                 'url': self.get_absolute_url(),
                 'update': update,
                 'title': self.title,
@@ -90,7 +91,7 @@ class Review(BaseModel):
                 title,
                 'demotime/messages/review.html',
                 context,
-                reviewer,
+                follower.user,
                 revision=self.revision,
             )
 
@@ -263,12 +264,15 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state'])
-        for reviewer in self.reviewers.all():
+        users = User.objects.filter(
+            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+        )
+        for user in users:
             Message.send_system_message(
                 '"{}" has been Reopened'.format(self.title),
                 'demotime/messages/reopened.html',
-                {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
-                reviewer,
+                {'review': self, 'previous_state': prev_state, 'reviewer': user},
+                user,
                 revision=self.revision,
             )
 
@@ -282,12 +286,15 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state'])
-        for reviewer in self.reviewers.all():
+        users = User.objects.filter(
+            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+        )
+        for user in users:
             Message.send_system_message(
                 '"{}" has been {}'.format(self.title, state.capitalize()),
                 'demotime/messages/closed.html',
-                {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
-                reviewer,
+                {'review': self, 'previous_state': prev_state, 'reviewer': user},
+                user,
                 revision=self.revision,
             )
 

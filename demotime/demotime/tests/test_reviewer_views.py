@@ -25,15 +25,16 @@ class TestReviewerViews(BaseTestCase):
         # Reset out mail queue
         mail.outbox = []
 
-    def test_reviewer_finder(self):
-        response = self.client.post(
-            reverse('reviewer-finder', kwargs={'pk': self.review.pk}),
-            {'reviewer_name': 'test_user'}
-        )
+    def test_find_reviewer_for_review(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_reviewer',
+            'name': 'test_user',
+            'review_pk': self.review.pk
+        })
         self.assertStatusCode(response, 200)
         data = json.loads(response.content)
         self.assertEqual(data, {
-            'reviewers': [{
+            'users': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.username,
             }],
@@ -41,29 +42,30 @@ class TestReviewerViews(BaseTestCase):
             'success': True,
         })
 
-    def test_reviewer_finder_no_review(self):
-        response = self.client.post(reverse('reviewer-finder'), {
-            'reviewer_name': 'test_user'
+    def test_find_user(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'search_users',
+            'name': 'test_user',
         })
         self.assertStatusCode(response, 200)
         data = json.loads(response.content)
         self.assertTrue(data['success'])
         self.assertEqual(data['errors'], {})
-        self.assertEqual(len(data['reviewers']), 3)
-        for user in data['reviewers']:
+        self.assertEqual(len(data['users']), 3)
+        for user in data['users']:
             assert 'test_user_' in user['name']
 
-    def test_reviewer_finder_display_name(self):
+    def test_find_user_display_name(self):
         self.test_user_2.userprofile.display_name = 'Tinker Tom'
         self.test_user_2.userprofile.save()
-        response = self.client.post(
-            reverse('reviewer-finder', kwargs={'pk': self.review.pk}),
-            {'reviewer_name': 'tinker'}
-        )
+        response = self.client.post(reverse('user-api',), {
+            'action': 'search_users',
+            'name': 'tinker'
+        })
         self.assertStatusCode(response, 200)
         data = json.loads(response.content)
         self.assertEqual(data, {
-            'reviewers': [{
+            'users': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.userprofile.display_name,
             }],
@@ -71,15 +73,16 @@ class TestReviewerViews(BaseTestCase):
             'success': True,
         })
 
-    def test_reviewer_finder_excludes_creator(self):
-        response = self.client.post(
-            reverse('reviewer-finder', kwargs={'pk': self.review.pk}),
-            {'reviewer_name': self.review.creator}
-        )
+    def test_find_reviewer_excludes_creator(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_reviewer',
+            'name': self.review.creator,
+            'review_pk': self.review.pk
+        })
         self.assertStatusCode(response, 200)
         data = json.loads(response.content)
         self.assertEqual(data, {
-            'reviewers': [{
+            'users': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.username,
             }],
@@ -87,26 +90,41 @@ class TestReviewerViews(BaseTestCase):
             'success': True,
         })
 
-    def test_reviewer_finder_missing_name(self):
-        response = self.client.post(
-            reverse('reviewer-finder', kwargs={'pk': self.review.pk}), {}
-        )
-        self.assertStatusCode(response, 400)
+    def test_find_reviewer_missing_name(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_reviewer',
+            'review_pk': self.review.pk
+        })
+        self.assertStatusCode(response, 200)
         data = json.loads(response.content)
+        users = User.objects.exclude(
+            reviewer__review=self.review
+        ).exclude(
+            username='demotime_sys'
+        ).exclude(
+            pk=self.review.creator.pk
+        )
+        user_list = []
+        for user in users:
+            user_list.append({
+                'pk': user.pk,
+                'name': user.userprofile.name
+            })
         self.assertEqual(data, {
-                'reviewers': [],
-                'success': False,
-                'errors': {'reviewer_name': 'Reviewer Name missing'}
+                'users': user_list,
+                'success': True,
+                'errors': {}
             }
         )
 
     def test_add_reviewer(self):
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(self.review.reviewers.count(), 2)
-        response = self.client.post(
-            reverse('add-reviewer', kwargs={'pk': self.review.pk}),
-            {'reviewer_pk': self.test_user_2.pk}
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': self.test_user_2.pk
+        })
         self.assertStatusCode(response, 200)
         data = json.loads(response.content)
         self.assertEqual(len(mail.outbox), 1)
@@ -129,72 +147,73 @@ class TestReviewerViews(BaseTestCase):
             ).exists()
         )
 
-    def test_add_reviewer_missing_reviewer(self):
-        response = self.client.post(
-            reverse('add-reviewer', kwargs={'pk': self.review.pk}), {}
-        )
+    def test_add_reviewer_missing_user_pk(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'review_pk': self.review.pk
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
                 'reviewer_name': '',
                 'reviewer_status': '',
                 'success': False,
-                'errors': {'reviewer_pk': 'Reviewer identifier missing'}
+                'errors': {'user_pk': 'User identifier missing'}
             }
         )
 
     def test_add_reviewer_already_on_review(self):
-        response = self.client.post(
-            reverse('add-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': User.objects.get(username='test_user_0').pk
-            }
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'user_pk': User.objects.get(username='test_user_0').pk,
+            'review_pk': self.review.pk,
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
                 'reviewer_name': '',
                 'reviewer_status': '',
                 'success': False,
-                'errors': {'reviewer_pk': 'User already on review'}
+                'errors': {'user_pk': 'User already on review'}
             }
         )
 
     def test_add_reviewer_not_found(self):
-        response = self.client.post(
-            reverse('add-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': 100000
-            }
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'user_pk': 100000,
+            'review_pk': self.review.pk
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
                 'reviewer_name': '',
                 'reviewer_status': '',
                 'success': False,
-                'errors': {'reviewer_pk': 'User not found'}
+                'errors': {'user_pk': 'User not found'}
             }
         )
 
     def test_add_creator_as_reviewer(self):
-        response = self.client.post(
-            reverse('add-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': self.review.creator.pk
-            }
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': self.review.creator.pk
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
                 'reviewer_name': '',
                 'reviewer_status': '',
                 'success': False,
-                'errors': {'reviewer_pk': 'User already on review'}
+                'errors': {'user_pk': 'User already on review'}
             }
         )
 
     def test_delete_reviewer(self):
         test_user_1 = User.objects.get(username='test_user_1')
         self.assertEqual(self.review.reviewers.count(), 2)
-        response = self.client.post(
-            reverse('delete-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': test_user_1.pk
-            }
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'user_pk': test_user_1.pk,
+            'review_pk': self.review.pk,
+        })
         self.assertStatusCode(response, 200)
         self.assertEqual(json.loads(response.content), {
             'success': True,
@@ -203,49 +222,50 @@ class TestReviewerViews(BaseTestCase):
         self.assertEqual(self.review.reviewers.count(), 1)
 
     def test_delete_reviewer_missing_reviewer(self):
-        response = self.client.post(
-            reverse('delete-reviewer', kwargs={'pk': self.review.pk}), {}
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'review_pk':  self.review.pk
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
             'success': False,
-            'errors': {'reviewer_pk': 'Reviewer identifier missing'}
+            'errors': {'user_pk': 'User identifier missing'}
         })
 
     def test_delete_reviewer_invalid_user(self):
-        response = self.client.post(
-            reverse('delete-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': 10000
-            }
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': 100000,
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
             'success': False,
-            'errors': {'reviewer_pk': 'User not found'}
+            'errors': {'user_pk': 'User not found'}
         })
 
     def test_delete_reviewer_not_on_review(self):
-        response = self.client.post(
-            reverse('delete-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': self.test_user_2.pk,
-            }
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': self.test_user_2.pk,
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
             'success': False,
-            'errors': {'reviewer_pk': 'User not currently on review'}
+            'errors': {'user_pk': 'User not currently on review'}
         })
 
     def test_delete_reviewer_remove_creator(self):
-        response = self.client.post(
-            reverse('delete-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': self.review.creator.pk,
-            }
-        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': self.review.creator.pk,
+        })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content), {
             'success': False,
-            'errors': {'reviewer_pk': 'User not currently on review'}
+            'errors': {'user_pk': 'User not currently on review'}
         })
 
     def test_delete_reviewer_not_owner(self):
@@ -257,10 +277,10 @@ class TestReviewerViews(BaseTestCase):
         )
         test_user_1 = User.objects.get(username='test_user_1')
         self.assertEqual(self.review.reviewers.count(), 2)
-        response = self.client.post(
-            reverse('delete-reviewer', kwargs={'pk': self.review.pk}), {
-                'reviewer_pk': test_user_1.pk
-            }
-        )
-        self.assertStatusCode(response, 404)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': test_user_1.pk,
+        })
+        self.assertStatusCode(response, 400)
         self.assertEqual(self.review.reviewers.count(), 2)

@@ -2,7 +2,6 @@ from django.db import models
 
 from .base import BaseModel
 from .messages import Message
-from .reviews import Reviewer
 
 
 class Follower(BaseModel):
@@ -22,7 +21,7 @@ class Follower(BaseModel):
 
     @classmethod
     def create_follower(cls, review, user, notify_creator=False, notify_follower=False):
-        existing_reviewer = Reviewer.objects.filter(review=review, reviewer=user)
+        existing_reviewer = review.reviewer_set.filter(reviewer=user)
         if existing_reviewer.exists():
             return existing_reviewer.get()
 
@@ -31,3 +30,8 @@ class Follower(BaseModel):
             user=user
         )
         return user
+
+    class Meta:
+        unique_together = (
+            ('review', 'user')
+        )
