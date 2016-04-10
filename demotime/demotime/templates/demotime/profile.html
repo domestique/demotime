@@ -84,7 +84,7 @@
             <label>
                 Bio:
             </label>
-            {{ object.bio }}
+            {{ object.bio|safe }}
         {% endif %}
     </section>
     {% if open_demos %}
