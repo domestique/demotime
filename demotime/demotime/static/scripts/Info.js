@@ -46,7 +46,7 @@ DemoTime.Info = Backbone.View.extend({
                     if (link.is(":hover")) {
                         link.tooltipster('show');
                     }
-                }, 500);
+                }, 1000);
             }
         });
     },
