@@ -35,10 +35,12 @@
                         <div class="cel">
                             {% if message.review %}
                                 {% if message.review.creator != request.user %}
-                                    <a title="Your approval status" class="dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                    <a data-pk="{{ message.review.pk }}" title="Your approval status" class="dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                {% else %}
+                                    <a data-pk="{{ message.review.pk }}" class="dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                                 {% endif %}
                             {% endif %}
-                            <a data-pk="{{ message.review.pk }}" class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
+                            <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
                         </div>
                         <div class="cel">
                             {{ message.created }}

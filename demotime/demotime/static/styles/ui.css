@@ -242,11 +242,11 @@ h3 small {
 
 .icon-Approved, .icon-approved {
     background: url(/static/images/emoji/smiley.png) 0 50% no-repeat;
-    padding-left: 25px;
-    background-size: 18px;
+    padding-left: 20px;
+    background-size: 16px;
 }
 .icon-Rejected, .icon-rejected {
     background: url(/static/images/emoji/frowning2.png) 0 50% no-repeat;
-    padding-left: 25px;
-    background-size: 18px;
+    padding-left: 20px;
+    background-size: 16px;
 }
