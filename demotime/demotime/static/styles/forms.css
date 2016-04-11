@@ -160,6 +160,7 @@ select[multiple="multiple"]:focus {
     height: 30px;
     cursor: pointer;
 }
+p img.emoji,
 blockquote .emoji,
 .note-editor img.emoji {
     max-width: 30px !important;
