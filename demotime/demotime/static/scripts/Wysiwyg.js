@@ -10,6 +10,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         $('textarea').summernote({
             'width': '100%',
             'height': '100',
+            shortcuts: false,
             toolbar: [
                 ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
                 ['para', ['ul', 'ol']],
