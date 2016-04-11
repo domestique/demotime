@@ -53,6 +53,21 @@ class TestReviewViews(BaseTestCase):
             review=self.review,
             user=self.user
         ).update(read=False)
+        bundle, _ = models.MessageBundle.objects.get_or_create(
+            review=self.review,
+            owner=self.user
+        )
+        bundle.read = False
+        bundle.deleted = False
+        bundle.save()
+        self.assertTrue(
+            models.MessageBundle.objects.filter(
+                review=self.review,
+                owner=self.user,
+                read=False,
+                deleted=False,
+            ).exists()
+        )
         response = self.client.get(reverse('review-detail', args=[self.review.pk]))
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
@@ -68,10 +83,34 @@ class TestReviewViews(BaseTestCase):
             user=self.user
         )
         self.assertTrue(user_review_status.read)
+        self.assertFalse(
+            models.MessageBundle.objects.filter(
+                review=self.review,
+                owner=self.user,
+                read=False,
+                deleted=False,
+            ).exists()
+        )
 
     def test_get_review_detail_as_reviewer(self):
         self.client.logout()
-        self.client.login(username='test_user_0', password='testing')
+        user = User.objects.get(username='test_user_0')
+        self.client.login(username=user.username, password='testing')
+        bundle, _ = models.MessageBundle.objects.get_or_create(
+            review=self.review,
+            owner=user
+        )
+        bundle.read = False
+        bundle.deleted = False
+        bundle.save()
+        self.assertTrue(
+            models.MessageBundle.objects.filter(
+                review=self.review,
+                owner=user,
+                read=False,
+                deleted=False,
+            ).exists()
+        )
         response = self.client.get(reverse('review-detail', args=[self.review.pk]))
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
@@ -84,6 +123,14 @@ class TestReviewViews(BaseTestCase):
             reviewer__username='test_user_0'
         ).exists())
         self.assertEqual(reviewer_form.initial['review'], self.review)
+        self.assertFalse(
+            models.MessageBundle.objects.filter(
+                review=self.review,
+                owner=self.user,
+                read=False,
+                deleted=False,
+            ).exists()
+        )
 
     def test_get_review_login_required(self):
         self.client.logout()

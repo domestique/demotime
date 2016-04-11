@@ -27,6 +27,10 @@ class ReviewDetail(DetailView):
         )
         self.attachment_form = None
         self.comment_form = None
+        models.MessageBundle.objects.filter(
+            owner=request.user,
+            review=self.revision.review
+        ).update(read=True)
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
