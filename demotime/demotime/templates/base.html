@@ -12,6 +12,12 @@
 
         <title>DemoTime {% block title %}{% endblock %}</title>
 
+        <script src="/static/scripts/library/jquery-2.1.3.min.js"></script>
+
+        {# Summernote #}
+        <link href="/static/styles/library/bootstrap_summernote.css" type="text/css" media="all" rel="stylesheet" />
+        <link href="/static/styles/library/summernotelib.css" type="text/css" media="all" rel="stylesheet" />
+
         {# Web fonts #}
         <link href='//fonts.googleapis.com/css?family=Roboto:100,200,300,400,700,300,900' rel='stylesheet' type='text/css'>
 
@@ -95,7 +101,6 @@
         </footer>
 
         {# Main librarys #}
-        <script src="/static/scripts/library/jquery-2.1.3.min.js"></script>
         <script src="/static/scripts/library/jquery.cookie.js"></script>
 
         <script>
@@ -114,6 +119,11 @@
         </script>
         <script src="/static/scripts/library/jquery.tooltipster.min.js"></script>
         <script src="/static/scripts/library/cel-0.2.0.min.js"></script>
+
+        {# Summernote #}
+        <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/static/scripts/library/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="/static/scripts/library/summernote.js"></script>
 
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
@@ -141,6 +151,7 @@
         <script src="/static/scripts/Reviewers.js"></script>
         <script src="/static/scripts/Info.js"></script>
         <script src="/static/scripts/BackgroundTasks.js"></script>
+        <script src="/static/scripts/Wysiwyg.js"></script>
 
         {% block footer_scripts %}
             <script src="/static/scripts/footer_scripts.js"></script>
@@ -165,6 +176,19 @@
         </script>
     </body>
     <div id="patterns">
+        <script type="text/x-pattern" id="emoji">
+        <div class="emoji_panel" title="Click to insert a reaction">
+            <img src="/static/images/emoji/smiley.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/grin.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/frowning2.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/astonished.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/confounded.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/cry.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/heart.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/thumbsup.png" class="add_emoji emoji">
+            <img src="/static/images/emoji/beers.png" class="add_emoji emoji">
+        </div>
+        </script>
         {% include "includes/patterns/review_info.html" %}
         {% block patterns %}{% endblock %}
     </div>

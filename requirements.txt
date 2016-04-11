@@ -8,4 +8,3 @@ django-registration-redux==1.4
 Fabric==1.10.1
 pytz==2015.2
 bdateutil==0.1
-django-summernote==0.8.3

@@ -127,4 +127,4 @@ setTimeout(function() {
     } else {
         document.getElementById("confetti").style.display = "none";
     }
-}, 50);
+}, 150);
