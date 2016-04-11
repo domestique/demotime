@@ -155,12 +155,13 @@ select[multiple="multiple"]:focus {
     text-align: right;
     background: #F5F5F5;
 }
-.emoji_panel img {
+.emoji_panel .emoji {
     width: 30px;
     height: 30px;
     cursor: pointer;
 }
-.note-editor img {
+blockquote .emoji,
+.note-editor img.emoji {
     max-width: 30px !important;
     max-height: 30px !important;
 }
