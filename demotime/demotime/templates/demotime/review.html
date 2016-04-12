@@ -112,7 +112,7 @@
                             </small>
                             {% if review.creator == request.user %}
                                 <small class="reviewer_deleter" style="display:none">
-                                    [<a data-pk="{{ reviewer.reviewer.pk }}">x</a>]
+                                    [<a data-reviewer="{{ reviewer.reviewer.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
@@ -275,7 +275,7 @@
 <script type="text/x-pattern" id="new_reviewers">
 <ul>
 <% _.each(person, function(person) { %>
-    <li><a href="#" data-pk="<%= person.pk %>" class="new_reviewer_click"><%= person.name %></a></li>
+    <li><a href="#" data-reviewer="<%= person.pk %>" class="new_reviewer_click"><%= person.name %></a></li>
 <% }) %>
 </ul>
 </script>
