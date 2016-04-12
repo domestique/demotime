@@ -143,6 +143,8 @@ SITE_ID = 1
 DT_PROD = os.environ.get('DT_PROD', '').lower() == 'true'
 DEFAULT_REMINDER_DAYS = 2
 
+SENDFILE_BACKEND = ''
+
 if DT_PROD:
     try:
         from prod_settings import *

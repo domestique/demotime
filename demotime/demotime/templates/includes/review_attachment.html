@@ -7,23 +7,23 @@
             <div class="attachment-description">{{ attachment.description }}</div>
         {% endif %}
         {% if attachment.attachment_type == "audio" %}
-            <audio src="{{ MEDIA_URL}}{{ attachment.attachment.name|urlencode }}" controls="true">
+            <audio src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true">
         {% endif %}
         {% if attachment.attachment_type == "movie" %}
-            <video src="{{ MEDIA_URL}}{{ attachment.attachment.name|urlencode }}" controls="true">
+            <video src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true">
         {% endif %}
         {% if attachment.attachment_type == "image" %}
             <span class="attachment-image">
-                <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="lightboxed">
-                    <img src="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}" class="img-thumbnail" height=300 width=300>
+                <a href="{% url "user-media" attachment.attachment.name|urlencode %}" class="lightboxed">
+                    <img src="{% url "user-media" attachment.attachment.name|urlencode %}" class="img-thumbnail" height=300 width=300>
                 </a>
             </span>
         {% endif %}
         {% if attachment.attachment_type == "document" %}
-            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}">Document: {{ attachment.pretty_name|urlencode }}</a>
+            <a href="{% url "user-media" attachment.attachment.name|urlencode %}">Document: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
         {% if attachment.attachment_type == "other" %}
-            <a href="{{ MEDIA_URL }}{{ attachment.attachment.name|urlencode }}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
+            <a href="{% url "user-media" attachment.attachment.name|urlencode %}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
     </section>
 </div>

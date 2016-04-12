@@ -11,10 +11,11 @@ from django.contrib.auth.views import (
 )
 
 from demotime.views import (
+    files,
     index_view,
+    messages,
     reviews,
     reviewers,
-    messages,
     users
 )
 
@@ -65,6 +66,11 @@ urlpatterns += [
         messages.messages_json_view,
         name='messages-json'
     ),
+]
+
+# Files
+urlpatterns += [
+    url(r'^file/(?P<file_path>.+)$', files.user_media_view, name='user-media'),
 ]
 
 # Accounts

@@ -62,7 +62,7 @@ DemoTime.Reviewers = Backbone.View.extend({
 
     add: function(event) {
         var link = $(event.target),
-            pk = link.data('pk'),
+            pk = link.data('reviewer'),
             self = this;
 
         event.preventDefault();
@@ -103,7 +103,7 @@ DemoTime.Reviewers = Backbone.View.extend({
         event.preventDefault();
         var $el = $(event.target),
             $li = $el.parents('li'),
-            pk = $el.data('pk'),
+            pk = $el.data('reviewer'),
             self = this;
 
         var req = $.ajax({

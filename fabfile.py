@@ -12,7 +12,7 @@ LOCAL_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 env.roledefs = {
     'local': ['localhost'],
-    'prod': ['analyte@izapa.analytemedia.com'],
+    'prod': [os.environ.get('DT_PROD_HOST')],
 }
 
 
