@@ -13,6 +13,7 @@ LOCAL_ROOT = os.path.dirname(os.path.realpath(__file__))
 env.roledefs = {
     'local': ['localhost'],
     'prod': ['analyte@izapa.analytemedia.com'],
+    'linode': ['demotime@45.56.64.236'],
 }
 
 
