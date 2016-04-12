@@ -143,7 +143,7 @@ SITE_ID = 1
 DT_PROD = os.environ.get('DT_PROD', '').lower() == 'true'
 DEFAULT_REMINDER_DAYS = 2
 
-SENDFILE_BACKEND = 'sendfile.backends.development'
+SENDFILE_BACKEND = ''
 
 if DT_PROD:
     try:
