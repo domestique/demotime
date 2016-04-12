@@ -25,10 +25,6 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
-        migrations.AlterModelOptions(
-            name='messagebundle',
-            options={'ordering': ['-modified']},
-        ),
         migrations.AlterUniqueTogether(
             name='follower',
             unique_together=set([('review', 'user')]),
