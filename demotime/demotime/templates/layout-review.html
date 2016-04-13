@@ -33,8 +33,8 @@ a.error {
             </div>
             <div class="form-group">
                 <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
-                {{ review_form.description }}
                 {{ review_form.description.errors }}
+                {{ review_form.description }}
             </div>
             <div class="attachments">
                 <h3 class="icon icon-attach">Attachments <small>Visually present with screenshots, screencasts, documents, etc</small></h3>
