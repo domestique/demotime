@@ -107,7 +107,8 @@ a.button-link.confirm {
     padding:1em;
 }
 .attachments label {
-    margin:0;
+    font-size: 16px;
+    margin:0 0 10px;
 }
 .attachments input[type="text"] {
     height:1.5rem;

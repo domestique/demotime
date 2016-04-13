@@ -13,48 +13,67 @@ a.error {
 .review select {
     margin-bottom:2em;
 }
+.review {
+    font-size: 12px;
+}
+.form-group.first {
+    margin-top: 0;
+}
+.attachments {
+    margin-top: 30px;
+}
+@media screen and (max-width:680px) {
+    h3 small {
+        display: block;
+        font-size: 11px;
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-    <div class="review">
-        <h1>{% block page_title %}{% endblock %}</h1>
-        <form action="" method="post" enctype="multipart/form-data" id="submit_review">
-            {% csrf_token %}
-            <div class="form-group">
-                <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>
-                {{ review_form.title.errors }}
-                {{ review_form.title }}
-            </div>
-            <div class="form-group">
-                <h3 class="icon icon-link-ext">{{ review_form.case_link.label }} <small>ex. https://someproject.tpondemand.com/entity/1234</small></h3>
-                {{ review_form.case_link.errors }}
-                {{ review_form.case_link }}
-            </div>
-            <div class="form-group">
-                <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
-                {{ review_form.description.errors }}
-                {{ review_form.description }}
-            </div>
-            <div class="attachments">
-                <h3 class="icon icon-attach">Attachments <small>Visually present with screenshots, screencasts, documents, etc</small></h3>
-                {{ attachment_forms.management_form }}
-                {% for form in attachment_forms %}
-                    <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
-                        {% include "includes/attachments_form.html" with form=form cols=4 %}
-                        {{ form.attachment.errors }}
-                    </section>
-                {% endfor %}
-            </div>
-            <div class="form-group">
-                <h3 class="icon icon-user">{{ review_form.reviewers.label }} <small>Hold down 'cmd' to select multiple people</small></h3>
-                {{ review_form.reviewers.errors }}
-                {{ review_form.reviewers }}
-            </div>
-            <div class="form-group">
-                <input type="submit" value="{% block button_text %}{% endblock %}">
-                <input type="button" value="Cancel" onclick="javascript: history.go(-1)">
-            </div>
-        </form>
-    </div>
+<h1>{% block page_title %}{% endblock %}</h1>
+<article>
+    <section>
+        <div class="review">
+            <form action="" method="post" enctype="multipart/form-data" id="submit_review">
+                {% csrf_token %}
+                <div class="form-group first">
+                    <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>
+                    {{ review_form.title.errors }}
+                    {{ review_form.title }}
+                </div>
+                <div class="form-group">
+                    <h3 class="icon icon-link-ext">{{ review_form.case_link.label }} <small>ex. https://project.tpondemand.com/entity/1234</small></h3>
+                    {{ review_form.case_link.errors }}
+                    {{ review_form.case_link }}
+                </div>
+                <div class="form-group">
+                    <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
+                    {{ review_form.description.errors }}
+                    {{ review_form.description }}
+                </div>
+                <div class="attachments">
+                    <h3 class="icon icon-attach">Attachments <small>Visually present with screenshots, screencasts, documents, etc</small></h3>
+                    {{ attachment_forms.management_form }}
+                    {% for form in attachment_forms %}
+                        <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                            {% include "includes/attachments_form.html" with form=form cols=4 %}
+                            {{ form.attachment.errors }}
+                        </section>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <h3 class="icon icon-user">{{ review_form.reviewers.label }} <small>Hold down 'cmd' to select multiple people</small></h3>
+                    {{ review_form.reviewers.errors }}
+                    {{ review_form.reviewers }}
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="{% block button_text %}{% endblock %}">
+                    <input type="button" value="Cancel" onclick="javascript: history.go(-1)">
+                </div>
+            </form>
+        </div>
+    </section>
+</article>
 {% endblock %}

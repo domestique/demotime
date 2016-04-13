@@ -19,6 +19,7 @@ $('.summary a').click(function(event) {
 $('.attachment-add').click(function(event) {
     event.preventDefault();
     $(this).parents('section').next().slideDown();
+    $(this).remove();
 });
 
 // Linkify URLs
