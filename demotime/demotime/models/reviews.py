@@ -336,6 +336,18 @@ class Review(BaseModel):
     def revision(self):
         return self.reviewrevision_set.latest()
 
+    @property
+    def reviewing_count(self):
+        return self.reviewer_set.filter(status=REVIEWING).count()
+
+    @property
+    def approved_count(self):
+        return self.reviewer_set.filter(status=APPROVED).count()
+
+    @property
+    def rejected_count(self):
+        return self.reviewer_set.filter(status=REJECTED).count()
+
 
 class Reviewer(BaseModel):
 

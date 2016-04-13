@@ -567,6 +567,9 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(review['title'], self.review.title)
         self.assertEqual(review['pk'], self.review.pk)
         self.assertEqual(review['url'], self.review.get_absolute_url())
+        self.assertEqual(review['reviewing_count'], 3)
+        self.assertEqual(review['approved_count'], 0)
+        self.assertEqual(review['rejected_count'], 0)
         reviewers = json_data['reviews'][0]['reviewers']
         followers = json_data['reviews'][0]['followers']
         for follower in self.followers:

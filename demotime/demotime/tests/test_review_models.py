@@ -370,3 +370,19 @@ class TestReviewModels(BaseTestCase):
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
         )
+
+    def test_reviewer_status_count_properties(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(review.reviewing_count, 3)
+        self.assertEqual(review.approved_count, 0)
+        self.assertEqual(review.rejected_count, 0)
+
+        review.reviewer_set.update(status=models.reviews.APPROVED)
+        self.assertEqual(review.reviewing_count, 0)
+        self.assertEqual(review.approved_count, 3)
+        self.assertEqual(review.rejected_count, 0)
+
+        review.reviewer_set.update(status=models.reviews.REJECTED)
+        self.assertEqual(review.reviewing_count, 0)
+        self.assertEqual(review.approved_count, 0)
+        self.assertEqual(review.rejected_count, 3)

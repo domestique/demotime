@@ -358,6 +358,9 @@ class ReviewJsonView(JsonView):
                     'state': review.state,
                     'reviewer_state': review.reviewer_state,
                     'pk': review.pk,
+                    'reviewing_count': review.reviewing_count,
+                    'approved_count': review.approved_count,
+                    'rejected_count': review.rejected_count,
                     'reviewers': [],
                     'followers': [],
                 }
