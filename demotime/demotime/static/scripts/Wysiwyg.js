@@ -6,7 +6,9 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         'click .add_emoji': 'add'
     },
 
-    initialize: function() {
+    initialize: function(options) {
+        this.options = options;
+
         $('textarea').summernote({
             'width': '100%',
             'height': '100',
@@ -35,7 +37,8 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
     add: function(event) {
         var img = $(event.target);
-        img.parents('.note-editor').prev('textarea').summernote('insertImage', img.attr('src'), function ($image) {
+
+        img.parents('.note-editor').prev('textarea').summernote('insertImage', this.options.dt_url + img.attr('src'), function ($image) {
             $image.addClass('emoji');
         });
     }
