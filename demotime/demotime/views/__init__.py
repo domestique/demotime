@@ -47,6 +47,10 @@ class IndexView(TemplateView):
             reviewers=self.request.user,
             state=models.reviews.OPEN,
         )
+        context['followed_demos'] = models.Review.objects.filter(
+            followers=self.request.user,
+            state=models.reviews.OPEN,
+        )
         # TODO: Figure out how to show the recently updated ones
         updated_demos = models.UserReviewStatus.objects.filter(
             user=self.request.user,

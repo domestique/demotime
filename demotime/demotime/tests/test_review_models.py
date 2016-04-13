@@ -22,9 +22,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.state, models.reviews.OPEN)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
-        self.assertEqual(statuses.count(), 4)
+        self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
-        self.assertEqual(statuses.filter(read=False).count(), 3)
+        self.assertEqual(statuses.filter(read=False).count(), 5)
         self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
@@ -74,9 +74,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(second_review.reviewer_set.count(), 3)
         self.assertEqual(second_review.follower_set.count(), 2)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
-        self.assertEqual(statuses.count(), 4)
+        self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
-        self.assertEqual(statuses.filter(read=False).count(), 3)
+        self.assertEqual(statuses.filter(read=False).count(), 5)
         self.assertEqual(len(mail.outbox), 4)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
@@ -265,7 +265,7 @@ class TestReviewModels(BaseTestCase):
                 review=obj,
                 read=False
             ).exclude(user=self.user).count(),
-            3
+            5
         )
         self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
@@ -297,7 +297,7 @@ class TestReviewModels(BaseTestCase):
                 review=obj,
                 read=False
             ).exclude(user=self.user).count(),
-            3
+            5
         )
         self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
@@ -330,7 +330,7 @@ class TestReviewModels(BaseTestCase):
                 review=obj,
                 read=False
             ).exclude(user=self.user).count(),
-            3
+            5
         )
         self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
@@ -363,7 +363,7 @@ class TestReviewModels(BaseTestCase):
                 review=obj,
                 read=False
             ).exclude(user=self.user).count(),
-            3
+            5
         )
         self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(

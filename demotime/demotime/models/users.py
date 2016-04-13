@@ -57,4 +57,7 @@ class UserReviewStatus(BaseModel):
 
     @classmethod
     def create_user_review_status(cls, review, user, read=False):
-        return cls.objects.create(review=review, user=user, read=read)
+        obj, _ = cls.objects.get_or_create(review=review, user=user)
+        obj.read = read
+        obj.save()
+        return obj

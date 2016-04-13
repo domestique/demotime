@@ -134,6 +134,9 @@ class Review(BaseModel):
 
         for follower in followers:
             Follower.create_follower(obj, follower)
+            UserReviewStatus.create_user_review_status(
+                obj, follower
+            )
 
         # Creator UserReviewStatus, set read to True, cuz they just created it
         # so I'm assuming they read it

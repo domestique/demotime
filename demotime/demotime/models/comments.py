@@ -68,9 +68,7 @@ class Comment(BaseModel):
             )
         ).distinct()
         for user in users:
-            print user
             if user == commenter:
-                print "skipping {}".format(user)
                 continue
 
             UserReviewStatus.objects.filter(

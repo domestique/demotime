@@ -23,11 +23,32 @@ class TestReviewViews(BaseTestCase):
         mail.outbox = []
 
     def test_get_index(self):
+        followed_kwargs = self.default_review_kwargs.copy()
+        followed_kwargs['creator'] = self.test_users[0]
+        followed_kwargs['reviewers'] = self.test_users.exclude(pk=self.test_users[0].pk)
+        followed_kwargs['followers'] = [self.user]
+        followed_review = models.Review.create_review(**followed_kwargs)
+
+        reviewer_kwargs = self.default_review_kwargs.copy()
+        reviewer_kwargs['creator'] = self.test_users[0]
+        reviewer_kwargs['followers'] = self.test_users.exclude(pk=self.test_users[0].pk)
+        reviewer_kwargs['reviewers'] = [self.user]
+        reviewer_review = models.Review.create_review(**reviewer_kwargs)
+
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         self.assertTemplateUsed(response, 'demotime/index.html')
-        for key in ['open_demos', 'open_reviews', 'updated_demos']:
+        for key in ['open_demos', 'open_reviews', 'updated_demos', 'followed_demos']:
             assert key in response.context
+
+        self.assertIn(followed_review, response.context['followed_demos'])
+        self.assertIn(self.review, response.context['open_demos'])
+        self.assertIn(reviewer_review, response.context['open_reviews'])
+        self.assertEqual(
+            list(response.context['updated_demos'].values_list('pk', flat=True)),
+            list(models.UserReviewStatus.objects.filter(user=self.user).values_list('pk', flat=True))
+        )
+        self.assertEqual(models.Review.objects.count(), 3)
 
     def test_get_review_detail(self):
         models.UserReviewStatus.objects.filter(
@@ -178,6 +199,13 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(
             models.Message.objects.filter(title__contains='POST').count(),
+            5
+        )
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
             5
         )
         self.assertFalse(
