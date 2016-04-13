@@ -11,7 +11,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
         $('textarea').summernote({
             'width': '100%',
-            'height': '100',
+            'height': '150',
             shortcuts: false,
             toolbar: [
                 ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
@@ -20,7 +20,25 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                 ['insert', ['table']]
             ]
         });
+
+        this.fix_tab_index();
+
         this.render();
+    },
+
+    // focus the wysiwyg when the input prior to hits TAB
+    fix_tab_index: function() {
+        var wysiwyg_form_group = this.$el.find('.note-editor').parents('.form-group'),
+            previous_input = wysiwyg_form_group.prev('.form-group').find('input');
+
+        previous_input.keydown(function(event) {
+            if (event.keyCode == 9) {
+                event.preventDefault();
+                wysiwyg_form_group.find('textarea').summernote('focus');
+                // clean up
+                wysiwyg_form_group.find('.note-editor .note-editor').remove();
+            }
+        });
     },
 
     render: function() {
