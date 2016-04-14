@@ -60,15 +60,20 @@
                                     {% url 'help' as help_url %}
                                     {% url 'profile' request.user.userprofile.pk as profile_url %}
                                     {% if request.user.is_authenticated %}
-                                        <li class="icon icon-user" {% if request.path == profile_url %}active{% else %}{% endif %}>
-                                            <a href="{{ request.user.userprofile.get_absolute_url }}">
-                                                {% if request.user.userprofile.display_name %}
+                                        <li>
+                                            {% if request.user.userprofile.display_name %}
+                                                <a href="{{ request.user.userprofile.get_absolute_url }}">
+                                                    {% if request.user.userprofile.avatar.name %}
+                                                        <img src="{% url "user-media" request.user.userprofile.avatar.name %}" width="20" height="20" class="avatar">
+                                                    {% else %}
+                                                        <img src="/static/images/no_image.jpg" width="20" height="20" class="avatar">
+                                                    {% endif %}
                                                     {{ request.user.userprofile.display_name }}
-                                                {% else %}
-                                                    {{ request.user.username }}
-                                                {% endif %}
-                                            </a>
-                                            <small>(<a href="{% url 'edit-profile' request.user.pk %}">edit</a>)</small>
+                                                </a>
+                                                <small>(<a href="{% url 'edit-profile' request.user.pk %}">edit</a>)</small>
+                                            {% else %}
+                                                <a href="{% url 'edit-profile' request.user.pk %}" class="icon icon-user">[set up your profile]</a>
+                                            {% endif %}
                                         </li>
                                         <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
                                         <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Log out</a></li>
@@ -88,11 +93,13 @@
             {% block sub_nav %}{% endblock %}
         </nav>
 
-        <div class="container content">
-            <div class="cradle">
-                {% block content %}{% endblock %}
+        <main>
+            <div class="container content">
+                <div class="cradle">
+                    {% block content %}{% endblock %}
+                </div>
             </div>
-        </div>
+        </main>
 
         <footer>
             <div class="footer container">

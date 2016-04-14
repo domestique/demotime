@@ -87,6 +87,11 @@ body.bookmarklet h1 {
     padding: 5px 10px;
 }
 
+.navbar .avatar {
+    position: relative;
+    top: 4px;
+}
+
 footer {
     margin-top:8em;
     font-size:.9em;
