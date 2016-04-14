@@ -22,6 +22,16 @@
                     </span>
                 </li>
             <% }) %>
+            <% _.each(review.followers, function(reviewer) { %>
+                <li>
+                    <span>
+                        <%= reviewer.name %>
+                        <small>
+                            following
+                        </small>
+                    </span>
+                </li>
+            <% }) %>
         </ul>
     </section>
 </article>
