@@ -98,17 +98,17 @@ DemoTime.Reviewers = Backbone.View.extend({
 
                 template = template({ person: self.person });
 
-                self.$el.find('.find_reviewer_li').before(template);
-                self.$el.find('.find_reviewer_li input').val('');
+                self.$el.find('.reviewer_ul').append(template);
             } else {
                 var html = $('#added_follower').html(),
                     template = _.template(html);
 
                 template = template({ person: self.person });
 
-                self.$el.find('.find_follower_li').before(template);
-                self.$el.find('.find_follower_li input').val('');
+                self.$el.find('.follower_ul').append(template);
             }
+
+            self.$el.find('.find_person_li input').val('');
 
         });
         req.error(function(err) {

@@ -26,7 +26,7 @@
 
     <div class="split~680 by:2 with-gap:3">
         <div class="cel">
-            {% include "includes/reviews_box.html" with reviews=open_reviews user=request.user %}
+            {% include "includes/reviews_box.html" with reviews=open_reviews follows=followed_demos user=request.user %}
         </div>
         <div class="cel">
             {% include "includes/updates_box.html" with reviews=updated_demos user=request.user %}

@@ -78,7 +78,7 @@ $('.review form').submit(function(e) {
     }
 });
 
-$('.review input:not(#find_reviewer)').keyup(function() {
+$('.review input:not(.find_person)').keyup(function() {
     window.onbeforeunload = function(e) {
         return 'You have unsaved changes. Exit DemoTime?.';
     };

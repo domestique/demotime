@@ -56,6 +56,7 @@ section.demos {
     margin-left: 3px;
     font-size: 8px;
     color: #ccc;
+    vertical-align: middle;
 }
 .reviews-list small.reviewing {
     color: #ffffe7;
