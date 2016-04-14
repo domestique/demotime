@@ -19,7 +19,9 @@
 <section class="reviews {% if not reviews %}done{% endif %}">
     {% if reviews %}
         <ul>
-            <li>Reviewing:</li>
+            {% if follows %}
+                <li>Reviewing:</li>
+            {% endif %}
             {% for demo in reviews %}
                 <li>
                     <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
