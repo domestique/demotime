@@ -44,7 +44,7 @@
 
 {% block patterns %}
 {{ block.super }}
-<script type="text/x-pattern" id="reviewer_results">
+<script type="text/x-pattern" id="user_results">
 <strong>Users</strong>
 <ul>
 <% if (user.length) { %>
@@ -75,8 +75,8 @@
 {{ block.super }}
 <script>
 var search = new DemoTime.Search({
-    review_url: '{% url 'user-api' %}',
-    reviewer_url: '{% url 'user-api' %}'
+    review_url: '{% url 'reviews-json' %}',
+    user_url: '{% url 'user-api' %}'
 });
 </script>
 {% endblock %}
