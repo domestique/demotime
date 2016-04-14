@@ -63,15 +63,28 @@ a.error {
                         </section>
                     {% endfor %}
                 </div>
-                <div class="form-group">
-                    <h3 class="icon icon-user">{{ review_form.reviewers.label }} <small>Hold down 'cmd' to select multiple people</small></h3>
-                    {{ review_form.reviewers.errors }}
-                    {{ review_form.reviewers }}
-                </div>
-                <div class="form-group">
-                    <h3 class="icon icon-user">{{ review_form.followers.label }} <small>Hold down 'cmd' to select multiple people</small></h3>
-                    {{ review_form.followers.errors }}
-                    {{ review_form.followers }}
+                <h3>
+                    Reviewers and Followers
+                    <span class="help" title="When you assign someone as a 'reviewer' they
+                    will need to either approve or reject a review. A follower can simply follow
+                    the progress of a review without the ability or need to approve or reject."></span>
+                    <small>Hold down 'cmd' to select multiple people</small>
+                </h3>
+                <div class="split~680 by:2 with-gap:3">
+                    <div class="cel">
+                        <div class="form-group">
+                            <h3 class="icon icon-user">{{ review_form.reviewers.label }}</h3>
+                            {{ review_form.reviewers.errors }}
+                            {{ review_form.reviewers }}
+                        </div>
+                    </div>
+                    <div class="cel">
+                        <div class="form-group">
+                            <h3 class="icon icon-user">{{ review_form.followers.label }}</h3>
+                            {{ review_form.followers.errors }}
+                            {{ review_form.followers }}
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="{% block button_text %}{% endblock %}">

@@ -96,6 +96,7 @@ select[multiple="multiple"]{
     border: 1px solid #eee;
     box-shadow: 4px 4px 0 #ccc;
     min-height: 300px;
+    width: 100%;
 }
 select[multiple="multiple"] option {
     color: #666;
@@ -104,11 +105,6 @@ select[multiple="multiple"] option {
 }
 select[multiple="multiple"]:focus {
     outline:none;
-}
-@media screen and (max-width:680px) {
-    select[multiple="multiple"] {
-        width: 100%;
-    }
 }
 
 .form-group {
@@ -136,6 +132,7 @@ select[multiple="multiple"]:focus {
 
 .note-editor {
     margin-bottom: 10px;
+    font-size: 16px;
 }
 .note-editor button {
     box-shadow: none;
