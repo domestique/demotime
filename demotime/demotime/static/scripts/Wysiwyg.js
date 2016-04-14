@@ -61,6 +61,8 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
         img.parents('.note-editor').prev('textarea').summernote('insertImage', self.options.dt_url + img.attr('src'), function ($image) {
             $image.addClass('emoji');
+            $image.attr('width', '30');
+            $image.attr('height', '30');
         });
     }
 });
