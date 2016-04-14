@@ -19,6 +19,7 @@ $('.summary a').click(function(event) {
 $('.attachment-add').click(function(event) {
     event.preventDefault();
     $(this).parents('section').next().slideDown();
+    $(this).remove();
 });
 
 // Linkify URLs
@@ -39,12 +40,11 @@ $('button').click(function() {
 // Smooth scroll to links
 var ScrollToLink = new DemoTime.ScrollToLink();
 
-var Wysiwyg = new DemoTime.Wysiwyg();
-
 // Handle review form submits (some light validation on attachments)
 $('.review form').submit(function(e) {
     var form = $(this),
-        proceed = true;
+        proceed = true,
+        reason = '';
 
     // Remove dialog warning
     $(window).unbind('beforeunload');
@@ -52,21 +52,27 @@ $('.review form').submit(function(e) {
 
     $('.attachment-container:visible').each(function() {
         var select = $(this).find('.attachment-type select'),
-            file = $(this).find('.attachment-file input');
+            file = $(this).find('.attachment-file input'),
+            desc = $(this).find('.attachment-desc input');
 
         if (!select.val() && file.val()) {
+            reason = 'an attachment type';
+            proceed = false;
+        }
+        if (!file.val() && desc.val()) {
+            reason = 'an attachment';
             proceed = false;
         }
     });
 
     if (!proceed) {
         e.preventDefault();
-        sweetAlert("Sorry...", "Please select an attachment type.", "error");
+        sweetAlert('Sorry...', 'One of your attachments is missing ' + reason, 'error');
     } else {
         swal ({
-            title: "Updating review",
-            text: "Just a sec...",
-            type: "success",
+            title: 'Updating review',
+            text: 'Just a sec...',
+            type: 'success',
             showConfirmButton: false
         });
     }

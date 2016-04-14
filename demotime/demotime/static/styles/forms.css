@@ -9,7 +9,7 @@ iframe {
 label {
     display:block;
     margin:1em 0 0;
-    font-size: 1em;
+    font-size:1em;
     color: #9e9e9e;
 }
 input[type=text],
@@ -105,6 +105,11 @@ select[multiple="multiple"] option {
 select[multiple="multiple"]:focus {
     outline:none;
 }
+@media screen and (max-width:680px) {
+    select[multiple="multiple"] {
+        width: 100%;
+    }
+}
 
 .form-group {
     margin-top:2em;
@@ -114,15 +119,18 @@ select[multiple="multiple"]:focus {
 }
 
 .errorlist {
-    margin:10px 0;
-    padding:0;
+    margin:3px 0 15px;
+    padding-left:28px;
+    border:2px solid red;
+    background:#fafafa url(/static/images/emoji/cry.png) 6px 6px no-repeat;
+    background-size:20px;
 }
 .errorlist li {
     list-style:none;
-    background:red;
     padding:5px;
-    color:#fff;
+    color: red;
     width:100%;
+    font-weight: 700;
     box-sizing: border-box;
 }
 
@@ -149,6 +157,12 @@ select[multiple="multiple"]:focus {
 .note-editable p {
     margin: 2px 0;
 }
+@media screen and (max-width:680px) {
+    .note-toolbar {
+        display: none;
+    }
+}
+
 
 .emoji_panel {
     padding: 5px;
