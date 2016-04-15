@@ -236,6 +236,7 @@ h3 small {
 }
 
 /* Custom icons */
+.icon-Reviewing:before, .icon-reviewing:before,
 .icon-Approved:before, .icon-approved:before,
 .icon-Rejected:before, .icon-rejected:before {
     display: none;
@@ -243,11 +244,20 @@ h3 small {
 
 .icon-Approved, .icon-approved {
     background: url(/static/images/emoji/smiley.png) 0 50% no-repeat;
-    padding-left: 20px;
-    background-size: 16px;
 }
+
+.icon-Reviewing, .icon-reviewing {
+    background: url(/static/images/emoji/clock.png) 0 50% no-repeat;
+}
+
 .icon-Rejected, .icon-rejected {
     background: url(/static/images/emoji/frowning2.png) 0 50% no-repeat;
+}
+
+.icon-Reviewing, .icon-reviewing,
+.icon-Approved, .icon-approved,
+.icon-Rejected, .icon-rejected {
     padding-left: 20px;
     background-size: 16px;
 }
+

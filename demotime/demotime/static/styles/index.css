@@ -84,3 +84,16 @@ section.demos {
 .reviews-list .quickfind a {
     color: #222;
 }
+
+.reviews-list .review_state {
+    margin-left: 2px;
+}
+.reviews-list .review_state .icon {
+    position: relative;
+    top: -2px;
+}
+.reviews-list .icon sup {
+    font-size: 9px;
+    position: relative;
+    left: -4px;
+}
