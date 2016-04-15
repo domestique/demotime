@@ -40,7 +40,7 @@ a.button-link.confirm {
     font-size: 12px;
     line-height: 22px;
 }
-.comments-reply .attachment-description {
+.comment_parent .attachment-description {
     background: #666;
 }
 .attachment-card {
