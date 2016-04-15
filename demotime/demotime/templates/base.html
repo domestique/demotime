@@ -160,13 +160,15 @@
         <script src="/static/scripts/BackgroundTasks.js"></script>
         <script src="/static/scripts/Wysiwyg.js"></script>
         <script>
-            var Wysiwyg = new DemoTime.Wysiwyg({
-                {# To make emoji in email work, use the server name outside of dev envs #}
-                {% if 'localhost' not in site_settings.SERVER_URL %}
-                    dt_url: location.protocol + '//{{ site_settings.SERVER_URL }}'
-                {% else %}
-                    dt_url: ''
-                {% endif %}
+            document.addEventListener('DOMContentLoaded', function() {
+                var Wysiwyg = new DemoTime.Wysiwyg({
+                    {# To make emoji in email work, use the server name outside of dev envs #}
+                    {% if 'localhost' not in site_settings.SERVER_URL %}
+                        dt_url: location.protocol + '//{{ site_settings.SERVER_URL }}'
+                    {% else %}
+                        dt_url: ''
+                    {% endif %}
+                });
             });
         </script>
 
