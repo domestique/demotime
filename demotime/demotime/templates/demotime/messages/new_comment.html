@@ -1,9 +1,8 @@
 Hello {{ receipient }},<br>
 <br>
-{{ comment.commenter|capfirst }} has added a comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>:<br>
+{{ comment.commenter|capfirst }} just added a new comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>:<br>
 <br>
-----------<br>
 {{ comment.comment|safe }}<br>
-----------<br>
+___<br>
 <br>
 - {{ sender }}
