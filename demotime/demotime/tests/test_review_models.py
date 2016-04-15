@@ -43,6 +43,9 @@ class TestReviewModels(BaseTestCase):
         first_rev = obj.revision
         second_review = models.Review.create_review(**second_review_kwargs)
         self.assertEqual(obj.reviewers.count(), 3)
+        approving_reviewer = obj.reviewer_set.all()[0]
+        approving_reviewer.status = models.reviews.APPROVED
+        approving_reviewer.save()
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(second_review.reviewers.count(), 3)
         self.assertEqual(len(mail.outbox), 6)
@@ -69,6 +72,8 @@ class TestReviewModels(BaseTestCase):
         self.assertTrue(new_obj.revision.is_max_revision)
         self.assertEqual(obj.reviewers.count(), 2)
         self.assertEqual(obj.reviewer_set.count(), 2)
+        for reviewer in obj.reviewer_set.all():
+            self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         self.assertEqual(second_review.reviewers.count(), 3)
         self.assertEqual(second_review.reviewer_set.count(), 3)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
