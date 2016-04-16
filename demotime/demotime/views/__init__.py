@@ -47,11 +47,16 @@ class IndexView(TemplateView):
             reviewers=self.request.user,
             state=models.reviews.OPEN,
         )
-        # TODO: Figure out how to show the recently updated ones
         updated_demos = models.UserReviewStatus.objects.filter(
             user=self.request.user,
         ).order_by('-modified')[:5]
         context['updated_demos'] = updated_demos
+
+        message_bundles = models.MessageBundle.objects.filter(
+            owner=self.request.user,
+            deleted=False,
+        ).order_by('read', '-modified')[:5]
+        context['message_bundles'] = message_bundles
         return context
 
 index_view = IndexView.as_view()

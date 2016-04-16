@@ -42,11 +42,25 @@ class TestReviewViews(BaseTestCase):
         mail.outbox = []
 
     def test_get_index(self):
+        reviewer_kwargs = self.default_review_kwargs.copy()
+        reviewer_kwargs['creator'] = self.test_users[0]
+        reviewer_kwargs['reviewers'] = [self.user]
+        reviewer_review = models.Review.create_review(**reviewer_kwargs)
+
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         self.assertTemplateUsed(response, 'demotime/index.html')
-        for key in ['open_demos', 'open_reviews', 'updated_demos']:
+        for key in ['open_demos', 'open_reviews', 'updated_demos', 'message_bundles']:
             assert key in response.context
+
+        self.assertIn(self.review, response.context['open_demos'])
+        self.assertIn(reviewer_review, response.context['open_reviews'])
+        self.assertEqual(
+            list(response.context['updated_demos'].values_list('pk', flat=True)),
+            list(models.UserReviewStatus.objects.filter(user=self.user).values_list('pk', flat=True))
+        )
+        self.assertEqual(len(response.context['message_bundles']), 1)
+        self.assertEqual(models.Review.objects.count(), 2)
 
     def test_get_review_detail(self):
         models.UserReviewStatus.objects.filter(
