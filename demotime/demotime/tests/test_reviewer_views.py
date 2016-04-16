@@ -303,10 +303,12 @@ class TestReviewerViews(BaseTestCase):
         self.assertStatusCode(response, 200)
         data = json.loads(response.content)
         self.assertEqual(data, {
-            'users': [{
-                'pk': self.test_user_2.pk,
-                'name': self.test_user_2.username,
-            }],
+            'users': [
+                {
+                    'pk': self.test_user_2.pk,
+                    'name': self.test_user_2.username,
+                }
+            ],
             'errors': {},
             'success': True,
         })

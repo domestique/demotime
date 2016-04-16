@@ -119,6 +119,8 @@ class UserAPI(JsonView):
             follower__review=self.review,
         ).exclude(
             reviewer__review=self.review,
+        ).exclude(
+            pk=self.review.creator.pk,
         )
         if post_data.get('name'):
             users = self._filter_users_by_name(users, post_data['name'])
@@ -226,7 +228,9 @@ class UserAPI(JsonView):
                 success=False
             )
 
-        users = self.default_user_list.exclude(reviewer__review=self.review)
+        users = self.default_user_list.exclude(
+            reviewer__review=self.review
+        ).exclude(pk=self.review.creator.pk)
         if post_data.get('name'):
             users = self._filter_users_by_name(users, post_data['name'])
         return self._build_json(users, {})
