@@ -112,7 +112,7 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertTrue(
             models.Message.objects.filter(
-                title='Added as reviewer on: {}'.format(self.review.title),
+                title='You have been added as a reviewer on: {}'.format(self.review.title),
                 receipient=self.test_user_2,
                 review=reviewer.review.revision,
             ).exists()
@@ -348,7 +348,7 @@ class TestUserApiFollowers(BaseTestCase):
         self.assertStatusCode(response, 200)
         data = json.loads(response.content)
         self.assertEqual(len(mail.outbox), 1)
-        reviewer = models.Follower.objects.get(
+        follower = models.Follower.objects.get(
             review=self.review, user=self.test_user_2
         )
         self.assertEqual(self.review.follower_set.count(), 3)
@@ -360,12 +360,61 @@ class TestUserApiFollowers(BaseTestCase):
         })
         self.assertTrue(
             models.Message.objects.filter(
+                title='You are now following {}'.format(
+                    self.review.title
+                ),
+                receipient=self.test_user_2,
+                review=follower.review.revision,
+            ).exists()
+        )
+
+    def test_add_follower_notify_follower_and_creator(self):
+        extra_follower = User.objects.create(username='extra')
+        extra_follower.set_password('testing')
+        extra_follower.save()
+
+        self.client.logout()
+        assert self.client.login(
+            username='extra',
+            password='testing'
+        )
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(self.review.follower_set.count(), 2)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_follower',
+            'review_pk': self.review.pk,
+            'user_pk': self.test_user_2.pk
+        })
+        self.assertStatusCode(response, 200)
+        follower = models.Follower.objects.get(
+            review=self.review, user=self.test_user_2
+        )
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'follower_name': self.test_user_2.userprofile.name,
+            'follower_user_pk': self.test_user_2.pk,
+            'success': True,
+            'errors': {},
+        })
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(self.review.follower_set.count(), 3)
+        self.assertTrue(
+            models.Message.objects.filter(
+                title='You are now following {}'.format(
+                    self.review.title
+                ),
+                receipient=self.test_user_2,
+                review=follower.review.revision,
+            ).exists()
+        )
+        self.assertTrue(
+            models.Message.objects.filter(
                 title='{} is now following {}'.format(
                     self.test_user_2.userprofile.name,
                     self.review.title
                 ),
                 receipient=self.review.creator,
-                review=reviewer.review.revision,
+                review=follower.review.revision,
             ).exists()
         )
 

@@ -375,34 +375,52 @@ class Reviewer(BaseModel):
         return self.reviewer.userprofile.display_name or self.reviewer.username
 
     @classmethod
-    def create_reviewer(cls, review, reviewer, non_revision=False):
+    def create_reviewer(cls, review, reviewer, notify_reviewer=False, notify_creator=False):
         obj = cls.objects.create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
         )
-        if non_revision:
-            obj._send_reviewer_message()
+
+        if notify_reviewer:
+            obj._send_reviewer_message(notify_reviewer=True, notify_creator=False)
+
+        if notify_creator:
+            obj._send_reviewer_message(notify_reviewer=False, notify_creator=True)
 
         return obj
 
-    def _send_reviewer_message(self, deleted=False):
-        title = '{} as reviewer on: {}'.format(
-            'Deleted' if deleted else 'Added',
-            self.review.title
-        )
+    def _send_reviewer_message(self, deleted=False, notify_reviewer=False, notify_creator=False):
+        if deleted:
+            title = 'Deleted as reviewer on: {}'.format(self.review.title)
+            receipient = self.reviewer
+        elif notify_reviewer:
+            title = 'You have been added as a reviewer on: {}'.format(
+                self.review.title
+            )
+            receipient = self.reviewer
+        elif notify_creator:
+            title = '{} has been added as a reviewer on: {}'.format(
+                self.reviewer_display_name,
+                self.review.title
+            )
+            receipient = self.review.creator
+        else:
+            raise Exception('No receipient for message in reviewer message')
 
         context = {
-            'receipient': self.reviewer,
+            'receipient': receipient,
             'url': self.review.get_absolute_url(),
             'title': self.review.title,
             'deleted': deleted,
+            'creator': notify_creator,
+            'reviewer': self,
         }
         Message.send_system_message(
             title,
             'demotime/messages/reviewer.html',
             context,
-            self.reviewer,
+            receipient,
             revision=self.review.revision,
         )
 

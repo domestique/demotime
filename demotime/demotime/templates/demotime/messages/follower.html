@@ -1,6 +1,11 @@
 Hello {{ receipient }},
 
-{{ follower.display_name }} is now following <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>!
+{% if is_follower %}
+    You have been assigned as a follower on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>!
+{% else %}
+    {{ follower.display_name }} is now following <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>!
+{% endif %}
+
 
 Thanks,
 {{ sender }}

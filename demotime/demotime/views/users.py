@@ -94,10 +94,13 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User already on review'}
             }
         else:
-            # Don't send an email if a user follows for themselves
-            non_revision = user != self.request.user
+            notify_follower = self.request.user != user
+            notify_creator = self.request.user != self.review.creator
             follower = models.Follower.create_follower(
-                self.review, user, non_revision=non_revision,
+                review=self.review,
+                user=user,
+                notify_follower=notify_follower,
+                notify_creator=notify_creator
             )
             return {
                 'follower_name': follower.user.userprofile.name,
@@ -208,8 +211,13 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User already on review'}
             }
         else:
+            notify_reviewer = self.request.user != user
+            notify_creator = self.request.user != self.review.creator
             reviewer = models.Reviewer.create_reviewer(
-                self.review, user, non_revision=True
+                review=self.review,
+                reviewer=user,
+                notify_reviewer=notify_reviewer,
+                notify_creator=notify_creator
             )
             return {
                 'reviewer_name': reviewer.reviewer.userprofile.name,

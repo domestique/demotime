@@ -1,5 +1,4 @@
 from django.core import mail
-from django.contrib.auth.models import User
 
 from demotime import models
 from demotime.tests import BaseTestCase
@@ -96,65 +95,6 @@ class TestReviewModels(BaseTestCase):
             first_rev.attachments.count(),
             second_rev.attachments.count()
         )
-
-    def test_create_reviewer(self):
-        obj = models.Review.create_review(**self.default_review_kwargs)
-        obj.reviewer_set.all().delete()
-        user = User.objects.get(username='test_user_0')
-        reviewer = models.Reviewer.create_reviewer(obj, user)
-        self.assertEqual(reviewer.status, models.reviews.REVIEWING)
-        self.assertEqual(reviewer.review.pk, obj.pk)
-        self.assertEqual(reviewer.reviewer.pk, user.pk)
-
-    def test_reviewer_set_status(self):
-        obj = models.Review.create_review(**self.default_review_kwargs)
-        reviewer = obj.reviewer_set.all()[0]
-        reminder = models.Reminder.objects.get(review=obj, user=reviewer.reviewer)
-        models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
-        reviewer.set_status(models.reviews.APPROVED)
-        self.assertEqual(
-            models.Reviewer.objects.get(pk=reviewer.pk).status,
-            models.reviews.APPROVED
-        )
-        msg_bundle = models.MessageBundle.objects.get(
-            review=obj,
-            owner=obj.creator
-        )
-        self.assertEqual(
-            msg_bundle.message_set.first().title,
-            '{} has approved your review: {}'.format(
-                reviewer.reviewer_display_name, obj.title
-            )
-        )
-        self.assertFalse(models.Reminder.objects.get(pk=reminder.pk).active)
-        models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
-
-        reviewer.set_status(models.reviews.REJECTED)
-        self.assertEqual(
-            models.Reviewer.objects.get(pk=reviewer.pk).status,
-            models.reviews.REJECTED
-        )
-        self.assertEqual(
-            msg_bundle.message_set.first().title,
-            '{} has rejected your review: {}'.format(
-                reviewer.reviewer_display_name, obj.title
-            )
-        )
-        self.assertFalse(models.Reminder.objects.get(pk=reminder.pk).active)
-        models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
-
-        reviewer.set_status(models.reviews.REVIEWING)
-        self.assertEqual(
-            models.Reviewer.objects.get(pk=reviewer.pk).status,
-            models.reviews.REVIEWING
-        )
-        self.assertEqual(
-            msg_bundle.message_set.first().title,
-            '{} resumed reviewing your review: {}'.format(
-                reviewer.reviewer_display_name, obj.title
-            )
-        )
-        self.assertTrue(models.Reminder.objects.get(pk=reminder.pk).active)
 
     def test_update_reviewer_state_approved(self):
         self.assertEqual(len(mail.outbox), 0)

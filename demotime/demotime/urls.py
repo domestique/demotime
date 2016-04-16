@@ -46,7 +46,7 @@ urlpatterns += [
     ),
     url(r'^review/(?P<pk>[\d]+)/update-state/$', reviews.review_state_view, name='update-review-state'),
     url(r'^comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
-    url(r'^profile/$', users.user_api, name='user-api'),
+    url(r'^users/$', users.user_api, name='user-api'),
     url(
         r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         reviews.delete_comment_attachment_view,
