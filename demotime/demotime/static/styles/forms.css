@@ -151,6 +151,9 @@ select[multiple="multiple"]:focus {
 .note-popover {
     display: none;
 }
+.note-editable {
+    font-size: 16px;
+}
 .note-editable p {
     margin: 2px 0;
 }

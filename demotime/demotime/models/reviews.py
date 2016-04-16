@@ -187,9 +187,12 @@ class Review(BaseModel):
 
         for reviewer in reviewers:
             try:
-                Reviewer.objects.get(review=obj, reviewer=reviewer)
+                reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
-                Reviewer.create_reviewer(obj, reviewer)
+                reviewer = Reviewer.create_reviewer(obj, reviewer)
+            else:
+                reviewer.status = REVIEWING
+                reviewer.save()
 
         for follower in followers:
             try:
