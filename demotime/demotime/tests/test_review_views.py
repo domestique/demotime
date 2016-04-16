@@ -38,7 +38,7 @@ class TestReviewViews(BaseTestCase):
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         self.assertTemplateUsed(response, 'demotime/index.html')
-        for key in ['open_demos', 'open_reviews', 'updated_demos', 'followed_demos']:
+        for key in ['open_demos', 'open_reviews', 'updated_demos', 'message_bundles', 'followed_demos']:
             assert key in response.context
 
         self.assertIn(followed_review, response.context['followed_demos'])
@@ -49,6 +49,7 @@ class TestReviewViews(BaseTestCase):
             list(models.UserReviewStatus.objects.filter(user=self.user).values_list('pk', flat=True))
         )
         self.assertEqual(models.Review.objects.count(), 3)
+        self.assertEqual(len(response.context['message_bundles']), 2)
 
     def test_get_review_detail(self):
         models.UserReviewStatus.objects.filter(
