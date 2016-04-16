@@ -8,10 +8,11 @@ from demotime import models
 from demotime.tests import BaseTestCase
 
 
-class TestReviewerViews(BaseTestCase):
+class TestUserApiReviewers(BaseTestCase):
+    ''' Tests for the Reviewers functionality of the User API '''
 
     def setUp(self):
-        super(TestReviewerViews, self).setUp()
+        super(TestUserApiReviewers, self).setUp()
         assert self.client.login(
             username=self.user.username,
             password='testing'
@@ -37,37 +38,6 @@ class TestReviewerViews(BaseTestCase):
             'users': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.username,
-            }],
-            'errors': {},
-            'success': True,
-        })
-
-    def test_find_user(self):
-        response = self.client.post(reverse('user-api'), {
-            'action': 'search_users',
-            'name': 'test_user',
-        })
-        self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
-        self.assertTrue(data['success'])
-        self.assertEqual(data['errors'], {})
-        self.assertEqual(len(data['users']), 3)
-        for user in data['users']:
-            assert 'test_user_' in user['name']
-
-    def test_find_user_display_name(self):
-        self.test_user_2.userprofile.display_name = 'Tinker Tom'
-        self.test_user_2.userprofile.save()
-        response = self.client.post(reverse('user-api',), {
-            'action': 'search_users',
-            'name': 'tinker'
-        })
-        self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
-        self.assertEqual(data, {
-            'users': [{
-                'pk': self.test_user_2.pk,
-                'name': self.test_user_2.userprofile.display_name,
             }],
             'errors': {},
             'success': True,
@@ -290,9 +260,24 @@ class TestReviewerViews(BaseTestCase):
         self.assertStatusCode(response, 400)
         self.assertEqual(self.review.reviewers.count(), 2)
 
-    # ======================================================= #
-    # Followers
-    # ======================================================= #
+
+class TestUserApiFollowers(BaseTestCase):
+    ''' Tests for the Followers functionality of the User API '''
+
+    def setUp(self):
+        super(TestUserApiFollowers, self).setUp()
+        assert self.client.login(
+            username=self.user.username,
+            password='testing'
+        )
+        review_kwargs = self.default_review_kwargs.copy()
+        review_kwargs['reviewers'] = User.objects.filter(
+            username__startswith='test_user_'
+        )[:2]
+        self.review = models.Review.create_review(**review_kwargs)
+        self.test_user_2 = User.objects.get(username='test_user_2')
+        # Reset out mail queue
+        mail.outbox = []
 
     def test_find_follower_excludes_creator_and_reviewers(self):
         response = self.client.post(reverse('user-api'), {
@@ -513,6 +498,49 @@ class TestReviewerViews(BaseTestCase):
             'errors': {'user_pk': "Not allowed to remove others from a demo you don't own"}
         })
         self.assertEqual(self.review.follower_set.count(), 2)
+
+
+class TestUserAPI(BaseTestCase):
+    ''' Test for the general purpose parts of the User API '''
+
+    def setUp(self):
+        super(TestUserAPI, self).setUp()
+        assert self.client.login(
+            username=self.user.username,
+            password='testing'
+        )
+        self.test_user_2 = User.objects.get(username='test_user_2')
+
+    def test_find_user(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'search_users',
+            'name': 'test_user',
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertTrue(data['success'])
+        self.assertEqual(data['errors'], {})
+        self.assertEqual(len(data['users']), 3)
+        for user in data['users']:
+            assert 'test_user_' in user['name']
+
+    def test_find_user_display_name(self):
+        self.test_user_2.userprofile.display_name = 'Tinker Tom'
+        self.test_user_2.userprofile.save()
+        response = self.client.post(reverse('user-api',), {
+            'action': 'search_users',
+            'name': 'tinker'
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'users': [{
+                'pk': self.test_user_2.pk,
+                'name': self.test_user_2.userprofile.display_name,
+            }],
+            'errors': {},
+            'success': True,
+        })
 
     def test_invalid_action_bad_request(self):
         response = self.client.post(reverse('user-api'), {'action': 'asdf'})
