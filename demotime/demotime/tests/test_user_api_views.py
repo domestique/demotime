@@ -260,6 +260,18 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertStatusCode(response, 400)
         self.assertEqual(self.review.reviewers.count(), 2)
 
+    def test_find_reviewer_review_not_specified(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_reviewer',
+            'user_pk': 1
+        })
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content), {
+            'users': [],
+            'errors': {'review': 'Find reviewer requires a Review PK'},
+            'success': False,
+        })
+
 
 class TestUserApiFollowers(BaseTestCase):
     ''' Tests for the Followers functionality of the User API '''
@@ -498,6 +510,18 @@ class TestUserApiFollowers(BaseTestCase):
             'errors': {'user_pk': "Not allowed to remove others from a demo you don't own"}
         })
         self.assertEqual(self.review.follower_set.count(), 2)
+
+    def test_find_follower_review_not_specified(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_follower',
+            'user_pk': 1
+        })
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content), {
+            'users': [],
+            'errors': {'review': 'Find follower requires a Review PK'},
+            'success': False,
+        })
 
 
 class TestUserAPI(BaseTestCase):
