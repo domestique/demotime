@@ -126,8 +126,7 @@
                 <ul class="follower_ul">
                     {% for follower in object.follower_set.all %}
                         <li>
-                            <a class="icon icon-{{ reviewer.get_status_display }}"
-                               href="{{ follower.user.userprofile.get_absolute_url }}">
+                            <a href="{{ follower.user.userprofile.get_absolute_url }}">
                                 {{ follower.user.userprofile }}</a>
                             <small>
                                 following

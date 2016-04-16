@@ -16,10 +16,9 @@
         follow their progress."></span>
 </h3>
 
-<section class="reviews {% if not reviews %}done{% endif %}">
-    {% if reviews %}
+<section class="reviews {% if not reviews and not follows %}done{% endif %}">
         <ul>
-            {% if follows %}
+            {% if reviews and follows %}
                 <li>Reviewing:</li>
             {% endif %}
             {% for demo in reviews %}
@@ -49,5 +48,4 @@
                 {% endfor %}
             {% endif %}
         </ul>
-    {% endif %}
 </section>

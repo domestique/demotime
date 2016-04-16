@@ -25,7 +25,7 @@ class UserAPI(JsonView):
     def default_user_list(self):
         sys_user = User.objects.get(username='demotime_sys')
         return User.objects.exclude(
-            pk__in=(self.request.user.pk, sys_user.pk)
+            pk=sys_user.pk
         )
 
     def _build_json(self, users, errors, success=True):
@@ -50,7 +50,10 @@ class UserAPI(JsonView):
 
     def _search_users(self, post_data):
         name = post_data.get('name')
-        users = self._filter_users_by_name(self.default_user_list, name)
+        users = self._filter_users_by_name(
+            self.default_user_list.exclude(pk=self.request.user.pk),
+            name
+        )
         return self._build_json(users, {})
 
     def _add_follower(self, post_data):
