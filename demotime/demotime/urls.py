@@ -15,8 +15,8 @@ from demotime.views import (
     index_view,
     messages,
     reviews,
-    reviewers,
-    users
+    users,
+    profile
 )
 
 
@@ -46,7 +46,7 @@ urlpatterns += [
     ),
     url(r'^review/(?P<pk>[\d]+)/update-state/$', reviews.review_state_view, name='update-review-state'),
     url(r'^comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
-    url(r'^users/$', reviewers.user_api, name='user-api'),
+    url(r'^profile/$', users.user_api, name='user-api'),
     url(
         r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         reviews.delete_comment_attachment_view,
@@ -77,8 +77,8 @@ urlpatterns += [
 urlpatterns += [
     url(r'^accounts/login/$', login, name='login'),
     url(r'^accounts/logout/$', logout_then_login, name='logout'),
-    url(r'^accounts/profile/(?P<pk>[\d]+)/$', users.profile_view, name='profile'),
-    url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', users.edit_profile_view, name='edit-profile'),
+    url(r'^accounts/profile/(?P<pk>[\d]+)/$', profile.profile_view, name='profile'),
+    url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', profile.edit_profile_view, name='edit-profile'),
     url(
         r'^accounts/password/reset/$',
         password_reset,
