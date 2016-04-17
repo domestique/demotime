@@ -1,4 +1,5 @@
 from django.core import mail
+from django.contrib.auth.models import User
 
 from demotime import models
 from demotime.tests import BaseTestCase
@@ -17,6 +18,42 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.follower_set.count(), 2)
+        attachment = obj.revision.attachments.all()[0]
+        attachment.attachment.name = 'test/test_file'
+        self.assertEqual(attachment.pretty_name, 'test_file')
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
+        statuses = models.UserReviewStatus.objects.filter(review=obj)
+        self.assertEqual(statuses.count(), 6)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 5)
+        self.assertEqual(len(mail.outbox), 5)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            4
+        )
+
+    def test_create_review_duped_reviewer_follower(self):
+        ''' Test creating a review with a user in both the Reviwers and the
+        Followers list
+        '''
+        self.assertEqual(len(mail.outbox), 0)
+        review_kwargs = self.default_review_kwargs.copy()
+        user_pks = list(self.test_users.values_list('pk', flat=True))
+        user_pks += list(self.followers.values_list('pk', flat=True))
+        review_kwargs['followers'] = User.objects.filter(pk__in=user_pks)
+        obj = models.Review.create_review(**review_kwargs)
+        assert obj.revision
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.title, 'Test Title')
+        self.assertEqual(obj.description, 'Test Description'),
+        self.assertEqual(obj.case_link, 'http://example.org/')
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.follower_set.count(), 2)
         attachment = obj.revision.attachments.all()[0]
         attachment.attachment.name = 'test/test_file'
         self.assertEqual(attachment.pretty_name, 'test_file')
@@ -80,6 +117,63 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(second_review.reviewers.count(), 3)
         self.assertEqual(second_review.reviewer_set.count(), 3)
         self.assertEqual(second_review.follower_set.count(), 2)
+        statuses = models.UserReviewStatus.objects.filter(review=obj)
+        self.assertEqual(statuses.count(), 6)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 5)
+        self.assertEqual(len(mail.outbox), 4)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            3
+        )
+        # Since we didn't supply attachments in the update, they should be
+        # copied over
+        self.assertEqual(
+            first_rev.attachments.count(),
+            second_rev.attachments.count()
+        )
+
+    def test_update_review_duped_reviewer_follower(self):
+        self.assertEqual(len(mail.outbox), 0)
+        review_kwargs = self.default_review_kwargs.copy()
+        user_pks = list(self.test_users.values_list('pk', flat=True))
+        user_pks += list(self.followers.values_list('pk', flat=True))
+        review_kwargs['followers'] = User.objects.filter(pk__in=user_pks)
+        obj = models.Review.create_review(**review_kwargs)
+        first_rev = obj.revision
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.follower_set.count(), 2)
+        approving_reviewer = obj.reviewer_set.all()[0]
+        approving_reviewer.status = models.reviews.APPROVED
+        approving_reviewer.save()
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(len(mail.outbox), 5)
+        mail.outbox = []
+
+        models.UserReviewStatus.objects.filter(review=obj).update(read=True)
+        review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'reviewers': self.test_users.exclude(username='test_user_0'),
+        })
+        new_obj = models.Review.update_review(**review_kwargs)
+        second_rev = new_obj.revision
+        self.assertEqual(obj.pk, new_obj.pk)
+        self.assertEqual(new_obj.title, 'New Title')
+        self.assertEqual(new_obj.case_link, 'http://badexample.org')
+        # Desc should be unchanged
+        self.assertEqual(new_obj.description, 'Test Description')
+        self.assertEqual(new_obj.revision.description, 'New Description')
+        self.assertEqual(new_obj.reviewrevision_set.count(), 2)
+        self.assertEqual(new_obj.revision.number, 2)
+        self.assertTrue(new_obj.revision.is_max_revision)
+        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.follower_set.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 2)
+        for reviewer in obj.reviewer_set.all():
+            self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)

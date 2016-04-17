@@ -107,6 +107,7 @@ class TestUserApiReviewers(BaseTestCase):
             'reviewer_name': self.test_user_2.userprofile.__unicode__(),
             'reviewer_user_pk': self.test_user_2.pk,
             'reviewer_status': models.reviews.REVIEWING,
+            'removed_follower': False,
             'success': True,
             'errors': {},
         })
@@ -115,6 +116,46 @@ class TestUserApiReviewers(BaseTestCase):
                 title='You have been added as a reviewer on: {}'.format(self.review.title),
                 receipient=self.test_user_2,
                 review=reviewer.review.revision,
+            ).exists()
+        )
+
+    def test_add_follower_as_reviewer(self):
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(self.review.reviewers.count(), 2)
+        self.assertEqual(self.review.follower_set.count(), 2)
+        follower = self.review.follower_set.all()[0].user
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': follower.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(mail.outbox), 1)
+        reviewer = models.Reviewer.objects.get(
+            review=self.review, reviewer=follower
+        )
+        self.assertEqual(reviewer.status, models.reviews.REVIEWING)
+        self.assertEqual(self.review.reviewers.count(), 3)
+        self.assertEqual(self.review.follower_set.count(), 1)
+        self.assertEqual(data, {
+            'reviewer_name': follower.userprofile.__unicode__(),
+            'reviewer_user_pk': follower.pk,
+            'reviewer_status': models.reviews.REVIEWING,
+            'removed_follower': True,
+            'success': True,
+            'errors': {},
+        })
+        self.assertTrue(
+            models.Message.objects.filter(
+                title='You have been added as a reviewer on: {}'.format(self.review.title),
+                receipient=follower,
+                review=reviewer.review.revision,
+            ).exists()
+        )
+        self.assertFalse(
+            models.Follower.objects.filter(
+                user=follower, review=self.review
             ).exists()
         )
 

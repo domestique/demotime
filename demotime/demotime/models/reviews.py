@@ -210,7 +210,7 @@ class Review(BaseModel):
         obj.follower_set.exclude(review=obj, user__in=followers).delete()
 
         # Messages
-        obj._send_revision_messages()
+        obj._send_revision_messages(update=True)
 
         # Reminders
         Reminder.update_reminders_for_review(obj)
@@ -369,6 +369,12 @@ class Reviewer(BaseModel):
         max_length=128, choices=STATUS_CHOICES,
         default='reviewing', db_index=True
     )
+
+    def __unicode__(self):
+        return u'{} Follower on {}'.format(
+            self.reviewer_display_name,
+            self.review.title,
+        )
 
     @property
     def reviewer_display_name(self):

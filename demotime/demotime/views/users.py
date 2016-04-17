@@ -211,6 +211,10 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User already on review'}
             }
         else:
+            count, _ = models.Follower.objects.filter(
+                review=self.review,
+                user=user,
+            ).delete()
             notify_reviewer = self.request.user != user
             notify_creator = self.request.user != self.review.creator
             reviewer = models.Reviewer.create_reviewer(
@@ -223,6 +227,7 @@ class UserAPI(JsonView):
                 'reviewer_name': reviewer.reviewer.userprofile.name,
                 'reviewer_user_pk': reviewer.reviewer.pk,
                 'reviewer_status': reviewer.status,
+                'removed_follower': count > 0,
                 'success': True,
                 'errors': {},
             }
