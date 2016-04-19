@@ -3,17 +3,17 @@
 var clock = Snap(".clock");
 var frame = clock.circle(32,32,30).attr({
     fill: "#ffffff",
-    stroke: "#df5b4d",
+    stroke: "#43B18A",
     strokeWidth: 4
 })
 var hours = clock.rect(29, 18, 6, 22, 3).attr({fill: "#344d5a"});
 var minutes = clock.rect(30, 15, 4, 25, 2).attr({fill: "#344d5a"});
 var seconds = clock.path("M30.5,38.625c0,0.828,0.672,1.5,1.5,1.5s1.5-0.672,1.5-1.5c0-0.656-0.414-1.202-1-1.406V10.125c0-0.277-0.223-0.5-0.5-0.5s-0.5,0.223-0.5,0.5v27.094C30.914,37.423,30.5,37.969,30.5,38.625z M31,38.625c0-0.552,0.448-1,1-1s1,0.448,1,1s-0.448,1-1,1S31,39.177,31,38.625z").attr({
-    fill: "#bb3e2c",
+    fill: "#43B18A",
 });
 var middle = clock.circle(32,32,3).attr({
     fill: "#ffffff",
-    stroke: "#bb3e2c",
+    stroke: "#D91D30",
     strokeWidth: 2
 })
 
