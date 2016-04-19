@@ -278,7 +278,7 @@ class Review(BaseModel):
         self.save(update_fields=['state'])
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
-        )
+        ).distinct()
         for user in users:
             Message.send_system_message(
                 '"{}" has been Reopened'.format(self.title),
@@ -300,7 +300,7 @@ class Review(BaseModel):
         self.save(update_fields=['state'])
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
-        )
+        ).distinct()
         for user in users:
             Message.send_system_message(
                 '"{}" has been {}'.format(self.title, state.capitalize()),
