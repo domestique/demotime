@@ -17,6 +17,16 @@ env.roledefs = {
 
 
 @api.roles('local')
+def load_prod_data(filename='demotimedata.json'):
+    db_path = os.path.join(LOCAL_ROOT, 'dt')
+    with api.lcd(db_path):
+        api.local('rm -f db.sqlite3')
+        api.local('python manage.py migrate')
+        api.local('echo "DELETE FROM django_content_type;" | sqlite3 db.sqlite3')
+        api.local('python manage.py loaddata {}'.format(filename))
+
+
+@api.roles('local')
 def run_tests(test_module='demotime'):
     api.local('echo "Cleaning out pycs"')
     api.local('find . -type f -name \*.pyc -delete')
