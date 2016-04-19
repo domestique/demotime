@@ -1,6 +1,17 @@
-Hello {{ reviewer }},
+Hello {{ receipient }},
 
-You have been {% if deleted %}removed{% else %}added{% endif %} as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+{% if deleted %}
+    You have been removed as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+{% else %}
+    {% if creator %}
+        {{ reviewer.reviewer_display_name }} has been added as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+    {% endif %}
+
+    {% if not creator %}
+        You have been added as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+    {% endif %}
+{% endif %}
+
 
 Thanks,
 {{ sender }}

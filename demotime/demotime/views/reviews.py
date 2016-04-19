@@ -358,13 +358,23 @@ class ReviewJsonView(JsonView):
                     'state': review.state,
                     'reviewer_state': review.reviewer_state,
                     'pk': review.pk,
+                    'reviewing_count': review.reviewing_count,
+                    'approved_count': review.approved_count,
+                    'rejected_count': review.rejected_count,
                     'reviewers': [],
+                    'followers': [],
                 }
                 for reviewer in review.reviewer_set.all():
                     review_dict['reviewers'].append({
                         'name': reviewer.reviewer.userprofile.name,
                         'user_pk': reviewer.reviewer.pk,
                         'reviewer_status': reviewer.status,
+                    })
+
+                for follower in review.follower_set.all():
+                    review_dict['followers'].append({
+                        'name': follower.user.userprofile.name,
+                        'user_pk': follower.user.pk,
                     })
 
                 review_json_dict['reviews'].append(review_dict)

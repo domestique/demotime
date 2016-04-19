@@ -202,6 +202,29 @@ class TestMessageViews(BaseTestCase):
             models.MessageBundle.objects.filter(owner=self.user).count(),
         )
 
+
+class TestMessagesAPI(BaseTestCase):
+
+    def setUp(self):
+        super(TestMessagesAPI, self).setUp()
+        self.review = models.Review.create_review(**self.default_review_kwargs)
+        self.user = User.objects.get(username='test_user_0')
+        self.first_message = models.Message.objects.get(receipient=self.user)
+        self.system_user = User.objects.get(username='demotime_sys')
+        for x in range(0, 2):
+            models.Message.create_message(
+                receipient=self.user,
+                sender=self.system_user,
+                title='Test Title {}'.format(x),
+                review_revision=self.review.revision,
+                thread=None,
+                message='Test Message {}'.format(x)
+            )
+        assert self.client.login(
+            username=self.user.username,
+            password='testing',
+        )
+
     def test_messages_json_with_review(self):
         models.MessageBundle.objects.update(read=True)
         last_bundle = models.MessageBundle.objects.filter(
@@ -262,7 +285,7 @@ class TestMessageViews(BaseTestCase):
             }],
         })
 
-    def test_messages_post_bulk_update(self):
+    def test_messages_post_bulk_read(self):
         bundles = models.MessageBundle.objects.filter(
             owner=self.user
         )
@@ -280,4 +303,96 @@ class TestMessageViews(BaseTestCase):
         self.assertEqual(json.loads(response.content), {
             'message_count': 0,
             'bundles': [],
+        })
+
+    def test_message_post_bulk_unread(self):
+        bundles = models.MessageBundle.objects.filter(
+            owner=self.user
+        )
+        bundles.update(read=True, deleted=False)
+        assert bundles.count() > 0
+        response = self.client.get(reverse('messages-json'))
+        self.assertEqual(
+            json.loads(response.content)['message_count'],
+            0,
+        )
+        response = self.client.post(reverse('messages-json'), {
+            'messages': list(bundles.values_list('pk', flat=True)),
+            'action': 'unread',
+        })
+        bundle = bundles.get()
+        messages = []
+        for msg in bundle.message_set.all():
+            messages.append({
+                'review_pk': msg.review.review.pk,
+                'review_url': msg.review.review.get_absolute_url(),
+                'thread_pk': msg.thread.pk if msg.thread else '',
+                'is_comment': msg.thread != None,
+                'review_title': msg.review.review.title,
+                'message_title': msg.title,
+                'message': msg.message,
+                'message_pk': msg.pk,
+            })
+        self.assertEqual(json.loads(response.content), {
+            'message_count': 1,
+            'bundles': [{
+                'bundle_pk': bundle.pk,
+                'messages': messages
+            }],
+        })
+
+    def test_message_post_bulk_delete(self):
+        bundles = models.MessageBundle.objects.filter(
+            owner=self.user
+        )
+        bundles.update(read=False, deleted=False)
+        assert bundles.count() > 0
+        response = self.client.get(reverse('messages-json'))
+        self.assertEqual(
+            json.loads(response.content)['message_count'],
+            bundles.count()
+        )
+        response = self.client.post(reverse('messages-json'), {
+            'messages': list(bundles.values_list('pk', flat=True)),
+            'action': 'delete',
+        })
+        self.assertEqual(json.loads(response.content), {
+            'message_count': 0,
+            'bundles': [],
+        })
+
+    def test_message_post_bulk_undelete(self):
+        bundles = models.MessageBundle.objects.filter(
+            owner=self.user
+        )
+        bundles.update(read=False, deleted=True)
+        assert bundles.count() > 0
+        response = self.client.get(reverse('messages-json'))
+        self.assertEqual(
+            json.loads(response.content)['message_count'],
+            0,
+        )
+        response = self.client.post(reverse('messages-json'), {
+            'messages': list(bundles.values_list('pk', flat=True)),
+            'action': 'undelete',
+        })
+        bundle = bundles.get()
+        messages = []
+        for msg in bundle.message_set.all():
+            messages.append({
+                'review_pk': msg.review.review.pk,
+                'review_url': msg.review.review.get_absolute_url(),
+                'thread_pk': msg.thread.pk if msg.thread else '',
+                'is_comment': msg.thread != None,
+                'review_title': msg.review.review.title,
+                'message_title': msg.title,
+                'message': msg.message,
+                'message_pk': msg.pk,
+            })
+        self.assertEqual(json.loads(response.content), {
+            'message_count': 1,
+            'bundles': [{
+                'bundle_pk': bundle.pk,
+                'messages': messages
+            }],
         })

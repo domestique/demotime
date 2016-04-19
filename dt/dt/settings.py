@@ -124,6 +124,7 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-package=demotime',
     '--logging-filter=-django.db.backends.schema',
+    '--with-id',
 ]
 
 # MAIL_SETTINGS

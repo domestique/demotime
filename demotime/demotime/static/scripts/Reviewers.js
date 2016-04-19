@@ -4,9 +4,9 @@ DemoTime.Reviewers = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'keyup #find_reviewer': 'typing',
-        'click .new_reviewer_click': 'add',
-        'click .reviewer_deleter': 'delete',
+        'keyup .find_person': 'typing',
+        'click .add_person_click': 'add',
+        'click .person_deleter': 'delete',
         'click .cancel': 'cancel'
     },
 
@@ -15,7 +15,7 @@ DemoTime.Reviewers = Backbone.View.extend({
     },
 
     cancel: function() {
-        this.$el.find('#find_reviewer').val('');
+        this.$el.find('.find_person').val('');
     },
 
     typing: function(event) {
@@ -28,21 +28,29 @@ DemoTime.Reviewers = Backbone.View.extend({
 
         if ($input.val().length > 2 && String.fromCharCode(event.keyCode).match(/[a-zA-Z]/i)) {
             var req = $.ajax({
-                url: self.options.finder_url,
+                url: self.options.url,
                 method: 'POST',
                 data: {
-                    reviewer_name: $input.val()
+                    action: $input.data('action'),
+                    review_pk: self.options.review_pk,
+                    name: $input.val()
                 }
             });
 
             req.success(function(data) {
                 self.people = new ReviewerModel(data);
 
-                if (self.people.get('reviewers').length) {
-                    // Grab the container template
-                    var html = $('#new_reviewers').html(),
-                        template = _.template(html);
-                    template = template({ person: self.people.get('reviewers') });
+                if (self.people.get('users').length) {
+                    // Grab the container template (reviewers vs. followers)
+                    if ($input.data('action') == 'find_reviewer') {
+                        var html = $('#new_reviewers').html(),
+                            template = _.template(html);
+                    } else {
+                        var html = $('#new_followers').html(),
+                            template = _.template(html);
+                    }
+
+                    template = template({ person: self.people.get('users') });
 
                     swal ({
                         title: "Found matches",
@@ -68,10 +76,12 @@ DemoTime.Reviewers = Backbone.View.extend({
         event.preventDefault();
 
         var req = $.ajax({
-            url: self.options.adder_url,
+            url: self.options.url,
             method: 'POST',
             data: {
-                reviewer_pk: pk
+                action: link.data('action'),
+                review_pk: self.options.review_pk,
+                user_pk: pk
             }
         });
 
@@ -82,12 +92,24 @@ DemoTime.Reviewers = Backbone.View.extend({
             self.person= new ReviewerModel(data);
 
             // Grab the container template
-            var html = $('#added_reviewer').html(),
-                template = _.template(html);
-            template = template({ person: self.person });
+            if (data.reviewer_name) {
+                var html = $('#added_reviewer').html(),
+                    template = _.template(html);
 
-            self.$el.find('.reviewers ul li:first-child').before(template);
-            self.$el.find('.reviewers input').val('');
+                template = template({ person: self.person });
+
+                self.$el.find('.reviewer_ul').append(template);
+            } else {
+                var html = $('#added_follower').html(),
+                    template = _.template(html);
+
+                template = template({ person: self.person });
+
+                self.$el.find('.follower_ul').append(template);
+            }
+
+            self.$el.find('.find_person_li input').val('');
+
         });
         req.error(function(err) {
             swal ({
@@ -103,14 +125,16 @@ DemoTime.Reviewers = Backbone.View.extend({
         event.preventDefault();
         var $el = $(event.target),
             $li = $el.parents('li'),
-            pk = $el.data('reviewer'),
+            pk = $el.data('person'),
             self = this;
 
         var req = $.ajax({
-            url: self.options.deleter_url,
+            url: self.options.url,
             method: 'POST',
             data: {
-                reviewer_pk: pk
+                action: $el.data('action'),
+                review_pk: self.options.review_pk,
+                user_pk: pk
             }
         });
 

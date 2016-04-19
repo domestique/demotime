@@ -1,5 +1,4 @@
 var SearchModel = Backbone.Model.extend();
-// Dynamically add/remove reviewers
 DemoTime.Search= Backbone.View.extend({
     el: '.quickfind',
 
@@ -21,21 +20,22 @@ DemoTime.Search= Backbone.View.extend({
         }
 
         if ($input.val().length > 1) {
-            var reviewer_req = $.ajax({
-                url: self.options.reviewer_url,
+            var user_req = $.ajax({
+                url: self.options.user_url,
                 method: 'POST',
                 data: {
-                    reviewer_name: $input.val()
+                    action: 'search_users',
+                    name: $input.val()
                 }
             });
 
-            reviewer_req.success(function(data) {
-                self.reviewers = new SearchModel(data);
+            user_req.success(function(data) {
+                self.users = new SearchModel(data);
 
                 // Grab the container template
-                var html = $('#reviewer_results').html(),
+                var html = $('#user_results').html(),
                     template = _.template(html);
-                template = template({ user: self.reviewers.get('reviewers') });
+                template = template({ user: self.users.get('users') });
 
                 self.$el.find('.quickfind-users').html(template);
                 self.$el.find('.quickfind-results').slideDown();

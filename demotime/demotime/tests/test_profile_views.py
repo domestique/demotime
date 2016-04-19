@@ -2,7 +2,6 @@ import os
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import models
 from demotime.tests import BaseTestCase
@@ -20,25 +19,7 @@ class TestProfileViews(BaseTestCase):
             password='testing'
         )
         # Sample review
-        self.review = models.Review.create_review(
-            creator=self.user,
-            title='Test Title',
-            description='Test Description',
-            case_link='http://example.org/',
-            reviewers=self.test_users,
-            attachments=[
-                {
-                    'attachment': File(BytesIO('test_file_1')),
-                    'attachment_type': 'image',
-                    'description': 'Testing',
-                },
-                {
-                    'attachment': File(BytesIO('test_file_2')),
-                    'attachment_type': 'image',
-                    'description': 'Testing',
-                },
-            ],
-        )
+        self.review = models.Review.create_review(**self.default_review_kwargs)
         self.profile_url = reverse('profile', args=[self.user.userprofile.pk])
         self.edit_url = reverse('edit-profile', args=[self.user.userprofile.pk])
         self.image_path = os.path.join(TEST_ROOT, 'test_data', 'activate_swag.gif')

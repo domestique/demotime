@@ -75,7 +75,7 @@ h1 .alert {
     cursor: pointer;
 }
 
-.reviewers li:hover .reviewer_deleter {
+.reviewers li:hover .person_deleter {
     margin-left: 2px;
     display: inline-block !important;
     cursor: pointer;
@@ -230,10 +230,10 @@ a[target="_blank"] {
     background:url(/static/images/new_window.png) 100% 20% no-repeat;
 }
 
-#find_reviewer {
+input.find_person {
     font-size: 11px;
     margin-top: 0;
-    width: 50%;
+    width: 95%;
     background: #f7f7f7;
     padding: 3px 10px;
     height: 30px;

@@ -28,7 +28,7 @@ $('blockquote p, .review-overview li, .review-overview p').linkify({
 });
 
 // Initialize tooltips
-$('.tooltip').tooltipster();
+$('.help').tooltipster();
 
 // Initialized button clicks
 $('button').click(function() {
@@ -78,7 +78,7 @@ $('.review form').submit(function(e) {
     }
 });
 
-$('.review input:not(#find_reviewer)').keyup(function() {
+$('.review input:not(.find_person)').keyup(function() {
     window.onbeforeunload = function(e) {
         return 'You have unsaved changes. Exit DemoTime?.';
     };

@@ -38,20 +38,20 @@ a.error {
         <div class="review">
             <form action="" method="post" enctype="multipart/form-data" id="submit_review">
                 {% csrf_token %}
-                <div class="form-group first">
+                <div class="form-group">
                     <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>
                     {{ review_form.title.errors }}
                     {{ review_form.title }}
                 </div>
                 <div class="form-group">
-                    <h3 class="icon icon-link-ext">{{ review_form.case_link.label }} <small>ex. https://project.tpondemand.com/entity/1234</small></h3>
+                    <h3 class="icon icon-link-ext">{{ review_form.case_link.label }} <small>ex. https://someproject.tpondemand.com/entity/1234</small></h3>
                     {{ review_form.case_link.errors }}
                     {{ review_form.case_link }}
                 </div>
                 <div class="form-group">
                     <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
-                    {{ review_form.description.errors }}
                     {{ review_form.description }}
+                    {{ review_form.description.errors }}
                 </div>
                 <div class="attachments">
                     <h3 class="icon icon-attach">Attachments <small>Visually present with screenshots, screencasts, documents, etc</small></h3>
@@ -63,10 +63,28 @@ a.error {
                         </section>
                     {% endfor %}
                 </div>
-                <div class="form-group">
-                    <h3 class="icon icon-user">{{ review_form.reviewers.label }} <small>Hold down 'cmd' to select multiple people</small></h3>
-                    {{ review_form.reviewers.errors }}
-                    {{ review_form.reviewers }}
+                <h3>
+                    Reviewers and Followers
+                    <span class="help" title="When you assign someone as a 'reviewer' they
+                    will need to either approve or reject a review. A follower can simply follow
+                    the progress of a review without the ability or need to approve or reject."></span>
+                    <small>Hold down 'cmd' to select multiple people</small>
+                </h3>
+                <div class="split~680 by:2 with-gap:3">
+                    <div class="cel">
+                        <div class="form-group">
+                            <h3 class="icon icon-user">{{ review_form.reviewers.label }}</h3>
+                            {{ review_form.reviewers.errors }}
+                            {{ review_form.reviewers }}
+                        </div>
+                    </div>
+                    <div class="cel">
+                        <div class="form-group">
+                            <h3 class="icon icon-user">{{ review_form.followers.label }}</h3>
+                            {{ review_form.followers.errors }}
+                            {{ review_form.followers }}
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="{% block button_text %}{% endblock %}">

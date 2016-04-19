@@ -76,7 +76,7 @@
                 {% if object.state != "closed" %}
                     <h4 class="heading">
                         Reviewer State:
-                        <span class="tooltip" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
+                        <span class="help" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
                     </h4>
                     {% if object.reviewer_state == "Approved" %}
                         <span class="icon-{{ object.reviewer_state }}">{{ object.reviewer_state|capfirst }}</span>
@@ -87,7 +87,7 @@
                 {% endif %}
                 <h4 class="heading">
                     Demo State:
-                    <span class="tooltip" title="The demo state is the state of the actual review itself (Open, closed, etc)">
+                    <span class="help" title="The demo state is the state of the actual review itself (Open, closed, etc)">
                 </h4>
                 {{ object.state|capfirst }}
                 {% if object.state == 'closed' %}
@@ -100,26 +100,56 @@
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
             <div class="cel reviewers">
-                <h4 class="heading">Reviewers:</h4>
-                <ul class="list-inline">
+                <h4 class="heading">
+                    Reviewers & Followers:
+                    <span class="help" title="When you assign someone as a 'reviewer' they
+                    will need to either approve or reject a review. A follower can simply follow
+                    the progress of a review without the ability or need to approve or reject."></span>
+                </h4>
+                <ul class="reviewer_ul">
                     {% for reviewer in object.reviewer_set.all %}
                         <li>
                             <a class="icon icon-{{ reviewer.get_status_display }}"
                                href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
-                                {{ reviewer.reviewer.userprofile }}</a>:
+                                {{ reviewer.reviewer.userprofile }}</a>
                             <small>
                                 {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                             </small>
                             {% if review.creator == request.user %}
-                                <small class="reviewer_deleter" style="display:none">
-                                    [<a data-reviewer="{{ reviewer.reviewer.pk }}">x</a>]
+                                <small class="person_deleter" style="display:none">
+                                    [<a data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
                     {% endfor %}
-                    {% if object.state != "closed" %}
+                </ul>
+                <ul class="follower_ul">
+                    {% for follower in object.follower_set.all %}
                         <li>
-                            <input type="text" id="find_reviewer" placeholder="add reviewer" maxlength="3">
+                            <a href="{{ follower.user.userprofile.get_absolute_url }}">
+                                {{ follower.user.userprofile }}</a>
+                            <small>
+                                following
+                            </small>
+                            {% if review.creator == request.user or follower.user == request.user %}
+                                <small class="person_deleter" style="display:none">
+                                    [<a data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                </small>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <ul class="find_person_ul">
+                    {% if object.state != "closed" %}
+                        <li class="find_person_li">
+                            <div class="split by:2 with-gap:2">
+                                <div class="cel">
+                                    <input type="text" class="find_person" data-action="find_reviewer" placeholder="add reviewer" maxlength="3">
+                                </div>
+                                <div class="cel">
+                                    <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
+                                </div>
+                            </div>
                         </li>
                     {% endif %}
                 </ul>
@@ -127,7 +157,7 @@
             <div class="cel">
                 <h4 class="heading">
                     Demo Revisions:
-                    <span class="tooltip" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be. Mouse over a revision to see when it was added."></span>
+                    <span class="help" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be. Mouse over a revision to see when it was added."></span>
                 </h4>
                 {% for rev in object.reviewrevision_set.all %}
                     <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
@@ -273,14 +303,20 @@
 {% block patterns %}
 {{ block.super }}
 <script type="text/x-pattern" id="new_reviewers">
-<ul>
 <% _.each(person, function(person) { %>
-    <li><a href="#" data-reviewer="<%= person.pk %>" class="new_reviewer_click"><%= person.name %></a></li>
+<li><a href="#" data-reviewer="<%= person.pk %>" data-action="add_reviewer" class="add_person_click"><%= person.name %></a></li>
 <% }) %>
-</ul>
+</script>
+<script type="text/x-pattern" id="new_followers">
+<% _.each(person, function(person) { %>
+<li><a href="#" data-reviewer="<%= person.pk %>" data-action="add_follower" class="add_person_click"><%= person.name %></a></li>
+<% }) %>
 </script>
 <script type="text/x-pattern" id="added_reviewer">
-<li><%= person.attributes.reviewer_name %>: <%= person.attributes.reviewer_status %></a></li>
+<li><a href="/accounts/profile/<%= person.attributes.reviewer_user_pk %>"><%= person.attributes.reviewer_name %></a> <small><%= person.attributes.reviewer_status %></small></li>
+</script>
+<script type="text/x-pattern" id="added_follower">
+<li><a href="/accounts/profile/<%= person.attributes.follower_user_pk %>"><%= person.attributes.follower_name %></a> <small>following</small></li>
 </script>
 {% endblock %}
 
@@ -407,9 +443,8 @@ $('[data-comment]').each(function() {
 {% endif %}
 
 var ModifyReviewers = new DemoTime.Reviewers({
-    finder_url: '{% url 'reviewer-finder' review.pk %}',
-    adder_url: '{% url 'add-reviewer' review.pk %}',
-    deleter_url: '{% url 'delete-reviewer' review.pk %}'
+    url: '{% url 'user-api' %}',
+    review_pk: '{{ review.pk }}'
 });
 
 // set up background tasks (new messages, comments etc)

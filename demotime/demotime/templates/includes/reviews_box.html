@@ -3,20 +3,24 @@
 {# Demos assigned to you #}
 
 <h3 class="icon icon-inbox">
-    Open Reviews Assigned to
+    Open Reviews Following/Assigned to
     {% if request.user.pk == user.pk %}
         You
     {% else %}
         {{ user }}
     {% endif %}
-    <span class="tooltip" title="Reviews are demos that have been assigned
+    <span class="help" title="Reviews are demos that have been assigned
         to you to review. You can leave feedback and ultimately approve or
-        reject a demo. Your approval status appears to the left."></span>
+        reject a demo. Your approval status appears to the left. Reviews you
+        are following do not require your approval and you can simply
+        follow their progress."></span>
 </h3>
 
-<section class="reviews {% if not reviews %}done{% endif %}">
-    {% if reviews %}
+<section class="reviews {% if not reviews and not follows %}done{% endif %}">
         <ul>
+            {% if reviews and follows %}
+                <li>Reviewing:</li>
+            {% endif %}
             {% for demo in reviews %}
                 <li>
                     <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
@@ -26,7 +30,22 @@
                         </a>
                     </span>
                 </li>
+                {% if follows and forloop.last %}
+                    <li></li>
+                {% endif %}
             {% endfor %}
+            {% if follows %}
+                <li>Following:</li>
+                {% for demo in follows %}
+                    <li>
+                        <span>
+                            DT-{{ demo.pk }}:
+                            <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
+                                {{ demo.title|truncatechars:48 }}
+                            </a>
+                        </span>
+                    </li>
+                {% endfor %}
+            {% endif %}
         </ul>
-    {% endif %}
 </section>

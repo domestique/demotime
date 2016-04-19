@@ -2,12 +2,14 @@ from django.db import models
 from django.db.models import Max
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.auth.models import User
 
 from .attachments import Attachment
 from .base import BaseModel
 from .messages import Message
 from .users import UserReviewStatus
 from .reminders import Reminder
+from .followers import Follower
 
 REVIEWING = 'reviewing'
 REJECTED = 'rejected'
@@ -36,6 +38,11 @@ class Review(BaseModel):
         'auth.User',
         related_name='reviewers',
         through='Reviewer'
+    )
+    followers = models.ManyToManyField(
+        'auth.User',
+        related_name='followers',
+        through='Follower'
     )
     title = models.CharField(max_length=1024)
     description = models.TextField()
@@ -77,10 +84,27 @@ class Review(BaseModel):
                 revision=self.revision,
             )
 
+        for follower in self.follower_set.all():
+            context = {
+                'receipient': follower.user,
+                'url': self.get_absolute_url(),
+                'update': update,
+                'title': self.title,
+                'is_follower': True,
+            }
+            Message.send_system_message(
+                title,
+                'demotime/messages/review.html',
+                context,
+                follower.user,
+                revision=self.revision,
+            )
+
     @classmethod
     def create_review(
             cls, creator, title, description,
-            case_link, reviewers, attachments=None):
+            case_link, reviewers, followers=None,
+            attachments=None):
         ''' Standard review creation method '''
         obj = cls.objects.create(
             creator=creator,
@@ -108,6 +132,12 @@ class Review(BaseModel):
                 obj, reviewer
             )
 
+        for follower in followers:
+            Follower.create_follower(obj, follower)
+            UserReviewStatus.create_user_review_status(
+                obj, follower
+            )
+
         # Creator UserReviewStatus, set read to True, cuz they just created it
         # so I'm assuming they read it
         UserReviewStatus.create_user_review_status(
@@ -125,7 +155,9 @@ class Review(BaseModel):
     @classmethod
     def update_review(
             cls, review, creator, title, description,
-            case_link, reviewers, attachments=None):
+            case_link, reviewers, followers=None,
+            attachments=None
+            ):
         ''' Standard update review method '''
         obj = cls.objects.get(pk=review)
         obj.title = title
@@ -155,9 +187,18 @@ class Review(BaseModel):
 
         for reviewer in reviewers:
             try:
-                Reviewer.objects.get(review=obj, reviewer=reviewer)
+                reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
-                Reviewer.create_reviewer(obj, reviewer)
+                reviewer = Reviewer.create_reviewer(obj, reviewer)
+            else:
+                reviewer.status = REVIEWING
+                reviewer.save()
+
+        for follower in followers:
+            try:
+                Follower.objects.get(review=obj, user=follower)
+            except Follower.DoesNotExist:
+                Follower.create_follower(review=obj, user=follower)
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
@@ -166,9 +207,10 @@ class Review(BaseModel):
 
         # Drop Reviewers no longer assigned
         obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers).delete()
+        obj.follower_set.exclude(review=obj, user__in=followers).delete()
 
         # Messages
-        obj._send_revision_messages()
+        obj._send_revision_messages(update=True)
 
         # Reminders
         Reminder.update_reminders_for_review(obj)
@@ -234,12 +276,15 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state'])
-        for reviewer in self.reviewers.all():
+        users = User.objects.filter(
+            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+        )
+        for user in users:
             Message.send_system_message(
                 '"{}" has been Reopened'.format(self.title),
                 'demotime/messages/reopened.html',
-                {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
-                reviewer,
+                {'review': self, 'previous_state': prev_state, 'reviewer': user},
+                user,
                 revision=self.revision,
             )
 
@@ -253,12 +298,15 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state'])
-        for reviewer in self.reviewers.all():
+        users = User.objects.filter(
+            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+        )
+        for user in users:
             Message.send_system_message(
                 '"{}" has been {}'.format(self.title, state.capitalize()),
                 'demotime/messages/closed.html',
-                {'review': self, 'previous_state': prev_state, 'reviewer': reviewer},
-                reviewer,
+                {'review': self, 'previous_state': prev_state, 'reviewer': user},
+                user,
                 revision=self.revision,
             )
 
@@ -294,6 +342,18 @@ class Review(BaseModel):
     def revision(self):
         return self.reviewrevision_set.latest()
 
+    @property
+    def reviewing_count(self):
+        return self.reviewer_set.filter(status=REVIEWING).count()
+
+    @property
+    def approved_count(self):
+        return self.reviewer_set.filter(status=APPROVED).count()
+
+    @property
+    def rejected_count(self):
+        return self.reviewer_set.filter(status=REJECTED).count()
+
 
 class Reviewer(BaseModel):
 
@@ -310,39 +370,63 @@ class Reviewer(BaseModel):
         default='reviewing', db_index=True
     )
 
+    def __unicode__(self):
+        return u'{} Follower on {}'.format(
+            self.reviewer_display_name,
+            self.review.title,
+        )
+
     @property
     def reviewer_display_name(self):
         return self.reviewer.userprofile.display_name or self.reviewer.username
 
     @classmethod
-    def create_reviewer(cls, review, reviewer, non_revision=False):
+    def create_reviewer(cls, review, reviewer, notify_reviewer=False, notify_creator=False):
         obj = cls.objects.create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
         )
-        if non_revision:
-            obj._send_reviewer_message()
+
+        if notify_reviewer:
+            obj._send_reviewer_message(notify_reviewer=True, notify_creator=False)
+
+        if notify_creator:
+            obj._send_reviewer_message(notify_reviewer=False, notify_creator=True)
 
         return obj
 
-    def _send_reviewer_message(self, deleted=False):
-        title = '{} as reviewer on: {}'.format(
-            'Deleted' if deleted else 'Added',
-            self.review.title
-        )
+    def _send_reviewer_message(self, deleted=False, notify_reviewer=False, notify_creator=False):
+        if deleted:
+            title = 'Deleted as reviewer on: {}'.format(self.review.title)
+            receipient = self.reviewer
+        elif notify_reviewer:
+            title = 'You have been added as a reviewer on: {}'.format(
+                self.review.title
+            )
+            receipient = self.reviewer
+        elif notify_creator:
+            title = '{} has been added as a reviewer on: {}'.format(
+                self.reviewer_display_name,
+                self.review.title
+            )
+            receipient = self.review.creator
+        else:
+            raise Exception('No receipient for message in reviewer message')
 
         context = {
-            'receipient': self.reviewer,
+            'receipient': receipient,
             'url': self.review.get_absolute_url(),
             'title': self.review.title,
             'deleted': deleted,
+            'creator': notify_creator,
+            'reviewer': self,
         }
         Message.send_system_message(
             title,
             'demotime/messages/reviewer.html',
             context,
-            self.reviewer,
+            receipient,
             revision=self.review.revision,
         )
 

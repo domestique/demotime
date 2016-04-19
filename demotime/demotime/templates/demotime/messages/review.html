@@ -1,9 +1,13 @@
-Hello {{ reviewer }},
+Hello {{ receipient }},
 
 {% if update %}
-There has been an update to <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+    There has been an update to <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
 {% else %}
-A new review has been created and assigned to you: <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+    {% if is_follower %}
+        You have been assigned as a follower on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+    {% else %}
+        A new review has been created and assigned to you: <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+    {% endif %}
 {% endif %}
 
 Thanks,

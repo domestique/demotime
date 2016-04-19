@@ -7,6 +7,7 @@ from .messages import Message, MessageBundle
 from .reviews import Review, ReviewRevision, Reviewer
 from .users import UserProfile, UserReviewStatus
 from .reminders import Reminder
+from .followers import Follower
 
 
 def create_profile(sender, instance, created, raw, **kwargs):
