@@ -17,7 +17,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
             if (self.options.comments_url) {
                 self.fetch_new_comments();
             }
-        }, 15000);
+        }, 5000);
     },
 
     // Update the header with any new messages
@@ -28,9 +28,11 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
             url: self.options.messages_url
         });
 
-        req.success(function(data) {
+        req.always(function(data) {
             if (data.message_count > 0) {
                 $('.msg_notifier').removeClass('read_notification').addClass('unread_notification').find('a').html(data.message_count);
+            } else {
+                $('.msg_notifier').removeClass('unread_notification').find('a').html(data.message_count);
             }
         });
     },
@@ -61,22 +63,15 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                         },
                         callback: {
                             onCloseClick: function() {
-                                // Mark message as read on balloon click
-                                // Send request to mark message as read
-                                var req = $.ajax({
-                                    url: self.options.comments_url,
-                                    method: 'POST',
-                                    data: {
-                                        'messages': bundle_obj.bundle_pk,
-                                        'action': 'read'
-                                    }
-                                });
-
-                                req.success(function(data) {
-                                    // Redirect the user to the comment
-                                    window.location.href = window.location.origin + window.location.pathname + '#comments';
+                                // Redirect the user to the comment
+                                if (update_obj.is_comment) {
+                                    var url_hook = '#comments';
+                                    window.location.href = self.options.dt_url + '#comments';
                                     window.location.reload();
-                                });
+                                // Or just reload the review
+                                } else {
+                                    window.location.href = self.options.dt_url;
+                                }
                             }
                         }
                     });
