@@ -1,7 +1,7 @@
 <script type="text/x-pattern" id="review_info">
 <article class="review_info">
     <section>
-        <strong class="title">DT-<%= review.pk %>: <%= review.title %></strong>
+        <a href="<%= review.url %>" class="title">DT-<%= review.pk %>: <%= review.title %></a>
         <p>Created by <strong><%= review.creator %></strong>
         <p>Reviewer State:
             <% if (review.reviewer_state == "approved") { %>
