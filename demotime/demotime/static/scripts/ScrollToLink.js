@@ -51,6 +51,11 @@ DemoTime.ScrollToLink = Backbone.View.extend({
         // Set a default timeout before animation of 0
         var timeout = timeout || 0;
 
+        // Prevent default jump (less jumpy experience)
+        setTimeout(function() {
+            window.scrollTo(0, 0);
+        }, 1);
+
         // Sometimes we use name='blah' other times
         // we target an ID. So lets look for names first, then
         // fall back to IDs.
