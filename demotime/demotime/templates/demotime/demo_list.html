@@ -7,9 +7,13 @@
         overflow:hidden;
         padding: 20px;
     }
+    .form-actions {
+        text-align: center;
+    }
     .filters select {
         margin-right:1.5em;
         margin-bottom:1em;
+        max-width: 100px;
     }
     .filters input[type="submit"] {
         margin-top:2em;
@@ -58,7 +62,9 @@
                     {{ form.errors }}
                     {{ form }}
                 {% endfor %}
-                <input type="submit" value="Filter Reviews">
+                <div class="form-actions">
+                    <input type="submit" value="Filter Reviews">
+                </div>
             </form>
         </section>
         <table id="results" cellspacing="0" cellpadding="0" width="100%">
