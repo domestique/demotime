@@ -12,7 +12,7 @@ class ReviewForm(forms.ModelForm):
             pk=user.pk
         ).exclude(
             userprofile__user_type=models.UserProfile.SYSTEM
-        ).order_by('userprofile__display_name', 'username')
+        ).order_by('username')
         self.fields['reviewers'].queryset = valid_users
         self.fields['followers'].queryset = valid_users
         self.fields['followers'].required = False
