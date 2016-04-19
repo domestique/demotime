@@ -48,6 +48,7 @@
                 <div class="cradle">
                     <div class="split by:1/3 with-gap:0">
                         <div class="cel">
+                            <svg id="svg" class="clock" onclick="window.location.href = '{% url 'index' %}'"></svg>
                             <a class="navbar-logo" href="{% url 'index' %}"><strong>Demo</strong>time</a>
                         </div>
                         <div class="cel">
@@ -144,6 +145,10 @@
         {# linkify plain urls #}
         <script src="/static/scripts/library/linkify.min.js"></script>
         <script src="/static/scripts/library/linkify-jquery.min.js"></script>
+
+        {# fancy clock #}
+        <script src="/static/scripts/library/snap.svg-min.js"></script>
+        <script src="/static/scripts/Clock.js"></script>
 
         {# keyboard #}
         <script src="/static/scripts/library/mousetrap.js"></script>
