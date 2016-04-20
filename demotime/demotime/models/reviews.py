@@ -481,7 +481,7 @@ class ReviewRevision(BaseModel):
     def get_absolute_url(self):
         return reverse('review-rev-detail', kwargs={
             'pk': self.review.pk,
-            'rev_pk': self.pk
+            'rev_num': self.number,
         })
 
     @property
