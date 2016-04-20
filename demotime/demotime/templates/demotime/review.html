@@ -160,7 +160,7 @@
                     <span class="help" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be. Mouse over a revision to see when it was added."></span>
                 </h4>
                 {% for rev in object.reviewrevision_set.all %}
-                    <div class="revision {% if revision.pk == rev.pk %}current{% endif %}">
+                    <div class="revision {% if revision.number == rev.number %}current{% endif %}">
                         <a title="{{ rev.modified }}" href="{{ rev.get_absolute_url }}">Revision {{ rev.number }}</a>
                         {% if rev.commentthread_set.count %}
                             <small>

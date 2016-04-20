@@ -15,9 +15,9 @@ class ReviewDetail(DetailView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        if self.kwargs.get('rev_pk'):
+        if self.kwargs.get('rev_num'):
             self.revision = get_object_or_404(
-                models.ReviewRevision, pk=self.kwargs['rev_pk']
+                models.ReviewRevision, pk=self.kwargs['rev_num']
             )
         else:
             self.revision = self.get_object().revision
@@ -137,7 +137,7 @@ class CreateReviewView(TemplateView):
             return redirect(
                 'review-rev-detail',
                 pk=review.pk,
-                rev_pk=review.revision.pk
+                rev_num=review.revision.pk
             )
         return self.get(request, *args, **kwargs)
 

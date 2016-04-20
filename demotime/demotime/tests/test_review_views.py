@@ -143,14 +143,14 @@ class TestReviewViews(BaseTestCase):
     def test_review_rev_detail(self):
         response = self.client.get(reverse('review-rev-detail', kwargs={
             'pk': self.review.pk,
-            'rev_pk': self.review.revision.pk
+            'rev_num': self.review.revision.number,
         }))
         self.assertStatusCode(response, 200)
 
     def test_review_rev_detail_404(self):
         response = self.client.get(reverse('review-rev-detail', kwargs={
             'pk': self.review.pk,
-            'rev_pk': 500,
+            'rev_num': 500,
         }))
         self.assertStatusCode(response, 404)
 
