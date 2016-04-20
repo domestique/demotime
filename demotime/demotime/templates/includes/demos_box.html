@@ -27,7 +27,7 @@
                         </a>
                     </span>
                     {% if demo.state == "closed" %}
-                        {{ demo.state }}
+                        <small>{{ demo.state }}</small>
                     {% else %}
                         <span class="review_state">
                             {% if demo.reviewer_state == "reviewing" %}
