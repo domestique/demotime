@@ -29,7 +29,7 @@
             {% include "includes/reviews_box.html" with reviews=open_reviews follows=followed_demos user=request.user %}
         </div>
         <div class="cel">
-            {% include "includes/updates_box.html" with reviews=updated_demos user=request.user %}
+            {% include "includes/updates_box.html" with message_bundles=message_bundles user=request.user %}
         </div>
     </div>
     {% if open_demos %}

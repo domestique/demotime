@@ -1,37 +1,36 @@
-{# Recently updated demos #}
+{% load demo_tags %}
 
-<h3 class="icon icon-mail">
-    Most Recently Updated Demos
-    <span class="help" title="Demos that are either owned by you
-    or are assigned to you that have been updated since you last reviewed them will appear here."></span>
+<h3 class="icon icon-inbox">
+    {% if request.user.pk == user.pk %}
+        Your
+    {% else %}
+        {{ user }}'s
+    {% endif %}
+    inbox
+    <span class="help" title="Reviews are demos that have been assigned
+        to you to review. You can leave feedback and ultimately approve or
+        reject a demo. Your approval status appears to the left. Reviews you
+        are following do not require your approval and you can simply
+        follow their progress."></span>
 </h3>
 
-<section class="updates {% if not reviews %}done{% endif %}">
-    {% if reviews %}
+<section class="updates">
+    <div class="messages-list">
         <ul>
-            {% for demo in reviews %}
-                {% if forloop.counter <= 5 %}
-                    <li {% if demo.read == True %}class="de-emphasize"{% endif %}>
-                        <span>
-                            DT-{{ demo.review.pk }}:
-                            <a data-pk="{{ demo.review.pk }}" href="{{ demo.review.get_absolute_url }}">
-                                {{ demo.review.title|truncatechars:48 }}
-                            </a>
-                        </span>
-                        <small class="{{ demo.review.reviewer_state }}">
-                            {% if demo.review.state == "closed" %}
-                                {{ demo.review.state }}
+            {% for message in message_bundles %}
+                <li {% if message.read %}class="de-emphasize"{% endif %}>
+                    {% if message.review %}
+                        <strong>
+                            {% if message.review.creator != request.user %}
+                                <a data-pk="{{ message.review.pk }}" title="Your approval status" class="dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                             {% else %}
-                                {% if demo.review.reviewer_state == "reviewing" %}
-                                    active
-                                {% else %}
-                                    {{ demo.review.reviewer_state }}
-                                {% endif %}
+                                <a data-pk="{{ message.review.pk }}" class="dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                             {% endif %}
-                        </small>
-                    </li>
-                {% endif %}
+                        </strong>
+                    {% endif %}
+                    <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title|truncatechars:48 }}</a>
+                </li>
             {% endfor %}
         </ul>
-    {% endif %}
+    </div>
 </section>

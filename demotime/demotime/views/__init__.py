@@ -62,7 +62,7 @@ class IndexView(TemplateView):
         message_bundles = models.MessageBundle.objects.filter(
             owner=self.request.user,
             deleted=False,
-        ).order_by('read', '-modified')[:5]
+        ).order_by('-modified')[:5]
         context['message_bundles'] = message_bundles
         return context
 

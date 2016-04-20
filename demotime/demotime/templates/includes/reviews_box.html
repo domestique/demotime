@@ -24,7 +24,11 @@
             {% for demo in reviews %}
                 <li>
                     <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
-                        DT-{{ demo.pk }}:
+                        <strong>
+                            <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
+                                DT-{{ demo.pk }}
+                            </a>:
+                        </strong>
                         <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
                             {{ demo.title|truncatechars:48 }}
                         </a>
