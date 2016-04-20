@@ -12,7 +12,7 @@
         updates. Click the DT-XX link to jump in to the demo itself."></span>
 </h3>
 
-<section class="updates">
+<section class="updates {% if not message_bundles %}done{% endif %}">
     <div class="messages-list">
         <ul>
             {% for message in message_bundles %}
