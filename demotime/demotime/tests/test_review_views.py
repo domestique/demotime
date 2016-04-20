@@ -363,7 +363,8 @@ class TestReviewViews(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertEqual(len(mail.outbox), 2)
+        # Only one message, simply for the approval
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_update_reviewer_status_failure_wrong_user(self):
         reviewer = models.Reviewer.objects.get(

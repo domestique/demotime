@@ -278,7 +278,7 @@ class Review(BaseModel):
         self.save(update_fields=['state'])
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
-        )
+        ).distinct()
         for user in users:
             Message.send_system_message(
                 '"{}" has been Reopened'.format(self.title),
@@ -300,7 +300,7 @@ class Review(BaseModel):
         self.save(update_fields=['state'])
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
-        )
+        ).distinct()
         for user in users:
             Message.send_system_message(
                 '"{}" has been {}'.format(self.title, state.capitalize()),
@@ -438,8 +438,11 @@ class Reviewer(BaseModel):
         reminder_active = status == REVIEWING
         Reminder.set_activity(self.review, self.reviewer, reminder_active)
 
-        # Send a message
-        if status != old_status:
+        # Send a message if this isn't the last person to approve/reject
+        all_statuses = self.review.reviewer_set.values_list('status', flat=True)
+        consensus = all(x == APPROVED for x in all_statuses) or all(
+            x == REJECTED for x in all_statuses)
+        if status != old_status and not consensus:
             status_display = '{} {}'.format(
                 'resumed' if status == REVIEWING else 'has',
                 self.status,

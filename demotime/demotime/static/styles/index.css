@@ -20,12 +20,16 @@ h1.heading {
 .reviews-list section,
 .reviews-list section a {
     color:#fff;
-    font-weight: 400;
+    font-weight: 200;
+}
+.reviews-list section strong a {
+    font-weight: 800;
 }
 li.de-emphasize span,
 span.icon-Approved { color: #999; }
 li.de-emphasize a,
 span.icon-Approved a { font-weight: 200; color: #ccc; }
+li.de-emphasize strong a { font-weight: 400; }
 
 .reviews-list ul {
     list-style:none;

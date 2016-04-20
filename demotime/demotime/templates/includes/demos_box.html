@@ -17,7 +17,11 @@
             {% for demo in reviews %}
                 <li>
                     <span>
-                        DT-{{ demo.pk }}:
+                        <strong>
+                            <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
+                                DT-{{ demo.pk }}
+                            </a>:
+                        </strong>
                         <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
                             {{ demo.title }}
                         </a>
