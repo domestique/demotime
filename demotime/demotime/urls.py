@@ -34,7 +34,7 @@ urlpatterns += [
     url(r'^review/(?P<pk>[\d]+)/$', reviews.review_detail, name='review-detail'),
     url(r'^(?i)DT-(?P<pk>[\d]+)/$', reviews.dt_redirect_view, name='dt-redirect'),
     url(
-        r'^review/(?P<pk>[\d]+)/rev/(?P<rev_pk>[\d]+)/$',
+        r'^review/(?P<pk>[\d]+)/rev/(?P<rev_num>[\d]+)/$',
         reviews.review_detail,
         name='review-rev-detail'
     ),
