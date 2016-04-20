@@ -22,18 +22,7 @@
                 <li>Reviewing:</li>
             {% endif %}
             {% for demo in reviews %}
-                <li>
-                    <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
-                        <strong>
-                            <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
-                                DT-{{ demo.pk }}
-                            </a>:
-                        </strong>
-                        <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
-                            {{ demo.title|truncatechars:48 }}
-                        </a>
-                    </span>
-                </li>
+                {% include "includes/reviews_li.html" %}
                 {% if follows and forloop.last %}
                     <li></li>
                 {% endif %}
@@ -41,14 +30,7 @@
             {% if follows %}
                 <li>Following:</li>
                 {% for demo in follows %}
-                    <li>
-                        <span>
-                            DT-{{ demo.pk }}:
-                            <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
-                                {{ demo.title|truncatechars:48 }}
-                            </a>
-                        </span>
-                    </li>
+                    {% include "includes/reviews_li.html" %}
                 {% endfor %}
             {% endif %}
         </ul>

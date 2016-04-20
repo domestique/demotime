@@ -1,0 +1,12 @@
+{% load demo_tags %}
+<li>
+    <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
+        DT-{{ demo.pk }}:
+        <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">
+            {{ demo.title|truncatechars:45 }}
+        </a>
+        <small>
+            (<a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile|truncatechars:15 }}</a>)
+        </small>
+    </span>
+</li>
