@@ -17,7 +17,9 @@ class ReviewDetail(DetailView):
     def dispatch(self, request, *args, **kwargs):
         if self.kwargs.get('rev_num'):
             self.revision = get_object_or_404(
-                models.ReviewRevision, pk=self.kwargs['rev_num']
+                models.ReviewRevision,
+                number=self.kwargs['rev_num'],
+                review__pk=self.kwargs['pk']
             )
         else:
             self.revision = self.get_object().revision
