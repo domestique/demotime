@@ -98,13 +98,14 @@ footer {
 }
 
 .clock {
-  width: 65px;
-  height: 65px;
-  margin: 10px;
-  border-radius: 10px;
-  float: left;
-  margin-right: 10px;
-  transform-origin-x: 50%;
-  transform-origin-y: 50%;
-  transform-origin-z: initial;
+    pointer: cursor;
+    width: 65px;
+    height: 65px;
+    margin: 10px;
+    border-radius: 10px;
+    float: left;
+    margin-right: 10px;
+    transform-origin-x: 50%;
+    transform-origin-y: 50%;
+    transform-origin-z: initial;
 }
