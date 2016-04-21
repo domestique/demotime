@@ -9,6 +9,11 @@ h1.heading {
     margin:0;
     font-size:18px;
 }
+@media screen and (max-width:680px) {
+    .reviews-list h3 {
+        font-size:14px;
+    }
+}
 .reviews-list section {
     min-height:170px;
     padding:10px;

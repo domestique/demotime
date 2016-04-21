@@ -50,6 +50,12 @@ article {
     padding: 20px;
     margin: 40px 0;
 }
+@media screen and (max-width:680px) {
+    article {
+        padding: 5px;
+        margin: 20px 0;
+    }
+}
 
 section {
     background:#fafafa;
@@ -61,7 +67,7 @@ section {
 }
 @media screen and (max-width:680px) {
     section {
-        padding:1em;
+        padding:.5em;
     }
 }
 section > h2:first-child,
@@ -109,11 +115,22 @@ p, li {
     margin-top: 20px;
     margin-bottom: 40px;
 }
+@media screen and (max-width:680px) {
+    .content h1 {
+        font-size: 30px;
+    }
+}
 .content h1 small {
     text-transform: uppercase;
     font-size: 12px;
     margin-left: 10px;
     vertical-align: middle;
+}
+@media screen and (max-width:680px) {
+    .content h1 small a {
+        margin-left: 2px;
+        font-size: 10px;
+    }
 }
 .review_info a,
 .content a {

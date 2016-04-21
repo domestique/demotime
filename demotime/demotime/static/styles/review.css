@@ -10,6 +10,13 @@
     font-weight: 300;
     position: relative;
 }
+@media screen and (max-width:680px) {
+    .content h1 {
+        padding: 10px;
+        font-size: 20px;
+        line-height: 24px;
+    }
+}
 h1 .alert {
     font-size: 10px;
     color: #aaa;
@@ -30,6 +37,11 @@ h1 .alert {
     font-size: 14px;
     overflow: hidden;
 }
+@media screen and (max-width:680px) {
+    .review-meta {
+        padding: 10px;
+    }
+}
 .review-meta .cel {
     float: left;
 }
@@ -44,9 +56,9 @@ h1 .alert {
     width: 20%;
 }
 @media screen and (max-width:680px) {
-    .review-meta .cel:nth-child(1),
-    .review-meta .cel:nth-child(2),
-    .review-meta .cel:nth-child(3) {
+    .review-meta > .cel:nth-child(1),
+    .review-meta > .cel:nth-child(2),
+    .review-meta > .cel:nth-child(3) {
         width: 100%;
         float: none;
         margin-bottom: 20px;
@@ -246,6 +258,11 @@ input.find_person {
     background: #fafafa;
     padding: 20px 25px;
     float: left;
+}
+@media screen and (max-width:680px) {
+    .your-status {
+        padding: 10px;
+    }
 }
 .your-status img {
     position: relative;
