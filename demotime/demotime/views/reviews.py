@@ -139,7 +139,7 @@ class CreateReviewView(TemplateView):
             return redirect(
                 'review-rev-detail',
                 pk=review.pk,
-                rev_num=review.revision.pk
+                rev_num=review.revision.number
             )
         return self.get(request, *args, **kwargs)
 
