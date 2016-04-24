@@ -104,10 +104,16 @@ section.demos {
 .reviews-list .icon sup {
     font-size: 9px;
     position: relative;
-    left: -4px;
+    left: -3px;
 }
 
 .icon-Reviewing, .icon-reviewing {
     background: url(/static/images/emoji/clock.png) 0 50% no-repeat;
     background-size: 16px;
+}
+
+.copy_link img {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
 }

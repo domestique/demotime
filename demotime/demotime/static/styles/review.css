@@ -284,11 +284,17 @@ input.find_person {
     font-weight: 900;
 }
 
-#confetti{
+#confetti {
     position: absolute;
     left: 0;
     top: 0;
     height: 100%;
     width: 100%;
+    min-width: 1400px;
     display: block;
+}
+
+.copy_link img {
+    position: relative;
+    top: 5px;
 }
