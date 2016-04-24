@@ -1,16 +1,19 @@
 <div class="attachment-card {{ attachment.attachment_type }} {% if attachment.description %}taller{% endif %} collapseable">
     <section>
         <h3 class="heading icon icon-{{ attachment.attachment_type }}">
-            {{ attachment.attachment_type|capfirst }}:
+            {{ attachment.attachment_type|capfirst }}
         </h3>
         {% if attachment.description %}
             <div class="attachment-description">{{ attachment.description }}</div>
         {% endif %}
         {% if attachment.attachment_type == "audio" %}
-            <audio src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true">
+            <audio src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true"></audio>
         {% endif %}
         {% if attachment.attachment_type == "movie" %}
-            <video src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true">
+            <video src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true"></video>
+            {% if attachment.attachment_type == "movie" %}
+                <br><small><a href="{% url "user-media" attachment.attachment.name|urlencode %}">download this</a></small>
+            {% endif %}
         {% endif %}
         {% if attachment.attachment_type == "image" %}
             <span class="attachment-image">
