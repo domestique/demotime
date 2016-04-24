@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 from .attachments import Attachment, attachment_filename
 from .comments import Comment, CommentThread
 from .messages import Message, MessageBundle
-from .reviews import Review, ReviewRevision, Reviewer
+from .reviews import Review, ReviewRevision
 from .users import UserProfile, UserReviewStatus
 from .reminders import Reminder
 from .followers import Follower
+from .reviewers import Reviewer
 
 
 def create_profile(sender, instance, created, raw, **kwargs):
