@@ -60,7 +60,7 @@ $('.review form').submit(function(e) {
             proceed = false;
         }
         if (!file.val() && desc.val()) {
-            reason = 'an attachment';
+            reason = 'a file';
             proceed = false;
         }
     });

@@ -285,7 +285,10 @@
                                 {% endif %}
                             {% endfor %}
                             <div class="comments-reply_new collapseable">
-                                {% use_macro form 'Reply' %}
+                                <a href="#" class="icon icon-comment leave_reply_link">Reply to this</a>
+                                <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
+                                    {% use_macro form 'Reply' %}
+                                </div>
                             </div>
                         </section>
                     {% endfor %}
@@ -296,7 +299,7 @@
         <article>
             <h3 class="heading">Post a New Comment</h3>
             <section class="new_comment">
-                {% use_macro form %}
+                {% use_macro form 'Reply' %}
             </section>
         </article>
     </div>
@@ -454,6 +457,16 @@ var ModifyReviewers = new DemoTime.Reviewers({
 var NewComments = new DemoTime.BackgroundTasks({
     comments_url: '{% url "messages-json" review.pk %}',
     dt_url: '{{ review.get_absolute_url }}'
+});
+
+$('.leave_reply_link').click(function(event) {
+    event.preventDefault();
+    var link = $(this);
+    link.next('.comment_container').slideDown(function() {
+        $(this).find('textarea').summernote('focus');
+        $(this).find('.note-editor .note-editor').remove();
+    });
+    link.remove();
 });
 </script>
 {% endblock %}
