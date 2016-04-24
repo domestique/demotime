@@ -12,7 +12,9 @@ h1, h2, h3 {
 h1, h2, h3, h4, h5 {
     font-weight:300;
 }
-h1 a, h2 a, h3 a {
+h1 a:not(.normal_text),
+h2 a:not(.normal_text),
+h3 a:not(.normal_text) {
     font-size:13px;
     margin-left:10px;
     vertical-align:middle;
@@ -134,7 +136,7 @@ p, li {
 }
 .review_info a,
 .content a {
-    color:#54BB9C;
+    color:#32CCAE;
     text-decoration:none;
     font-weight:700;
 }

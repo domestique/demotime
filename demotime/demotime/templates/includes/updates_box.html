@@ -6,7 +6,7 @@
     {% else %}
         {{ user }}'s
     {% endif %}
-    inbox
+    <a href="{% url 'inbox' %}" class="normal_text">inbox</a>
     <span class="help" title="Here is a list of reviews that have been
         recently updated. Click a title to view the message bundle and recent
         updates. Click the DT-XX link to jump in to the demo itself."></span>
@@ -27,7 +27,7 @@
                             {% endif %}
                         </strong>
                     {% endif %}
-                    <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title|truncatechars:40 }}</a>
+                    <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title|truncatechars:35 }}</a>
                     {% if message.review.state == "closed" %}
                         <small>
                             {{ message.review.state }}

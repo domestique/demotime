@@ -37,7 +37,7 @@ dl.messages-nav dd.current.last {
     border-radius:0 10px 10px 0;
 }
 dl.messages-nav dd.current {
-    background:#54BB9C;
+    background:#32CCAE;
 }
 dl.messages-nav dd.current a {
     color:#fff;
@@ -48,7 +48,7 @@ dl.messages-nav dd.current a {
         margin:40px auto;
         width:200px;
         height:40px;
-        background:#54BB9C;
+        background:#32CCAE;
         border:2px solid #415E73;
         border-radius:6px;
         display:block;
@@ -71,7 +71,7 @@ dl.messages-nav dd.current a {
         width:40px;
         height:40px;
         background-color:#fff;
-        color:#54BB9C;
+        color:#32CCAE;
         font-size:18px;
         font-family:Verdana, sans-serif;
         line-height:40px;
@@ -97,7 +97,7 @@ dl.messages-nav dd.current a {
     }
 
     dl.messages-nav dd.current a {
-        background-color:#54BB9C;
+        background-color:#32CCAE;
         color:#fff;
     }
 
@@ -115,7 +115,7 @@ dl.messages-nav dd.current a {
     }
 
     dl.messages-nav dd a:hover {
-        background-color:#54BB9C;
+        background-color:#32CCAE;
         color:#fff;
     }
 

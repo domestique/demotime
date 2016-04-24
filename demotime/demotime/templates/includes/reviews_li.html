@@ -8,7 +8,7 @@
             </a>:
         </strong>
         <a href="{{ demo.get_absolute_url }}">
-            {{ demo.title|truncatechars:40 }}
+            {{ demo.title|truncatechars:35 }}
         </a>
         {% if demo.state == "closed" %}
             <small>{{ demo.state }}</small>

@@ -103,7 +103,7 @@ footer {
 }
 
 .clock {
-    pointer: cursor;
+    cursor: pointer;
     width: 65px;
     height: 65px;
     margin: 10px;
@@ -116,7 +116,7 @@ footer {
 }
 
 nav.subnav {
-    background:#54BB9C;
+    background:#32CCAE;
     text-align:center;
     margin-top:0px;
     padding:8px 0;
