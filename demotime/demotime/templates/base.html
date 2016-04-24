@@ -91,7 +91,17 @@
                     </div>
                 </div>
             </div>
-            {% block sub_nav %}{% endblock %}
+            {% block sub_nav %}
+                <nav class="subnav">
+                    <div class="container">
+                        <ul>
+                            <li><a href="{% url 'about' %}">About</a>
+                            <!--li><a href="{% url 'addons' %}">Add-ons</a-->
+                            <li><a href="https://demoti.me/blog/" target="_blank">Blog</a>
+                        </ul>
+                    </div>
+                </nav>
+            {% endblock %}
         </nav>
 
         <main>

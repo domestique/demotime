@@ -2,6 +2,8 @@
 {% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
+{% block sub_nav %}{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <link href="/static/styles/review.css" rel="stylesheet">
