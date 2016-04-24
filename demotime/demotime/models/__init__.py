@@ -9,6 +9,8 @@ from .users import UserProfile, UserReviewStatus
 from .reminders import Reminder
 from .followers import Follower
 from .reviewers import Reviewer
+from .groups import GroupType, Group, GroupMember
+from .projects import Project, ProjectGroup, ProjectMember
 
 
 def create_profile(sender, instance, created, raw, **kwargs):

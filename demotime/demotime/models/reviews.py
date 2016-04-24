@@ -58,6 +58,8 @@ class Review(BaseModel):
         max_length=128, choices=REVIEWER_STATE_CHOICES,
         default=REVIEWING, db_index=True
     )
+    is_public = models.BooleanField(default=False)
+    project = models.ForeignKey('Project')
 
     def __unicode__(self):
         return u'Review: {} by {}'.format(
