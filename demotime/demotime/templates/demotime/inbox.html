@@ -68,17 +68,29 @@
 {% block footer_scripts %}
 {{ block.super }}
 <script>
-    $('.messages-archive_all').click(function() {
-        var form = $(this).parents('form');
+    $('.messages-archive_all').click(function(event) {
+        var button = $(this);
+        event.preventDefault();
 
-        var r = confirm('Archive all messages?');
-        if (r == true) {
-            form.find('#id_messages option').prop('selected', true);
-            form.find('#id_action').val('read');
-            form.submit();
-        } else {
-            return false;
-        }
+        swal({
+            title: "Are you sure?",
+            text: "Archive all messages?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Confirm",
+            closeOnConfirm: false
+        },
+        function (isConfirm) {
+            if (isConfirm) {
+                var form = button.parents('form');
+                form.find('#id_messages option').prop('selected', true);
+                form.find('#id_action').val('read');
+                form.submit();
+            } else {
+                return false;
+            }
+        });
     });
 </script>
 {% endblock %}
