@@ -300,7 +300,7 @@ h1.heading {
 .copy_link {
     position: absolute;
     left: -3px;
-    top: 23%;
+    top: 33px;
     margin: 0 !important;
 }
 @media screen and (max-width:680px) {
