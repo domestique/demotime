@@ -4,7 +4,7 @@
     margin-bottom: 20px;
     text-transform: none;
     font-size: 35px;
-    line-height: 45px;
+    line-height: 42px;
     color:#333;
     padding: 25px;
     font-weight: 300;
@@ -294,7 +294,23 @@ input.find_person {
     display: block;
 }
 
-.copy_link img {
+h1.heading {
     position: relative;
-    top: 5px;
+}
+.copy_link {
+    position: absolute;
+    left: -3px;
+    top: 23%;
+    margin: 0 !important;
+}
+@media screen and (max-width:680px) {
+    .copy_link {
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+    .copy_link img {
+        width: 15px;
+        height: 15px;
+    }
 }
