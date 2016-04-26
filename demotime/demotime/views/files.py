@@ -1,18 +1,27 @@
 import os
+import re
 
 from django.conf import settings
 from django.views import static
 from django.views.generic.base import View
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+
+from demotime import models
+from demotime.views import CanViewMixin
 
 from sendfile import sendfile
 
 
-class UserMedia(View):
+class UserMedia(CanViewMixin, View):
 
-    @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
+        file_path = kwargs['file_path']
+        pk_search = re.search('\d+', file_path)
+        pk = pk_search.group() if pk_search else None
+        self.review = get_object_or_404(
+            models.Review,
+            pk=pk,
+        )
         return super(UserMedia, self).dispatch(*args, **kwargs)
 
     def get(self, request, file_path):

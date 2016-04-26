@@ -1,8 +1,6 @@
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 
 from demotime import models
 from . import JsonView
@@ -16,9 +14,9 @@ class UserAPI(JsonView):
         'add_reviewer', 'find_reviewer', 'drop_reviewer'
     )
 
-    @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.review = None
+        self.project = None
         return super(UserAPI, self).dispatch(*args, **kwargs)
 
     @property

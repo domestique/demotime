@@ -108,8 +108,8 @@ class Review(BaseModel):
     @classmethod
     def create_review(
             cls, creator, title, description,
-            case_link, reviewers, followers=None,
-            attachments=None):
+            case_link, reviewers, project,
+            followers=None, attachments=None):
         ''' Standard review creation method '''
         obj = cls.objects.create(
             creator=creator,
@@ -118,6 +118,7 @@ class Review(BaseModel):
             case_link=case_link,
             state=OPEN,
             reviewer_state=REVIEWING,
+            project=project,
         )
         rev = ReviewRevision.objects.create(
             review=obj,
@@ -160,13 +161,14 @@ class Review(BaseModel):
     @classmethod
     def update_review(
             cls, review, creator, title, description,
-            case_link, reviewers, followers=None,
-            attachments=None
+            case_link, reviewers, project,
+            followers=None, attachments=None
             ):
         ''' Standard update review method '''
         obj = cls.objects.get(pk=review)
         obj.title = title
         obj.case_link = case_link
+        obj.project = project
         obj.save()
         prev_revision = obj.revision
         rev_count = obj.reviewrevision_set.count()
@@ -372,6 +374,7 @@ class ReviewRevision(BaseModel):
 
     def get_absolute_url(self):
         return reverse('review-rev-detail', kwargs={
+            'proj_slug': self.review.project.slug,
             'pk': self.review.pk,
             'rev_num': self.number,
         })

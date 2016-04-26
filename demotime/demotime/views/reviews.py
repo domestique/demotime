@@ -6,15 +6,20 @@ from django.utils.decorators import method_decorator
 from django.contrib.contenttypes.models import ContentType
 
 from demotime import forms, models
+from demotime.views import CanViewMixin
 from . import JsonView
 
 
-class ReviewDetail(DetailView):
+class ReviewDetail(CanViewMixin, DetailView):
     template_name = 'demotime/review.html'
     model = models.Review
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(
+            models.Project,
+            slug=self.kwargs['proj_slug']
+        )
         if self.kwargs.get('rev_num'):
             self.revision = get_object_or_404(
                 models.ReviewRevision,
@@ -24,6 +29,7 @@ class ReviewDetail(DetailView):
         else:
             self.revision = self.get_object().revision
 
+        self.review = self.revision.review
         self.comment = models.Comment(
             commenter=self.request.user
         )
@@ -68,6 +74,7 @@ class ReviewDetail(DetailView):
             review=self.revision.review,
             user=self.request.user,
         ).update(read=True)
+        context['project'] = self.project
         context['revision'] = self.revision
         context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
         context['attachment_form'] = self.attachment_form if self.attachment_form else forms.AttachmentForm()
@@ -104,14 +111,16 @@ class CreateReviewView(TemplateView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
-
-    def post(self, request, pk=None, *args, **kwargs):
-        if pk:
-            self.review_inst = get_object_or_404(models.Review, pk=pk)
+        if kwargs.get('pk'):
+            self.review_inst = get_object_or_404(models.Review, pk=kwargs['pk'])
+            self.project = self.review_inst.project
             self.template_name = 'demotime/edit_review.html'
         else:
             self.review_inst = models.Review(creator=self.request.user)
+            self.project = None
+        return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, pk=None, *args, **kwargs):
         self.review_form = forms.ReviewForm(
             user=self.request.user,
             instance=self.review_inst,
@@ -138,6 +147,7 @@ class CreateReviewView(TemplateView):
 
             return redirect(
                 'review-rev-detail',
+                proj_slug=review.project.slug,
                 pk=review.pk,
                 rev_num=review.revision.number
             )
@@ -164,6 +174,7 @@ class CreateReviewView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CreateReviewView, self).get_context_data(**kwargs)
         context.update({
+            'project': self.project,
             'review_form': self.review_form,
             'review_inst': self.review_inst,
             'attachment_forms': self.attachment_forms
@@ -205,16 +216,18 @@ class ReviewerStatusView(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
+        reviewer_pk = kwargs['reviewer_pk']
+        self.reviewer = get_object_or_404(
+            models.Reviewer, pk=reviewer_pk, reviewer=self.request.user
+        )
+        self.review = self.reviewer.review
+        self.project = self.review.project
         return super(ReviewerStatusView, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):
-        reviewer_pk = kwargs['reviewer_pk']
-        reviewer = get_object_or_404(
-            models.Reviewer, pk=reviewer_pk, reviewer=self.request.user
-        )
-        form = forms.ReviewerStatusForm(reviewer, data=self.request.POST)
+        form = forms.ReviewerStatusForm(self.reviewer, data=self.request.POST)
         if form.is_valid():
-            state_changed, new_state = reviewer.set_status(
+            state_changed, new_state = self.reviewer.set_status(
                 form.cleaned_data['status']
             )
             return {
@@ -229,7 +242,7 @@ class ReviewerStatusView(JsonView):
             return {
                 'reviewer_state_changed': False,
                 'new_state': '',
-                'reviewer_status': reviewer.status,
+                'reviewer_status': self.reviewer.status,
                 'success': False,
                 'errors': form.errors,
             }
@@ -241,16 +254,19 @@ class ReviewStateView(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
+        review_pk = kwargs['pk']
+        self.review = get_object_or_404(models.Review, pk=review_pk)
+        self.project = self.review.project
         return super(ReviewStateView, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):
-        review_pk = kwargs['pk']
-        review = get_object_or_404(models.Review, pk=review_pk)
-        form = forms.ReviewStateForm(self.request.user, review.pk, data=self.request.POST)
+        form = forms.ReviewStateForm(
+            self.request.user, self.review.pk, data=self.request.POST
+        )
         if form.is_valid():
-            changed = review.update_state(form.cleaned_data['state'])
+            changed = self.review.update_state(form.cleaned_data['state'])
             return {
-                'state': review.state,
+                'state': self.review.state,
                 'state_changed': changed,
                 'success': True,
                 'errors': {},
@@ -258,7 +274,7 @@ class ReviewStateView(JsonView):
         else:
             self.status = 400
             return {
-                'state': review.state,
+                'state': self.review.state,
                 'state_changed': False,
                 'success': False,
                 'errors': form.errors,
@@ -344,6 +360,14 @@ class UpdateCommentView(DetailView):
 
 class ReviewJsonView(JsonView):
 
+    def dispatch(self, *args, **kwargs):
+        self.project = get_object_or_404(
+            models.Project,
+            slug=kwargs['proj_slug']
+        )
+        self.review = None
+        return super(ReviewJsonView, self).dispatch(*args, **kwargs)
+
     def post(self, *args, **kwargs):
         form = forms.ReviewFilterForm(self.request.POST)
         if form.is_valid():
@@ -393,10 +417,11 @@ class DTRedirectView(RedirectView):
     pattern_name = 'review-detail'
 
     def get_redirect_url(self, *args, **kwargs):
-        get_object_or_404(
+        review = get_object_or_404(
             models.Review,
             pk=kwargs.get('pk')
         )
+        kwargs['proj_slug'] = review.project.slug
         return super(DTRedirectView, self).get_redirect_url(*args, **kwargs)
 
 review_form_view = CreateReviewView.as_view()

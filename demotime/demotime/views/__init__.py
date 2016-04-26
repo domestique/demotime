@@ -1,14 +1,40 @@
 import json
 
-from django.http import HttpResponse
-from django.views.generic import TemplateView, View
+from django.db.models import Q
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView, View
 
 from demotime import models
 
 
-class JsonView(View):
+class CanViewMixin(UserPassesTestMixin):
+
+    def test_func(self):
+        if not self.request.user.is_authenticated():
+            return False
+
+        if not self.project:
+            return True
+
+        if self.project.is_public or (self.review and self.review.is_public):
+            return True
+
+        user_list = User.objects.filter(
+            Q(projectmember__project=self.project) |
+            Q(groupmember__group__project=self.project)
+        ).distinct()
+
+        if user_list.filter(pk=self.request.user.pk).exists():
+            return True
+
+        return False
+
+
+class JsonView(CanViewMixin, View):
 
     content_type = 'application/json'
     status = None
@@ -65,5 +91,6 @@ class IndexView(TemplateView):
         ).order_by('-modified')[:5]
         context['message_bundles'] = message_bundles
         return context
+
 
 index_view = IndexView.as_view()
