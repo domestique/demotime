@@ -126,11 +126,13 @@ class MessagesJsonView(JsonView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.review = None
+        self.project = None
         if 'review_pk' in kwargs:
             self.review = get_object_or_404(
                 models.Review,
                 pk=kwargs.get('review_pk'),
             )
+            self.project = self.review.project
         return super(MessagesJsonView, self).dispatch(*args, **kwargs)
 
     def _format_json(self, bundles):

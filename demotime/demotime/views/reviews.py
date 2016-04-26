@@ -287,18 +287,20 @@ class DeleteCommentAttachmentView(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        comment_pk = kwargs['comment_pk']
+        self.comment = get_object_or_404(
+            models.Comment, pk=comment_pk, commenter=request.user
+        )
+        self.review = self.comment.thread.review_revision.review
+        self.project = self.review.project
         return super(DeleteCommentAttachmentView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         ct = ContentType.objects.get(app_label='demotime', model='comment')
         attachment_pk = kwargs['attachment_pk']
-        comment_pk = kwargs['comment_pk']
-        comment = get_object_or_404(
-            models.Comment, pk=comment_pk, commenter=request.user
-        )
         attachment = get_object_or_404(
             models.Attachment, pk=attachment_pk,
-            content_type=ct, object_id=comment.pk
+            content_type=ct, object_id=self.comment.pk
         )
         if request.POST.get('delete') == 'true':
             attachment.delete()
