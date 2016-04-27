@@ -14,14 +14,11 @@ from demotime import models
 class CanViewMixin(UserPassesTestMixin):
 
     def test_func(self):
-        if not self.request.user.is_authenticated():
-            return False
-
-        if not self.project:
-            return True
-
         if self.project.is_public or (self.review and self.review.is_public):
             return True
+
+        if not self.request.user.is_authenticated():
+            return False
 
         user_list = User.objects.filter(
             Q(projectmember__project=self.project) |
@@ -34,12 +31,11 @@ class CanViewMixin(UserPassesTestMixin):
         return False
 
 
-class JsonView(CanViewMixin, View):
+class JsonView(View):
 
     content_type = 'application/json'
     status = None
 
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         response = super(JsonView, self).dispatch(request, *args, **kwargs)
         if isinstance(response, HttpResponse):
@@ -54,6 +50,10 @@ class JsonView(CanViewMixin, View):
             content_type=self.content_type,
             status=self.status,
         )
+
+
+class CanViewJsonView(CanViewMixin, JsonView):
+    pass
 
 
 class IndexView(TemplateView):

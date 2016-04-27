@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from demotime import forms, models
 from demotime.views import CanViewMixin
-from . import JsonView
+from . import CanViewJsonView
 
 
 class ReviewDetail(CanViewMixin, DetailView):
@@ -210,7 +210,7 @@ class ReviewListView(ListView):
         return context
 
 
-class ReviewerStatusView(JsonView):
+class ReviewerStatusView(CanViewJsonView):
 
     status = 200
 
@@ -248,7 +248,7 @@ class ReviewerStatusView(JsonView):
             }
 
 
-class ReviewStateView(JsonView):
+class ReviewStateView(CanViewJsonView):
 
     status = 200
 
@@ -281,7 +281,7 @@ class ReviewStateView(JsonView):
             }
 
 
-class DeleteCommentAttachmentView(JsonView):
+class DeleteCommentAttachmentView(CanViewJsonView):
 
     status = 200
 
@@ -360,7 +360,7 @@ class UpdateCommentView(DetailView):
             return self.get(*args, **kwargs)
 
 
-class ReviewJsonView(JsonView):
+class ReviewJsonView(CanViewJsonView):
 
     def dispatch(self, *args, **kwargs):
         self.project = get_object_or_404(

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Project {{ object.name }}{% endblock %}
+
+{% block sub_nav %}{% endblock %}
+
+{% block content %}
+<h3>{{ object.name }} Open Demos</h3>
+<ul>
+    {% for review in open_demos %}
+        <li><a href="{% url 'review-detail' object.slug review.pk %}">DT-{{ review.pk }}</a></li>
+    {% endfor %}
+</ul>
+
+<h3>Your Recently Updated Demos</h3>
+<ul>
+    {% for review in user_updated_demos %}
+        <li><a href="{% url 'review-detail' object.slug review.pk %}">DT-{{ review.review.pk }}</a></li>
+    {% endfor %}
+</ul>
+
+<h3>Recently updated demos on {{ object.name }}</h3>
+<ul>
+    {% for review in updated_demos %}
+        <li><a href="{% url 'review-detail' object.slug review.pk %}">DT-{{ review.pk }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

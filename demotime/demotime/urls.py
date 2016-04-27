@@ -16,7 +16,8 @@ from demotime.views import (
     messages,
     reviews,
     users,
-    profile
+    profile,
+    projects,
 )
 
 
@@ -26,6 +27,11 @@ urlpatterns = [
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help'),
     url(r'^addons/$', TemplateView.as_view(template_name='addons.html'), name='addons'),
+]
+
+# Projects
+urlpatterns += [
+    url(r'(?P<proj_slug>[-\w]+)/$', projects.project_view, name='project'),
 ]
 
 # Reviews

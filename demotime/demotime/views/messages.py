@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from demotime import forms, models
-from . import JsonView
+from . import CanViewJsonView
 
 
 class InboxView(ListView):
@@ -119,7 +119,7 @@ class MessageDetailView(DetailView):
         return context
 
 
-class MessagesJsonView(JsonView):
+class MessagesJsonView(CanViewJsonView):
 
     status = 200
 
