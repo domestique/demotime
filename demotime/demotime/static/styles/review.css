@@ -98,7 +98,6 @@ h1 .alert {
 }
 
 .manage-review {
-    padding:10px 3px;
     float: right;
 }
 .manage-review ul {
@@ -109,8 +108,8 @@ h1 .alert {
 .manage-review ul li {
     list-style:none;
     display:inline-block;
-    margin-left:20px;
-    padding:1em 0 1em 1em;
+    margin: 22px 0 28px 5px;
+    padding: 5px 0 5px 5px;
 }
 .manage-review a {
     color:#fff;
@@ -256,8 +255,8 @@ input.find_person {
     box-shadow:4px 4px 0 #ccc;
     border: 1px solid #ddd;
     background: #fafafa;
-    padding: 20px 25px;
-    margin: 3px 0;
+    padding: 10px 25px;
+    margin: 15px 0 5px;
     float: left;
 }
 @media screen and (max-width:680px) {
@@ -267,7 +266,7 @@ input.find_person {
 }
 .your-status img {
     position: relative;
-    top: 6px;
+    top: 4px;
 }
 @media screen and (max-width:680px) {
     .your-status {
