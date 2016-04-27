@@ -139,7 +139,11 @@ DemoTime.Reviewers = Backbone.View.extend({
         });
 
         req.success(function() {
-            $li.slideUp();
+            if (!$li.length) {
+                window.location.reload();
+            } else {
+                $li.slideUp();
+            }
         });
 
         req.error(function(err) {

@@ -257,6 +257,7 @@ input.find_person {
     border: 1px solid #ddd;
     background: #fafafa;
     padding: 20px 25px;
+    margin: 3px 0;
     float: left;
 }
 @media screen and (max-width:680px) {

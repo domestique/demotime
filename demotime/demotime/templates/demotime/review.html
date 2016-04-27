@@ -30,6 +30,20 @@
                     </h3>
                 {% endif %}
             </div>
+        {% elif object.state != "closed" %}
+            {% for follower in object.follower_set.all %}
+                {% if follower.user == request.user %}
+                    <div class="your-status">
+                        You are following this case
+                        <small class="person_deleter">
+                            [<a href="#" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
+                        </small>
+                        <span class="help" title="When you are assigned as a 'reviewer' you
+                        will need to either approve or reject a review. A follower can simply follow
+                        the progress of a review without the ability or need to approve or reject."></span>
+                    </div>
+                {% endif %}
+            {% endfor %}
         {% endif %}
         <div class="manage-review">
             <ul>
@@ -117,7 +131,7 @@
                             </small>
                             {% if review.creator == request.user %}
                                 <small class="person_deleter" style="display:none">
-                                    [<a data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+                                    [<a href="#" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
@@ -133,7 +147,7 @@
                             </small>
                             {% if review.creator == request.user or follower.user == request.user %}
                                 <small class="person_deleter" style="display:none">
-                                    [<a data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                    [<a href="#" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
