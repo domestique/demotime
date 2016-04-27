@@ -125,7 +125,7 @@ p, li {
 .content h1 small {
     text-transform: uppercase;
     font-size: 12px;
-    margin-left: 10px;
+    margin-left: 5px;
     vertical-align: middle;
 }
 @media screen and (max-width:680px) {

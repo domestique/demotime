@@ -63,11 +63,8 @@
             <a href="#" class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ object.pk }}" title="Copy URL"><img src="/static/images/ic_attach.svg"></a>
             <strong>DT-{{ object.pk }}</strong>: {{ object.title }}
                 <small class="alert">
-                Viewing
-                {% if revision.is_max_revision %}
-                    latest revision
-                {% else %}
-                    revision {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
+                {% if not revision.is_max_revision %}
+                    Rev {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
                 {% endif %}
             </small>
         </h1>
@@ -182,7 +179,7 @@
             <section class="collapseable">
                 <p>{{ object.description|safe|linebreaksbr }}</p>
 
-                {% if revision.description and object.reviewrevision_set.all.count > 1 %}
+                {% if revision.description and object.reviewrevision_set.all.count > 1 and revision.number > 1 %}
                     <div class="latest-revision-note">
                         <h3 class="heading">{% if revision.is_max_revision %}Latest Revision Note{% else %}Revision {{ revision.number }} Note{% endif %}</h3>
                         <section>

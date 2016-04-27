@@ -2,7 +2,7 @@
 $('.lightboxed').fancybox();
 
 // Set focus on pageload
-$('.content input[type="text"]:not(#find_reviewer)').first().focus();
+$('.content input[type="text"]:not(.find_person)').first().focus();
 
 // Animate buttons
 $('button, .button-link, input[type="submit"]').click(function() {
