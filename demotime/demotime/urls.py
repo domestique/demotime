@@ -29,11 +29,6 @@ urlpatterns = [
     url(r'^addons/$', TemplateView.as_view(template_name='addons.html'), name='addons'),
 ]
 
-# Projects
-urlpatterns += [
-    url(r'(?P<proj_slug>[-\w]+)/$', projects.project_view, name='project'),
-]
-
 # Reviews
 urlpatterns += [
     # Review Creation
@@ -131,4 +126,9 @@ urlpatterns += [
         name='password_reset_complete'
     ),
     url(r'^users/$', users.user_api, name='user-api'),
+]
+
+# Projects
+urlpatterns += [
+    url(r'(?P<proj_slug>[-\w]+)/$', projects.project_view, name='project'),
 ]

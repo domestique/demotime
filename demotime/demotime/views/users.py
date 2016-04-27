@@ -18,6 +18,7 @@ class UserAPI(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
+        self.review = None
         return super(UserAPI, self).dispatch(*args, **kwargs)
 
     @property

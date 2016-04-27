@@ -102,7 +102,7 @@ class Message(BaseModel):
         })
         msg_text = loader.get_template(
             template_name
-        ).render(Context(context_dict))
+        ).render(context_dict)
         obj = cls.create_message(
             receipient=receipient,
             sender=system_user,
