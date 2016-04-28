@@ -144,6 +144,9 @@ section.no_email {
         min-height:80px;
     }
 }
+.message section > p:first-child {
+    margin-top: 0;
+}
 
 .messages-list {
     border:1px solid #ddd;
