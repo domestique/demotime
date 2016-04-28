@@ -69,10 +69,17 @@ $('.review form').submit(function(e) {
         e.preventDefault();
         sweetAlert('Sorry...', 'One of your attachments is missing ' + reason, 'error');
     } else {
+        $('body').on('click', '#game', function(event) {
+            event.preventDefault();
+            $('#game_container').slideDown();
+            $('.sweet-alert').css('margin-top', '-325px');
+        });
+
         swal ({
             title: 'Updating review',
-            text: 'Just a sec...',
+            text: 'Just a sec... <a href="javascript:void(0)" id="game">oh don\'t click this</a><br><table id="game_container" style="display: none; margin: 20px 0 10px 0; width:460px; background:#fff; border:1px solid #F3F3F3;" cellspacing="0" cellpadding="0"><tr><td style="font-family:verdana; font-size:11px; color:#000; padding:5px 5px;"><object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0" width="460" height="280"><param name="movie" value="http://www.games68.com/games/pacman.swf"><param name="quality" value="high"></param><param name="menu" value="false"></param><embed src="http://www.games68.com/games/pacman.swf" width="460" height="280" quality="high" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" menu="false" ></embed></object></td></tr>',
             type: 'success',
+            html: true,
             showConfirmButton: false
         });
     }
