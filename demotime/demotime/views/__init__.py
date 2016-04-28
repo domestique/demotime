@@ -14,6 +14,7 @@ from demotime import models
 class CanViewMixin(UserPassesTestMixin):
 
     require_admin_privileges = False
+    raise_exception = True
 
     def test_func(self):
         if (not self.require_admin_privileges) and (
@@ -24,6 +25,7 @@ class CanViewMixin(UserPassesTestMixin):
 
         if not self.request.user.is_authenticated():
             # Otherwise we're going to need to see some authentication
+            self.raise_exception = False
             return False
 
         user_list = User.objects.filter(

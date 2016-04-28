@@ -38,7 +38,7 @@ class TestProjectViews(BaseTestCase):
         response = self.client.get(
             reverse('project-admin', args=[self.project.slug])
         )
-        self.assertStatusCode(response, 302)
+        self.assertStatusCode(response, 403)
 
         pm.is_admin = True
         pm.save()
