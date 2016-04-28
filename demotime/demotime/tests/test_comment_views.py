@@ -34,12 +34,15 @@ class TestCommentViews(BaseTestCase):
         fh = StringIO('testing')
         fh.name = 'test_file_1'
         self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
-            'comment': "Oh nice demo!",
-            'attachment': fh,
-            'attachment_type': 'image',
-            'description': 'Test Description',
-        })
+        response = self.client.post(
+            reverse('review-detail', args=[self.project.slug, self.review.pk]),
+            {
+                'comment': "Oh nice demo!",
+                'attachment': fh,
+                'attachment_type': 'image',
+                'description': 'Test Description',
+            }
+        )
         self.assertStatusCode(response, 302)
         rev = self.review.revision
         self.assertEqual(rev.commentthread_set.count(), 2)
@@ -65,19 +68,20 @@ class TestCommentViews(BaseTestCase):
 
     def test_reply_to_comment(self):
         self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
-            'comment': "Oh nice demo!",
-        })
+        response = self.client.post(
+            reverse('review-detail', args=[self.project.slug, self.review.pk]),
+            {'comment': "Oh nice demo!"},
+        )
         rev = self.review.revision
         self.assertStatusCode(response, 302)
         self.assertEqual(rev.commentthread_set.count(), 2)
         self.assertEqual(len(mail.outbox), 5)
 
         thread = rev.commentthread_set.latest()
-        response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
-            'comment': "Reply!",
-            'thread': thread.pk
-        })
+        response = self.client.post(
+            reverse('review-detail', args=[self.project.slug, self.review.pk]),
+            {'comment': "Reply!", 'thread': thread.pk}
+        )
         self.assertStatusCode(response, 302)
         # Still just 1 thread
         self.assertEqual(rev.commentthread_set.count(), 2)
@@ -86,17 +90,19 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(len(mail.outbox), 10)
 
     def test_create_second_thread(self):
-        response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
-            'comment': "Oh nice demo!",
-        })
+        response = self.client.post(
+            reverse('review-detail', args=[self.project.slug, self.review.pk]),
+            {'comment': "Oh nice demo!"},
+        )
         rev = self.review.revision
         self.assertStatusCode(response, 302)
         self.assertEqual(rev.commentthread_set.count(), 2)
 
         thread = rev.commentthread_set.latest()
-        response = self.client.post(reverse('review-detail', args=[self.review.pk]), {
-            'comment': "New Comment!",
-        })
+        response = self.client.post(
+            reverse('review-detail', args=[self.project.slug, self.review.pk]),
+            {'comment': "New Comment!"},
+        )
         self.assertStatusCode(response, 302)
         self.assertEqual(rev.commentthread_set.count(), 3)
         self.assertEqual(thread.comment_set.count(), 1)

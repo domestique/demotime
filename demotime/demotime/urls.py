@@ -16,7 +16,8 @@ from demotime.views import (
     messages,
     reviews,
     users,
-    profile
+    profile,
+    projects,
 )
 
 
@@ -30,30 +31,48 @@ urlpatterns = [
 
 # Reviews
 urlpatterns += [
+    # Review Creation
     url(r'^create/$', reviews.review_form_view, name='create-review'),
-    url(r'^review/(?P<pk>[\d]+)/$', reviews.review_detail, name='review-detail'),
+    # DT-1234 redirect view
     url(r'^(?i)DT-(?P<pk>[\d]+)/$', reviews.dt_redirect_view, name='dt-redirect'),
+    # Review Detail Page
     url(
-        r'^review/(?P<pk>[\d]+)/rev/(?P<rev_num>[\d]+)/$',
+        r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/$',
+        reviews.review_detail,
+        name='review-detail'
+    ),
+    # Review Revision Detail Page
+    url(
+        r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/rev/(?P<rev_num>[\d]+)/$',
         reviews.review_detail,
         name='review-rev-detail'
     ),
-    url(r'^review/(?P<pk>[\d]+)/edit/$', reviews.review_form_view, name='edit-review'),
+    # Review Edit Page
+    url(r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/edit/$', reviews.review_form_view, name='edit-review'),
+    # Reviewer Approval/Rejection
     url(
-        r'^review/(?P<review_pk>[\d]+)/reviewer-status/(?P<reviewer_pk>[\d]+)/$',
+        r'^(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/reviewer-status/(?P<reviewer_pk>[\d]+)/$',
         reviews.reviewer_status_view,
         name='update-reviewer-status',
     ),
-    url(r'^review/(?P<pk>[\d]+)/update-state/$', reviews.review_state_view, name='update-review-state'),
+    # Review State Update (open/closed)
+    url(
+        r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/update-state/$',
+        reviews.review_state_view,
+        name='update-review-state'
+    ),
+    url(r'^review/list/$', reviews.review_list_view, name='review-list'),
+    url(r'^(?P<proj_slug>[\w-]+)review/search/$', reviews.review_json_view, name='reviews-json'),
+]
+
+# Comments
+urlpatterns += [
     url(r'^comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
-    url(r'^users/$', users.user_api, name='user-api'),
     url(
         r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         reviews.delete_comment_attachment_view,
         name='update-comment-attachment'
     ),
-    url(r'^review/list/$', reviews.review_list_view, name='review-list'),
-    url(r'^review/search/$', reviews.review_json_view, name='reviews-json'),
 ]
 
 # Messages
@@ -73,7 +92,7 @@ urlpatterns += [
     url(r'^file/(?P<file_path>.+)$', files.user_media_view, name='user-media'),
 ]
 
-# Accounts
+# Users
 urlpatterns += [
     url(r'^accounts/login/$', login, name='login'),
     url(r'^accounts/logout/$', logout_then_login, name='logout'),
@@ -106,4 +125,11 @@ urlpatterns += [
         {'template_name': 'registration/password_reset_completed.html'},
         name='password_reset_complete'
     ),
+    url(r'^users/$', users.user_api, name='user-api'),
+]
+
+# Projects
+urlpatterns += [
+    url(r'(?P<proj_slug>[-\w]+)/admin/$', projects.project_admin, name='project-admin'),
+    url(r'(?P<proj_slug>[-\w]+)/$', projects.project_view, name='project'),
 ]

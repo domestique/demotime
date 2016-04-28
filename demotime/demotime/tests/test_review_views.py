@@ -71,7 +71,10 @@ class TestReviewViews(BaseTestCase):
                 deleted=False,
             ).exists()
         )
-        response = self.client.get(reverse('review-detail', args=[self.review.pk]))
+        response = self.client.get(reverse(
+            'review-detail',
+            args=[self.project.slug, self.review.pk]
+        ))
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
         self.assertTemplateUsed(response, 'demotime/review.html')
@@ -114,7 +117,10 @@ class TestReviewViews(BaseTestCase):
                 deleted=False,
             ).exists()
         )
-        response = self.client.get(reverse('review-detail', args=[self.review.pk]))
+        response = self.client.get(reverse(
+            'review-detail',
+            args=[self.project.slug, self.review.pk]
+        ))
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
         self.assertTemplateUsed(response, 'demotime/review.html')
@@ -137,11 +143,15 @@ class TestReviewViews(BaseTestCase):
 
     def test_get_review_login_required(self):
         self.client.logout()
-        response = self.client.get(reverse('review-detail', args=[self.review.pk]))
+        response = self.client.get(reverse(
+            'review-detail',
+            args=[self.project.slug, self.review.pk]
+        ))
         self.assertStatusCode(response, 302)
 
     def test_review_rev_detail(self):
         response = self.client.get(reverse('review-rev-detail', kwargs={
+            'proj_slug': self.project.slug,
             'pk': self.review.pk,
             'rev_num': self.review.revision.number,
         }))
@@ -149,6 +159,7 @@ class TestReviewViews(BaseTestCase):
 
     def test_review_rev_detail_404(self):
         response = self.client.get(reverse('review-rev-detail', kwargs={
+            'proj_slug': self.project.slug,
             'pk': self.review.pk,
             'rev_num': 500,
         }))
@@ -178,6 +189,7 @@ class TestReviewViews(BaseTestCase):
             'case_link': 'http://www.example.org',
             'reviewers': self.test_users.values_list('pk', flat=True),
             'followers': self.followers.values_list('pk', flat=True),
+            'project': self.project.pk,
             'form-TOTAL_FORMS': 4,
             'form-INITIAL_FORMS': 0,
             'form-MIN_NUM_FORMS': 0,
@@ -223,21 +235,25 @@ class TestReviewViews(BaseTestCase):
         fh.name = 'test_file_1'
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(reverse('edit-review', args=[self.review.pk]), {
-            'creator': self.user,
-            'title': title,
-            'description': 'Updated Description',
-            'case_link': 'http://www.example.org/1/',
-            'reviewers': self.test_users.values_list('pk', flat=True),
-            'followers': [],
-            'form-TOTAL_FORMS': 4,
-            'form-INITIAL_FORMS': 0,
-            'form-MIN_NUM_FORMS': 0,
-            'form-MAX_NUM_FORMS': 5,
-            'form-0-attachment': fh,
-            'form-0-attachment_type': 'image',
-            'form-0-description': 'Test Description',
-        })
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            {
+                'creator': self.user,
+                'title': title,
+                'description': 'Updated Description',
+                'case_link': 'http://www.example.org/1/',
+                'reviewers': self.test_users.values_list('pk', flat=True),
+                'followers': [],
+                'project': self.project.pk,
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+                'form-0-attachment': fh,
+                'form-0-attachment_type': 'image',
+                'form-0-description': 'Test Description',
+            }
+        )
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
         self.assertEqual(obj.creator, self.user)
@@ -286,7 +302,7 @@ class TestReviewViews(BaseTestCase):
             reviewer=user,
         )
         url = reverse(
-            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+            'update-reviewer-status', args=[self.project.slug, self.review.pk, reviewer.pk]
         )
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -312,7 +328,7 @@ class TestReviewViews(BaseTestCase):
             reviewer=user,
         )
         url = reverse(
-            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+            'update-reviewer-status', args=[self.project.slug, self.review.pk, reviewer.pk]
         )
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -347,7 +363,9 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(self.review.reviewer_state, models.reviews.REVIEWING)
         self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         url = reverse('update-reviewer-status', kwargs={
-            'review_pk': self.review.pk, 'reviewer_pk': reviewer.pk
+            'proj_slug': self.project.slug,
+            'review_pk': self.review.pk,
+            'reviewer_pk': reviewer.pk
         })
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -372,7 +390,7 @@ class TestReviewViews(BaseTestCase):
             reviewer=self.test_users[0],
         )
         url = reverse(
-            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+            'update-reviewer-status', args=[self.project.slug, self.review.pk, reviewer.pk]
         )
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -383,7 +401,7 @@ class TestReviewViews(BaseTestCase):
 
     def test_update_review_state_closed(self):
         self.assertEqual(len(mail.outbox), 0)
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.CLOSED
@@ -403,7 +421,7 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(len(mail.outbox), 5)
 
     def test_update_review_state_aborted(self):
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.ABORTED
@@ -424,7 +442,7 @@ class TestReviewViews(BaseTestCase):
     def test_update_review_state_reopened(self):
         self.review.state = models.reviews.CLOSED
         self.review.save(update_fields=['state'])
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.OPEN,
@@ -445,7 +463,7 @@ class TestReviewViews(BaseTestCase):
     def test_update_review_state_invalid(self):
         self.client.logout()
         self.client.login(username='test_user_0', password='testing')
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.OPEN,
@@ -577,9 +595,10 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.title, 'Test Title')
 
     def test_review_json_no_match(self):
-        response = self.client.post(reverse('reviews-json'), {
-            'title': 'zxy'
-        })
+        response = self.client.post(
+            reverse('reviews-json', args=[self.project.slug]),
+            {'title': 'zxy'}
+        )
         self.assertStatusCode(response, 200)
         self.assertEqual(json.loads(response.content), {
             'count': 0,
@@ -587,9 +606,10 @@ class TestReviewViews(BaseTestCase):
         })
 
     def test_review_json_by_pk(self):
-        response = self.client.post(reverse('reviews-json'), {
-            'pk': self.review.pk,
-        })
+        response = self.client.post(
+            reverse('reviews-json', args=[self.project.slug]),
+            {'pk': self.review.pk}
+        )
         self.assertStatusCode(response, 200)
         json_data = json.loads(response.content)
         self.assertEqual(json_data['count'], 1)
@@ -619,13 +639,16 @@ class TestReviewViews(BaseTestCase):
 
     def test_review_json_all_the_filters(self):
         test_user = User.objects.get(username='test_user_0')
-        response = self.client.post(reverse('reviews-json'), {
-            'reviewer': test_user.pk,
-            'creator': self.user.pk,
-            'state': models.reviews.OPEN,
-            'reviewer_state': models.reviews.REVIEWING,
-            'title': 'test',
-        })
+        response = self.client.post(
+            reverse('reviews-json', args=[self.project.slug]),
+            {
+                'reviewer': test_user.pk,
+                'creator': self.user.pk,
+                'state': models.reviews.OPEN,
+                'reviewer_state': models.reviews.REVIEWING,
+                'title': 'test',
+            }
+        )
         self.assertStatusCode(response, 200)
         json_data = json.loads(response.content)
         self.assertEqual(json_data['count'], 1)
@@ -672,7 +695,10 @@ class TestReviewViews(BaseTestCase):
         self.assertStatusCode(response, 301)
         self.assertRedirects(
             response,
-            reverse('review-detail', kwargs={'pk': review.pk}),
+            reverse('review-detail', kwargs={
+                'proj_slug': self.project.slug,
+                'pk': review.pk
+            }),
             status_code=301,
         )
 

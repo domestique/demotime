@@ -58,7 +58,7 @@
         <div class="manage-review">
             <ul>
                 {% if request.user == object.creator %}
-                    <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Add revision</a></li>
+                    <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="button-link icon icon-pencil">Add revision</a></li>
                     {% if object.state == 'closed' %}
                         <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
                     {% else %}
@@ -405,7 +405,7 @@ $('[data-comment]').each(function() {
             {% if reviewer %}
                 // Sets the new reviewer status
                 var req = $.ajax({
-                    url: '{% url "update-reviewer-status" revision.review.pk reviewer.pk %}',
+                    url: '{% url "update-reviewer-status" revision.review.project.slug revision.review.pk reviewer.pk %}',
                     method: 'POST',
                     data: {
                         review: {{ revision.review.pk }},
@@ -425,7 +425,7 @@ $('[data-comment]').each(function() {
                 // Sets the new demo status
                 function finisher_ajax() {
                     var req = $.ajax({
-                        url: '{% url "update-review-state" revision.review.pk %}',
+                        url: '{% url "update-review-state" revision.review.project.slug revision.review.pk %}',
                         method: 'POST',
                         data: {
                             review: {{ revision.review.pk }},

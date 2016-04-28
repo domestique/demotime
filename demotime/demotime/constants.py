@@ -1,0 +1,6 @@
+REVIEWING = 'reviewing'
+REJECTED = 'rejected'
+APPROVED = 'approved'
+OPEN = 'open'
+CLOSED = 'closed'
+ABORTED = 'aborted'

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Q
 
 from demotime import models
 
@@ -31,3 +32,13 @@ def has_unread_messages(request):
 
 def site_settings(request):
     return {'site_settings': settings}
+
+
+def available_projects(request):
+    projects = models.Project.objects.filter(
+        # Direct Membership
+        Q(projectmember__user=request.user) |
+        # Group Membership
+        Q(projectgroup__group__groupmember__user=request.user)
+    )
+    return {'available_projects': projects}

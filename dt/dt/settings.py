@@ -108,6 +108,7 @@ TEMPLATES = [
                 'demotime.context_processors.has_unread_messages',
                 'demotime.context_processors.unread_message_count',
                 'demotime.context_processors.site_settings',
+                'demotime.context_processors.available_projects',
             ],
         },
     },
@@ -134,6 +135,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # ACCOUNT SETTINGS
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_ACTIVATION_DAYS = 7
+AUTHENTICATION_BACKENDS = ['demotime.authentication_backends.UserProxyModelBackend']
 
 # SERVER SETTINGS
 SERVER_URL = os.environ.get('DT_URL', 'localhost:8000')
