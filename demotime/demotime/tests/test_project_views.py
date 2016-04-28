@@ -28,3 +28,21 @@ class TestProjectViews(BaseTestCase):
         self.assertEqual(context['user_updated_demos'].count(), 5)
         self.assertEqual(context['updated_demos'].count(), 5)
         self.assertEqual(context['object'], self.project)
+
+    def test_project_admin_requires_admin(self):
+        models.ProjectMember.objects.all().delete()
+        models.ProjectGroup.objects.all().delete()
+        pm, _ = models.ProjectMember.objects.get_or_create(
+            project=self.project, user=self.user
+        )
+        response = self.client.get(
+            reverse('project-admin', args=[self.project.slug])
+        )
+        self.assertStatusCode(response, 302)
+
+        pm.is_admin = True
+        pm.save()
+        response = self.client.get(
+            reverse('project-admin', args=[self.project.slug])
+        )
+        self.assertStatusCode(response, 200)

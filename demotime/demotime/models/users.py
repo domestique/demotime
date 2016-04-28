@@ -1,6 +1,7 @@
 import os
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from .base import BaseModel
@@ -8,6 +9,30 @@ from .base import BaseModel
 
 def avatar_field(instance, filename):
     return os.path.join('users', str(instance.user.pk), filename)
+
+
+class UserProxy(User):
+
+    def is_member(self, project):
+        user_list = User.objects.filter(
+            models.Q(projectmember__project=project) |
+            models.Q(groupmember__group__project=project)
+        ).distinct()
+        return user_list.filter(pk=self.pk).exists()
+
+    def is_admin(self, project):
+        admin_groups = self.groupmember_set.filter(
+            group__projectgroup__project=project,
+            group__projectgroup__is_admin=True
+        )
+        admin_user = self.projectmember_set.filter(
+            project=project,
+            is_admin=True
+        )
+        return admin_groups.exists() or admin_user.exists()
+
+    class Meta:
+        proxy = True
 
 
 class UserProfile(BaseModel):

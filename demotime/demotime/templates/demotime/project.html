@@ -5,6 +5,9 @@
 
 {% block content %}
 <h3>{{ object.name }} Open Demos</h3>
+{% if is_admin %}
+    <a href="{% url 'project-admin' object.slug %}">{{ object.name }} Administration</a>
+{% endif %}
 <ul>
     {% for review in open_demos %}
         <li><a href="{% url 'review-detail' object.slug review.pk %}">DT-{{ review.pk }}</a></li>

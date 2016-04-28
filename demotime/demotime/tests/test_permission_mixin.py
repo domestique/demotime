@@ -1,7 +1,7 @@
 from mock import Mock
 
 from demotime.views import CanViewMixin
-from demotime import constants, models
+from demotime import models
 from demotime.tests import BaseTestCase
 
 
@@ -69,3 +69,43 @@ class TestPermissionMixin(BaseTestCase):
         models.ProjectMember.objects.all().delete()
         models.ProjectGroup.objects.all().delete()
         self.assertFalse(self.mixin.test_func())
+
+    def test_require_admin_privileges(self):
+        self.project.is_public = False
+        self.request.user = self.user
+        self.user.is_authenticated = Mock(return_value=True)
+        self.mixin.project = self.project
+        self.mixin.review = self.review
+        self.mixin.request = self.request
+        self.mixin.require_admin_privileges = True
+        models.ProjectMember.objects.all().delete()
+        models.ProjectGroup.objects.all().delete()
+
+        pm, _ = models.ProjectMember.objects.get_or_create(
+            project=self.project, user=self.user
+        )
+        self.assertFalse(self.mixin.test_func())
+
+        pm.is_admin = True
+        pm.save()
+        self.assertTrue(self.mixin.test_func())
+
+    def test_require_admin_privileges_overrides_is_public(self):
+        self.project.is_public = True
+        self.request.user = self.user
+        self.user.is_authenticated = Mock(return_value=True)
+        self.mixin.project = self.project
+        self.mixin.review = self.review
+        self.mixin.request = self.request
+        self.mixin.require_admin_privileges = True
+        models.ProjectMember.objects.all().delete()
+        models.ProjectGroup.objects.all().delete()
+
+        pm, _ = models.ProjectMember.objects.get_or_create(
+            project=self.project, user=self.user
+        )
+        self.assertFalse(self.mixin.test_func())
+
+        pm.is_admin = True
+        pm.save()
+        self.assertTrue(self.mixin.test_func())

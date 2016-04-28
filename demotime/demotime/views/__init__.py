@@ -13,11 +13,17 @@ from demotime import models
 
 class CanViewMixin(UserPassesTestMixin):
 
+    require_admin_privileges = False
+
     def test_func(self):
-        if self.project.is_public or (self.review and self.review.is_public):
+        if (not self.require_admin_privileges) and (
+                self.project.is_public or (self.review and self.review.is_public)
+        ):
+            # Public Project/Review, so they're in
             return True
 
         if not self.request.user.is_authenticated():
+            # Otherwise we're going to need to see some authentication
             return False
 
         user_list = User.objects.filter(
@@ -26,8 +32,29 @@ class CanViewMixin(UserPassesTestMixin):
         ).distinct()
 
         if user_list.filter(pk=self.request.user.pk).exists():
-            return True
+            # User is in an applicable group or is a direct member of a project,
+            # but we need to check admin privileges first, if applicable
+            if self.require_admin_privileges:
+                admin_groups = self.request.user.groupmember_set.filter(
+                    group__projectgroup__project=self.project,
+                    group__projectgroup__is_admin=True
+                )
+                admin_user = self.request.user.projectmember_set.filter(
+                    project=self.project,
+                    is_admin=True
+                )
+                if admin_user.exists() or admin_groups.exists():
+                    # User is either in an admin group associated with this
+                    # project or is a direct ProjectMember with admin rights
+                    return True
+                else:
+                    return False
+            else:
+                # Don't care about admin privileges, just care that they are in
+                # a proper group or a direct member
+                return True
 
+        # If everything else was skipped, let's go ahead and send them packing.
         return False
 
 
