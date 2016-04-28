@@ -17,7 +17,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
             if (self.options.comments_url) {
                 self.fetch_new_comments();
             }
-        }, 5000);
+        }, 120000); // check for msgs every 2 mins
     },
 
     // Update the header with any new messages
