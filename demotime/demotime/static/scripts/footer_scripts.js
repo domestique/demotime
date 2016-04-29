@@ -41,7 +41,7 @@ $('button').click(function() {
 var ScrollToLink = new DemoTime.ScrollToLink();
 
 // Handle review form submits (some light validation on attachments)
-$('.review form').click(function(e) {
+$('.review form').submit(function(e) {
     var form = $(this),
         proceed = true,
         reason = '';
