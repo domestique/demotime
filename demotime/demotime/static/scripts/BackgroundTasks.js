@@ -67,7 +67,6 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                 $('.msg_notifier').removeClass('unread_notification').addClass('read_notification').find('a').html(data.message_count);
                 self.options.counter = self.options.counter + 1;
             }
-            return data.message_count;
         });
     },
 
