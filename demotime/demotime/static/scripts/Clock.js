@@ -34,7 +34,7 @@ var updateTime = function() {
     count = count + 1;
 
     if (count > 3600) { // timemout clock after an hour
-        $('.clock').css('opacity', '0.8')
+        $('.clock').css('opacity', '0.5')
             .css({
                 'filter'         : 'blur(1px)',
                 '-webkit-filter' : 'blur(1px)',
