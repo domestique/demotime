@@ -27,6 +27,10 @@ dl.messages-nav dd a {
 .messages-list a {
     font-size: 14px;
 }
+.messages-list a {
+    display: inline-block;
+    min-height: 25px;
+}
 dl.messages-nav dd.last {
     border-right:0;
 }
