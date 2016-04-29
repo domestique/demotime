@@ -9,3 +9,4 @@ Fabric==1.10.1
 pytz==2015.2
 bdateutil==0.1
 django-sendfile==0.3.10
+pycrypto==2.6.1
