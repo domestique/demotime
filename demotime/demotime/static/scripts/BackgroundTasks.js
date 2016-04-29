@@ -4,20 +4,50 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
 
     initialize: function(options) {
         this.options = options;
+        this.options.counter = 0;
+        this.options.max_attempts = 5;
+        this.options.check_every = 60000; // check for msgs every minute
         this.render();
     },
 
     render: function() {
         var self = this;
 
-        setInterval(function() {
+        self.options.interval = setInterval(function() {
             if (self.options.messages_url) {
                 self.fetch_new_messages();
             }
             if (self.options.comments_url) {
                 self.fetch_new_comments();
+                self.check_activity_count();
             }
-        }, 120000); // check for msgs every 2 mins
+
+        }, self.options.check_every);
+    },
+
+    check_activity_count: function() {
+        var self = this;
+
+        // Cancelling background task after an hour of no activity
+        if ((self.options.counter > self.options.max_attempts) && self.options.interval) {
+            clearInterval(self.options.interval);
+            self.options.noty = noty({
+                text: 'Background tasks have timed out on this page (click to refresh)',
+                layout: 'bottomRight',
+                type: 'warning',
+                animation: {
+                    open: 'animated flipInX',
+                    close: 'animated flipOutX',
+                    easing: 'swing', // easing
+                    speed: 500 // opening & closing animation speed
+                },
+                callback: {
+                    onCloseClick: function() {
+                        window.location.reload();
+                    }
+                }
+            });
+        }
     },
 
     // Update the header with any new messages
@@ -30,10 +60,14 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
 
         req.always(function(data) {
             if (data.message_count > 0) {
+                console.log('Running background tasks and received new messages');
                 $('.msg_notifier').removeClass('read_notification').addClass('unread_notification').find('a').html(data.message_count);
             } else {
+                console.log('Running background tasks and received no new messages');
                 $('.msg_notifier').removeClass('unread_notification').addClass('read_notification').find('a').html(data.message_count);
+                self.options.counter = self.options.counter + 1;
             }
+            return data.message_count;
         });
     },
 
@@ -76,6 +110,8 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                         }
                     });
                 }
+            } else {
+                self.options.counter = self.options.counter + 1;
             }
         });
     }
