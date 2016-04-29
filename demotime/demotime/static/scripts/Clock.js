@@ -41,7 +41,8 @@ var updateTime = function() {
                 '-moz-filter'    : 'blur(1px)',
                 '-o-filter'      : 'blur(1px)',
                 '-ms-filter'     : 'blur(1px)'
-            });
+            })
+            .parent().attr('title', 'Clock has timed out due to inactivity');
         clearInterval(interval);
     }
 }
