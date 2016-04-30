@@ -1,5 +1,5 @@
 // SNAPSVG.JS Clock Layout
-
+var count = 0;
 var clock = Snap(".clock");
 var frame = clock.circle(32,32,30).attr({
     fill: "#ffffff",
@@ -31,9 +31,23 @@ var updateTime = function() {
     hours.animate({transform: "r" + hour * 30 + "," + 32 + "," + 32}, 200, mina.elastic);
     minutes.animate({transform: "r" + minute * 6 + "," + 32 + "," + 32}, 200, mina.elastic);
     seconds.animate({transform: "r" + second * 6 + "," + 32 + "," + 32}, 500, mina.elastic);
+    count = count + 1;
+
+    if (count > 600) { // timemout clock after an hour
+        $('.clock').css('opacity', '0.5')
+            .css({
+                'filter'         : 'blur(1px)',
+                '-webkit-filter' : 'blur(1px)',
+                '-moz-filter'    : 'blur(1px)',
+                '-o-filter'      : 'blur(1px)',
+                '-ms-filter'     : 'blur(1px)'
+            })
+            .parent().attr('title', 'Clock has timed out due to inactivity');
+        clearInterval(interval);
+    }
 }
 
-setInterval(updateTime, 1000)
+var interval = setInterval(updateTime, 1000)
 function clock() {
     var t = moment(),
         a = t.minutes() * 6,

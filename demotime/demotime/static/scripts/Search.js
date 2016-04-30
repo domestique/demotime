@@ -66,7 +66,9 @@ DemoTime.Search= Backbone.View.extend({
                     self.$el.find('.quickfind-results').slideDown();
                 });
             } else {
-                this.$el.find('.quickfind-results').slideUp();
+                if (self.$el.find('.quickfind-results').length) {
+                    self.$el.find('.quickfind-results').slideUp();
+                }
             }
         }
     }

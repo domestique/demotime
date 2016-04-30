@@ -12,24 +12,48 @@
 {% block content %}
 <div class="review" id="review">
     <div class="review-top">
-        {% if reviewer and object.state != "closed" %}
+        {% if request.user == object.creator %}
             <div class="your-status">
-                {% if request.user == object.creator %}
-                    <h3>Demo State: <strong>{{ object.state|capfirst }}</strong></h3>
-                {% else %}
-                    <h3>
-                        Your approval status:
-                        {% if reviewer.status == 'approved' %}
-                            <canvas id="confetti" width="1" height="1"></canvas>
-                            <script type="text/javascript" src="/static/scripts/confetti.js"></script>
-                            <img src="/static/images/emoji/smiley.png" width="30" height="30">
-                        {% elif reviewer.status == 'rejected' %}
-                            <img src="/static/images/emoji/frowning2.png" width="30" height="30">
-                        {% endif %}
-                        <strong>{{ reviewer.status|capfirst }}</strong>
-                    </h3>
-                {% endif %}
+                <h3>
+                    Demo State:
+                    {% if object.state == 'closed' %}
+                        <canvas id="confetti" width="1" height="1"></canvas>
+                        <script type="text/javascript" src="/static/scripts/confetti.js"></script>
+                        <img src="/static/images/emoji/smiley.png" width="25" height="25">
+                    {% endif %}
+                    <strong>{{ object.state|capfirst }}</strong>
+                </h3>
             </div>
+        {% endif %}
+        {% if reviewer %}
+            <div class="your-status">
+                <h3>
+                    Your approval status:
+                    {% if reviewer.status == 'approved' %}
+                        <canvas id="confetti" width="1" height="1"></canvas>
+                        <script type="text/javascript" src="/static/scripts/confetti.js"></script>
+                        <img src="/static/images/emoji/smiley.png" width="25" height="25">
+                    {% elif reviewer.status == 'rejected' %}
+                        <img src="/static/images/emoji/frowning2.png" width="25" height="25">
+                    {% endif %}
+                    <strong>{{ reviewer.status|capfirst }}</strong>
+                </h3>
+            </div>
+        {% endif %}
+        {% if object.state != "closed" %}
+            {% for follower in object.follower_set.all %}
+                {% if follower.user == request.user %}
+                    <div class="your-status">
+                        You are following this case
+                        <small class="person_deleter">
+                            [<a href="#" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
+                        </small>
+                        <span class="help" title="When you are assigned as a 'reviewer' you
+                        will need to either approve or reject a review. A follower can simply follow
+                        the progress of a review without the ability or need to approve or reject."></span>
+                    </div>
+                {% endif %}
+            {% endfor %}
         {% endif %}
         <div class="manage-review">
             <ul>
@@ -76,7 +100,7 @@
                 {% if object.state != "closed" %}
                     <h4 class="heading">
                         Reviewer State:
-                        <span class="help" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'">
+                        <span class="help" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'"></span>
                     </h4>
                     {% if object.reviewer_state == "Approved" %}
                         <span class="icon-{{ object.reviewer_state }}">{{ object.reviewer_state|capfirst }}</span>
@@ -87,7 +111,7 @@
                 {% endif %}
                 <h4 class="heading">
                     Demo State:
-                    <span class="help" title="The demo state is the state of the actual review itself (Open, closed, etc)">
+                    <span class="help" title="The demo state is the state of the actual review itself (Open, closed, etc)"></span>
                 </h4>
                 {{ object.state|capfirst }}
                 {% if object.state == 'closed' %}
@@ -117,7 +141,7 @@
                             </small>
                             {% if review.creator == request.user %}
                                 <small class="person_deleter" style="display:none">
-                                    [<a data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+                                    [<a href="#" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
@@ -133,7 +157,7 @@
                             </small>
                             {% if review.creator == request.user or follower.user == request.user %}
                                 <small class="person_deleter" style="display:none">
-                                    [<a data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                    [<a href="#" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
