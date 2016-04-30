@@ -130,6 +130,7 @@ urlpatterns += [
 
 # Projects
 urlpatterns += [
-    url(r'(?P<proj_slug>[-\w]+)/admin/$', projects.project_admin, name='project-admin'),
-    url(r'(?P<proj_slug>[-\w]+)/$', projects.project_view, name='project'),
+    url(r'(?P<proj_slug>[-\w]+)/admin/edit/$', projects.project_admin, name='project-admin'),
+    url(r'(?P<proj_slug>[-\w]+)/admin/$', projects.project_detail, name='project-detail'),
+    url(r'(?P<proj_slug>[-\w]+)/$', projects.project_dashboard, name='project-dashboard'),
 ]

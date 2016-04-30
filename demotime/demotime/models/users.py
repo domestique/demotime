@@ -31,6 +31,10 @@ class UserProxy(User):
         )
         return admin_groups.exists() or admin_user.exists()
 
+    @property
+    def display_name(self):
+        return u'{}'.format(self.userprofile.display_name or self.username)
+
     class Meta:
         proxy = True
 

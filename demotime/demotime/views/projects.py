@@ -1,13 +1,14 @@
 from django.views.generic import DetailView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.shortcuts import redirect
 
-from demotime import constants, models
+from demotime import constants, forms, models
 from demotime.views import CanViewMixin
 
 
-class ProjectDetail(CanViewMixin, DetailView):
-    template_name = 'demotime/project.html'
+class ProjectDashboard(CanViewMixin, DetailView):
+    template_name = 'demotime/project_dashboard.html'
     model = models.Project
     slug_url_kwarg = 'proj_slug'
 
@@ -15,10 +16,10 @@ class ProjectDetail(CanViewMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.project = self.get_object()
         self.review = None
-        return super(ProjectDetail, self).dispatch(request, *args, **kwargs)
+        return super(ProjectDashboard, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(ProjectDetail, self).get_context_data(**kwargs)
+        context = super(ProjectDashboard, self).get_context_data(**kwargs)
         context['open_demos'] = models.Review.objects.filter(
             project=self.project,
             state=constants.OPEN,
@@ -35,6 +36,19 @@ class ProjectDetail(CanViewMixin, DetailView):
         return context
 
 
+class ProjectDetail(CanViewMixin, DetailView):
+    template_name = 'demotime/project_detail.html'
+    model = models.Project
+    slug_url_kwarg = 'proj_slug'
+    require_admin_privileges = True
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.project = self.get_object()
+        self.review = None
+        return super(ProjectDetail, self).dispatch(request, *args, **kwargs)
+
+
 class ProjectAdmin(CanViewMixin, DetailView):
     template_name = 'demotime/project_admin.html'
     model = models.Project
@@ -47,5 +61,18 @@ class ProjectAdmin(CanViewMixin, DetailView):
         self.review = None
         return super(ProjectAdmin, self).dispatch(request, *args, **kwargs)
 
-project_view = ProjectDetail.as_view()
+    def get_context_data(self, **kwargs):
+        context = super(ProjectAdmin, self).get_context_data(**kwargs)
+        context['project_form'] = forms.ProjectForm(instance=self.project)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = forms.ProjectForm(instance=self.project, data=request.POST)
+        if form.is_valid():
+            pass # data = form.cleaned_data
+
+        return redirect('project-detail', proj_slug=self.project.slug)
+
+project_dashboard = ProjectDashboard.as_view()
+project_detail = ProjectDetail.as_view()
 project_admin = ProjectAdmin.as_view()

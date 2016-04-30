@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from demotime import models
+from demotime import models, widgets
 
 
 class ReviewForm(forms.ModelForm):
@@ -263,3 +263,30 @@ class UpdateCommentForm(CommentForm, AttachmentForm):
             raise forms.ValidationError('Attachments require an Attachment Type')
 
         return data['attachment_type']
+
+
+class ProjectForm(forms.ModelForm):
+
+    groups = forms.ModelMultipleChoiceField(
+        queryset=models.Group.objects.all(),
+        widget=forms.CheckboxSelectMultiple
+    )
+    members = forms.ModelMultipleChoiceField(
+        queryset=User.objects.none()
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        self.fields['members'] = forms.ModelMultipleChoiceField(
+            queryset=User.objects.exclude(
+                userprofile__user_type=models.UserProfile.SYSTEM
+            ).order_by('username'),
+            widget=widgets.MemberSelectMultiple(project=self.instance)
+        )
+
+    class Meta:
+        model = models.Project
+        fields = (
+            'name', 'description', 'groups',
+            'members', 'is_public',
+        )

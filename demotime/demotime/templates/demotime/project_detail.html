@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Project {{ object.name }} Administration{% endblock %}
+
+{% block sub_nav %}{% endblock %}
+
+{% block content %}
+<h3>{{ object.name }} Adminstration</h3>
+<ul>
+    <li>Name: {{ object.name }}</li>
+    <li>Description: {{ object.description }}</li>
+    {% if object.projectgroup_set.count %}
+        <li>Groups {% if request.user.is_superuser %}(<a href="#">Manage Groups</a>){% endif %}:
+            <ul>
+                {% for group in object.projectgroup_set.all %}
+                    <li>{{ group.group.name }} {% if group.is_admin %} - Admin{% endif %}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endif %}
+    {% if object.projectmember_set.count %}
+        <li>Members:
+            <ul>
+                {% for member in object.projectmember_set.all %}
+                    <li>{{ member.user.display_name }} {% if member.is_admin %} - Admin{% endif %}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endif %}
+    <li>Public: {{ object.is_public }}</li>
+    <li><a href="{% url 'project-admin' object.slug %}">Manage Project</a></li>
+</ul>
+{% endblock %}
+

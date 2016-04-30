@@ -4,6 +4,10 @@
 {% block sub_nav %}{% endblock %}
 
 {% block content %}
-<h3>{{ object.name }} Adminstration</h3>
+<form action="{% url 'project-admin' object.slug %}" method='post'>
+    {% csrf_token %}
+    {{ project_form.as_p }}
+    <input type="submit" value="Submit" />
+</form>
 {% endblock %}
 
