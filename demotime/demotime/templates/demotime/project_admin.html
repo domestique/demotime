@@ -6,8 +6,57 @@
 {% block content %}
 <form action="{% url 'project-admin' object.slug %}" method='post'>
     {% csrf_token %}
+    {# PROJECT FORM #}
     {{ project_form.as_p }}
+
+    {# EDIT GROUPS FORMS #}
+    <h3>Edit Groups</h3>
+    <div class="">
+        {{ edit_group_formset.management_form }}
+        {% for form in edit_group_formset %}
+            <section>
+                {{ form.as_p }}
+            </section>
+        {% endfor %}
+    </div>
+
+    {# EDIT MEMBERS FORMS #}
+    <h3>Edit Members</h3>
+    <div class="">
+        {{ edit_member_formset.management_form }}
+        {% for form in edit_member_formset %}
+            <section>
+                {{ form.as_p }}
+            </section>
+        {% endfor %}
+    </div>
+
+    {# ADD GROUPS FORMS #}
+    <h3>Add Groups</h3>
+    <div class="attachments">
+        {{ group_formset.management_form }}
+        {% for form in group_formset %}
+            <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                {{ form.as_p }}
+                <label>&nbsp;</label>
+                <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
+            </section>
+        {% endfor %}
+    </div>
+
+    {# ADD MEMBERS FORMS #}
+    <h3>Add Members</h3>
+    <div class="attachments">
+        {{ member_formset.management_form }}
+        {% for form in member_formset %}
+            <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                {{ form.as_p }}
+                <label>&nbsp;</label>
+                <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
+            </section>
+        {% endfor %}
+    </div>
+
     <input type="submit" value="Submit" />
 </form>
 {% endblock %}
-

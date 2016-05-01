@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from demotime import models, widgets
+from demotime import models
 
 
 class ReviewForm(forms.ModelForm):
@@ -265,28 +265,50 @@ class UpdateCommentForm(CommentForm, AttachmentForm):
         return data['attachment_type']
 
 
-class ProjectForm(forms.ModelForm):
+class ProjectMemberForm(forms.ModelForm):
 
-    groups = forms.ModelMultipleChoiceField(
-        queryset=models.Group.objects.all(),
-        widget=forms.CheckboxSelectMultiple
-    )
-    members = forms.ModelMultipleChoiceField(
-        queryset=User.objects.none()
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(ProjectForm, self).__init__(*args, **kwargs)
-        self.fields['members'] = forms.ModelMultipleChoiceField(
-            queryset=User.objects.exclude(
-                userprofile__user_type=models.UserProfile.SYSTEM
-            ).order_by('username'),
-            widget=widgets.MemberSelectMultiple(project=self.instance)
+    class Meta:
+        model = models.ProjectMember
+        fields = (
+            'user', 'is_admin'
         )
+
+
+class EditProjectMemberForm(forms.ModelForm):
+
+    delete = forms.BooleanField(required=False)
+
+    class Meta:
+        model = models.ProjectMember
+        fields = (
+            'user', 'is_admin'
+        )
+
+
+class ProjectGroupForm(forms.ModelForm):
+
+    class Meta:
+        model = models.ProjectGroup
+        fields = (
+            'group', 'is_admin'
+        )
+
+
+class EditProjectGroupForm(forms.ModelForm):
+
+    delete = forms.BooleanField(required=False)
+
+    class Meta:
+        model = models.ProjectGroup
+        fields = (
+            'group', 'is_admin'
+        )
+
+
+class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = models.Project
         fields = (
-            'name', 'description', 'groups',
-            'members', 'is_public',
+            'name', 'description', 'is_public',
         )

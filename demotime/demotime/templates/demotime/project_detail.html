@@ -21,7 +21,7 @@
         <li>Members:
             <ul>
                 {% for member in object.projectmember_set.all %}
-                    <li>{{ member.user.display_name }} {% if member.is_admin %} - Admin{% endif %}</li>
+                    <li>{{ member.user.userprofile.name }} {% if member.is_admin %} - Admin{% endif %}</li>
                 {% endfor %}
             </ul>
         </li>

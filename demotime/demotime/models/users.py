@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from .base import BaseModel
+from .groups import Group
 
 
 def avatar_field(instance, filename):
@@ -30,6 +31,14 @@ class UserProxy(User):
             is_admin=True
         )
         return admin_groups.exists() or admin_user.exists()
+
+    @property
+    def admin_groups(self):
+        return Group.objects.filter(pk__in=(
+            self.groupmember_set.filter(is_admin=True).values_list(
+                'group', flat=True
+            )
+        ))
 
     @property
     def display_name(self):
