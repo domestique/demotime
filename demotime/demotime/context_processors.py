@@ -35,6 +35,9 @@ def site_settings(request):
 
 
 def available_projects(request):
+    if not request.user.is_authenticated():
+        return {'available_projects': models.Project.objects.none()}
+
     projects = models.Project.objects.filter(
         # Direct Membership
         Q(projectmember__user=request.user) |

@@ -1,6 +1,6 @@
 from mock import Mock
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 
 from demotime import context_processors, models
 from demotime.tests import BaseTestCase
@@ -98,4 +98,14 @@ class TestContextProcessors(BaseTestCase):
         self.assertEqual(
             list(projects.values_list('pk', flat=True)),
             list(models.Project.objects.filter(pk=self.project.pk).values_list('pk', flat=True))
+        )
+
+    def test_available_projects_unauthed(self):
+        self.request_mock.user = AnonymousUser()
+        projects = context_processors.available_projects(
+            self.request_mock
+        )['available_projects']
+        self.assertEqual(
+            list(projects),
+            list(models.Project.objects.none())
         )
