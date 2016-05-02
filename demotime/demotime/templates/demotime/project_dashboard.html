@@ -1,30 +1,59 @@
 {% extends 'base.html' %}
-{% block title %}Project {{ object.name }}{% endblock %}
+{% block title %}- Project {{ object.name }}{% endblock %}
 
 {% block sub_nav %}{% endblock %}
 
+{% block styles %}
+{{ block.super }}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
+{% endblock %}
+
 {% block content %}
-<h3>{{ object.name }} Open Demos</h3>
-{% if is_admin %}
-    <a href="{% url 'project-detail' object.slug %}">{{ object.name }} Administration</a>
-{% endif %}
-<ul>
-    {% for review in open_demos %}
-        <li><a href="{% url 'review-detail' object.slug review.pk %}">DT-{{ review.pk }}</a></li>
-    {% endfor %}
-</ul>
+<h1 class="heading">
+    {{ object.name }} Dashboard
+    {% if is_admin %}
+        <small>
+            <a href="{% url 'project-detail' object.slug %}">{{ object.name }} Administration</a>
+        </small>
+    {% endif %}
+</h1><br>
 
-<h3>Your Recently Updated Demos</h3>
-<ul>
-    {% for review in user_updated_demos %}
-        <li><a href="{% url 'review-detail' object.slug review.pk %}">DT-{{ review.review.pk }}</a></li>
-    {% endfor %}
-</ul>
-
-<h3>Recently updated demos on {{ object.name }}</h3>
-<ul>
-    {% for review in updated_demos %}
-        <li><a href="{% url 'review-detail' object.slug review.pk %}">DT-{{ review.pk }}</a></li>
-    {% endfor %}
-</ul>
+<div class="reviews-list">
+    <div class="split~680 by:2 with-gap:2">
+        <div class="cel">
+            <h3 class="icon icon-inbox">
+                Your recently updated demos on {{ object.name }}
+            </h3>
+            <section class="reviews {% if not user_updated_demos %}done{% endif %}">
+                <ul>
+                    {% for review in updated_demos %}
+                        {% include "includes/reviews_li.html" with demo=review %}
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+        <div class="cel">
+            <h3 class="icon icon-inbox">
+                Updated Demos on {{ object.name }}
+            </h3>
+            <section class="updates {% if not updated_demos %}done{% endif %}">
+                <ul>
+                    {% for review in updated_demos %}
+                        {% include "includes/reviews_li.html" with demo=review %}
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+    <h3 class="icon icon-calendar">
+        Active demos on {{ object.name }}
+    </h3>
+    <section class="demos {% if not open_demos %}done{% endif %}">
+        <ul>
+            {% for review in open_demos %}
+                {% include "includes/reviews_li.html" with demo=review %}
+            {% endfor %}
+        </ul>
+    </section>
+</div>
 {% endblock %}

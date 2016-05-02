@@ -1,0 +1,21 @@
+{% load demo_tags %}
+
+{# Demos assigned to you #}
+
+<h3 class="icon icon-inbox">
+    Your Recently Updated Demos
+    {# TODO #}
+    <span class="help" title="Reviews are demos that have been assigned
+        to you to review. You can leave feedback and ultimately approve or
+        reject a demo. Your approval status appears to the left. Reviews you
+        are following do not require your approval and you can simply
+        follow their progress."></span>
+</h3>
+
+<section class="reviews {% if not reviews %}done{% endif %}">
+    <ul>
+        {% for review in reviews %}
+            {% include "includes/reviews_li.html" with demo=review.review %}
+        {% endfor %}
+    </ul>
+</section>
