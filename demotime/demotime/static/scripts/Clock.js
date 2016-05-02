@@ -33,7 +33,7 @@ var updateTime = function() {
     seconds.animate({transform: "r" + second * 6 + "," + 32 + "," + 32}, 500, mina.elastic);
     count = count + 1;
 
-    if (count > 600) { // timemout clock after an hour
+    if (count > 1200) { // timemout clock after 20 mins
         $('.clock').css('opacity', '0.5')
             .css({
                 'filter'         : 'blur(1px)',
