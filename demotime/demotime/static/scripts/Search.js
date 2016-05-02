@@ -1,5 +1,6 @@
 var SearchModel = Backbone.Model.extend();
-DemoTime.Search= Backbone.View.extend({
+
+DemoTime.Search = Backbone.View.extend({
     el: '.quickfind',
 
     events: {
