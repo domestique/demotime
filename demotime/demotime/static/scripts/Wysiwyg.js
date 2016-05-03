@@ -17,7 +17,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                 ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
                 ['para', ['ul', 'ol']],
                 ['misc', ['undo', 'redo', 'codeview', 'link']],
-                ['insert', ['table']]
+                ['insert', ['table', 'picture']]
             ]
         });
 
