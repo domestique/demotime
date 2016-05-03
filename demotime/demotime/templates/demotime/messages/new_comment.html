@@ -4,7 +4,7 @@ Hello {{ receipient }},<br>
 <br>
 {% if "data:image" in comment.comment %}
     This comment contains an image that we could not decode for email.<br>
-    Please visit <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">the demo</a><br>
+    Please visit <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">the demo</a>
     to see the comment on the site.
 {% else %}
     {{ comment.comment|safe|truncatechars:1000 }}<br><br>
