@@ -2,7 +2,17 @@ Hello {{ receipient }},<br>
 <br>
 {{ comment.commenter|capfirst }} just added a new comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>:<br>
 <br>
-{{ comment.comment|safe }}<br>
+{% if "data:image" in comment.comment %}
+    This comment contains an image that we could not decode for email.<br>
+    Please visit <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">the demo</a><br>
+    to see the comment on the site.
+{% else %}
+    {{ comment.comment|safe|truncatechars:1000 }}<br><br>
+    {% if comment.comment.length > 1000 %}
+        <em>this message was truncated</em>.<br>
+        read the rest <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">here</a>
+    {% endif %}
+{% endif %}<br><br>
 ___<br>
 <br>
 - {{ sender }}
