@@ -5,29 +5,29 @@ h1.heading {
 .quickfind {
     margin: 20px 0;
 }
-.reviews-list h3 {
+.dashboard h3 {
     margin:0;
     font-size:18px;
 }
 @media screen and (max-width:680px) {
-    .reviews-list h3 {
+    .dashboard h3 {
         font-size:14px;
     }
 }
-.reviews-list section {
+.dashboard section {
     min-height:170px;
     padding:10px;
 }
-.reviews-list section li {
+.dashboard section li {
     color: #ccc;
     padding: 4px 0;
 }
-.reviews-list section,
-.reviews-list section a {
+.dashboard section,
+.dashboard section a {
     color:#fff;
     font-weight: 200;
 }
-.reviews-list section strong a {
+.dashboard section strong a {
     font-weight: 800;
 }
 li.de-emphasize span,
@@ -36,21 +36,21 @@ li.de-emphasize a,
 span.icon-Approved a { font-weight: 200; color: #ccc; }
 li.de-emphasize strong a { font-weight: 400; }
 
-.reviews-list ul {
+.dashboard ul {
     list-style:none;
     margin:0;
     padding:0;
 }
-section.reviews {
+section.emph_high {
     background:rgba(48, 48, 48, 1);
 }
-section.updates {
+section.emph_med {
     background:rgba(48, 48, 48, .8);
 }
-section.demos {
+section.emph_low {
     background:rgba(48, 48, 48, .7);
 }
-.reviews-list section.done {
+.dashboard section.done {
     background-image:url(/static/images/done.png);
     background-repeat:no-repeat;
     background-size:10%;
@@ -60,14 +60,14 @@ section.demos {
 .state-highlight:before {
     font-size:1.5em;
 }
-.reviews-list small {
+.dashboard small {
     text-transform: uppercase;
     margin-left: 3px;
     font-size: 8px;
     color: #ccc;
     vertical-align: middle;
 }
-.reviews-list small.reviewing {
+.dashboard small.reviewing {
     color: #ffffe7;
     font-weight: 800;
 }
@@ -75,7 +75,7 @@ section.demos {
 .quickfind-results {
     display: none;
 }
-.reviews-list .quickfind-results section li {
+.dashboard .quickfind-results section li {
     color: #999;
 }
 .quickfind-results section {
@@ -90,18 +90,18 @@ section.demos {
 .quickfind-users {
     margin-top: 15px;
 }
-.reviews-list .quickfind a {
+.dashboard .quickfind a {
     color: #222;
 }
 
-.reviews-list .review_state {
+.dashboard .review_state {
     margin-left: 2px;
 }
-.reviews-list .review_state .icon {
+.dashboard .review_state .icon {
     position: relative;
     top: -2px;
 }
-.reviews-list .icon sup {
+.dashboard .icon sup {
     font-size: 9px;
     position: relative;
     left: -3px;

@@ -1,33 +1,107 @@
 {% extends 'base.html' %}
-{% block title %}Project {{ object.name }} Administration{% endblock %}
+{% block title %}{{ object.name }} Administration{% endblock %}
 
 {% block sub_nav %}{% endblock %}
 
-{% block content %}
-<h3>{{ object.name }} Adminstration</h3>
-<ul>
-    <li>Name: {{ object.name }}</li>
-    <li>Description: {{ object.description }}</li>
-    {% if object.projectgroup_set.count %}
-        <li>Groups {% if request.user.is_superuser %}(<a href="#">Manage Groups</a>){% endif %}:
-            <ul>
-                {% for group in object.projectgroup_set.all %}
-                    <li>{{ group.group.name }} {% if group.is_admin %} - Admin{% endif %}</li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% endif %}
-    {% if object.projectmember_set.count %}
-        <li>Members:
-            <ul>
-                {% for member in object.projectmember_set.all %}
-                    <li>{{ member.user.userprofile.name }} {% if member.is_admin %} - Admin{% endif %}</li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% endif %}
-    <li>Public: {{ object.is_public }}</li>
-    <li><a href="{% url 'project-admin' object.slug %}">Manage Project</a></li>
-</ul>
+{% block styles %}
+{{ block.super }}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
 {% endblock %}
 
+{% block content %}
+<h1 class="heading">
+    {{ object.name }} Administration
+    <small><a href="{% url 'project-admin' object.slug %}">edit</a></small>
+</h1><br>
+
+<div class="dashboard split~680 by:3 with-gap:3">
+    <div class="cel">
+        <h3 class="icon icon-cog">
+            Basic project details
+            <small>
+                <a href="{% url 'project-admin' object.slug %}">Edit</a>
+            </small>
+        </h3>
+        <section class="emph_high">
+            <ul>
+                <li>
+                    <strong>Description</strong>:<br>
+                    {{ object.description }}
+                </li>
+                <li>
+                    This is a
+                    <strong>
+                        {% if object.is_public %}
+                            pubic
+                        {% else %}
+                            private
+                        {% endif %}
+                    </strong>
+                    project.
+                    <span class="help" title="TODO"></span>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <div class="cel">
+        <h3 class="icon icon-cloud">
+            Project group
+            {% if request.user.is_superuser %}
+                <small>
+                    <a href="#">Manage</a>
+                </small>
+            {% endif %}
+        </h3>
+        <section class="emph_med">
+            <ul>
+                {% if object.projectgroup_set.count %}
+                    {% for group in object.projectgroup_set.all %}
+                        <li>{{ group.group.name }} {% if group.is_admin %}<small>admin</small>{% endif %}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No groups exist yet (<a href="#">create</a>)</li>
+                {% endif %}
+            </ul>
+        </section>
+    </div>
+    <div class="cel">
+        <h3 class="icon icon-user">
+            Project members
+            <small>
+                <a href="#">Manage</a>
+            </small>
+        </h3>
+        <section class="emph_low">
+            <ul>
+                {% if object.projectmember_set.count %}
+                    <li>Members:
+                        <ul>
+                            {% for member in object.projectmember_set.all %}
+                                <li>{{ member.user.userprofile.name }} {% if member.is_admin %} - Admin{% endif %}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% else %}
+                    <li>
+                        No members exist yet
+                        <small>
+                            <a href="#">add</a>
+                        </small>
+                    </li>
+                {% endif %}
+            </ul>
+        </section>
+    </div>
+</div>
+<h3>
+    Recently Updated Demos in <strong>{{ object.name }}</strong>
+    <small>
+        <a href="#">VIEW ALL</a>
+    </small>
+</h3>
+<section class="emph_low">
+    {% for review in updated_demos %}
+        {% include "includes/reviews_li.html" with demo=review %}
+    {% endfor %}
+</section>
+{% endblock %}
