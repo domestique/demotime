@@ -24,7 +24,7 @@
             <h3 class="icon icon-inbox">
                 Your recently updated demos on {{ object.name }}
             </h3>
-            <section class="reviews {% if not user_updated_demos %}done{% endif %}">
+            <section class="emph_high {% if not user_updated_demos %}done{% endif %}">
                 <ul>
                     {% for review in updated_demos %}
                         {% include "includes/reviews_li.html" with demo=review %}
@@ -36,7 +36,7 @@
             <h3 class="icon icon-inbox">
                 Updated Demos on {{ object.name }}
             </h3>
-            <section class="updates {% if not updated_demos %}done{% endif %}">
+            <section class="emph_med {% if not updated_demos %}done{% endif %}">
                 <ul>
                     {% for review in updated_demos %}
                         {% include "includes/reviews_li.html" with demo=review %}
@@ -48,7 +48,7 @@
     <h3 class="icon icon-calendar">
         Active demos on {{ object.name }}
     </h3>
-    <section class="demos {% if not open_demos %}done{% endif %}">
+    <section class="emph_low {% if not open_demos %}done{% endif %}">
         <ul>
             {% for review in open_demos %}
                 {% include "includes/reviews_li.html" with demo=review %}
