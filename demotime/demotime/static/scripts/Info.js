@@ -18,6 +18,8 @@ DemoTime.Info = Backbone.View.extend({
 
         if (!link.data('pk')) { return false }
 
+        this.options.review_url = link.data('url')
+
         var review_req = $.ajax({
             url: self.options.review_url,
             method: 'POST',

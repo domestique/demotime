@@ -19,7 +19,7 @@
                     <span>
                         <a href="#" class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ demo.pk }}" title="Copy URL"><img src="/static/images/ic_attach.svg"></a>
                         <strong>
-                            <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>:
+                            <a data-url="{% url 'reviews-json' demo.project.slug %}" data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>:
                         </strong>
                         <a href="{{ demo.get_absolute_url }}">
                             {{ demo.title }}

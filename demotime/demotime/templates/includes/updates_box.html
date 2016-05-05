@@ -21,9 +21,9 @@
                         <strong>
                             <a href="#" class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ message.review.pk }}" title="Copy URL"><img src="/static/images/ic_attach.svg"></a>
                             {% if message.review.creator != request.user %}
-                                <a data-pk="{{ message.review.pk }}" title="Your approval status" class="dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                <a data-url="{% url 'reviews-json' message.review.project.slug %}" data-pk="{{ message.review.pk }}" title="Your approval status" class="dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                             {% else %}
-                                <a data-pk="{{ message.review.pk }}" class="dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                <a data-url="{% url 'reviews-json' message.review.project.slug %}" data-pk="{{ message.review.pk }}" class="dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                             {% endif %}
                         </strong>
                     {% endif %}
