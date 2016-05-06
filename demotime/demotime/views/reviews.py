@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from demotime import forms, models
 from demotime.views import CanViewMixin
-from . import CanViewJsonView
+from . import CanViewJsonView, JsonView
 
 
 class ReviewDetail(CanViewMixin, DetailView):
@@ -194,7 +194,10 @@ class ReviewListView(ListView):
 
     def get_queryset(self):
         qs = super(ReviewListView, self).get_queryset()
-        form = forms.ReviewFilterForm(self.request.GET)
+        form = forms.ReviewFilterForm(
+            self.request.user.projects,
+            data=self.request.GET
+        )
         if form.is_valid():
             return form.get_reviews(qs)
 
@@ -205,7 +208,10 @@ class ReviewListView(ListView):
         initial = self.request.GET.copy()
         initial['state'] = initial.get('state', models.reviews.OPEN)
         context.update({
-            'form': forms.ReviewFilterForm(initial=initial)
+            'form': forms.ReviewFilterForm(
+                self.request.user.projects,
+                initial=initial
+            )
         })
         return context
 
@@ -360,18 +366,28 @@ class UpdateCommentView(DetailView):
             return self.get(*args, **kwargs)
 
 
-class ReviewJsonView(CanViewJsonView):
+class ReviewJsonView(JsonView):
 
+    @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        self.project = get_object_or_404(
-            models.Project,
-            slug=kwargs['proj_slug']
-        )
-        self.review = None
+        if self.request.POST.get('project_pk'):
+            self.projects = models.Project.objects.filter(
+                pk=self.request.POST['project_pk']
+            )
+
+        elif kwargs.get('proj_slug'):
+            self.projects = models.Project.objects.filter(
+                slug=kwargs['proj_slug']
+            )
+        else:
+            self.projects = self.request.user.projects
         return super(ReviewJsonView, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):
-        form = forms.ReviewFilterForm(self.request.POST)
+        form = forms.ReviewFilterForm(
+            self.projects,
+            data=self.request.POST
+        )
         if form.is_valid():
             reviews = form.get_reviews()
             review_json_dict = {

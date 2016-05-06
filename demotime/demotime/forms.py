@@ -78,8 +78,9 @@ class ReviewFilterForm(forms.Form):
         widget=forms.HiddenInput
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, projects, *args, **kwargs):
         super(ReviewFilterForm, self).__init__(*args, **kwargs)
+        self.projects = projects
         for key, value in self.fields.iteritems():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
@@ -91,6 +92,7 @@ class ReviewFilterForm(forms.Form):
             return models.Review.objects.none()
 
         qs = models.Review.objects.all() if not initial_qs else initial_qs
+        qs = qs.filter(project__in=self.projects)
         data = self.cleaned_data
         if data.get('reviewer'):
             qs = qs.filter(reviewer__reviewer=data['reviewer'])

@@ -662,6 +662,48 @@ class TestReviewViews(BaseTestCase):
         reviewers = review['reviewers']
         self.assertIn(test_user.pk, [x['user_pk'] for x in reviewers])
 
+    def test_review_json_without_project_slug(self):
+        project = models.Project.objects.create(
+            name='Second Project', slug='second-project', description=''
+        )
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Test Title 2'
+        second_review_kwargs['project'] = project
+        second_review = models.Review.create_review(**second_review_kwargs)
+        response = self.client.post(reverse('reviews-json'), {
+            'title': 'test'
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        self.assertEqual(review['title'], 'Test Title')
+        self.assertEqual(review['pk'], self.review.pk)
+        self.assertNotEqual(review['pk'], second_review.pk)
+
+    def test_review_json_posting_project_pk(self):
+        project = models.Project.objects.create(
+            name='Second Project', slug='second-project', description=''
+        )
+        models.ProjectMember.objects.create(
+            project=project, user=self.user
+        )
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Test Title 2'
+        second_review_kwargs['project'] = project
+        second_review = models.Review.create_review(**second_review_kwargs)
+        response = self.client.post(reverse('reviews-json'), {
+            'title': 'test',
+            'project_pk': self.project.pk,
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        self.assertEqual(review['title'], 'Test Title')
+        self.assertEqual(review['pk'], self.review.pk)
+        self.assertNotEqual(review['pk'], second_review.pk)
+
     def test_review_list_sort_by_newest(self):
         review_kwargs = self.default_review_kwargs.copy()
         review_kwargs['title'] = 'Newer Review'

@@ -62,6 +62,7 @@ urlpatterns += [
         name='update-review-state'
     ),
     url(r'^review/list/$', reviews.review_list_view, name='review-list'),
+    url(r'^review/search/$', reviews.review_json_view, name='reviews-json'),
     url(r'^(?P<proj_slug>[\w-]+)/review/search/$', reviews.review_json_view, name='reviews-json'),
 ]
 

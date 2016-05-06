@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 
 from .base import BaseModel
 from .groups import Group
+from .projects import Project
 
 
 def avatar_field(instance, filename):
@@ -31,6 +32,13 @@ class UserProxy(User):
             is_admin=True
         )
         return admin_groups.exists() or admin_user.exists()
+
+    @property
+    def projects(self):
+        return Project.objects.filter(
+            models.Q(projectmember__user=self) |
+            models.Q(projectgroup__group__groupmember__user=self)
+        ).distinct()
 
     @property
     def admin_groups(self):
