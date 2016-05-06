@@ -370,17 +370,16 @@ class ReviewJsonView(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
+        self.projects = self.request.user.projects
         if self.request.POST.get('project_pk'):
-            self.projects = models.Project.objects.filter(
+            self.projects = self.projects.filter(
                 pk=self.request.POST['project_pk']
             )
 
         elif kwargs.get('proj_slug'):
-            self.projects = models.Project.objects.filter(
+            self.projects = self.projects.filter(
                 slug=kwargs['proj_slug']
             )
-        else:
-            self.projects = self.request.user.projects
         return super(ReviewJsonView, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):

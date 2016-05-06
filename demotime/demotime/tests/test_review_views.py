@@ -704,6 +704,22 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(review['pk'], self.review.pk)
         self.assertNotEqual(review['pk'], second_review.pk)
 
+    def test_review_json_posting_project_pk_unauthorized(self):
+        project = models.Project.objects.create(
+            name='Second Project', slug='second-project', description=''
+        )
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Test Title 2'
+        second_review_kwargs['project'] = project
+        models.Review.create_review(**second_review_kwargs)
+        response = self.client.post(reverse('reviews-json'), {
+            'title': 'test',
+            'project_pk': project.pk,
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data['count'], 0)
+
     def test_review_list_sort_by_newest(self):
         review_kwargs = self.default_review_kwargs.copy()
         review_kwargs['title'] = 'Newer Review'
