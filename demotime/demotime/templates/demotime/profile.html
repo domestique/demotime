@@ -4,6 +4,7 @@
 {% block sub_nav %}{% endblock %}
 
 {% block styles %}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
 {{ block.super }}
 <style>
     main .avatar {
@@ -54,6 +55,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="dashboard">
     <h1 class="heading">
         {% if owner_viewing %}Your Profile{% else %}{{ object }}'s Profile{% endif %}
         {% if owner_viewing %}
@@ -95,4 +97,5 @@
     {% if open_reviews %}
         {% include "includes/reviews_box.html" with reviews=open_reviews user=object.user %}
     {% endif %}
+</div>
 {% endblock %}

@@ -75,7 +75,8 @@
 {{ block.super }}
 <script>
 var search = new DemoTime.Search({
-    user_url: '{% url 'user-api' %}'
+    user_url: '{% url 'user-api' %}',
+    review_url: '{% url 'reviews-json' %}'
 });
 </script>
 {% endblock %}
