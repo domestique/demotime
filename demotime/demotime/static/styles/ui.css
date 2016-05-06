@@ -285,9 +285,12 @@ h3 small {
 .quickfind-results section ul,
 .quickfind-results section li {
     margin: 0;
+    padding: 3px 0;
 }
 .quickfind-results section a {
     padding: 0;
+    line-height: 21px;
+    display: inline;
 }
 .quickfind-results section li {
     color: #999;
