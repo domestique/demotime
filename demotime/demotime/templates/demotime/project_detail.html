@@ -11,33 +11,12 @@
 {% endblock %}
 
 {% block content %}
-<style>
-.project_header {
-    margin-bottom: 30px;
-}
-.project_switcher {
-    margin: 20px;
-    padding: 5px 10px;
-    line-height: 28px;
-    text-align: right;
-}
-.project_switcher select {
-    width: 100%;
-}
-.project_switcher a {
-    display: inline-block;
-    font-size: 12px;
-}
-</style>
-
 <div class="split by:4/1 project_header">
     <div class="cel">
         <h1 class="heading">
             {{ object.name }} Administration
             <small><a href="{% url 'project-admin' object.slug %}">edit</a></small>
         </h1>
-    </div>
-    <div class="cel">
     </div>
 </div>
 
