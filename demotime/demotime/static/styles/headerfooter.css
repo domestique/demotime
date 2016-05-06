@@ -79,6 +79,20 @@ body.bookmarklet h1 {
 
 .navbar .manage_user {
     position: relative;
+    border: 1px solid #777;
+    padding: 2px 3px;
+    position: relative;
+    top: -1px;
+}
+.navbar .manage_user:after {
+    font-family: Verdana;
+    content: '↴';
+    font-size: 12px;
+    font-weight: 800;
+    margin-left: 1px;
+    position: relative;
+    top: -1px;
+    color: #777;
 }
 .navbar .manage_user ul {
     display: none;

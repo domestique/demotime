@@ -297,3 +297,14 @@ h1.heading {
         height: 15px;
     }
 }
+
+a[data-type="approved"] {
+    background: #1B9074;
+    color: #fff;
+    border: 1px solid #fafafa;
+}
+a[data-type="rejected"] {
+    background: #904445;
+    color: #fff;
+    border: 1px solid #fafafa;
+}
