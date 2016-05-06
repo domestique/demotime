@@ -1,7 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'layout_user.html' %}
 {% block title %}{{ object.name }} Administration{% endblock %}
 
-{% block sub_nav %}{% endblock %}
+{% block sub_nav_actions %}
+    <a href="#" class="icon icon-lightbulb">Create a new project</a>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
@@ -36,15 +38,6 @@
         </h1>
     </div>
     <div class="cel">
-        <section class="project_switcher">
-            <select>
-                <option>Switch Projects</option>
-                {% for project in available_projects %}
-                    <option value="{{ project.slug }}">{{ project.name }}</option>
-                {% endfor %}
-            </select>
-            <a href="#" class="icon icon-lightbulb">Create a new project</a>
-        </section>
     </div>
 </div>
 

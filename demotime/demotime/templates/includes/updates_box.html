@@ -28,32 +28,7 @@
                         </strong>
                     {% endif %}
                     <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title|truncatechars:35 }}</a>
-                    {% if message.review.state == "closed" %}
-                        <small>
-                            {{ message.review.state }}
-                        </small>
-                    {% else %}
-                        <span class="review_state">
-                            {% if message.review.reviewer_state == "reviewing" %}
-                                {% if message.review.reviewing_count %}
-                                    <span title="# Reviewing" class="icon icon-reviewing"><sup>{{ message.review.reviewing_count }}</sup></span>
-                                {% endif %}
-                                {% if message.review.approved_count %}
-                                    <span title="# Approved" class="icon icon-approved"><sup>{{ message.review.approved_count }}</sup></span>
-                                {% endif %}
-                                {% if message.review.rejected_count %}
-                                    <span title="# Rejected" class="icon icon-rejected"><sup>{{ message.review.rejected_count }}</sup></span>
-                                {% endif %}
-                            {% else %}
-                                <small>
-                                    {{ message.review.reviewer_state }}
-                                </small>
-                            {% endif %}
-                        </span>
-                        <small>
-                            <a href="{{ message.review.creator.userprofile.get_absolute_url }}">({{ message.review.creator.userprofile|truncatechars:15 }})</a>
-                        </small>
-                    {% endif %}
+                    {% include "includes/review_state.html" with demo=message.review %}
                 </li>
             {% endfor %}
         </ul>

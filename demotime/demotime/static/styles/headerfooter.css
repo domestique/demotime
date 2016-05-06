@@ -10,7 +10,7 @@ body.bookmarklet h1 {
     background:#303030;
     box-shadow:0 2px 5px #ccc;
     padding:5px 0 0;
-    margin-bottom:3em;
+    margin-bottom:20px;
 }
 .navbar a {
     color:#fff;
@@ -37,24 +37,9 @@ body.bookmarklet h1 {
     text-align:right;
     line-height:85px;
 }
-@media screen and (max-width:1000px) {
-    .navbar .navbar-nav {
-        margin-top:10px;
-        line-height:1em;
-        font-size:.8em;
-    }
-    .navbar .navbar-nav li {
-        display:block;
-    }
-}
 @media screen and (max-width:370px) {
     .navbar .navbar-nav {
         text-align:right;
-    }
-    .navbar .navbar-nav li {
-        display:inline-block;
-        padding:5px 0;
-        margin-left:2px;
     }
 }
 .navbar-nav small a {
@@ -69,13 +54,10 @@ body.bookmarklet h1 {
 .navbar ul.navbar-nav {
     line-height:71px;
 }
-.navbar ul li {
-    padding:5px 10px;
+.navbar li {
+    padding:5px;
     border-radius:10px;
     display:inline-block;
-}
-.navbar ul li.active {
-    background:#618A55;
 }
 .navbar .read_notification a {
     background: #777;
@@ -93,6 +75,36 @@ body.bookmarklet h1 {
 .navbar .avatar {
     position: relative;
     top: 4px;
+}
+
+.navbar .manage_user {
+    position: relative;
+}
+.navbar .manage_user ul {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    padding: 10px;
+    background: rgba(250, 250, 250, 0.95);
+    width: 100px;
+    box-shadow: 4px 4px 0 #ccc;
+}
+.navbar .manage_user li {
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+.navbar .manage_user li a {
+    font-weight: bold;
+    display: block;
+    color: #32CCAE;
+    padding: 3px 10px;
+    font-size: 12px;
+}
+.navbar .manage_user li a:hover {
+    background: rgba(48, 48, 48, 1);
+    color: #fff;
 }
 
 footer {
@@ -122,6 +134,12 @@ nav.subnav {
     padding:8px 0;
     text-align:right;
 }
+@media screen and (max-width:940px) {
+    nav.subnav {
+        padding-left:10px;
+        padding-right:10px;
+    }
+}
 .subnav a {
     background:#fff;
     color:#555;
@@ -131,11 +149,34 @@ nav.subnav {
     border-radius:3px;
     margin:0;
 }
+@media screen and (max-width:680px) {
+    .subnav a {
+        padding:3px;
+    }
+}
+@media screen and (max-width:450px) {
+    .subnav a {
+        margin: 3px 0;
+    }
+}
 .subnav ul,
 .subnav ul li {
     margin:0 0 0 10px;
     padding:0;
 }
+.subnav .global_actions {
+    text-align: right;
+    padding-top: 3px;
+}
+@media screen and (max-width:680px) {
+    .subnav input[type="text"] {
+        font-size: 12px;
+    }
+    .subnav .global_actions {
+        padding-top: 8px;
+    }
+}
+
 .container img {
     max-width: 100%;
 }

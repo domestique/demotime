@@ -1,0 +1,24 @@
+<script type="text/x-pattern" id="user_results">
+    <strong>Users</strong>
+    <ul>
+    <% if (user.length) { %>
+        <% _.each(user, function(user) { %>
+            <li><a href="/accounts/profile/<%= user.pk %>"><%= user.name %></a></li>
+        <% }) %>
+    <% } else { %>
+        <li>No matching users found</li>
+    <% } %>
+    </ul>
+</script>
+<script type="text/x-pattern" id="review_results">
+    <strong>Demos</strong>
+    <ul>
+    <% if (reviews.length) { %>
+        <% _.each(reviews, function(review) { %>
+            <li><a href="<%= review.url %>"><%= review.title %></a>, by <%= review.creator %></li>
+        <% }) %>
+    <% } else { %>
+        <li>No matching reviews found</li>
+    <% } %>
+    </ul>
+</script>

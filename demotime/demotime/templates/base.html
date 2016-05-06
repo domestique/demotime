@@ -54,36 +54,32 @@
                         <div class="cel">
                             <div class="navbar-nav">
                                 <ul>
-                                    {% url 'index' as index_url %}
-                                    {% url 'create-review' as create_review_url %}
-                                    {% url 'login' as login_url %}
-                                    {% url 'inbox' as inbox_url %}
-                                    {% url 'help' as help_url %}
-                                    {% url 'profile' request.user.userprofile.pk as profile_url %}
                                     {% if request.user.is_authenticated %}
-                                        <li>
-                                            {% if request.user.userprofile.display_name %}
-                                                <a href="{{ request.user.userprofile.get_absolute_url }}">
-                                                    {% if request.user.userprofile.avatar.name %}
-                                                        <img src="{% url "user-media" request.user.userprofile.avatar.name %}" width="20" height="20" class="avatar">
-                                                    {% else %}
-                                                        <img src="/static/images/no_image.jpg" width="20" height="20" class="avatar">
-                                                    {% endif %}
-                                                    {{ request.user.userprofile.display_name }}
-                                                </a>
-                                                <small>(<a href="{% url 'edit-profile' request.user.pk %}">edit</a>)</small>
-                                            {% else %}
-                                                <a href="{% url 'edit-profile' request.user.pk %}" class="icon icon-user">[set up your profile]</a>
-                                            {% endif %}
-                                        </li>
-                                        <li class="icon icon-pencil {% if request.path == create_review_url %}active{% else %}{% endif %}"><a href="{{ create_review_url }}">Create a demo</a></li>
-                                        <li><a class="icon icon-paper-plane" href="{% url 'logout' %}">Log out</a></li>
-                                        <li class="{% if request.path == help_url %}active{% endif %}"><a class="icon icon-help-circled-alt" href="{% url 'help' %}">Help</a></li>
-                                        <li><span class="msg_notifier {% if has_unread_messages %}un{% endif %}read_notification"><a href="{{ inbox_url }}">{{ unread_message_count }}</a></span></li>
-                                    {% else %}
-                                        {% if request.path != login_url %}
-                                            <li><a href="{% url 'login' %}">Login</a></li>
+                                        {% if not request.user.userprofile.avatar.name %}
+                                            <li>
+                                                <a href="{% url 'edit-profile' request.user.pk %}" class="icon icon-attention">You need an avatar</a>
+                                            </li>
                                         {% endif %}
+                                        <li>
+                                            <div class="manage_user">
+                                                <a href="#" class="manage_user-toggler icon icon-user">
+                                                    {% if request.user.userprofile.display_name %}
+                                                        {{ request.user.userprofile.display_name }}
+                                                    {% else %}
+                                                        [set up your profile]
+                                                    {% endif %}
+                                                </a>
+                                                <ul>
+                                                    <li><a class="manage_user-item" href="{{ request.user.userprofile.get_absolute_url }}">Profile</a></li>
+                                                    <li><a class="manage_user-item" href="{% url 'help' %}">Help</a></li>
+                                                    <li><a class="manage_user-item" href="https://demoti.me/blog/" target="_blank">Blog</a></li>
+                                                    <li><a class="manage_user-item" href="{% url 'logout' %}">Log out</a></li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                        <li><span class="msg_notifier {% if has_unread_messages %}un{% endif %}read_notification"><a href="{% url 'inbox' %}">{{ unread_message_count }}</a></span></li>
+                                    {% else %}
+                                        <li><a href="{% url 'login' %}">Log in</a></li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -211,43 +207,49 @@
             });
         </script>
 
+        {% if request.user %}
+        <script src="/static/scripts/Account.js"></script>
+        <script src="/static/scripts/Search.js"></script>
+        <script>
+            // top right account toggler
+            var account = new DemoTime.Account();
+
+            // global search
+            var search = new DemoTime.Search({
+                user_url: '{% url 'user-api' %}',
+                review_url: '{% url 'reviews-json' %}'
+            });
+        </script>
+        {% endif %}
+
         {% block footer_scripts %}
             <script src="/static/scripts/footer_scripts.js"></script>
         {% endblock %}
 
         {% if request.GET.hide_header %}
-        <script>
-            $('body').addClass('bookmarklet');
-        </script>
+            <script>
+                $('body').addClass('bookmarklet');
+            </script>
         {% endif %}
 
         <script>
-        {% if request.user %}
-            // set up background tasks (new messages, comments etc)
-            var BackgroundTasks = new DemoTime.BackgroundTasks({
-                messages_url: '{% url "messages-json" %}'
-            });
-            var info = new DemoTime.Info({
-                review_url: '{% url "reviews-json" %}'
-            });
-        {% endif %}
+            {% if request.user %}
+                // set up background tasks (new messages, comments etc)
+                var BackgroundTasks = new DemoTime.BackgroundTasks({
+                    messages_url: '{% url "messages-json" %}'
+                });
+                var info = new DemoTime.Info({
+                    review_url: '{% url "reviews-json" %}'
+                });
+            {% endif %}
         </script>
     </body>
     <div id="patterns">
-        <script type="text/x-pattern" id="emoji">
-        <div class="emoji_panel" title="Click to insert a reaction">
-            <img src="/static/images/emoji/smiley.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/grin.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/frowning2.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/astonished.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/confounded.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/cry.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/heart.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/thumbsup.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/beers.png" class="add_emoji emoji">
-        </div>
-        </script>
-        {% include "includes/patterns/review_info.html" %}
+        {% if request.user %}
+            {% include "includes/patterns/emoji.html" %}
+            {% include "includes/patterns/search.html" %}
+            {% include "includes/patterns/review_info.html" %}
+        {% endif %}
         {% block patterns %}{% endblock %}
     </div>
 </html>

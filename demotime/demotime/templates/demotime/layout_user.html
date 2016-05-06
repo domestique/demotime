@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block sub_nav %}
+<nav class="subnav">
+    <div class="container split by:2 align:t">
+        <div class="cel">
+            {% include "includes/search.html" %}
+        </div>
+        <div class="cel global_actions">
+            {% block sub_nav_actions %}
+                <a class="icon icon-pencil" href="{% url 'create-review' %}">Create a demo</a></li>
+            {% endblock %}
+        </div>
+    </div>
+</nav>
+{% endblock %}
+

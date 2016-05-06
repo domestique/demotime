@@ -1,7 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'layout_user.html' %}
 {% block title %}- Project {{ object.name }}{% endblock %}
 
-{% block sub_nav %}{% endblock %}
+{% block sub_nav_actions %}
+    <a href="#" class="icon icon-lightbulb">Create a new project</a>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
@@ -10,7 +12,7 @@
 
 {% block content %}
 <h1 class="heading">
-    {{ object.name }} Dashboard
+    <strong>{{ object.name }}</strong> Dashboard
     {% if is_admin %}
         <small>
             <a href="{% url 'project-detail' object.slug %}">{{ object.name }} Administration</a>
@@ -22,19 +24,27 @@
     <div class="split~680 by:2 with-gap:2">
         <div class="cel">
             <h3 class="icon icon-inbox">
-                Your recently updated demos on {{ object.name }}
+                Your demos with new activity on <strong>{{ object.name }}</strong>
+                <span class="help" title="A Project consists of one or more demos.
+                    The demos that you have created that are part of '{{ object.name }}'
+                    with recent updates (new comments, approval state changes,
+                    new revisions, etc) will appear here."></span>
             </h3>
             <section class="emph_high {% if not user_updated_demos %}done{% endif %}">
                 <ul>
-                    {% for review in updated_demos %}
-                        {% include "includes/reviews_li.html" with demo=review %}
+                    {% for review in user_updated_demos %}
+                        {% include "includes/reviews_li.html" with demo=review.review %}
                     {% endfor %}
                 </ul>
             </section>
         </div>
         <div class="cel">
             <h3 class="icon icon-inbox">
-                Updated Demos on {{ object.name }}
+                Updated Demos on <strong>{{ object.name }}</strong>
+                <span class="help" title="Here you will see all recently updated
+                    demos on '{{ object.name }}' regardless of who created them.
+                    This is a good way to see what demos are changing throughout
+                    the project."></span>
             </h3>
             <section class="emph_med {% if not updated_demos %}done{% endif %}">
                 <ul>
@@ -46,12 +56,16 @@
         </div>
     </div>
     <h3 class="icon icon-calendar">
-        Active demos on {{ object.name }}
+        Newly created demos on <strong>{{ object.name }}</strong>
+        <span class="help" title="Here you will see all of the newest
+            demos on '{{ object.name }}' regardless of who created them.
+            This is a good way to see what demos are added within
+            the project."></span>
     </h3>
     <section class="emph_low {% if not open_demos %}done{% endif %}">
         <ul>
             {% for review in open_demos %}
-                {% include "includes/reviews_li.html" with demo=review %}
+                {% include "includes/reviews_li.html" with demo=review truncate='false' %}
             {% endfor %}
         </ul>
     </section>

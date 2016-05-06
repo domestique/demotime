@@ -1,12 +1,17 @@
-{% extends 'base.html' %}
-
-{% block sub_nav %}{% endblock %}
+{% extends 'layout_user.html' %}
 
 {% block styles %}
 {{ block.super }}
 <style>
     label[for="id_email"] {
         margin-top:60px;
+    }
+    #avatar-clear_id:after {
+        content: 'Remove';
+        margin-left: 15px;
+    }
+    label[for="avatar-clear_id"] {
+        display: none;
     }
 </style>
 {% endblock %}

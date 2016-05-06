@@ -15,38 +15,7 @@
     {% if reviews %}
         <ul>
             {% for demo in reviews %}
-                <li>
-                    <span>
-                        <a href="#" class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ demo.pk }}" title="Copy URL"><img src="/static/images/ic_attach.svg"></a>
-                        <strong>
-                            <a data-prj="{{ demo.project.pk }}" data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>:
-                        </strong>
-                        <a href="{{ demo.get_absolute_url }}">
-                            {{ demo.title }}
-                        </a>
-                    </span>
-                    {% if demo.state == "closed" %}
-                        <small>{{ demo.state }}</small>
-                    {% else %}
-                        <span class="review_state">
-                            {% if demo.reviewer_state == "reviewing" %}
-                                {% if demo.reviewing_count %}
-                                    <span title="# Reviewing" class="icon icon-reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
-                                {% endif %}
-                                {% if demo.approved_count %}
-                                    <span title="# Approved" class="icon icon-approved"><sup>{{ demo.approved_count }}</sup></span>
-                                {% endif %}
-                                {% if demo.rejected_count %}
-                                    <span title="# Rejected" class="icon icon-rejected"><sup>{{ demo.rejected_count }}</sup></span>
-                                {% endif %}
-                            {% else %}
-                                <small>
-                                    {{ demo.reviewer_state }}
-                                </small>
-                            {% endif %}
-                        </span>
-                    {% endif %}
-                </li>
+                {% include "includes/reviews_li.html" with truncate='false' %}
             {% endfor %}
         </ul>
     {% endif %}

@@ -1,44 +1,53 @@
-{% extends 'base.html' %}
+{% extends 'layout_user.html' %}
 
 {% block sub_nav %}{% endblock %}
 
 {% block styles %}
 {{ block.super }}
 <style>
+    section {
+        padding: 10px 20px;
+    }
     section section {
-        overflow:hidden;
-        padding: 20px;
+        overflow: hidden;
+        padding: 5px 20px;
     }
     .form-actions {
         text-align: center;
     }
     .filters select {
-        margin-right:1.5em;
-        margin-bottom:1em;
+        margin-right: 1.5em;
+        margin-bottom: 1em;
         max-width: 100px;
     }
     .filters input[type="submit"] {
-        margin-top:2em;
-        margin-left:1em;
-        width:50%;
+        margin-top: 10px;
+        width: 50%;
+    }
+    .filters label {
+        display: inline-block;
     }
     @media screen and (max-width:680px) {
         .filters select {
-            width:100%;
-            margin-bottom:2em;
+            margin-bottom: 10px;
         }
         .filters input[type="submit"] {
-            float:none;
-            margin:1em 0;
-            width:100%;
-            display:block;
+            float: none;
+            margin: 10px 0;
+            width: 100%;
+            display: block;
+        }
+        .filters label {
+            display: block;
+            width: 100%;
+            margin: 0;
         }
     }
     .filters input[type="text"] {
         padding: 10px;
         height: auto;
         border: 1px solid #ddd;
-        margin-bottom: 50px;
+        margin-bottom: 20px;
     }
     table {
         background: #fff;
@@ -55,12 +64,12 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="heading">Created Demo List</h1>
+    <h1 class="heading">Find a Demo</h1>
     <section>
         <section>
             <form action="" method="get" class="filters">
                 {% for form in form %}
-                    <label style="display: inline;">{{ form.label }}</label>
+                    <label>{{ form.label }}</label>
                     {{ form.errors }}
                     {{ form }}
                 {% endfor %}

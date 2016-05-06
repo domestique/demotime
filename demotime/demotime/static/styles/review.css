@@ -97,23 +97,6 @@ h1 .alert {
     display: inline-block;
 }
 
-.manage-review {
-    float: right;
-}
-.manage-review ul {
-    margin:0;
-    padding:0;
-    display:inline-block;
-}
-.manage-review ul li {
-    list-style:none;
-    display:inline-block;
-    margin: 22px 0 28px 5px;
-    padding: 5px 0 5px 5px;
-}
-.manage-review a {
-    color:#fff;
-}
 .main-content {
     clear: both;
 }
@@ -234,7 +217,7 @@ article {
     margin-bottom: 0;
 }
 
-a[target="_blank"] {
+main a[target="_blank"] {
     display: inline-block;
     padding-right: 15px;
     margin-right: 3px;

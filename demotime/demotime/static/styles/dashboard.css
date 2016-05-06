@@ -2,9 +2,6 @@
 h1.heading {
     margin-bottom: 10px;
 }
-.quickfind {
-    margin: 20px 0;
-}
 .dashboard h3 {
     margin:0;
     font-size:18px;
@@ -70,28 +67,6 @@ section.emph_low {
 .dashboard small.reviewing {
     color: #ffffe7;
     font-weight: 800;
-}
-
-.quickfind-results {
-    display: none;
-}
-.dashboard .quickfind-results section li {
-    color: #999;
-}
-.quickfind-results section {
-    min-height: 0;
-}
-.quickfind-results strong {
-    display: block;
-    background: #ddd;
-    color: #555;
-    padding: 5px;
-}
-.quickfind-users {
-    margin-top: 15px;
-}
-.dashboard .quickfind a {
-    color: #222;
 }
 
 .dashboard .review_state {

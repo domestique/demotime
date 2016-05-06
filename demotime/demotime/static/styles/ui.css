@@ -131,7 +131,7 @@ a.button-link.confirm {
 }
 
 @media screen and (max-width:680px) {
-    [class~='split~680']>.cel {
+    main [class~='split~680']>.cel {
         margin-bottom:1.5em;
     }
 }
@@ -266,3 +266,47 @@ h3 small {
 .copy_link {
     margin: 0;
 }
+
+.quickfind input[type="text"] {
+    background: #fafafa;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    height: auto;
+    margin: 0;
+}
+@media screen and (max-width:680px) {
+    .quickfind input[type="text"] {
+        font-size: 11px;
+    }
+}
+.quickfind-results {
+    display: none;
+}
+.quickfind-results section ul,
+.quickfind-results section li {
+    margin: 0;
+}
+.quickfind-results section a {
+    padding: 0;
+}
+.quickfind-results section li {
+    color: #999;
+}
+.quickfind-results section {
+    min-height: 0;
+    padding: 10px;
+    margin-bottom: 5px
+}
+.quickfind-results strong {
+    display: block;
+    background: #ddd;
+    color: #555;
+    padding: 5px;
+}
+.quickfind-users {
+    margin-top: 15px;
+}
+.dashboard .quickfind a {
+    color: #222;
+}
+

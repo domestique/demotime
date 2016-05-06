@@ -1,8 +1,33 @@
-{% extends 'base.html' %}
+{% extends 'layout_user.html' %}
 {% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
-{% block sub_nav %}{% endblock %}
+{% block sub_nav_actions %}
+<ul class="manage-review">
+    {% if request.user == object.creator %}
+        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="icon icon-pencil">Add revision</a></li>
+        {% if object.state == 'closed' %}
+            <li class="open"><a data-type="open" href="#" class="icon icon-eye">Open demo</a></li>
+        {% else %}
+            <li class="closed"><a data-type="closed" href="#" class="icon icon-ok">Close demo</a></li>
+        {% endif %}
+    {% else %}
+        {% if reviewer and object.state != "closed" %}
+            {% if reviewer.status == 'approved' %}
+                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="icon icon-thumbs-up">Unapprove demo</a></li>
+            {% else %}
+                <li><a data-type="approved" href="#" class="icon icon-thumbs-up">Approve demo</a></li>
+            {% endif %}
+            {% if reviewer.status == 'rejected' %}
+                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="alert icon icon-thumbs-down">Unreject demo</a></li>
+            {% else %}
+                <li><a data-type="rejected" href="#" class="alert icon icon-thumbs-down">Reject demo</a></li>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    <li><a class="icon icon-plus" href="{% url 'create-review' %}">Create</a></li>
+</ul>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
@@ -55,31 +80,6 @@
                 {% endif %}
             {% endfor %}
         {% endif %}
-        <div class="manage-review">
-            <ul>
-                {% if request.user == object.creator %}
-                    <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="button-link icon icon-pencil">Add revision</a></li>
-                    {% if object.state == 'closed' %}
-                        <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
-                    {% else %}
-                        <li class="closed"><a data-type="closed" href="#" class="button-link icon icon-ok">Close demo</a></li>
-                    {% endif %}
-                {% else %}
-                    {% if reviewer and object.state != "closed" %}
-                        {% if reviewer.status == 'approved' %}
-                            <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up">Unapprove demo</a></li>
-                        {% else %}
-                            <li><a data-type="approved" href="#" class="button-link icon icon-thumbs-up">Approve demo</a></li>
-                        {% endif %}
-                        {% if reviewer.status == 'rejected' %}
-                            <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="button-link alert icon icon-thumbs-down">Unreject demo</a></li>
-                        {% else %}
-                            <li><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-            </ul>
-        </div>
     </div>
 
     <div class="main-content">

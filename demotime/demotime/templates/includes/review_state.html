@@ -1,0 +1,24 @@
+{% if demo.state == "closed" %}
+    <small>{{ demo.state }}</small>
+{% else %}
+    <span class="review_state">
+        {% if demo.reviewer_state == "reviewing" %}
+            {% if demo.reviewing_count %}
+                <span title="# Reviewing" class="icon icon-reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
+            {% endif %}
+            {% if demo.approved_count %}
+                <span title="# Approved" class="icon icon-approved"><sup>{{ demo.approved_count }}</sup></span>
+            {% endif %}
+            {% if demo.rejected_count %}
+                <span title="# Rejected" class="icon icon-rejected"><sup>{{ demo.rejected_count }}</sup></span>
+            {% endif %}
+        {% else %}
+            <small>
+                {{ demo.reviewer_state }}
+            </small>
+        {% endif %}
+    </span>
+{% endif %}
+<small>
+    <a href="{{ demo.creator.userprofile.get_absolute_url }}">({{ demo.creator.userprofile|truncatechars:15 }})</a>
+</small>

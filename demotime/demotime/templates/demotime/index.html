@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout_user.html' %}
 {% load demo_tags %}
 
 {% block styles %}
@@ -13,17 +13,6 @@
 </h1>
 
 <div class="dashboard">
-
-    <div class="quickfind">
-        <form action="{% url 'review-list' %}#results" method="get">
-            <input type="text" id="id_title" name="title" placeholder="Quickly find a demo or user by keyword">
-            <div class="quickfind-results"><section>
-                <div class="quickfind-reviews"></div>
-                <div class="quickfind-users"></div>
-            </section></div>
-        </form>
-    </div>
-
     <div class="split~680 by:2 with-gap:2">
         <div class="cel">
             {% include "includes/reviews_box.html" with reviews=open_reviews follows=followed_demos user=request.user %}
@@ -67,16 +56,5 @@
     <li>No matching reviews found</li>
 <% } %>
 </ul>
-</script>
-{% endblock %}
-
-{% block footer_scripts %}
-<script src="/static/scripts/Search.js"></script>
-{{ block.super }}
-<script>
-var search = new DemoTime.Search({
-    user_url: '{% url 'user-api' %}',
-    review_url: '{% url 'reviews-json' %}'
-});
 </script>
 {% endblock %}

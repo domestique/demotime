@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout_user.html' %}
 {% load demo_tags %}
 
 {% block sub_nav %}{% endblock %}
@@ -35,7 +35,6 @@
         font-weight: 700;
     }
     section {
-        width: 70%;
         padding: 10px;
     }
     @media screen and (max-width:680px) {
@@ -58,9 +57,13 @@
 <div class="dashboard">
     <h1 class="heading">
         {% if owner_viewing %}Your Profile{% else %}{{ object }}'s Profile{% endif %}
-        {% if owner_viewing %}
-            <a href="{% url 'edit-profile' object.pk %}">(edit)</a>
-        {% endif %}
+        <small>
+            {% if owner_viewing %}
+                <a href="{% url 'edit-profile' object.pk %}">edit</a>
+            {% else %}
+                <a href="{% url 'review-list' %}?creator={{ object.pk }}">View this user's demos</a>
+            {% endif %}
+        </small>
     </h1>
 
     {% if object.avatar.name %}
@@ -74,7 +77,7 @@
             <img src="/static/images/no_image.jpg" class="avatar">
         {% endif %}
     {% endif %}
-    <section>
+    <section class="emph_high">
         <label>Display Name:</label>
         {{ object.display_name }}
         {% if owner_viewing %}
@@ -91,11 +94,5 @@
             {{ object.bio|safe }}
         {% endif %}
     </section>
-    {% if open_demos %}
-        {% include "includes/demos_box.html" with reviews=open_demos user=object.user %}
-    {% endif %}
-    {% if open_reviews %}
-        {% include "includes/reviews_box.html" with reviews=open_reviews user=object.user %}
-    {% endif %}
 </div>
 {% endblock %}
