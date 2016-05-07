@@ -93,7 +93,7 @@
                         <ul>
                             <li><a href="{% url 'about' %}">About</a>
                             <!--li><a href="{% url 'addons' %}">Add-ons</a-->
-                            <li><a href="https://demoti.me/blog/" target="_blank">Blog</a>
+                            <li><a href="https://demoti.me/blog/" class="header-blog" target="_blank">Blog</a>
                         </ul>
                     </div>
                 </nav>
@@ -243,8 +243,10 @@
                 });
 
                 if(typeof(Storage) !== "undefined") {
-                    if (localStorage.getItem('blog20160507')) {
-                        localStorage.setItem("blog20160507", true);
+                    var blog_entry = 'blog20160507'
+
+                    if (!localStorage.getItem(blog_entry)) {
+                        localStorage.setItem(blog_entry, true);
                         $('.header-blog, .manage_user').addClass('highlight');
                         setTimeout(function() {
                             $('.header-blog, .manage_user').removeClass('highlight');

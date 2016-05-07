@@ -180,3 +180,9 @@ blockquote .emoji,
     max-width: 30px !important;
     max-height: 30px !important;
 }
+.note-group-select-from-files {
+    display: none !important;
+}
+.modal.link-dialog .form-group {
+    margin-top: 0;
+}

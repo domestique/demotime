@@ -12,12 +12,13 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         $('textarea').summernote({
             'width': '100%',
             'height': '150',
+            maximumImageFileSize: 2621440, // 2.5MB
             shortcuts: false,
             toolbar: [
                 ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
                 ['para', ['ul', 'ol']],
                 ['misc', ['undo', 'redo', 'codeview', 'link']],
-                ['insert', ['table']]
+                ['insert', ['table', 'picture']]
             ]
         });
 
