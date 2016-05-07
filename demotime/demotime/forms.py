@@ -6,15 +6,11 @@ from demotime import models
 
 class ReviewForm(forms.ModelForm):
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
-        valid_users = User.objects.exclude(
-            pk=user.pk
-        ).exclude(
-            userprofile__user_type=models.UserProfile.SYSTEM
-        ).order_by('username')
-        self.fields['reviewers'].queryset = valid_users
-        self.fields['followers'].queryset = valid_users
+        self.project = project
+        self.fields['reviewers'].queryset = self.project.members
+        self.fields['followers'].queryset = self.project.members
         self.fields['followers'].required = False
 
         for key, value in self.fields.iteritems():
@@ -27,7 +23,7 @@ class ReviewForm(forms.ModelForm):
         model = models.Review
         fields = (
             'reviewers', 'description', 'title',
-            'case_link', 'followers', 'project',
+            'case_link', 'followers',
         )
 
 

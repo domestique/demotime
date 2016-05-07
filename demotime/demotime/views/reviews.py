@@ -111,19 +111,26 @@ class CreateReviewView(TemplateView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(
+            models.Project,
+            slug=kwargs['proj_slug']
+        )
         if kwargs.get('pk'):
             self.review_inst = get_object_or_404(models.Review, pk=kwargs['pk'])
             self.project = self.review_inst.project
             self.template_name = 'demotime/edit_review.html'
         else:
-            self.review_inst = models.Review(creator=self.request.user)
-            self.project = None
+            self.review_inst = models.Review(
+                creator=self.request.user,
+                project=self.project,
+            )
         return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, pk=None, *args, **kwargs):
         self.review_form = forms.ReviewForm(
             user=self.request.user,
             instance=self.review_inst,
+            project=self.project,
             data=request.POST
         )
         AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)
@@ -131,6 +138,7 @@ class CreateReviewView(TemplateView):
         if self.review_form.is_valid() and self.attachment_forms.is_valid():
             data = self.review_form.cleaned_data
             data['creator'] = request.user
+            data['project'] = self.project
             data['attachments'] = []
             for form in self.attachment_forms.forms:
                 if form.cleaned_data:
@@ -165,6 +173,7 @@ class CreateReviewView(TemplateView):
             self.review_form = forms.ReviewForm(
                 user=self.request.user,
                 instance=self.review_inst,
+                project=self.project,
                 initial={'description': ''},
             )
             AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)

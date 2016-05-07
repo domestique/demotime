@@ -8,7 +8,10 @@
         </div>
         <div class="cel global_actions">
             {% block sub_nav_actions %}
-                <a class="icon icon-plus" href="{% url 'create-review' %}">Create a demo</a></li>
+                {% comment %}
+                    FIXME: Broken by create-review needing a project.slug
+                    <a class="icon icon-plus" href="{% url 'create-review' %}">Create a demo</a></li>
+                {% endcomment %}
             {% endblock %}
         </div>
     </div>

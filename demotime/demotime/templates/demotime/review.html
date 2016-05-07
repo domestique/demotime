@@ -25,7 +25,7 @@
             {% endif %}
         {% endif %}
     {% endif %}
-    <li><a class="icon icon-plus" href="{% url 'create-review' %}">Create</a></li>
+    <li><a class="icon icon-plus" href="{% url 'create-review' object.project.slug %}">Create</a></li>
 </ul>
 {% endblock %}
 

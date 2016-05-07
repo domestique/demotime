@@ -166,7 +166,7 @@ class TestReviewViews(BaseTestCase):
         self.assertStatusCode(response, 404)
 
     def test_get_create_review(self):
-        response = self.client.get(reverse('create-review'))
+        response = self.client.get(reverse('create-review', args=[self.project.slug]))
         self.assertStatusCode(response, 200)
         self.assertIn('review_form', response.context)
         self.assertIn('review_inst', response.context)
@@ -174,15 +174,28 @@ class TestReviewViews(BaseTestCase):
 
     def test_get_create_review_login_required(self):
         self.client.logout()
-        response = self.client.get(reverse('create-review'))
+        response = self.client.get(reverse('create-review', args=[self.project.slug]))
         self.assertStatusCode(response, 302)
+
+    def test_create_review_filters_out_unauthorized_users(self):
+        ''' Test asserts that we don't show reviewer/followers that aren't
+        part of the project that the review is being created under
+        '''
+        unauthed_user = User.objects.create(username='bad_user')
+        response = self.client.get(reverse('create-review', args=[self.project.slug]))
+        self.assertStatusCode(response, 200)
+        form = response.context['review_form']
+        reviewers = form.fields['reviewers'].queryset
+        followers = form.fields['followers'].queryset
+        self.assertNotIn(unauthed_user, reviewers)
+        self.assertNotIn(unauthed_user, followers)
 
     def test_post_create_review(self):
         fh = StringIO('testing')
         fh.name = 'test_file_1'
         title = 'Test Title Create Review POST'
         self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(reverse('create-review'), {
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
             'creator': self.user,
             'title': title,
             'description': 'Test Description',
@@ -282,7 +295,7 @@ class TestReviewViews(BaseTestCase):
         )
 
     def test_post_create_review_with_errors(self):
-        response = self.client.post(reverse('create-review'), {
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
             'creator': self.user,
             'form-TOTAL_FORMS': 4,
             'form-INITIAL_FORMS': 0,

@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from demotime.models.base import BaseModel
 
@@ -16,7 +18,14 @@ class Project(BaseModel):
         return u'Project {}'.format(self.name)
 
     def get_absolute_url(self):
-        raise NotImplementedError()
+        return reverse('project-detail', args=[self.slug])
+
+    @property
+    def members(self):
+        return User.objects.filter(
+            models.Q(projectmember__project=self) |
+            models.Q(group__projectgroup__project=self)
+        ).distinct().order_by('username')
 
 
 class ProjectGroup(BaseModel):
