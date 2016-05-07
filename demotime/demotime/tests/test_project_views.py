@@ -1,3 +1,5 @@
+import json
+
 from django.core.urlresolvers import reverse
 
 from demotime import constants, models
@@ -243,3 +245,89 @@ class TestProjectViews(BaseTestCase):
         member_to_demote.refresh_from_db()
         self.assertTrue(member_to_promote.is_admin)
         self.assertFalse(member_to_demote.is_admin)
+
+    def test_project_json_view_search_by_name_post(self):
+        response = self.client.post(reverse('project-json'), {
+            'name': 'default',
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data, {
+            'count': 1,
+            'projects': [{
+                'pk': self.project.pk,
+                'slug': self.project.slug,
+                'description': self.project.description,
+                'url': self.project.get_absolute_url(),
+                'is_public': self.project.is_public,
+                'name': self.project.name,
+            }]
+        })
+
+    def test_project_json_view_search_by_name_get(self):
+        response = self.client.get(reverse('project-json'), {
+            'name': 'default',
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data, {
+            'count': 1,
+            'projects': [{
+                'pk': self.project.pk,
+                'slug': self.project.slug,
+                'description': self.project.description,
+                'url': self.project.get_absolute_url(),
+                'is_public': self.project.is_public,
+                'name': self.project.name,
+            }]
+        })
+
+    def test_project_json_view_search_without_name_get(self):
+        response = self.client.get(reverse('project-json'))
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data, {
+            'count': 1,
+            'projects': [{
+                'pk': self.project.pk,
+                'slug': self.project.slug,
+                'description': self.project.description,
+                'url': self.project.get_absolute_url(),
+                'is_public': self.project.is_public,
+                'name': self.project.name,
+            }]
+        })
+
+    def test_project_json_view_search_without_name_post(self):
+        response = self.client.post(reverse('project-json'))
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content)
+        self.assertEqual(json_data, {
+            'count': 1,
+            'projects': [{
+                'pk': self.project.pk,
+                'slug': self.project.slug,
+                'description': self.project.description,
+                'url': self.project.get_absolute_url(),
+                'is_public': self.project.is_public,
+                'name': self.project.name,
+            }]
+        })
+
+    def test_project_json_view_hides_unauthed_get(self):
+        models.ProjectGroup.objects.all().delete()
+        models.ProjectMember.objects.all().delete()
+        response = self.client.get(reverse('project-json'))
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content), {
+            'count': 0, 'projects': []
+        })
+
+    def test_project_json_view_hides_unauthed_post(self):
+        models.ProjectGroup.objects.all().delete()
+        models.ProjectMember.objects.all().delete()
+        response = self.client.post(reverse('project-json'))
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content), {
+            'count': 0, 'projects': []
+        })

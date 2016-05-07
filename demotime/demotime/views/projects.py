@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import redirect
 
 from demotime import constants, forms, models
-from demotime.views import CanViewMixin
+from demotime.views import CanViewMixin, JsonView
 
 
 class ProjectDashboard(CanViewMixin, DetailView):
@@ -188,6 +188,49 @@ class ProjectAdmin(CanViewMixin, DetailView):
 
         return redirect('project-detail', proj_slug=self.project.slug)
 
+
+class ProjectJsonView(JsonView):
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectJsonView, self).dispatch(*args, **kwargs)
+
+    def _build_json(self, projects):
+        json_resp = {
+            'count': projects.count(),
+            'projects': []
+        }
+        for project in projects:
+            json_resp['projects'].append(
+                {
+                    'pk': project.pk,
+                    'slug': project.slug,
+                    'name': project.name,
+                    'description': project.description,
+                    'is_public': project.is_public,
+                    'url': project.get_absolute_url(),
+                }
+            )
+
+        return json_resp
+
+    def get(self, request, *args, **kwargs):
+        name = request.POST.get('name')
+        projects = request.user.projects
+        if name:
+            projects = projects.filter(name__icontains=name)
+
+        return self._build_json(projects)
+
+    def post(self, request, *args, **kwargs):
+        name = request.POST.get('name')
+        projects = request.user.projects
+        if name:
+            projects = projects.filter(name__icontains=name)
+
+        return self._build_json(projects)
+
 project_dashboard = ProjectDashboard.as_view()
 project_detail = ProjectDetail.as_view()
 project_admin = ProjectAdmin.as_view()
+project_json = ProjectJsonView.as_view()
