@@ -97,7 +97,7 @@
                         <ul>
                             <li><a href="{% url 'about' %}">About</a>
                             <!--li><a href="{% url 'addons' %}">Add-ons</a-->
-                            <li><a href="https://demoti.me/blog/" target="_blank">Blog</a>
+                            <li><a href="https://demoti.me/blog/" class="header-blog" target="_blank">Blog</a>
                         </ul>
                     </div>
                 </nav>
@@ -231,6 +231,18 @@
                 review_url: '{% url 'reviews-json' %}'
             });
         {% endif %}
+
+        if(typeof(Storage) !== "undefined") {
+            var blog_entry = 'blog20160507'
+
+            if (!localStorage.getItem(blog_entry)) {
+                localStorage.setItem(blog_entry, true);
+                $('.header-blog').addClass('highlight');
+                setTimeout(function() {
+                    $('.header-blog').removeClass('highlight');
+                }, 20000);
+            }
+        }
         </script>
     </body>
     <div id="patterns">

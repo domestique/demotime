@@ -95,6 +95,13 @@ body.bookmarklet h1 {
     top: 4px;
 }
 
+.header-blog.highlight:after {
+    font-family: "fontello";
+    content: '\e828';
+    color: red;
+    margin-left: 3px;
+}
+
 footer {
     margin-top:8em;
     font-size:.9em;
