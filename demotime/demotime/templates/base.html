@@ -72,7 +72,7 @@
                                                 <ul>
                                                     <li><a class="manage_user-item" href="{{ request.user.userprofile.get_absolute_url }}">Profile</a></li>
                                                     <li><a class="manage_user-item" href="{% url 'help' %}">Help</a></li>
-                                                    <li><a class="manage_user-item" href="https://demoti.me/blog/" target="_blank">Blog</a></li>
+                                                    <li class="header-blog"><a class="manage_user-item" href="https://demoti.me/blog/" target="_blank">Blog</a></li>
                                                     <li><a class="manage_user-item" href="{% url 'logout' %}">Log out</a></li>
                                                 </ul>
                                             </div>
@@ -241,6 +241,16 @@
                 var info = new DemoTime.Info({
                     review_url: '{% url "reviews-json" %}'
                 });
+
+                if(typeof(Storage) !== "undefined") {
+                    if (localStorage.getItem('blog20160507')) {
+                        localStorage.setItem("blog20160507", true);
+                        $('.header-blog, .manage_user').addClass('highlight');
+                        setTimeout(function() {
+                            $('.header-blog, .manage_user').removeClass('highlight');
+                        }, 20000);
+                    }
+                }
             {% endif %}
         </script>
     </body>

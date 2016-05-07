@@ -94,6 +94,15 @@ body.bookmarklet h1 {
     top: -1px;
     color: #777;
 }
+.navbar .header-blog.highlight a:after,
+.navbar .manage_user.highlight:after {
+    font-family: "fontello";
+    content: '\e828';
+    color: red;
+}
+.navbar .header-blog.highlight a:after {
+    margin-left: 3px;
+}
 .navbar .manage_user ul {
     display: none;
     position: absolute;
