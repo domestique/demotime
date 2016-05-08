@@ -109,3 +109,33 @@ class TestPermissionMixin(BaseTestCase):
         pm.is_admin = True
         pm.save()
         self.assertTrue(self.mixin.test_func())
+
+    def test_require_superuser_privileges(self):
+        self.user.is_superuser = True
+        self.request.user = self.user
+        self.user.is_authenticated = Mock(return_value=True)
+        self.mixin.project = None
+        self.mixin.review = None
+        self.mixin.request = self.request
+        self.mixin.require_superuser_privileges = True
+        self.assertTrue(self.mixin.test_func())
+
+    def test_require_superuser_privileges_without_superuser(self):
+        self.user.is_superuser = False
+        self.request.user = self.user
+        self.user.is_authenticated = Mock(return_value=True)
+        self.mixin.project = None
+        self.mixin.review = None
+        self.mixin.request = self.request
+        self.mixin.require_superuser_privileges = True
+        self.assertFalse(self.mixin.test_func())
+
+    def test_require_superuser_privileges_unauthed(self):
+        self.user.is_superuser = True
+        self.request.user = self.user
+        self.user.is_authenticated = Mock(return_value=False)
+        self.mixin.project = None
+        self.mixin.review = None
+        self.mixin.request = self.request
+        self.mixin.require_superuser_privileges = True
+        self.assertFalse(self.mixin.test_func())

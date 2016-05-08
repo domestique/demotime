@@ -11,6 +11,12 @@ class GroupType(BaseModel):
     def __unicode__(self):
         return u'GroupType: {}'.format(self.slug)
 
+    @classmethod
+    def create_group_type(cls, name, slug):
+        return cls.objects.create(
+            name=name, slug=slug
+        )
+
 
 class Group(BaseModel):
 
@@ -22,6 +28,23 @@ class Group(BaseModel):
 
     def __unicode__(self):
         return u'Group: {}'.format(self.slug)
+
+    @classmethod
+    def create_group(cls, name, slug, description, group_type, members=None):
+        members = members or []
+        obj = cls.objects.create(
+            name=name,
+            slug=slug,
+            description=description,
+            group_type=group_type,
+        )
+        for member in members:
+            GroupMember.create_group_member(
+                user=member['user'],
+                group=obj,
+                is_admin=member['is_admin']
+            )
+        return obj
 
 
 class GroupMember(BaseModel):
@@ -35,3 +58,12 @@ class GroupMember(BaseModel):
             self.group.slug,
             self.user.userprofile.name
         )
+
+    @classmethod
+    def create_group_member(cls, user, group, is_admin=False):
+        obj = cls.objects.create(
+            user=user,
+            group=group,
+            is_admin=is_admin
+        )
+        return obj
