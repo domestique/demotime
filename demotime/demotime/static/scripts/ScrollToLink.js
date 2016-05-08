@@ -7,11 +7,15 @@ DemoTime.ScrollToLink = Backbone.View.extend({
     },
 
     initialize: function() {
-        this.$url = window.location.href;
+        this.$url = window.location.href,
+        self = this;
 
         // On pageload, jump to a link, if it exists
         if (this.$url.indexOf('#') > -1 && this.$url.split('#')[1]) {
-            this.jump_to_link(this.$url.split('#')[1], 1000);
+            // Prevent default jump (less jumpy experience)
+            setTimeout(function() {
+                self.jump_to_link(self.$url.split('#')[1], 1000);
+            }, 1);
         } else {
             // otherwise, return
             return true;
@@ -50,11 +54,6 @@ DemoTime.ScrollToLink = Backbone.View.extend({
         //
         // Set a default timeout before animation of 0
         var timeout = timeout || 0;
-
-        // Prevent default jump (less jumpy experience)
-        setTimeout(function() {
-            window.scrollTo(0, 0);
-        }, 1);
 
         // Sometimes we use name='blah' other times
         // we target an ID. So lets look for names first, then

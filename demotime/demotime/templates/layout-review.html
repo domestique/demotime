@@ -97,3 +97,8 @@ a.error {
     </section>
 </article>
 {% endblock %}
+
+{% block footer_scripts %}
+{{ block.super }}
+<script src="/static/scripts/review_utils.js"></script>
+{% endblock %}

@@ -190,9 +190,25 @@
 
         <script> var DemoTime = [] </script>
         <script src="/static/scripts/ScrollToLink.js"></script>
-        <script src="/static/scripts/Reviewers.js"></script>
+
+        {% if request.user %}
+        {# DT-XX Info boxes #}
         <script src="/static/scripts/Info.js"></script>
+        <script>
+            var info = new DemoTime.Info({
+                review_url: '{% url "reviews-json" %}'
+            });
+        </script>
+
+        {# set up background tasks (new messages, comments etc) #}
         <script src="/static/scripts/BackgroundTasks.js"></script>
+        <script>
+            var BackgroundTasks = new DemoTime.BackgroundTasks({
+                messages_url: '{% url "messages-json" %}'
+            });
+        </script>
+
+        {# WYSIWYG editors #}
         <script src="/static/scripts/Wysiwyg.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -207,24 +223,40 @@
             });
         </script>
 
-        {% if request.user %}
+        {# Account management dropdown in the header #}
         <script src="/static/scripts/Account.js"></script>
-        <script src="/static/scripts/Search.js"></script>
         <script>
             // top right account toggler
             var account = new DemoTime.Account();
+        </script>
 
-            // global search
+        {# Global search #}
+        <script src="/static/scripts/Search.js"></script>
+        <script>
             var search = new DemoTime.Search({
                 user_url: '{% url 'user-api' %}',
                 review_url: '{% url 'reviews-json' %}',
                 project_url: '{% url 'project-json' %}'
             });
+
+            // set up blog notifications
+            if(typeof(Storage) !== "undefined") {
+                var blog_entry = 'blog20160507'
+
+                if (!localStorage.getItem(blog_entry)) {
+                    localStorage.setItem(blog_entry, true);
+                    $('.header-blog, .manage_user').addClass('highlight');
+                    setTimeout(function() {
+                        $('.header-blog, .manage_user').removeClass('highlight');
+                    }, 20000);
+                }
+            }
         </script>
         {% endif %}
 
         {% block footer_scripts %}
-            <script src="/static/scripts/footer_scripts.js"></script>
+            <script src="/static/scripts/FooterScripts.js"></script>
+            <script> var footer_scripts = new DemoTime.FooterScripts() </script>
         {% endblock %}
 
         {% if request.GET.hide_header %}
@@ -233,29 +265,6 @@
             </script>
         {% endif %}
 
-        <script>
-            {% if request.user %}
-                // set up background tasks (new messages, comments etc)
-                var BackgroundTasks = new DemoTime.BackgroundTasks({
-                    messages_url: '{% url "messages-json" %}'
-                });
-                var info = new DemoTime.Info({
-                    review_url: '{% url "reviews-json" %}'
-                });
-
-                if(typeof(Storage) !== "undefined") {
-                    var blog_entry = 'blog20160507'
-
-                    if (!localStorage.getItem(blog_entry)) {
-                        localStorage.setItem(blog_entry, true);
-                        $('.header-blog, .manage_user').addClass('highlight');
-                        setTimeout(function() {
-                            $('.header-blog, .manage_user').removeClass('highlight');
-                        }, 20000);
-                    }
-                }
-            {% endif %}
-        </script>
     </body>
     <div id="patterns">
         {% if request.user %}

@@ -1,14 +1,3 @@
-// Initialize lightboxes
-$('.lightboxed').fancybox();
-
-// Set focus on pageload
-$('.content input[type="text"]:not(.find_person)').first().focus();
-
-// Animate buttons
-$('button, .button-link, input[type="submit"]').click(function() {
-    $(this).addClass('animated pulse');
-});
-
 // Slide toggle summary boxes
 $('.summary a').click(function(event) {
     event.preventDefault();
@@ -26,19 +15,6 @@ $('.attachment-add').click(function(event) {
 $('blockquote p, .review-overview li, .review-overview p').linkify({
     target: "_blank"
 });
-
-// Initialize tooltips
-$('.help').tooltipster();
-
-// Initialized button clicks
-$('button').click(function() {
-    if ($(this).data('href')) {
-        window.location.href = $(this).data('href');
-    }
-});
-
-// Smooth scroll to links
-var ScrollToLink = new DemoTime.ScrollToLink();
 
 // Handle review form submits (some light validation on attachments)
 $('.review form').submit(function(e) {
