@@ -217,7 +217,8 @@
             // global search
             var search = new DemoTime.Search({
                 user_url: '{% url 'user-api' %}',
-                review_url: '{% url 'reviews-json' %}'
+                review_url: '{% url 'reviews-json' %}',
+                project_url: '{% url 'project-json' %}'
             });
         </script>
         {% endif %}

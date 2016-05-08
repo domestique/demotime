@@ -305,11 +305,8 @@ h3 small {
     background: #ddd;
     color: #555;
     padding: 5px;
-}
-.quickfind-users {
-    margin-top: 15px;
+    cursor: pointer;
 }
 .dashboard .quickfind a {
     color: #222;
 }
-
