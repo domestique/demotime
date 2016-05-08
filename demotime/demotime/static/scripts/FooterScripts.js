@@ -2,7 +2,8 @@ DemoTime.FooterScripts = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'change .new_demo_dropdown': 'create_demo'
+        'change .new_demo_dropdown': 'create_demo',
+        'click .new_demo_link': 'create_demo'
     },
 
     initialize: function() {
@@ -31,11 +32,23 @@ DemoTime.FooterScripts = Backbone.View.extend({
         var ScrollToLink = new DemoTime.ScrollToLink();
     },
 
+    // Create a demo
     create_demo: function(event) {
-        var select = $(event.target);
+        event.preventDefault();
 
-        if (select.val()) {
-            window.location.href = select.val();
+        if ($(event.target).tagName == "SELECT") {
+            var select = $(event.target);
+
+            if (select.val()) {
+                window.location.href = select.val();
+            }
+        } else {
+            var link = $(event.target),
+                select = link.prev('select');
+
+            if (select.val()) {
+                window.location.href = select.val();
+            }
         }
     }
 })
