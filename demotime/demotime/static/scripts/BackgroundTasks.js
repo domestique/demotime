@@ -6,7 +6,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         this.options = options;
         this.options.counter = 0;
         this.options.check_every = 60000; // check for msgs every minute
-        this.options.max_attempts = 30; // after 30 mins of inactivity, ajax stops
+        this.options.max_attempts = 60; // after 30 mins of inactivity, ajax stops
         this.render();
     },
 
@@ -62,6 +62,10 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
             if (data.message_count > 0) {
                 console.log('Running background tasks and received new messages');
                 $('.msg_notifier').removeClass('read_notification').addClass('unread_notification').find('a').html(data.message_count);
+                if (!self.options.original_page_title) {
+                    self.options.original_page_title = document.title;
+                }
+                document.title = '(' + data.message_count + ') ' + self.options.original_page_title;
             } else {
                 console.log('Running background tasks and received no new messages');
                 $('.msg_notifier').removeClass('unread_notification').addClass('read_notification').find('a').html(data.message_count);
