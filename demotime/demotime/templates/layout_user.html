@@ -8,13 +8,18 @@
         </div>
         <div class="cel global_actions">
             {% block sub_nav_actions %}
-                {% comment %}
-                    FIXME: Broken by create-review needing a project.slug
-                    <a class="icon icon-plus" href="{% url 'create-review' %}">Create a demo</a></li>
-                {% endcomment %}
+                {% for project in available_projects %}
+                    {% if forloop.first %}
+                        <a class="icon icon-plus" href="{% url 'create-review' project.slug %}">Create a demo</a></li>
+                    {% else %}
+                        <select>
+                            <option>Create a demo for:</option>
+                            <option value="{% url 'create-review' project.slug %}">{{ project.name }}</option>
+                        </select>
+                    {% endif %}
+                {% endfor %}
             {% endblock %}
         </div>
     </div>
 </nav>
 {% endblock %}
-

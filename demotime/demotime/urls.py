@@ -25,8 +25,7 @@ from demotime.views import (
 urlpatterns = [
     url('^$', index_view, name='index'),
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
-    url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help'),
-    url(r'^addons/$', TemplateView.as_view(template_name='addons.html'), name='addons'),
+    url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help')
 ]
 
 # Reviews

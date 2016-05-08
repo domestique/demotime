@@ -2,7 +2,7 @@
 {% block title %}{{ object.name }} Administration{% endblock %}
 
 {% block sub_nav_actions %}
-    <a href="#" class="icon icon-lightbulb">Create a new project</a>
+    <a href="{% url 'create-review' object.slug %}" class="icon icon-lightbulb">Create a Demo</a>
 {% endblock %}
 
 {% block styles %}

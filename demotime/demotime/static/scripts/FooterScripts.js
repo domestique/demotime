@@ -1,6 +1,10 @@
 DemoTime.FooterScripts = Backbone.View.extend({
     el: 'body',
 
+    events: {
+        'change .new_demo_dropdown': 'create_demo'
+    },
+
     initialize: function() {
         // Initialize lightboxes
         this.$el.find('.lightboxed').fancybox();
@@ -25,6 +29,13 @@ DemoTime.FooterScripts = Backbone.View.extend({
 
         // Smooth scroll to links
         var ScrollToLink = new DemoTime.ScrollToLink();
+    },
+
+    create_demo: function(event) {
+        var select = $(event.target);
+
+        if (select.val()) {
+            window.location.href = select.val();
+        }
     }
 })
-
