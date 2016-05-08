@@ -109,9 +109,8 @@ body.bookmarklet h1 {
     top: 30px;
     right: 0;
     padding: 10px;
-    background: rgba(250, 250, 250, 0.95);
-    width: 100px;
-    box-shadow: 4px 4px 0 #ccc;
+    background: rgba(70, 70, 70, 0.95);
+    width: 111px;
     z-index: 2;
 }
 .navbar .manage_user li {
