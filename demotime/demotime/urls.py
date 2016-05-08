@@ -12,12 +12,13 @@ from django.contrib.auth.views import (
 
 from demotime.views import (
     files,
+    groups,
     index_view,
     messages,
-    reviews,
-    users,
     profile,
     projects,
+    reviews,
+    users,
 )
 
 
@@ -126,6 +127,13 @@ urlpatterns += [
         name='password_reset_complete'
     ),
     url(r'^users/$', users.user_api, name='user-api'),
+]
+
+# Groups
+urlpatterns += [
+    url(r'^groups/$', groups.group_list, name='group-list'),
+    #url(r'^groups/create/$', groups.manage_group, name='group-create'),
+    #url(r'^groups/edit/(?P<group_slug>[\w]+)/$', groups.manage_group, name='group-edit'),
 ]
 
 # Projects

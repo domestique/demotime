@@ -1,0 +1,92 @@
+{% extends 'layout_user.html' %}
+
+{% block sub_nav %}{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    section {
+        padding: 10px 20px;
+    }
+    section section {
+        overflow: hidden;
+        padding: 5px 20px;
+    }
+    .form-actions {
+        text-align: center;
+    }
+    .filters select {
+        margin-right: 1.5em;
+        margin-bottom: 1em;
+        max-width: 100px;
+    }
+    .filters input[type="submit"] {
+        margin-top: 10px;
+        width: 50%;
+    }
+    .filters label {
+        display: inline-block;
+    }
+    @media screen and (max-width:680px) {
+        .filters select {
+            margin-bottom: 10px;
+        }
+        .filters input[type="submit"] {
+            float: none;
+            margin: 10px 0;
+            width: 100%;
+            display: block;
+        }
+        .filters label {
+            display: block;
+            width: 100%;
+            margin: 0;
+        }
+    }
+    .filters input[type="text"] {
+        padding: 10px;
+        height: auto;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+    }
+    table {
+        background: #fff;
+        border: 1px solid #ddd;
+    }
+    th, td {
+        font-size: 14px;
+        vertical-align: top;
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1 class="heading">Groups</h1>
+    <section>
+        <table id="results" cellspacing="0" cellpadding="0" width="100%">
+            {% if object_list %}
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Members</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                {% for obj in object_list %}
+                    <tr>
+                        <td>{{ obj.name }}</td>
+                        <td>{% for member in obj.groupmember_set.all %}{{ member.user.userprofile.name }},{% endfor %}</td>
+                        <td><a href="#">Edit</a>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td>No groups.</td></tr>
+            {% endif %}
+        </table>
+        </ul>
+    </section>
+{% endblock %}
+
