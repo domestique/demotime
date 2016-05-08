@@ -5,7 +5,7 @@
 {% block sub_nav_actions %}
 <ul>
     {% if request.user == object.creator %}
-        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="review-changer icon icon-pencil">Add revision</a></li>
+        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="icon icon-pencil">Add revision</a></li>
         {% if object.state == 'closed' %}
             <li class="open"><a data-type="open" href="#" class="review-changer icon icon-eye">Open demo</a></li>
         {% else %}
