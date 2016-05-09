@@ -6,7 +6,7 @@ iframe {
     box-sizing: border-box;
     margin-top: 10px;
 }
-label {
+main label {
     display:block;
     margin:1em 0 0;
     font-size:1em;
@@ -186,3 +186,40 @@ blockquote .emoji,
 .modal.link-dialog .form-group {
     margin-top: 0;
 }
+
+.dd-container,
+.dd-select {
+    max-width: 195px;
+}
+.dd-container {
+    display: inline-block;
+    text-align: left;
+}
+.dd-container li {
+    display: block;
+    text-align: left;
+    box-sizing: border-box;
+    width: 100%;
+}
+.dd-container li a {
+    color: #666;
+    padding: 5px;
+}
+.dd-container .dd-select {
+    border: 0;
+    border-radius: 0;
+}
+.dd-select label {
+    color: #666;
+}
+.dd-select .dd-selected {
+    padding: 7px;
+}
+@media screen and (max-width:375px) {
+    .dd-container,
+    .dd-select {
+        max-width: 140px;
+    }
+}
+
+.

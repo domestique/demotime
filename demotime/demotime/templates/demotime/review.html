@@ -3,29 +3,29 @@
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
 {% block sub_nav_actions %}
-<ul>
+<ul class="subnav-item">
     {% if request.user == object.creator %}
-        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="icon icon-pencil">Add revision</a></li>
+        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Add revision</a></li>
         {% if object.state == 'closed' %}
-            <li class="open"><a data-type="open" href="#" class="review-changer icon icon-eye">Open demo</a></li>
+            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Open demo</a></li>
         {% else %}
-            <li class="closed"><a data-type="closed" href="#" class="review-changer icon icon-ok">Close demo</a></li>
+            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close demo</a></li>
         {% endif %}
     {% else %}
         {% if reviewer and object.state != "closed" %}
             {% if reviewer.status == 'approved' %}
-                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="review-changer icon icon-thumbs-up">Unapprove demo</a></li>
+                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove demo</a></li>
             {% else %}
-                <li><a data-type="approved" href="#" class="review-changer icon icon-thumbs-up">Approve demo</a></li>
+                <li><a data-type="approved" href="#" class="subnav-item review-changer icon icon-thumbs-up">Approve demo</a></li>
             {% endif %}
             {% if reviewer.status == 'rejected' %}
-                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="alert review-changer icon icon-thumbs-down">Unreject demo</a></li>
+                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject demo</a></li>
             {% else %}
-                <li><a data-type="rejected" href="#" class="alert review-changer icon icon-thumbs-down">Reject demo</a></li>
+                <li><a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject demo</a></li>
             {% endif %}
         {% endif %}
     {% endif %}
-    <li><a class="icon icon-plus" href="{% url 'create-review' object.project.slug %}">New demo</a></li>
+    <li><a class="subnav-item icon icon-plus" href="{% url 'create-review' object.project.slug %}">New demo</a></li>
 </ul>
 {% endblock %}
 

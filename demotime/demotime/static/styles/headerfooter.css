@@ -163,7 +163,7 @@ nav.subnav {
         padding-right:10px;
     }
 }
-.subnav a {
+.subnav a.subnav-item {
     background:#fff;
     color:#555;
     font-weight:400;
@@ -173,20 +173,20 @@ nav.subnav {
     margin:0;
 }
 @media screen and (max-width:680px) {
-    .subnav a {
+    .subnav a.subnav-item {
         padding:3px;
     }
 }
 @media screen and (max-width:450px) {
-    .subnav a {
+    .subnav a.subnav-item {
         margin: 3px 0;
     }
 }
 .subnav .cel {
     position: relative;
 }
-.subnav ul,
-.subnav ul li {
+.subnav ul.subnav-item,
+.subnav ul.subnav-item li {
     margin:0 0 0 10px;
     padding:0;
 }
@@ -205,4 +205,21 @@ nav.subnav {
 
 .container img {
     max-width: 100%;
+}
+
+.new_demo {
+    position: relative;
+    top: -3px;
+    line-height: 18px;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+.new_demo > * {
+    vertical-align: middle;
+}
+.new_demo a.subnav-item {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    border-radius: 0;
 }

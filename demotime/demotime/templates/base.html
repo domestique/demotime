@@ -90,9 +90,9 @@
             {% block sub_nav %}
                 <nav class="subnav">
                     <div class="container">
-                        <ul>
-                            <li><a href="{% url 'about' %}">About</a>
-                            <li><a href="https://demoti.me/blog/" class="header-blog" target="_blank">Blog</a>
+                        <ul class="subnav-item">
+                            <li><a class="subnav-item" href="{% url 'about' %}">About</a>
+                            <li><a class="subnav-item" href="https://demoti.me/blog/" class="header-blog" target="_blank">Blog</a>
                         </ul>
                     </div>
                 </nav>
@@ -206,6 +206,9 @@
                 messages_url: '{% url "messages-json" %}'
             });
         </script>
+
+        {# custom dropdowns #}
+        <script src="/static/scripts/library/selects.js"></script>
 
         {# WYSIWYG editors #}
         <script src="/static/scripts/Wysiwyg.js"></script>

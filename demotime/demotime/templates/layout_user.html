@@ -8,18 +8,22 @@
         </div>
         <div class="cel global_actions">
             {% block sub_nav_actions %}
-                {% if available_projects|length == 1 %}
+                {% if available_projects|length == 0 %}
                     {% for project in available_projects %}
-                        <a class="icon icon-plus" href="{% url 'create-review' project.slug %}">Create a demo</a></li>
+                        <a class="subnav-item icon icon-plus" href="{% url 'create-review' project.slug %}">Create a demo</a></li>
                     {% endfor %}
                 {% else %}
-                    Create a demo for:
-                    <select class="new_demo_dropdown">
-                    {% for project in available_projects %}
-                        <option value="{% url 'create-review' project.slug %}">{{ project.name }}</option>
-                    {% endfor %}
-                    </select>
-                    <a class="new_demo_link icon icon-plus" href="#">Go</a>
+                    <div class="new_demo">
+                        <label class="icon icon-pencil">
+                            New demo:
+                        </label>
+                        <select class="new_demo_dropdown">
+                            {% for project in available_projects %}
+                                <option value="{% url 'create-review' project.slug %}">{{ project.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <a class="subnav-item new_demo_link icon icon-plus" href="#">Create</a>
+                    </div>
                 {% endif %}
             {% endblock %}
         </div>

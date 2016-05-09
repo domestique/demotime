@@ -10,6 +10,9 @@ DemoTime.FooterScripts = Backbone.View.extend({
         // Initialize lightboxes
         this.$el.find('.lightboxed').fancybox();
 
+        // Custom selects
+        $('select').ddslick();
+
         // Set focus on pageload
         this.$el.find('.content input[type="text"]:not(.find_person)').first().focus();
 
@@ -36,19 +39,11 @@ DemoTime.FooterScripts = Backbone.View.extend({
     create_demo: function(event) {
         event.preventDefault();
 
-        if ($(event.target).tagName == "SELECT") {
-            var select = $(event.target);
+        var link = $(event.target),
+            select = link.parents('.new_demo').find('.dd-selected-value');
 
-            if (select.val()) {
-                window.location.href = select.val();
-            }
-        } else {
-            var link = $(event.target),
-                select = link.prev('select');
-
-            if (select.val()) {
-                window.location.href = select.val();
-            }
+        if (select.val()) {
+            window.location.href = select.val();
         }
     }
 })
