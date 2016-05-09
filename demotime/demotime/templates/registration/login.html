@@ -23,11 +23,13 @@
             padding-bottom:2em;
         }
     }
-    .signup button {
+    .signup a {
         width:100%;
         font-size:1.4em;
         margin:10px 0 0;
         opacity:0.8;
+        box-sizing: border-box;
+        text-align: center;
     }
 </style>
 {% endblock %}
@@ -67,7 +69,7 @@
             <section class="signup">
                 <h2 class="heading">Want an account?</h2>
                 <p>Signing up is easy and free.</p>
-                <button class="confirm" data-href="{% url 'registration_register' %}">Sign Up!</button>
+                <a class="button-link confirm" href="{% url 'registration_register' %}">Sign Up!</a>
             </section>
         </div>
     </div>

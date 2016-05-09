@@ -30,6 +30,7 @@
         <link rel="stylesheet" href="/static/styles/library/animate.css">
         <link rel="stylesheet" href="/static/styles/library/swal.css">
 
+
         {# Lightbox #}
         <link rel="stylesheet" href="/static/scripts/library/fancybox/jquery.fancybox.css">
 
@@ -130,7 +131,12 @@
                 }
             });
         </script>
+
+        {# tooltips #}
         <script src="/static/scripts/library/jquery.tooltipster.min.js"></script>
+        <script> $('.help').tooltipster() </script>
+
+        {# split/cel framework #}
         <script src="/static/scripts/library/cel-0.2.0.min.js"></script>
 
         {# Summernote #}
@@ -140,6 +146,7 @@
 
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
+        <script> $('.lightboxed').fancybox() </script>
 
         {# alerts #}
         <script src="/static/scripts/library/swal.js"></script>
@@ -187,8 +194,12 @@
         {# Google Analytics #}
         {% include "includes/analytics.html" %}
 
+        {# Namespacing #}
         <script> var DemoTime = [] </script>
+
+        {# Smooth scroll to links #}
         <script src="/static/scripts/ScrollToLink.js"></script>
+        <script> var ScrollToLink = new DemoTime.ScrollToLink() </script>
 
         {% if request.user %}
         {# DT-XX Info boxes #}
@@ -209,6 +220,7 @@
 
         {# custom dropdowns #}
         <script src="/static/scripts/library/selects.js"></script>
+        <script> $('select.slick').ddslick() </script>
 
         {# WYSIWYG editors #}
         <script src="/static/scripts/Wysiwyg.js"></script>
@@ -256,17 +268,7 @@
         </script>
         {% endif %}
 
-        {% block footer_scripts %}
-            <script src="/static/scripts/FooterScripts.js"></script>
-            <script> var footer_scripts = new DemoTime.FooterScripts() </script>
-        {% endblock %}
-
-        {% if request.GET.hide_header %}
-            <script>
-                $('body').addClass('bookmarklet');
-            </script>
-        {% endif %}
-
+        {% block scripts %}{% endblock %}
     </body>
     <div id="patterns">
         {% if request.user %}

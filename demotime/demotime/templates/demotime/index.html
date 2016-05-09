@@ -1,4 +1,4 @@
-{% extends 'layout_user.html' %}
+{% extends 'layout-user.html' %}
 {% load demo_tags %}
 
 {% block styles %}
@@ -29,4 +29,12 @@
 <div class="tip">
     <strong>Power tip</strong>: You can now simply type in {{ site_settings.SERVER_URL }}/DT-1234 to be redirected to a demo.
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/scripts/Dashboard.js"></script>
+{{ block.super }}
+<script>
+var dashboard = new DemoTime.Dashboard();
+</script>
 {% endblock %}

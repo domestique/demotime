@@ -17,7 +17,7 @@
                         <label class="icon icon-pencil">
                             New demo:
                         </label>
-                        <select class="new_demo_dropdown">
+                        <select class="slick new_demo_dropdown">
                             {% for project in available_projects %}
                                 <option value="{% url 'create-review' project.slug %}">{{ project.name }}</option>
                             {% endfor %}

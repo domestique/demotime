@@ -1,4 +1,4 @@
-{% extends 'layout_user.html' %}
+{% extends 'layout-user.html' %}
 {% load demo_tags %}
 {% block title %} - Inbox{% endblock %}
 
@@ -65,7 +65,7 @@
 </div>
 {% endblock %}
 
-{% block footer_scripts %}
+{% block scripts %}
 {{ block.super }}
 <script>
     $('.messages-archive_all').click(function(event) {

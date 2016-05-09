@@ -4,6 +4,9 @@ $('.summary a').click(function(event) {
     $(this).parents('.summary').next().slideToggle();
 });
 
+// Focus first box
+$('.content input[type="text"]').first().focus();
+
 // Dynamically add additional attachments
 $('.attachment-add').click(function(event) {
     event.preventDefault();

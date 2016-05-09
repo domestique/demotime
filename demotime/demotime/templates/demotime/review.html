@@ -1,4 +1,4 @@
-{% extends 'layout_user.html' %}
+{% extends 'layout-user.html' %}
 {% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
@@ -347,7 +347,7 @@
 </script>
 {% endblock %}
 
-{% block footer_scripts %}
+{% block scripts %}
 {{ block.super }}
 <script src="/static/scripts/Review.js"></script>
 <script src="/static/scripts/Reviewers.js"></script>

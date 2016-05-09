@@ -1,4 +1,4 @@
-{% extends 'layout_user.html' %}
+{% extends 'layout-user.html' %}
 
 {% block sub_nav %}{% endblock %}
 
@@ -46,7 +46,7 @@ h1 em {
         <div class="review">
             <form action="" method="post" enctype="multipart/form-data" id="submit_review">
                 {% csrf_token %}
-                <div class="form-group">
+                <div class="form-group" style="margin-top: 0">
                     <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>
                     {{ review_form.title.errors }}
                     {{ review_form.title }}
@@ -104,7 +104,7 @@ h1 em {
 </article>
 {% endblock %}
 
-{% block footer_scripts %}
+{% block scripts %}
 {{ block.super }}
 <script src="/static/scripts/review_utils.js"></script>
 {% endblock %}
