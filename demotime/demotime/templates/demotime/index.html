@@ -21,14 +21,38 @@
             {% include "includes/updates_box.html" with message_bundles=message_bundles user=request.user %}
         </div>
     </div>
-    {% if open_demos %}
-        {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
-    {% endif %}
+    <div class="split~680 by:3/1 with-gap:2">
+        <div class="cel">
+            {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
+        </div>
+        <div class="cel">
+            <h3 class="icon icon-cog">
+                Projects you belong to
+                <span class="help" title="A Project consists of one or more demos.
+                    Think of it as a group of demos that all have something in common.
+                    Projects are a way of organizing demos."></span>
+            </h3>
+            <section class="emph_lower">
+                <ul>
+                    {% if available_projects %}
+                        {% for project in available_projects %}
+                            <li><a href="{{ project.slug }}">{{ project.name }}</a></li>
+                        {% endfor %}
+                    {% else %}
+                        <li>You aren't a member of any projects</li>
+                    {% endif %}
+                </ul>
+            </section>
+        </div>
+    </div>
+    {% include "includes/legend.html" %}
 </div>
 
+{% comment %}
 <div class="tip">
     <strong>Power tip</strong>: You can now simply type in {{ site_settings.SERVER_URL }}/DT-1234 to be redirected to a demo.
 </div>
+{% endcomment %}
 {% endblock %}
 
 {% block scripts %}

@@ -9,8 +9,13 @@
     }
 }
 .dashboard section {
-    min-height:170px;
+    min-height:185px;
     padding:10px;
+}
+@media screen and (max-width:375px) {
+    .dashboard section {
+        min-height:0;
+    }
 }
 .dashboard section li {
     color: #ccc;
@@ -23,6 +28,11 @@
 }
 .dashboard section strong a {
     font-weight: 800;
+}
+span.icon-Reviewing,
+span.icon-Reviewing a {
+    color: #fff;
+    font-weight: 400;
 }
 li.de-emphasize span,
 span.icon-Approved { color: #999; }
@@ -43,6 +53,9 @@ section.emph_med {
 }
 section.emph_low {
     background:rgba(48, 48, 48, .7);
+}
+section.emph_lower {
+    background:rgba(48, 48, 48, .6);
 }
 .dashboard section.done {
     background-image:url(/static/images/done.png);
@@ -88,4 +101,33 @@ section.emph_low {
     display: inline-block;
     width: 13px;
     height: 13px;
+}
+
+.new_demo {
+    position: relative;
+    top: -3px;
+    line-height: 18px;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+.new_demo > * {
+    vertical-align: middle;
+}
+.new_demo select {
+    visibility: hidden;
+    min-width: 190px;
+}
+.new_demo a.subnav-item {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    border-radius: 0;
+}
+
+.legend {
+    margin-top: 50px;
+}
+.legend li span {
+    color: #666;
+    font-weight: 300;
 }

@@ -24,7 +24,7 @@
     <div class="split~680 by:2 with-gap:2">
         <div class="cel">
             <h3 class="icon icon-inbox">
-                Your demos with new activity on <strong>{{ object.name }}</strong>
+                Updated demos you're reviewing on <strong>{{ object.name }}</strong>
                 <span class="help" title="A Project consists of one or more demos.
                     The demos that you have created that are part of '{{ object.name }}'
                     with recent updates (new comments, approval state changes,
@@ -69,5 +69,6 @@
             {% endfor %}
         </ul>
     </section>
+    {% include "includes/legend.html" %}
 </div>
 {% endblock %}

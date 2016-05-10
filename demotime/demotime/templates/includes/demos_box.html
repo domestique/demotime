@@ -11,12 +11,21 @@
     {% endif %}
 </h3>
 
-<section class="emph_low {% if not reviews %}done{% endif %}">
+<section class="emph_low">
     {% if reviews %}
         <ul>
             {% for demo in reviews %}
                 {% include "includes/reviews_li.html" with truncate='false' %}
             {% endfor %}
+        </ul>
+    {% else %}
+        <ul>
+            <li>
+                You have no active demos.
+            </li>
+            <li>
+                <a class="icon icon-plus" href="#" onclick="javascript:$('.new_demo a').trigger('click');">Create one now</a>
+            </li>
         </ul>
     {% endif %}
 </section>
