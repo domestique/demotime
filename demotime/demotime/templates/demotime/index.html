@@ -13,7 +13,7 @@
 </h1>
 
 <div class="dashboard">
-    <div class="split~680 by:2 with-gap:2">
+    <div class="split~680 by:2 with-gap:2 dashboard-upper">
         <div class="cel">
             {% include "includes/reviews_box.html" with reviews=open_reviews follows=followed_demos user=request.user %}
         </div>
@@ -21,7 +21,7 @@
             {% include "includes/updates_box.html" with message_bundles=message_bundles user=request.user %}
         </div>
     </div>
-    <div class="split~680 by:3/1 with-gap:2">
+    <div class="split~680 by:3/1 with-gap:2 dashboard-lower">
         <div class="cel">
             {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
         </div>

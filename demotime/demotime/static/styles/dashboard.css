@@ -9,11 +9,16 @@
     }
 }
 .dashboard section {
-    min-height:185px;
     padding:10px;
 }
+.dashboard-upper section {
+    min-height:185px;
+}
+.dashboard-lower section {
+    min-height: 70px;
+}
 @media screen and (max-width:375px) {
-    .dashboard section {
+    .dashboard-upper section {
         min-height:0;
     }
 }
