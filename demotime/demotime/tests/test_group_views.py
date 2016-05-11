@@ -86,7 +86,7 @@ class TestGroupManageViews(BaseTestCase):
             group=group, user__in=self.test_users
         ).exists())
 
-    def test_edti_group_get(self):
+    def test_edit_group_get(self):
         response = self.client.get(reverse('group-manage'), args=[self.group.slug])
         self.assertStatusCode(response, 200)
         self.assertIn('form', response.context)
@@ -107,3 +107,53 @@ class TestGroupManageViews(BaseTestCase):
         self.assertEqual(self.group.name, 'Swansons')
         self.assertEqual(self.group.slug, 'swansons')
         self.assertEqual(self.group.description, 'this will be no fun at all')
+
+    def test_edit_admins_make_admins(self):
+        models.GroupMember.objects.filter(group=self.group).update(is_admin=False)
+        post_data = {
+            'form-TOTAL_FORMS': self.group.groupmember_set.count(),
+            'form-INITIAL_FORMS': self.group.groupmember_set.count(),
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': self.group.groupmember_set.count(),
+        }
+        for count, gm in enumerate(models.GroupMember.objects.filter(group=self.group)):
+            post_data.update({
+                'form-{}-user'.format(count): gm.user.pk,
+                'form-{}-group'.format(count): gm.group.pk,
+                'form-{}-is_admin'.format(count): True,
+                'form-{}-id'.format(count): gm.pk,
+            })
+
+        response = self.client.post(
+            reverse('group-manage-admins', args=[self.group.slug]),
+            post_data
+        )
+        self.assertStatusCode(response, 302)
+        gms = models.GroupMember.objects.filter(group=self.group)
+        for gm in gms:
+            self.assertTrue(gm.is_admin)
+
+    def test_edit_admins_demote_admins(self):
+        models.GroupMember.objects.filter(group=self.group).update(is_admin=True)
+        post_data = {
+            'form-TOTAL_FORMS': self.group.groupmember_set.count(),
+            'form-INITIAL_FORMS': self.group.groupmember_set.count(),
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': self.group.groupmember_set.count(),
+        }
+        for count, gm in enumerate(models.GroupMember.objects.filter(group=self.group)):
+            post_data.update({
+                'form-{}-user'.format(count): gm.user.pk,
+                'form-{}-group'.format(count): gm.group.pk,
+                'form-{}-is_admin'.format(count): False,
+                'form-{}-id'.format(count): gm.pk,
+            })
+
+        response = self.client.post(
+            reverse('group-manage-admins', args=[self.group.slug]),
+            post_data
+        )
+        self.assertStatusCode(response, 302)
+        gms = models.GroupMember.objects.filter(group=self.group)
+        for gm in gms:
+            self.assertFalse(gm.is_admin)

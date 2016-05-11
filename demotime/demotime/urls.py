@@ -33,6 +33,7 @@ urlpatterns = [
 urlpatterns += [
     url(r'^groups/$', groups.group_list, name='group-list'),
     url(r'^groups/create/$', groups.manage_group, name='group-manage'),
+    url(r'^groups/edit/(?P<group_slug>[\w-]+)/admins$', groups.manage_group_admins, name='group-manage-admins'),
     url(r'^groups/edit/(?P<group_slug>[\w-]+)/$', groups.manage_group, name='group-manage'),
 ]
 

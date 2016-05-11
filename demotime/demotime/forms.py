@@ -319,3 +319,17 @@ class GroupForm(forms.ModelForm):
         fields = (
             'name', 'slug', 'description', 'group_type', 'members'
         )
+
+
+class GroupMemberForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(GroupMemberForm, self).__init__(*args, **kwargs)
+        self.fields['user'].widget = forms.HiddenInput()
+        self.fields['group'].widget = forms.HiddenInput()
+
+    class Meta:
+        model = models.GroupMember
+        fields = (
+            'user', 'group', 'is_admin',
+        )

@@ -1,10 +1,10 @@
-from django.contrib.auth.models import User
+from django.forms import modelformset_factory
 from django.views.generic import ListView, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404, redirect
 
-from demotime import constants, forms, models
+from demotime import forms, models
 from demotime.views import CanViewMixin
 
 
@@ -61,5 +61,55 @@ class GroupEditView(CanViewMixin, TemplateView):
 
         return self.get(request, *args, **kwargs)
 
+
+class GroupMemberManageView(CanViewMixin, TemplateView):
+
+    template_name = 'demotime/group_member_manage.html'
+    require_superuser_privileges = True
+    project = None
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.group = get_object_or_404(
+            models.Group, slug=kwargs['group_slug']
+        )
+
+        self.member_formset = modelformset_factory(
+            models.GroupMember,
+            form=forms.GroupMemberForm,
+            max_num=models.GroupMember.objects.filter(group=self.group).count(),
+            extra=0,
+        )
+
+        return super(GroupMemberManageView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(GroupMemberManageView, self).get_context_data(**kwargs)
+        context['group'] = self.group
+        context['member_formset'] = self.member_formset(
+            queryset=models.GroupMember.objects.filter(group=self.group),
+        )
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        member_form = self.member_formset(
+            queryset=models.GroupMember.objects.filter(group=self.group),
+            data=request.POST,
+        )
+        if member_form.is_valid():
+            for gm_data in member_form.cleaned_data:
+                gm = models.GroupMember.objects.get(
+                    group=gm_data['group'],
+                    user=gm_data['user']
+                )
+                gm.is_admin = gm_data['is_admin']
+                gm.save(update_fields=['is_admin'])
+
+            return redirect('group-list')
+
+        return self.get(request, *args, **kwargs)
+
 group_list = GroupListView.as_view()
 manage_group = GroupEditView.as_view()
+manage_group_admins = GroupMemberManageView.as_view()

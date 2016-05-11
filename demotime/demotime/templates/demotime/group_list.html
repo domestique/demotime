@@ -65,6 +65,7 @@
 
 {% block content %}
     <h1 class="heading">Groups</h1>
+    <a href="#">Manage Group Types</a>
     <section>
         <table id="results" cellspacing="0" cellpadding="0" width="100%">
             {% if object_list %}
@@ -73,6 +74,7 @@
                         <th>Name</th>
                         <th>Members</th>
                         <th>Edit</th>
+                        <th>Manage Admins</th>
                     </tr>
                 </thead>
                 {% for obj in object_list %}
@@ -80,6 +82,7 @@
                         <td>{{ obj.name }}</td>
                         <td>{% for member in obj.groupmember_set.all %}{{ member.user.userprofile.name }},{% endfor %}</td>
                         <td><a href="{% url 'group-manage' obj.slug %}">Edit</a>
+                        <td><a href="{% url 'group-manage-admins' obj.slug %}">Admins</a></td>
                     </tr>
                 {% endfor %}
             {% else %}
