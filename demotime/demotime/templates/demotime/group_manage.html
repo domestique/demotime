@@ -1,0 +1,30 @@
+{% extends 'layout-user.html' %}
+{% block title %}
+    {% if group %}
+        Group {{ group.name }} Administration
+    {% else %}
+        Create Group
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if group %}
+    <h3>Edit {{ group.name }}</h3>
+{% else %}
+    <h3>Create Group</h3>
+{% endif %}
+{% if group %}
+    <form action="{% url 'group-manage' group.slug %}" method='post'>
+{% else %}
+    <form action="{% url 'group-manage' %}" method='post'>
+{% endif %}
+    {% csrf_token %}
+    <div class="">
+        <section>
+            {{ form.as_p }}
+        </section>
+        <input type="submit" value="Submit" />
+    </div>
+</form>
+{% endblock %}
+

@@ -79,7 +79,7 @@
                     <tr>
                         <td>{{ obj.name }}</td>
                         <td>{% for member in obj.groupmember_set.all %}{{ member.user.userprofile.name }},{% endfor %}</td>
-                        <td><a href="#">Edit</a>
+                        <td><a href="{% url 'group-manage' obj.slug %}">Edit</a>
                     </tr>
                 {% endfor %}
             {% else %}

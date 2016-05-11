@@ -36,6 +36,21 @@ class TestGroupMemberModel(BaseTestCase):
         self.assertEqual(gm.group, self.group)
         self.assertFalse(gm.is_admin)
 
+    def test_create_group_will_not_dupe(self):
+        models.GroupMember.objects.all().delete()
+        models.GroupMember.create_group_member(
+            user=self.user,
+            group=self.group,
+            is_admin=False,
+        )
+        self.assertEqual(models.GroupMember.objects.count(), 1)
+        models.GroupMember.create_group_member(
+            user=self.user,
+            group=self.group,
+            is_admin=False,
+        )
+        self.assertEqual(models.GroupMember.objects.count(), 1)
+
 
 class TestGroupModel(BaseTestCase):
 

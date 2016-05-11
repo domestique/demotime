@@ -310,3 +310,12 @@ class ProjectForm(forms.ModelForm):
         fields = (
             'name', 'description', 'is_public',
         )
+
+
+class GroupForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Group
+        fields = (
+            'name', 'slug', 'description', 'group_type', 'members'
+        )
