@@ -1,6 +1,6 @@
 from mock import Mock
 
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser
 
 from demotime import context_processors, models
 from demotime.tests import BaseTestCase
@@ -12,7 +12,7 @@ class TestContextProcessors(BaseTestCase):
         super(TestContextProcessors, self).setUp()
         models.Review.create_review(**self.default_review_kwargs)
         self.request_mock = Mock()
-        self.user = User.objects.get(username='test_user_0')
+        self.user = models.UserProxy.objects.get(username='test_user_0')
         self.request_mock.user = self.user
         self.request_mock.user.is_authenticated = Mock(return_value=True)
 
