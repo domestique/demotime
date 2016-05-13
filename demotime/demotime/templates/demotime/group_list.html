@@ -65,7 +65,6 @@
 
 {% block content %}
     <h1 class="heading">Groups</h1>
-    <a href="#">Manage Group Types</a>
     <section>
         <table id="results" cellspacing="0" cellpadding="0" width="100%">
             {% if object_list %}
@@ -88,6 +87,26 @@
             {% else %}
                 <tr><td>No groups.</td></tr>
             {% endif %}
+        </table>
+        </ul>
+    </section>
+    <h1 class="heading">Group Types</h1>
+    <section>
+        <table id="results" cellspacing="0" cellpadding="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            {% for obj in group_types %}
+                <tr>
+                    <td>{{ obj.name }}</td>
+                    <td>{{ obj.slug }}</td>
+                    <td><a href="{% url 'group-type-manage' obj.slug %}">Edit</a>
+                </tr>
+            {% endfor %}
         </table>
         </ul>
     </section>

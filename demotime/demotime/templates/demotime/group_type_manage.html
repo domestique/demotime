@@ -1,0 +1,31 @@
+{% extends 'layout-user.html' %}
+{% block title %}
+    {% if group %}
+        Group Type {{ group_type.name }} Administration
+    {% else %}
+        Create Group Type
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if group_type %}
+    <h3>Edit {{ group_type.name }}</h3>
+{% else %}
+    <h3>Create Group Type</h3>
+{% endif %}
+{% if group_type %}
+    <form action="{% url 'group-type-manage' group_type.slug %}" method='post'>
+{% else %}
+    <form action="{% url 'group-type-manage' %}" method='post'>
+{% endif %}
+    {% csrf_token %}
+    <div class="">
+        <section>
+            {{ form.as_p }}
+        </section>
+        <input type="submit" value="Submit" />
+    </div>
+</form>
+{% endblock %}
+
+
