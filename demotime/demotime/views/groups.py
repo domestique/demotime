@@ -15,6 +15,12 @@ class GroupListView(CanViewMixin, ListView):
     require_superuser_privileges = True
     project = None
 
+    def get_context_data(self, **kwargs):
+        context = super(GroupListView, self).get_context_data(**kwargs)
+        context['group_types'] = models.GroupType.objects.all()
+
+        return context
+
 
 class GroupEditView(CanViewMixin, TemplateView):
 
@@ -110,6 +116,45 @@ class GroupMemberManageView(CanViewMixin, TemplateView):
 
         return self.get(request, *args, **kwargs)
 
+
+class GroupTypeManageView(CanViewMixin, TemplateView):
+
+    template_name = 'demotime/group_type_manage.html'
+    require_superuser_privileges = True
+    project = None
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if kwargs.get('slug'):
+            self.group_type = get_object_or_404(
+                models.GroupType,
+                slug=kwargs['slug']
+            )
+        else:
+            self.group_type = None
+
+        self.form = forms.GroupTypeForm(instance=self.group_type)
+        return super(GroupTypeManageView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(GroupTypeManageView, self).get_context_data(**kwargs)
+        context['form'] = self.form
+        context['group_type'] = self.group_type
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.form = forms.GroupTypeForm(
+            data=request.POST, instance=self.group_type
+        )
+        if self.form.is_valid():
+            self.form.save()
+            return redirect('group-list')
+
+        return self.get(request, *args, **kwargs)
+
+
 group_list = GroupListView.as_view()
 manage_group = GroupEditView.as_view()
 manage_group_admins = GroupMemberManageView.as_view()
+manage_group_type = GroupTypeManageView.as_view()

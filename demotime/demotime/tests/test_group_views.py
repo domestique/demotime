@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 
-from demotime import models
+from demotime import forms, models
 from demotime.tests import BaseTestCase
 
 
@@ -108,6 +108,17 @@ class TestGroupManageViews(BaseTestCase):
         self.assertEqual(self.group.slug, 'swansons')
         self.assertEqual(self.group.description, 'this will be no fun at all')
 
+    def test_edit_admins_get(self):
+        response = self.client.get(
+            reverse('group-manage-admins', args=[self.group.slug])
+        )
+        self.assertStatusCode(response, 200)
+        self.assertEqual(
+            response.context['group'],
+            self.group
+        )
+        self.assertIn('member_formset', response.context)
+
     def test_edit_admins_make_admins(self):
         models.GroupMember.objects.filter(group=self.group).update(is_admin=False)
         post_data = {
@@ -157,3 +168,51 @@ class TestGroupManageViews(BaseTestCase):
         gms = models.GroupMember.objects.filter(group=self.group)
         for gm in gms:
             self.assertFalse(gm.is_admin)
+
+    def test_create_group_type_get(self):
+        response = self.client.get(reverse('group-type-manage'))
+        self.assertStatusCode(response, 200)
+        self.assertTrue(
+            isinstance(response.context['form'], forms.GroupTypeForm)
+        )
+
+    def test_create_group_type(self):
+        response = self.client.post(reverse('group-type-manage'), {
+            'name': 'Test Type',
+            'slug': 'test-type',
+        })
+        self.assertStatusCode(response, 302)
+        gt = models.GroupType.objects.get(slug='test-type')
+        self.assertEqual(gt.name, 'Test Type')
+
+    def test_edit_group_type_get(self):
+        response = self.client.get(
+            reverse('group-type-manage', args=[self.group_type.slug])
+        )
+        self.assertStatusCode(response, 200)
+        self.assertEqual(
+            response.context['group_type'],
+            models.GroupType.objects.get(slug=self.group_type.slug)
+        )
+        self.assertTrue(
+            isinstance(response.context['form'], forms.GroupTypeForm)
+        )
+
+    def test_edit_group_type(self):
+        response = self.client.post(
+            reverse('group-type-manage', args=[self.group_type.slug]),
+            {'name': 'Test Type', 'slug': 'test-type'}
+        )
+        self.assertStatusCode(response, 302)
+        self.group_type.refresh_from_db()
+        self.assertEqual(self.group_type.name, 'Test Type')
+        self.assertEqual(self.group_type.slug, 'test-type')
+
+    def test_manage_group_type_errors(self):
+        self.assertEqual(models.GroupType.objects.count(), 1)
+        response = self.client.post(reverse('group-type-manage'), {})
+        self.assertStatusCode(response, 200)
+        form = response.context['form']
+        self.assertEqual(models.GroupType.objects.count(), 1)
+        self.assertIn('name', form.errors)
+        self.assertIn('slug', form.errors)

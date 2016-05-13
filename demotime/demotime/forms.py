@@ -333,3 +333,12 @@ class GroupMemberForm(forms.ModelForm):
         fields = (
             'user', 'group', 'is_admin',
         )
+
+
+class GroupTypeForm(forms.ModelForm):
+
+    class Meta:
+        model = models.GroupType
+        fields = (
+            'name', 'slug'
+        )
