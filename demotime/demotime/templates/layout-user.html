@@ -18,6 +18,9 @@
                             New demo:
                         </label>
                         <select class="slick new_demo_dropdown">
+                            {% if object.name %}
+                                <option value="{% url 'create-review' object.slug %}">{{ object.name }}</option>
+                            {% endif %}
                             {% for project in available_projects %}
                                 <option value="{% url 'create-review' project.slug %}">{{ project.name }}</option>
                             {% endfor %}

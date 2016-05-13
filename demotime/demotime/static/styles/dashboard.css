@@ -12,7 +12,7 @@
     padding:10px;
 }
 .dashboard-upper section {
-    min-height:185px;
+    min-height:190px;
 }
 .dashboard-lower section {
     min-height: 70px;
@@ -34,6 +34,7 @@
 .dashboard section strong a {
     font-weight: 800;
 }
+.dashboard .messages-list a,
 span.icon-Reviewing,
 span.icon-Reviewing a {
     color: #fff;
@@ -41,6 +42,7 @@ span.icon-Reviewing a {
 }
 li.de-emphasize span,
 span.icon-Approved { color: #999; }
+.dashboard .messages-list li.de-emphasize a,
 li.de-emphasize a,
 span.icon-Approved a { font-weight: 200; color: #ccc; }
 li.de-emphasize strong a { font-weight: 400; }

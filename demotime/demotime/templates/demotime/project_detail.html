@@ -1,10 +1,6 @@
 {% extends 'layout-user.html' %}
 {% block title %}{{ object.name }} Administration{% endblock %}
 
-{% block sub_nav_actions %}
-    <a href="{% url 'create-review' object.slug %}" class="subnav-item icon icon-lightbulb">Create a Demo</a>
-{% endblock %}
-
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css">
@@ -15,7 +11,9 @@
     <div class="cel">
         <h1 class="heading">
             {{ object.name }} Administration
-            <small><a href="{% url 'project-admin' object.slug %}">edit</a></small>
+            {% if request.user.is_superuser %}
+                <small><a href="{% url 'project-admin' object.slug %}">edit</a></small>
+            {% endif %}
         </h1>
     </div>
 </div>
@@ -52,6 +50,10 @@
     <div class="cel">
         <h3 class="icon icon-cloud">
             Project groups
+            <span class="help" title="A Project consists of one or more demos.
+                The demos that you have created that are part of '{{ object.name }}'
+                with recent updates (new comments, approval state changes,
+                new revisions, etc) will appear here."></span>
             {% if request.user.is_superuser %}
                 <small>
                     <a href="#">Manage</a>
@@ -73,9 +75,11 @@
     <div class="cel">
         <h3 class="icon icon-user">
             Project members
-            <small>
-                <a href="#">Manage</a>
-            </small>
+            {% if request.user.is_superuser %}
+                <small>
+                    <a href="#">Manage</a>
+                </small>
+            {% endif %}
         </h3>
         <section class="emph_low">
             <ul>

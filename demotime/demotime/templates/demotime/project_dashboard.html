@@ -1,10 +1,6 @@
 {% extends 'layout-user.html' %}
 {% block title %}- Project {{ object.name }}{% endblock %}
 
-{% block sub_nav_actions %}
-    <a href="{% url 'create-review' object.slug %}" class="subnav-item icon icon-lightbulb">Create a Demo</a>
-{% endblock %}
-
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css">
@@ -20,7 +16,7 @@
     {% endif %}
 </h1><br>
 
-<div class="dashboard">
+<div class="dashboard dashboard-upper">
     <div class="split~680 by:2 with-gap:2">
         <div class="cel">
             <h3 class="icon icon-inbox">
