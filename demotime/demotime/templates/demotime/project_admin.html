@@ -1,64 +1,206 @@
 {% extends 'layout-user.html' %}
 {% block title %}Project {{ object.name }} Administration{% endblock %}
 
-{% block sub_nav_actions %}
-    <a href="{% url 'create-review' object.slug %}" class="subnav-item icon icon-lightbulb">Create a Demo</a>
+{% block styles %}
+{{ block.super }}
+<style>
+a.error {
+    transition:5s;
+}
+.project h3 {
+    font-size:1.1em;
+    font-weight:400;
+}
+.project select {
+    margin-bottom:2em;
+}
+.project {
+    font-size: 12px;
+}
+.form-group.first {
+    margin-top: 0;
+}
+.project label {
+    font-size: 1.7em;
+    color: #555;
+    font-weight: 400;
+}
+.project section p:first-child {
+    margin-top: 0;
+}
+.project section section section {
+    box-shadow: none;
+    background: #f7f7f7;
+    padding: 10px;
+}
+.project section label {
+    color: #777;
+    font-size: 1.3em;
+    margin-top: 0;
+    padding-top: 0;
+}
+section .form-group {
+    margin-top: 0;
+}
+@media screen and (max-width:680px) {
+    h3 small {
+        display: block;
+        font-size: 11px;
+    }
+}
+.groups,
+.members {
+    overflow: hidden;
+}
+
+label[for="id_is_public"],
+.groups label,
+.members label {
+    display: inline-block;
+}
+
+.groups select {
+    margin: 0 5px;
+}
+
+.groups a,
+.members a {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.group,
+.member {
+    float: left;
+    width: 33%;
+    margin-bottom: 15px;
+}
+@media screen and (max-width:680px) {
+    .group,
+    .member {
+        width: 50%;
+    }
+}
+
+.project input[type="checkbox"] {
+    position: relative;
+    top: -1px;
+    left: 3px;
+}
+section label[for="id_is_public"] {
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
-<form action="{% url 'project-admin' object.slug %}" method='post'>
-    {% csrf_token %}
-    {# PROJECT FORM #}
-    {{ project_form.as_p }}
+<h1>Editing {{ object.name }} details</h1>
 
-    {# EDIT GROUPS FORMS #}
-    <h3>Edit Groups</h3>
-    <div class="">
-        {{ edit_group_formset.management_form }}
-        {% for form in edit_group_formset %}
+<article class="project">
+    <section>
+        <form action="{% url 'project-admin' object.slug %}" method='post'>
+            {% csrf_token %}
+            {# PROJECT FORM #}
+            <h3 class="icon icon-pencil">
+                Basic information
+            </h3>
             <section>
-                {{ form.as_p }}
+                {{ project_form.as_p }}
             </section>
-        {% endfor %}
-    </div>
 
-    {# EDIT MEMBERS FORMS #}
-    <h3>Edit Members</h3>
-    <div class="">
-        {{ edit_member_formset.management_form }}
-        {% for form in edit_member_formset %}
+            {# EDIT GROUPS FORMS #}
+            <h3 class="icon icon-cog">
+                Groups
+                <span class="help" title="TODO"></span>
+            </h3>
+
             <section>
-                {{ form.as_p }}
+                <div class="split~680 by:2 with-gap:3">
+                    <div class="cel">
+                        <h4>Edit</h4>
+                        <section class="groups">
+                            {{ edit_group_formset.management_form }}
+                            {% for field in edit_group_formset %}
+                                <div class="form-group {{ field.errors|yesno:'errors,'}}">
+                                    <div class="fields">
+                                        {{ field }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                    <div class="cel">
+                        {# ADD GROUPS FORMS #}
+                        <h4>Add</h4>
+                        <section class="groups">
+                            {{ group_formset.management_form }}
+                            {% for field in group_formset %}
+                                <div class="group">
+                                    <div class="form-group {{ field.errors|yesno:'errors,'}}">
+                                        <div class="fields">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    <a href="#" id="add_groups" class="attachment-add icon icon-plus-circled">add another</a>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                </div>
             </section>
-        {% endfor %}
-    </div>
 
-    {# ADD GROUPS FORMS #}
-    <h3>Add Groups</h3>
-    <div class="attachments">
-        {{ group_formset.management_form }}
-        {% for form in group_formset %}
-            <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
-                {{ form.as_p }}
-                <label>&nbsp;</label>
-                <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
+            <h3 class="icon icon-user">
+                Members
+                <span class="help" title="TODO"></span>
+            </h3>
+
+            <section>
+                <div class="split~680 by:2 with-gap:3">
+                    <div class="cel">
+                        <h4>Edit</h4>
+                        <section class="members">
+                            {{ edit_member_formset.management_form }}
+                            {% for field in edit_member_formset %}
+                                <div class="form-group {{ field.name }} {{ field.errors|yesno:'errors,'}}">
+                                    <div class="fields">
+                                        {{ field }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                    <div class="cel">
+                        {# ADD MEMBERS FORMS #}
+                        <h4>Add</h4>
+                        <section class="members">
+                            {{ member_formset.management_form }}
+                            {% for field in member_formset %}
+                                <div class="member" {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                                    <div class="form-group {{ field.errors|yesno:'errors,'}}">
+                                        <div class="fields">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    <a href="#" id="add_member" class="icon icon-plus-circled">add another</a>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                </div>
             </section>
-        {% endfor %}
-    </div>
 
-    {# ADD MEMBERS FORMS #}
-    <h3>Add Members</h3>
-    <div class="attachments">
-        {{ member_formset.management_form }}
-        {% for form in member_formset %}
-            <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
-                {{ form.as_p }}
-                <label>&nbsp;</label>
-                <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
-            </section>
-        {% endfor %}
-    </div>
+            <input type="submit" value="Submit" />
+        </form>
+    </section>
+</article>
+{% endblock %}
 
-    <input type="submit" value="Submit" />
-</form>
+{% block scripts %}
+{{ block.super }}
+<script src="/static/scripts/EditProject.js"></script>
+<script>
+var edit_project = new DemoTime.EditProject();
+</script>
 {% endblock %}
