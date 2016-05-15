@@ -37,7 +37,7 @@ urlpatterns += [
     url(r'^admin/groups/edit/(?P<group_slug>[\w-]+)/$', groups.manage_group, name='group-manage'),
     url(r'^admin/group-types/create/$', groups.manage_group_type, name='group-type-manage'),
     url(r'^admin/group-types/edit/(?P<slug>[\w-]+)/$', groups.manage_group_type, name='group-type-manage'),
-    url(r'^adminprojects/create/$', projects.project_admin, name='project-create'),
+    url(r'^admin/projects/create/$', projects.project_admin, name='project-create'),
 ]
 
 # Reviews
