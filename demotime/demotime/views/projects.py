@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from django.forms import modelformset_factory
-from django.views.generic import DetailView
+from django.views.generic import DetailView, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 
 from demotime import constants, forms, models
 from demotime.views import CanViewMixin, JsonView
@@ -51,7 +51,7 @@ class ProjectDetail(CanViewMixin, DetailView):
         return super(ProjectDetail, self).dispatch(request, *args, **kwargs)
 
 
-class ProjectAdmin(CanViewMixin, DetailView):
+class ProjectAdmin(CanViewMixin, TemplateView):
     template_name = 'demotime/project_admin.html'
     model = models.Project
     slug_url_kwarg = 'proj_slug'
@@ -59,7 +59,14 @@ class ProjectAdmin(CanViewMixin, DetailView):
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        self.project = self.get_object()
+        try:
+            self.project = models.Project.objects.get(
+                slug=self.kwargs.get(self.slug_url_kwarg)
+            )
+        except models.Project.DoesNotExist:
+            self.project = None
+            self.require_superuser_privileges = True
+
         self.review = None
         self.member_formset = modelformset_factory(
             models.ProjectMember,
@@ -87,6 +94,7 @@ class ProjectAdmin(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectAdmin, self).get_context_data(**kwargs)
+        context['object'] = self.project
         context['project_form'] = forms.ProjectForm(instance=self.project)
         context['member_formset'] = self.member_formset(
             queryset=models.ProjectMember.objects.none(),
@@ -141,7 +149,7 @@ class ProjectAdmin(CanViewMixin, DetailView):
         )
         if forms_valid:
             # Project Form
-            project_form.save()
+            self.project = project_form.save()
 
             # New Members
             members = member_fs.save(commit=False)

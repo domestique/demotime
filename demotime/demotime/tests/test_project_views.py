@@ -84,6 +84,7 @@ class TestProjectViews(BaseTestCase):
             'name': 'Test Project',
             'description': 'test_edit_project',
             'is_public': is_public,
+            'slug': self.project.slug,
         })
         response = self.client.post(self.admin_url, self.post_data)
 
@@ -109,6 +110,7 @@ class TestProjectViews(BaseTestCase):
             'name': self.project.name,
             'description': self.project.description,
             'is_public': self.project.is_public,
+            'slug': self.project.slug,
             'add_group-0-group': group_one.pk,
             'add_group-0-is_admin': True,
             'add_group-1-group': group_two.pk,
@@ -157,6 +159,7 @@ class TestProjectViews(BaseTestCase):
             'name': self.project.name,
             'description': self.project.description,
             'is_public': self.project.is_public,
+            'slug': self.project.slug,
             'edit_group-0-group': group_to_delete.pk,
             'edit_group-0-is_admin': False,
             'edit_group-0-delete': True,
@@ -193,6 +196,7 @@ class TestProjectViews(BaseTestCase):
             'name': self.project.name,
             'description': self.project.description,
             'is_public': self.project.is_public,
+            'slug': self.project.slug,
             'add_member-0-user': member_one.pk,
             'add_member-0-is_admin': True,
             'add_member-1-user': member_two.pk,
@@ -226,6 +230,7 @@ class TestProjectViews(BaseTestCase):
             'name': self.project.name,
             'description': self.project.description,
             'is_public': self.project.is_public,
+            'slug': self.project.slug,
             'edit_member-0-user': member_to_delete.user.pk,
             'edit_member-0-is_admin': False,
             'edit_member-0-delete': True,

@@ -18,13 +18,13 @@ class CanViewMixin(UserPassesTestMixin):
     raise_exception = True
 
     def test_func(self):
+        if self.request.user.is_authenticated() and self.request.user.is_superuser:
+            return True
+
         if self.require_superuser_privileges:
-            if self.request.user.is_superuser and self.request.user.is_authenticated():
-                return True
-            else:
-                if not self.request.user.is_authenticated():
-                    self.raise_exception = False
-                return False
+            if not self.request.user.is_authenticated():
+                self.raise_exception = False
+            return False
 
         if (not self.require_admin_privileges) and (
                 self.project.is_public or (self.review and self.review.is_public)

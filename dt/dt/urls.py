@@ -11,7 +11,7 @@ admin.autodiscover()
 urlpatterns = [
     # DT needs to be on top, otherwise django-reg tramples some urls
     url('', include(demotime_urls)),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^djadmin/', include(admin.site.urls)),
     url(r'^accounts/', include(registration_urls))
 ]
 

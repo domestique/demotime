@@ -96,11 +96,19 @@ section label[for="id_is_public"] {
 {% endblock %}
 
 {% block content %}
-<h1>Editing {{ object.name }} details</h1>
+{% if object %}
+    <h1>Editing {{ object.name }} details</h1>
+{% else %}
+    <h1>Create Project</h1>
+{% endif %}
 
 <article class="project">
     <section>
-        <form action="{% url 'project-admin' object.slug %}" method='post'>
+        {% if object %}
+            <form action="{% url 'project-admin' object.slug %}" method='post'>
+        {% else %}
+            <form action="{% url 'project-create' %}" method='post'>
+        {% endif %}
             {% csrf_token %}
             {# PROJECT FORM #}
             <h3 class="icon icon-pencil">

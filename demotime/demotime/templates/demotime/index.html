@@ -36,7 +36,7 @@
                 <ul>
                     {% if available_projects %}
                         {% for project in available_projects %}
-                            <li><a href="{{ project.slug }}">{{ project.name }}</a></li>
+                            <li><a href="{{ project.get_absolute_url }}">{{ project.name }}</a></li>
                         {% endfor %}
                     {% else %}
                         <li>You aren't a member of any projects</li>

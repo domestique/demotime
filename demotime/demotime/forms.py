@@ -308,7 +308,7 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = (
-            'name', 'description', 'is_public',
+            'name', 'slug', 'description', 'is_public',
         )
 
 

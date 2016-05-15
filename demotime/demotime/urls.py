@@ -29,51 +29,52 @@ urlpatterns = [
     url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help')
 ]
 
-# Groups
+# Admin urls
 urlpatterns += [
-    url(r'^groups/$', groups.group_list, name='group-list'),
-    url(r'^groups/create/$', groups.manage_group, name='group-manage'),
-    url(r'^groups/edit/(?P<group_slug>[\w-]+)/admins$', groups.manage_group_admins, name='group-manage-admins'),
-    url(r'^groups/edit/(?P<group_slug>[\w-]+)/$', groups.manage_group, name='group-manage'),
-    url(r'^groups-type/create/$', groups.manage_group_type, name='group-type-manage'),
-    url(r'^groups-type/edit/(?P<slug>[\w-]+)/$', groups.manage_group_type, name='group-type-manage'),
+    url(r'^admin/groups/$', groups.group_list, name='group-list'),
+    url(r'^admin/groups/create/$', groups.manage_group, name='group-manage'),
+    url(r'^admin/groups/edit/(?P<group_slug>[\w-]+)/admins$', groups.manage_group_admins, name='group-manage-admins'),
+    url(r'^admin/groups/edit/(?P<group_slug>[\w-]+)/$', groups.manage_group, name='group-manage'),
+    url(r'^admin/group-types/create/$', groups.manage_group_type, name='group-type-manage'),
+    url(r'^admin/group-types/edit/(?P<slug>[\w-]+)/$', groups.manage_group_type, name='group-type-manage'),
+    url(r'^adminprojects/create/$', projects.project_admin, name='project-create'),
 ]
 
 # Reviews
 urlpatterns += [
     # Review Creation
-    url(r'^(?P<proj_slug>[\w-]+)/create/$', reviews.review_form_view, name='create-review'),
+    url(r'^reviews/(?P<proj_slug>[\w-]+)/create/$', reviews.review_form_view, name='create-review'),
     # DT-1234 redirect view
     url(r'^(?i)DT-(?P<pk>[\d]+)/$', reviews.dt_redirect_view, name='dt-redirect'),
     # Review Detail Page
     url(
-        r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/$',
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/$',
         reviews.review_detail,
         name='review-detail'
     ),
     # Review Revision Detail Page
     url(
-        r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/rev/(?P<rev_num>[\d]+)/$',
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/rev/(?P<rev_num>[\d]+)/$',
         reviews.review_detail,
         name='review-rev-detail'
     ),
     # Review Edit Page
-    url(r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/edit/$', reviews.review_form_view, name='edit-review'),
+    url(r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/edit/$', reviews.review_form_view, name='edit-review'),
     # Reviewer Approval/Rejection
     url(
-        r'^(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/reviewer-status/(?P<reviewer_pk>[\d]+)/$',
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/reviewer-status/(?P<reviewer_pk>[\d]+)/$',
         reviews.reviewer_status_view,
         name='update-reviewer-status',
     ),
     # Review State Update (open/closed)
     url(
-        r'^(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/update-state/$',
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/update-state/$',
         reviews.review_state_view,
         name='update-review-state'
     ),
-    url(r'^review/list/$', reviews.review_list_view, name='review-list'),
-    url(r'^review/search/$', reviews.review_json_view, name='reviews-json'),
-    url(r'^(?P<proj_slug>[\w-]+)/review/search/$', reviews.review_json_view, name='reviews-json'),
+    url(r'^reviews/list/$', reviews.review_list_view, name='review-list'),
+    url(r'^reviews/search/$', reviews.review_json_view, name='reviews-json'),
+    url(r'^reviews/(?P<proj_slug>[\w-]+)/search/$', reviews.review_json_view, name='reviews-json'),
 ]
 
 # Comments
@@ -142,7 +143,7 @@ urlpatterns += [
 # Projects
 urlpatterns += [
     url(r'projects/$', projects.project_json, name='project-json'),
-    url(r'(?P<proj_slug>[-\w]+)/admin/edit/$', projects.project_admin, name='project-admin'),
-    url(r'(?P<proj_slug>[-\w]+)/admin/$', projects.project_detail, name='project-detail'),
-    url(r'(?P<proj_slug>[-\w]+)/$', projects.project_dashboard, name='project-dashboard'),
+    url(r'projects/(?P<proj_slug>[-\w]+)/admin/edit/$', projects.project_admin, name='project-admin'),
+    url(r'projects/(?P<proj_slug>[-\w]+)/admin/$', projects.project_detail, name='project-detail'),
+    url(r'projects/(?P<proj_slug>[-\w]+)/$', projects.project_dashboard, name='project-dashboard'),
 ]
