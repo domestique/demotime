@@ -1,6 +1,6 @@
 {% if demo.state == "closed" %}
     <small>{{ demo.state }}</small>
-{% else %}
+{% elif demo.reviewing_count or demo.reviewing_count or demo.rejected_count %}
     <span class="review_state">
         {% if demo.reviewer_state == "reviewing" %}
             {% if demo.reviewing_count %}
@@ -19,6 +19,8 @@
         {% endif %}
     </span>
 {% endif %}
-<small>
-    <a href="{{ demo.creator.userprofile.get_absolute_url }}">({{ demo.creator.userprofile|truncatechars:15 }})</a>
-</small>
+{% if demo.creator %}
+    <small>
+        <a href="{{ demo.creator.userprofile.get_absolute_url }}">({{ demo.creator.userprofile|truncatechars:15 }})</a>
+    </small>
+{% endif %}
