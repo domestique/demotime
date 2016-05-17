@@ -44,7 +44,7 @@
             {% for follower in object.follower_set.all %}
                 {% if follower.user == request.user %}
                     <div class="your-status">
-                        You are following this case
+                        You are following this demo
                         <small class="person_deleter">
                             [<a href="#" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
                         </small>

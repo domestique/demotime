@@ -40,7 +40,7 @@
             <a href="{% url 'inbox' %}" class="button-link">Back to inbox</a>
         </li>
         <li>
-            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open this case</a>
+            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open this demo</a>
         </li>
     </ul>
     {% for msg in object.message_set.all %}
