@@ -2,6 +2,15 @@
 
 {% block sub_nav %}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'edit-profile' request.user.pk %}">Your Profile</a> &gt; Edit
+    </div>
+</div>
+{% endblock %}
+
+
 {% block styles %}
 {{ block.super }}
 <style>
@@ -19,7 +28,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="heading">Edit Your Profile</h1>
+    <h1 class="heading">Editing Your Profile</h1>
     <section>
         <form action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}

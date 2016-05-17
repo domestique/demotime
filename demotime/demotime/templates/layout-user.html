@@ -10,7 +10,7 @@
             {% block sub_nav_actions %}
                 {% if available_projects|length == 0 %}
                     {% for project in available_projects %}
-                        <a class="subnav-item icon icon-plus" href="{% url 'create-review' project.slug %}">Create a demo</a></li>
+                        <a class="subnav-item icon icon-plus" href="{% url 'create-review' project.slug %}">New demo</a></li>
                     {% endfor %}
                 {% else %}
                     <div class="new_demo">
@@ -27,10 +27,10 @@
                                 {% endif %}
                             {% endfor %}
                             {% if request.user.is_superuser %}
-                                <option value="{% url 'project-create' %}">Create new project</option>
+                                <option value="{% url 'project-create' %}">New project</option>
                             {% endif %}
                         </select>
-                        <a class="subnav-item new_demo_link icon icon-plus" href="#">Create</a>
+                        <a class="subnav-item new_demo_link icon icon-plus" href="#">New</a>
                     </div>
                 {% endif %}
             {% endblock %}

@@ -1,6 +1,14 @@
 {% extends 'layout-user.html' %}
 {% load demo_tags %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        Your dashboard
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css">
@@ -43,7 +51,7 @@
                     {% endif %}
                     {% if request.user.is_superuser %}
                         <li>
-                            <a class="icon icon-plus" href="{% url 'project-create' %}">Create new project</a>
+                            <a class="icon icon-plus" href="{% url 'project-create' %}">New project</a>
                         </li>
                     {% endif %}
                 </ul>

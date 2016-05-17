@@ -1,6 +1,14 @@
 {% extends 'layout-user.html' %}
 {% block title %}- Project {{ object.name }}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; {{ object.name }}
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css">

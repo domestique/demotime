@@ -8,19 +8,32 @@
 </nav>
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'group-list' %}">Groups</a> &gt;
+        {% if group %}
+            Editing {{ group.name }}
+        {% else %}
+            New Group
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
 {% block title %}
     {% if group %}
-        Group {{ group.name }} Administration
+        Editing {{ group.name }}
     {% else %}
-        Create Group
+        New Group
     {% endif %}
 {% endblock %}
 
 {% block content %}
 {% if group %}
-    <h1>Edit {{ group.name }}</h1>
+    <h1>Editing {{ group.name }}</h1>
 {% else %}
-    <h1>Create Group</h1>
+    <h1>New Group</h1>
 {% endif %}
 {% if group %}
     <form action="{% url 'group-manage' group.slug %}" method='post'>

@@ -1,6 +1,14 @@
 {% extends 'layout-user.html' %}
 {% block title %}{{ object.name }} Administration{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'project-dashboard' object.slug %}">{{ object.name }}</a> &gt; Administration
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css">
@@ -10,7 +18,7 @@
 <h1 class="heading">
     <strong>{{ object.name }}</strong> Administration
     <small>
-        <a href="{% url 'project-dashboard' object.slug %}">Dashboard</a>
+        <a href="{% url 'project-dashboard' object.slug %}">Project Dashboard</a>
     </small>
 </h1>
 

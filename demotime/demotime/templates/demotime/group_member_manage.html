@@ -9,8 +9,18 @@
 </nav>
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'group-list' %}">Groups</a> &gt;
+            Editing {{ group.name }} admins
+            </a>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
-    <h1>Edit {{ group.name }} Admins</h1>
+    <h1>Editing {{ group.name }} Admins</h1>
     <div class="">
         <form action="{% url 'group-manage-admins' group.slug %}" method="post">
             {% csrf_token %}

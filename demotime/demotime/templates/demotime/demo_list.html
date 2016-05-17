@@ -2,6 +2,14 @@
 
 {% block sub_nav %}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Find a demo
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <style>

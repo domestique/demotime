@@ -2,6 +2,14 @@
 {% load demo_tags %}
 {% block title %} - Inbox{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Inbox
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/inbox.css">

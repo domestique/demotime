@@ -8,6 +8,14 @@
 </nav>
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Groups
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <style>
@@ -83,7 +91,7 @@
             {% endif %}
             <tr>
                 <td colspan="4">
-                    <a class="icon icon-plus" href="{% url 'group-manage' %}">Create a group</a>
+                    <a class="icon icon-plus" href="{% url 'group-manage' %}">New group</a>
                 </td>
             </tr>
         </table>
@@ -113,7 +121,7 @@
                 {% endfor %}
                 <tr>
                     <td colspan="4">
-                        <a class="icon icon-plus" href="{% url 'group-type-manage' %}">Create a group type</a>
+                        <a class="icon icon-plus" href="{% url 'group-type-manage' %}">New group type</a>
                     </td>
                 </tr>
             </table>

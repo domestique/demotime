@@ -3,6 +3,15 @@
 
 {% block sub_nav %}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        {% if owner_viewing %}Your Profile{% else %}{{ object }}'s Profile{% endif %}
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 <link rel="stylesheet" href="/static/styles/dashboard.css">
 {{ block.super }}

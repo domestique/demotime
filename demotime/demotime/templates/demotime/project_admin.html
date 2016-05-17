@@ -1,6 +1,19 @@
 {% extends 'layout-user.html' %}
 {% block title %}Project {{ object.name }} Administration{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        {% if object %}
+            <a href="{% url 'project-dashboard' object.slug %}">{{ object.name }}</a> &gt; <a href="{% url 'project-detail' object.slug %}">Administration</a> &gt; Edit
+        {% else %}
+            New Project
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <style>
@@ -105,7 +118,7 @@ section label[for="id_is_public"] {
 {% if object %}
     <h1>Editing {{ object.name }} details</h1>
 {% else %}
-    <h1>Create Project</h1>
+    <h1>New Project</h1>
 {% endif %}
 
 <article class="project">

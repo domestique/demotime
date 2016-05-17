@@ -67,6 +67,7 @@ body.bookmarklet h1 {
 }
 .navbar .unread_notification a {
     background: #E03743;
+    border-radius: 2px;
     color: white;
     font-weight: 700;
     padding: 5px 10px;
@@ -80,6 +81,7 @@ body.bookmarklet h1 {
 .navbar .manage_user {
     position: relative;
     border: 1px solid #777;
+    border-radius: 2px;
     padding: 2px 3px;
     position: relative;
     top: -1px;
@@ -227,3 +229,17 @@ nav.subnav {
     border-radius: 0;
 }
 
+.breadcrumbs {
+    background: #1F8470;
+    padding: 10px 0;
+}
+.breadcrumbs,
+.breadcrumbs a {
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.breadcrumbs a {
+    font-weight: 700;
+}
