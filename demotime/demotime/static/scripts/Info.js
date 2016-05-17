@@ -4,8 +4,8 @@ DemoTime.Info = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'mouseover a': 'lookup',
-        'mouseout a': 'destroy'
+        'mouseover .has_bubble': 'lookup',
+        'mouseout .has_bubble': 'destroy'
     },
 
     initialize: function(options) {

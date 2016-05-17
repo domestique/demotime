@@ -100,7 +100,7 @@
                 {% for obj in object_list %}
                     <tr>
                         <td>DT-{{ obj.pk }}</td>
-                        <td><a data-prj="{{ obj.project.pk }}" data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">{{ obj.title|truncatechars:65 }}</a></td>
+                        <td><a class="has_bubble" data-prj="{{ obj.project.pk }}" data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">{{ obj.title|truncatechars:65 }}</a></td>
                         <td><a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a></td>
                         <td>
                             {% if obj.reviewer_state == "approved" %}
