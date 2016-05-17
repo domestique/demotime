@@ -192,6 +192,10 @@ h3 small {
     color: #ffffe7
 }
 
+.left {
+    text-align: left;
+}
+
 .tip {
     background: #fafafa;
     border: 1px solid #ddd;

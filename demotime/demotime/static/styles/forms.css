@@ -221,5 +221,6 @@ blockquote .emoji,
         max-width: 140px;
     }
 }
-
-.
+.dd-option {
+    border-bottom: 0 !important;
+}

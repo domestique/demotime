@@ -31,6 +31,9 @@
     color:#fff;
     font-weight: 200;
 }
+.dashboard li p:first-child {
+    margin: 0;
+}
 .dashboard section strong a {
     font-weight: 800;
 }

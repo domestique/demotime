@@ -1,114 +1,123 @@
 {% extends 'layout-user.html' %}
 
-{% block sub_nav %}{% endblock %}
+{% block sub_nav %}
+<nav class="subnav">
+    <div class="container left">
+        <a class="icon icon-left-dir" href="javascript:history.back()">Go back</a>
+    </div>
+</nav>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
 <style>
-    section {
-        padding: 10px 20px;
-    }
-    section section {
-        overflow: hidden;
-        padding: 5px 20px;
-    }
-    .form-actions {
-        text-align: center;
-    }
-    .filters select {
-        margin-right: 1.5em;
-        margin-bottom: 1em;
-        max-width: 100px;
-    }
-    .filters input[type="submit"] {
-        margin-top: 10px;
-        width: 50%;
-    }
-    .filters label {
-        display: inline-block;
-    }
-    @media screen and (max-width:680px) {
-        .filters select {
-            margin-bottom: 10px;
-        }
-        .filters input[type="submit"] {
-            float: none;
-            margin: 10px 0;
-            width: 100%;
-            display: block;
-        }
-        .filters label {
-            display: block;
-            width: 100%;
-            margin: 0;
-        }
-    }
-    .filters input[type="text"] {
-        padding: 10px;
-        height: auto;
-        border: 1px solid #ddd;
-        margin-bottom: 20px;
-    }
     table {
         background: #fff;
-        border: 1px solid #ddd;
+        border: 1px solid #eee;
+    }
+    th {
+        font-weight: 400;
     }
     th, td {
         font-size: 14px;
         vertical-align: top;
         text-align: left;
         padding: 8px;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid #eee;
+    }
+    table li {
+        display: inline-block;
+        list-style: none;
+        padding: 0 3px;
+        margin: 1px;
+        font-weight: 300;
+        color: #aaa;
+    }
+    table li.admin {
+        color: #666;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    th small {
+        color: #777;
+        margin-left: 10px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <h1 class="heading">Groups</h1>
+    <h1 class="heading">
+        Groups
+        <span class="help" title="TODO"></span>
+    </h1>
     <section>
         <table id="results" cellspacing="0" cellpadding="0" width="100%">
             {% if object_list %}
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Members</th>
-                        <th>Edit</th>
-                        <th>Manage Admins</th>
+                        <th width="25%">Name</th>
+                        <th>Members <small>(<strong>bold</strong> denotes admins)</small></th>
                     </tr>
                 </thead>
                 {% for obj in object_list %}
                     <tr>
-                        <td>{{ obj.name }}</td>
-                        <td>{% for member in obj.groupmember_set.all %}{{ member.user.userprofile.name }},{% endfor %}</td>
-                        <td><a href="{% url 'group-manage' obj.slug %}">Edit</a>
-                        <td><a href="{% url 'group-manage-admins' obj.slug %}">Admins</a></td>
+                        <td>
+                            <a class="icon icon-pencil" href="{% url 'group-manage' obj.slug %}"></a>
+                            {{ obj.name }}
+                        </td>
+                        <td>
+                            {% for member in obj.groupmember_set.all %}
+                                <li {% if member.is_admin %}class="admin" title="administrator"{% endif %}>
+                                    {{ member.user.userprofile.name }}
+                                </li>
+                            {% endfor %}
+                            <small>
+                                <a class="icon icon-user" href="{% url 'group-manage-admins' obj.slug %}">Manage admins</a>
+
+                            </small>
+                        </td>
                     </tr>
                 {% endfor %}
             {% else %}
                 <tr><td>No groups.</td></tr>
             {% endif %}
+            <tr>
+                <td colspan="4">
+                    <a class="icon icon-plus" href="{% url 'group-manage' %}">Create a group</a>
+                </td>
+            </tr>
         </table>
         </ul>
     </section>
-    <h1 class="heading">Group Types</h1>
-    <section>
-        <table id="results" cellspacing="0" cellpadding="0" width="100%">
-            <thead>
+    <article>
+        <h3 class="heading">
+            Group Types
+            <span class="help" title="TODO"></span>
+        </h3>
+        <section>
+            <table id="results" cellspacing="0" cellpadding="0" width="100%">
+                <thead>
+                    <tr>
+                        <th width="75%">Name</th>
+                        <th>Slug</th>
+                    </tr>
+                </thead>
+                {% for obj in group_types %}
+                    <tr>
+                        <td>
+                            <a class="icon icon-pencil" href="{% url 'group-type-manage' obj.slug %}"></a>
+                            {{ obj.name }}
+                        </td>
+                        <td>{{ obj.slug }}</td>
+                    </tr>
+                {% endfor %}
                 <tr>
-                    <th>Name</th>
-                    <th>Slug</th>
-                    <th>Edit</th>
+                    <td colspan="4">
+                        <a class="icon icon-plus" href="{% url 'group-type-manage' %}">Create a group type</a>
+                    </td>
                 </tr>
-            </thead>
-            {% for obj in group_types %}
-                <tr>
-                    <td>{{ obj.name }}</td>
-                    <td>{{ obj.slug }}</td>
-                    <td><a href="{% url 'group-type-manage' obj.slug %}">Edit</a>
-                </tr>
-            {% endfor %}
-        </table>
-        </ul>
-    </section>
+            </table>
+            </ul>
+        </section>
+    </article>
 {% endblock %}
-

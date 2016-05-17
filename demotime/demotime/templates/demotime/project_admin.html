@@ -75,10 +75,16 @@ label[for="id_is_public"],
     width: 33%;
     margin-bottom: 15px;
 }
+.group {
+    width: 50%;
+}
 @media screen and (max-width:680px) {
     .group,
     .member {
         width: 50%;
+    }
+    .group {
+        width: 100%;
     }
 }
 
@@ -119,7 +125,7 @@ section label[for="id_is_public"] {
             </section>
 
             {# EDIT GROUPS FORMS #}
-            <h3 class="icon icon-cog">
+            <h3 class="icon icon-cog" id="groups">
                 Groups
                 <span class="help" title="TODO"></span>
             </h3>
@@ -145,13 +151,13 @@ section label[for="id_is_public"] {
                         <section class="groups">
                             {{ group_formset.management_form }}
                             {% for field in group_formset %}
-                                <div class="group">
+                                <div class="group" {% if forloop.counter > 1 %}style="display:none"{% endif %}>
                                     <div class="form-group {{ field.errors|yesno:'errors,'}}">
                                         <div class="fields">
                                             {{ field }}
                                         </div>
                                     </div>
-                                    <a href="#" id="add_groups" class="attachment-add icon icon-plus-circled">add another</a>
+                                    <a href="#" id="add_group" class="attachment-add icon icon-plus-circled">add another</a>
                                 </div>
                             {% endfor %}
                         </section>
@@ -159,7 +165,7 @@ section label[for="id_is_public"] {
                 </div>
             </section>
 
-            <h3 class="icon icon-user">
+            <h3 class="icon icon-user" id="members">
                 Members
                 <span class="help" title="TODO"></span>
             </h3>
@@ -207,8 +213,8 @@ section label[for="id_is_public"] {
 
 {% block scripts %}
 {{ block.super }}
-<script src="/static/scripts/EditProject.js"></script>
+<script src="/static/scripts/EditGroupsProjects.js"></script>
 <script>
-var edit_project = new DemoTime.EditProject();
+var edit = new DemoTime.EditGroupsProjects();
 </script>
 {% endblock %}

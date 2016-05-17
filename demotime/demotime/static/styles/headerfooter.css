@@ -1,63 +1,63 @@
 body.bookmarklet nav,
 body.bookmarklet footer {
-    display:none;
+    display: none;
 }
 body.bookmarklet h1 {
-    margin-top:.5em;
+    margin-top: .5em;
 }
 .navbar {
-    color:#fff;
-    background:#303030;
-    box-shadow:0 2px 5px #ccc;
-    padding:5px 0 0;
-    margin-bottom:20px;
+    color: #fff;
+    background: #303030;
+    box-shadow: 0 2px 5px #ccc;
+    padding: 5px 0 0;
+    margin-bottom: 20px;
 }
 .navbar a {
-    color:#fff;
-    text-decoration:none;
+    color: #fff;
+    text-decoration: none;
 }
 .navbar .navbar-logo {
-    background-size:80px;
-    letter-spacing:2px;
-    line-height:85px;
-    vertical-align:middle;
-    text-transform:uppercase;
-    font-size:.8em;
-    display:inline-block;
+    background-size: 80px;
+    letter-spacing: 2px;
+    line-height: 85px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    font-size: .8em;
+    display: inline-block;
 }
-@media screen and (max-width:680px) {
+@media screen and (max-width: 680px) {
     .navbar .navbar-logo {
         display: none;
     }
 }
 .navbar .navbar-brand {
-    padding:5px 0;
+    padding: 5px 0;
 }
 .navbar .navbar-nav {
-    text-align:right;
-    line-height:85px;
+    text-align: right;
+    line-height: 85px;
 }
-@media screen and (max-width:370px) {
+@media screen and (max-width: 370px) {
     .navbar .navbar-nav {
-        text-align:right;
+        text-align: right;
     }
 }
 .navbar-nav small a {
     color: #25C59E;
 }
 .navbar ul {
-    list-style:none;
-    margin:0;
-    padding:0;
-    display:inline-block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
 }
 .navbar ul.navbar-nav {
-    line-height:71px;
+    line-height: 71px;
 }
 .navbar li {
-    padding:5px;
-    border-radius:10px;
-    display:inline-block;
+    padding: 5px;
+    border-radius: 10px;
+    display: inline-block;
 }
 .navbar .read_notification a {
     background: #777;
@@ -125,16 +125,16 @@ body.bookmarklet h1 {
     padding: 3px 10px;
     font-size: 12px;
 }
-.navbar .manage_user li a:hover {
+.navbar .manage_user li a: hover {
     background: rgba(48, 48, 48, 1);
     color: #fff;
 }
 
 footer {
-    margin-top:8em;
-    font-size:.9em;
-    text-align:center;
-    color:#ccc;
+    margin-top: 8em;
+    font-size: .9em;
+    text-align: center;
+    color: #ccc;
 }
 
 .clock {
@@ -151,33 +151,32 @@ footer {
 }
 
 nav.subnav {
-    background:#32CCAE;
-    text-align:center;
-    margin-top:0px;
-    padding:8px 0;
-    text-align:right;
+    background: #32CCAE;
+    margin-top: 0px;
+    padding: 8px 0;
+    text-align: right;
 }
-@media screen and (max-width:940px) {
+@media screen and (max-width: 940px) {
     nav.subnav {
-        padding-left:10px;
-        padding-right:10px;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 .subnav a.subnav-item {
-    background:#fff;
-    color:#555;
-    font-weight:400;
-    display:inline-block;
-    padding:3px 10px;
-    border-radius:3px;
-    margin:0;
+    background: #fff;
+    color: #555;
+    font-weight: 400;
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin: 0;
 }
-@media screen and (max-width:680px) {
+@media screen and (max-width: 680px) {
     .subnav a.subnav-item {
-        padding:3px;
+        padding: 3px;
     }
 }
-@media screen and (max-width:450px) {
+@media screen and (max-width: 450px) {
     .subnav a.subnav-item {
         margin: 3px 0;
     }
@@ -187,14 +186,14 @@ nav.subnav {
 }
 .subnav ul.subnav-item,
 .subnav ul.subnav-item li {
-    margin:0 0 0 10px;
-    padding:0;
+    margin: 0 0 0 10px;
+    padding: 0;
 }
 .subnav .global_actions {
     text-align: right;
     padding-top: 3px;
 }
-@media screen and (max-width:680px) {
+@media screen and (max-width: 680px) {
     .subnav input[type="text"] {
         font-size: 12px;
     }

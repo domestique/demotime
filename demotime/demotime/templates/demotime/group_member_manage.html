@@ -1,8 +1,16 @@
 {% extends 'layout-user.html' %}
 {% block title %}{{ group.name }} Admins{% endblock %}
 
+{% block sub_nav %}
+<nav class="subnav">
+    <div class="container left">
+        <a class="icon icon-left-dir" href="javascript:history.back()">Go back</a>
+    </div>
+</nav>
+{% endblock %}
+
 {% block content %}
-    <h3>Edit {{ group.name }} Admins</h3>
+    <h1>Edit {{ group.name }} Admins</h1>
     <div class="">
         <form action="{% url 'group-manage-admins' group.slug %}" method="post">
             {% csrf_token %}

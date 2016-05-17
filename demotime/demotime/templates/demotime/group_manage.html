@@ -1,4 +1,13 @@
 {% extends 'layout-user.html' %}
+
+{% block sub_nav %}
+<nav class="subnav">
+    <div class="container left">
+        <a class="icon icon-left-dir" href="javascript:history.back()">Go back</a>
+    </div>
+</nav>
+{% endblock %}
+
 {% block title %}
     {% if group %}
         Group {{ group.name }} Administration
@@ -9,9 +18,9 @@
 
 {% block content %}
 {% if group %}
-    <h3>Edit {{ group.name }}</h3>
+    <h1>Edit {{ group.name }}</h1>
 {% else %}
-    <h3>Create Group</h3>
+    <h1>Create Group</h1>
 {% endif %}
 {% if group %}
     <form action="{% url 'group-manage' group.slug %}" method='post'>
@@ -28,3 +37,10 @@
 </form>
 {% endblock %}
 
+{% block scripts %}
+{{ block.super }}
+<script src="/static/scripts/EditGroupsProjects.js"></script>
+<script>
+var edit = new DemoTime.EditGroupsProjects();
+</script>
+{% endblock %}

@@ -9,7 +9,7 @@ class GroupType(BaseModel):
     slug = models.SlugField(unique=True)
 
     def __unicode__(self):
-        return u'GroupType: {}'.format(self.slug)
+        return u'{}'.format(self.slug)
 
     @classmethod
     def create_group_type(cls, name, slug):

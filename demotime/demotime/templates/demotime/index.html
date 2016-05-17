@@ -41,6 +41,11 @@
                     {% else %}
                         <li>You aren't a member of any projects</li>
                     {% endif %}
+                    {% if request.user.is_superuser %}
+                        <li>
+                            <a class="icon icon-plus" href="{% url 'project-create' %}">Create new project</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </section>
         </div>
@@ -53,12 +58,4 @@
     <strong>Power tip</strong>: You can now simply type in {{ site_settings.SERVER_URL }}/DT-1234 to be redirected to a demo.
 </div>
 {% endcomment %}
-{% endblock %}
-
-{% block scripts %}
-<script src="/static/scripts/Dashboard.js"></script>
-{{ block.super }}
-<script>
-var dashboard = new DemoTime.Dashboard();
-</script>
 {% endblock %}
