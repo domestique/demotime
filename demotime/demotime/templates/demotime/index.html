@@ -8,7 +8,7 @@
 
 {% block content %}
 <h1 class="heading">
-    Dashboard
+    <strong>Your</strong> Dashboard
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
 </h1>
 
@@ -26,8 +26,8 @@
             {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
         </div>
         <div class="cel">
-            <h3 class="icon icon-cog">
-                Projects you belong to
+            <h3>
+                Projects you're a member of
                 <span class="help" title="A Project consists of one or more demos.
                     Think of it as a group of demos that all have something in common.
                     Projects are a way of organizing demos."></span>
@@ -36,7 +36,7 @@
                 <ul>
                     {% if available_projects %}
                         {% for project in available_projects %}
-                            <li><a href="{{ project.get_absolute_url }}">{{ project.name }}</a></li>
+                            <li><a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a></li>
                         {% endfor %}
                     {% else %}
                         <li>You aren't a member of any projects</li>

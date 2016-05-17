@@ -7,13 +7,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="split by:4/1 project_header">
-    <div class="cel">
-        <h1 class="heading">
-            {{ object.name }} Administration
-        </h1>
-    </div>
-</div>
+<h1 class="heading">
+    <strong>{{ object.name }}</strong> Administration
+    <small>
+        <a href="{% url 'project-dashboard' object.slug %}">Dashboard</a>
+    </small>
+</h1>
 
 <div class="dashboard split~680 by:3 with-gap:3">
     <div class="cel">
@@ -99,15 +98,4 @@
         </section>
     </div>
 </div>
-<h3>
-    Recently Updated Demos in <strong>{{ object.name }}</strong>
-    <small>
-        <a href="#">VIEW ALL</a>
-    </small>
-</h3>
-<section class="emph_low">
-    {% for review in updated_demos %}
-        {% include "includes/reviews_li.html" with demo=review %}
-    {% endfor %}
-</section>
 {% endblock %}
