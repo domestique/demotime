@@ -48,7 +48,7 @@
             <a href="{% url 'inbox' %}" class="button-link">Back to inbox</a>
         </li>
         <li>
-            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open this case</a>
+            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open this demo</a>
         </li>
     </ul>
     {% for msg in object.message_set.all %}
@@ -64,16 +64,9 @@
         <li>
             <a href="{{ object.get_absolute_url }}?action=mark-unread" class="button-link">Mark Unread</a>
         </li>
-        {% if prev_msg %}
-            <li>
-                <a href="{{ prev_msg.get_absolute_url }}" class="button-link">Previous Unread Message</a>
-            </li>
-        {% endif %}
-        {% if next_msg %}
-            <li>
-                <a href="{{ next_msg.get_absolute_url }}" class="button-link">Next Unread Message</a>
-            </li>
-        {% endif %}
+        <li>
+            <a href="{% url 'inbox' %}" class="button-link">Back to inbox</a>
+        </li>
     </ul>
 </div>
 {% endblock %}
