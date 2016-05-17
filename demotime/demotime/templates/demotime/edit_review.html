@@ -1,6 +1,10 @@
 {% extends 'layout-review.html' %}
-{% block title %} - Editing '{{ review_inst.title }}'{% endblock %}
-{% block page_title %}Editing a demo{% endblock %}
-{% block button_text %}Editing demo{% endblock %}
+{% block title %} - Updating DT-{{ review_inst.pk }}{% endblock %}
+{% block page_title %}Updating DT-{{ review_inst.pk }}{% endblock %}
+{% block button_text %}Update demo{% endblock %}
 {% block description_leader %}Revision {% endblock %}
 {% block description_follower %}<small>Give your revision some context</small>{% endblock %}
+{% block crumbs_contents %}
+    <a href="{{ review_inst.get_absolute_url }}">DT-{{ review_inst.pk }}: {{ review_inst.title }}</a> &gt;
+    New revision
+{% endblock %}

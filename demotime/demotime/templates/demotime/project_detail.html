@@ -4,7 +4,9 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <div class="container">
-        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'project-dashboard' object.slug %}">{{ object.name }}</a> &gt; Administration
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        <a href="{% url 'project-dashboard' object.slug %}">{{ object.name }}</a> &gt;
+        Administration
     </div>
 </div>
 {% endblock %}

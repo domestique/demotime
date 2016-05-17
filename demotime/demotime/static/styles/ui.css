@@ -15,13 +15,13 @@ a.button-link {
 a.button-link:hover {
     text-decoration:none;
 }
-button.alert,
-a.button-link.alert {
+.subnav a.subnav-item.alert {
     background:#E03743;
+    color: #fff;
 }
-button.confirm,
-a.button-link.confirm {
+.subnav a.subnav-item.confirm {
     background:#335166;
+    color: #fff;
 }
 
 .review-attachments {

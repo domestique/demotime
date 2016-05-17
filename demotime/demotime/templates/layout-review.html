@@ -2,6 +2,16 @@
 
 {% block sub_nav %}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        <a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a> &gt;
+        {% block crumbs_contents %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 {{ block.super }}
 <style>
@@ -57,7 +67,7 @@ h1 em {
                     {{ review_form.case_link }}
                 </div>
                 <div class="form-group">
-                    <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
+                    <h3 class="icon icon-pencil">{% block description_leader %}{% endblock %}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
                     {{ review_form.description }}
                     {{ review_form.description.errors }}
                 </div>

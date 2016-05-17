@@ -2,6 +2,16 @@
 {% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        <a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a> &gt;
+        DT-{{ object.pk }}: {{ object.title }}
+    </div>
+</div>
+{% endblock %}
+
 {% block sub_nav_actions %}
 <ul class="subnav-item">
     {% if request.user == object.creator %}
@@ -16,7 +26,7 @@
             {% if reviewer.status == 'approved' %}
                 <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove demo</a></li>
             {% else %}
-                <li><a data-type="approved" href="#" class="subnav-item review-changer icon icon-thumbs-up">Approve demo</a></li>
+                <li><a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve demo</a></li>
             {% endif %}
             {% if reviewer.status == 'rejected' %}
                 <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject demo</a></li>
