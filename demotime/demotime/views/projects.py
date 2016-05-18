@@ -3,7 +3,7 @@ from django.forms import modelformset_factory
 from django.views.generic import DetailView, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 
 from demotime import constants, forms, models
 from demotime.views import CanViewMixin, JsonView
@@ -25,7 +25,7 @@ class ProjectDashboard(CanViewMixin, DetailView):
         context['open_demos'] = models.Review.objects.filter(
             project=self.project,
             state=constants.OPEN,
-        )[:5]
+        )
         user_updated_demos = models.UserReviewStatus.objects.filter(
             review__project=self.project,
             user=self.request.user,
