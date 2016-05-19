@@ -44,11 +44,18 @@ span.icon-Reviewing a {
     font-weight: 400;
 }
 li.de-emphasize span,
-span.icon-Approved { color: #999; }
+span.icon-Approved {
+    color: #999;
+}
 .dashboard .messages-list li.de-emphasize a,
 li.de-emphasize a,
-span.icon-Approved a { font-weight: 200; color: #ccc; }
-li.de-emphasize strong a { font-weight: 400; }
+span.icon-Approved a {
+    font-weight: 200;
+    opacity: 0.4;
+}
+li.de-emphasize strong a {
+    font-weight: 400;
+}
 
 .dashboard ul {
     list-style:none;
