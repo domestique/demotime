@@ -204,6 +204,13 @@ h3 small {
 }
 
 /* Review bubble */
+.copy_link {
+    background: url(/static/images/ic_attach.svg) 0 50% no-repeat;
+    display: inline-block;
+    padding-left: 20px;
+    background-size: 15px;
+}
+
 .review_info {
     margin: 0;
     padding: 10px;
@@ -253,7 +260,7 @@ h3 small {
 .review_info .icon-Reviewing, .icon-reviewing,
 .icon-Reviewing, .icon-reviewing {
     background: url(/static/images/emoji/clock_dark.png) 0 50% no-repeat !important;
-    background-size: 16px !important;
+    background-size: 15px !important;
 }
 
 .icon-Rejected, .icon-rejected {
@@ -264,11 +271,7 @@ h3 small {
 .icon-Approved, .icon-approved,
 .icon-Rejected, .icon-rejected {
     padding-left: 20px;
-    background-size: 16px;
-}
-
-.copy_link {
-    margin: 0;
+    background-size: 15px;
 }
 
 .quickfind input[type="text"] {

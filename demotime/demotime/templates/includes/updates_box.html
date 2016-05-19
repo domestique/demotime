@@ -16,16 +16,15 @@
     <div class="messages-list">
         <ul>
             {% for message in message_bundles %}
-                <li {% if message.read %}class="de-emphasize"{% endif %}>
+                <li class="{% if message.read %}de-emphasize{% endif %}">
                     {% if message.review %}
-                        <a href="#" class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ message.review.pk }}" title="Copy URL"><img src="/static/images/ic_attach.svg"></a>
                         {% if message.review.creator != request.user %}
                             <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" title="Your approval status" class="has_bubble dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                         {% else %}
                             <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                         {% endif %}
                     {% endif %}
-                    <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title|truncatechars:35 }}</a>
+                    <a class="{{ message.read }} icon icon-mail" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
                     {% include "includes/review_state.html" with demo=message.review %}
                 </li>
             {% endfor %}

@@ -127,7 +127,7 @@ body.bookmarklet h1 {
     padding: 3px 10px;
     font-size: 12px;
 }
-.navbar .manage_user li a: hover {
+.navbar .manage_user li a:hover {
     background: rgba(48, 48, 48, 1);
     color: #fff;
 }

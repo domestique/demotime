@@ -281,21 +281,8 @@ h1.heading {
     position: relative;
 }
 .copy_link {
-    position: absolute;
-    left: -3px;
-    top: 33px;
-    margin: 0 !important;
-}
-@media screen and (max-width:680px) {
-    .copy_link {
-        position: relative;
-        top: 0;
-        left: 0;
-    }
-    .copy_link img {
-        width: 15px;
-        height: 15px;
-    }
+    margin-left: -20px;
+    cursor: pointer;
 }
 
 a[data-type="approved"] {

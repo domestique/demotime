@@ -15,7 +15,7 @@
     {% if reviews %}
         <ul>
             {% for demo in reviews %}
-                {% include "includes/reviews_li.html" with truncate='false' %}
+                {% include "includes/reviews_li.html" %}
             {% endfor %}
         </ul>
     {% else %}

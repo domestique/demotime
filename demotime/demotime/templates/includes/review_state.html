@@ -1,26 +1,41 @@
-{% if demo.state == "closed" %}
-    <small>{{ demo.state }}</small>
-{% elif demo.reviewing_count or demo.reviewing_count or demo.rejected_count %}
-    <span class="review_state has_bubble" data-prj="{{ demo.project.pk }}" data-pk="{{ demo.pk }}">
-        {% if demo.reviewer_state == "reviewing" %}
-            {% if demo.reviewing_count %}
-                <span class="icon icon-reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
-            {% endif %}
-            {% if demo.approved_count %}
-                <span class="icon icon-approved"><sup>{{ demo.approved_count }}</sup></span>
-            {% endif %}
-            {% if demo.rejected_count %}
-                <span class="icon icon-rejected"><sup>{{ demo.rejected_count }}</sup></span>
-            {% endif %}
-        {% else %}
+<div class="review_state">
+    {% if demo.state == "closed" %}
+        <small>{{ demo.state }}</small>
+    {% elif demo.reviewer_state == "approved" %}
+        <span class="icon icon-approved">
             <small>
-                {{ demo.reviewer_state }}
+                {{ demo.reviewer_state }}!
+                {% if demo.state == "open" and request.user.pk == user.pk %}
+                    <span style="margin-left: 3px;">please <a href="{{ demo.get_absolute_url }}">close this demo</a></span>
+                {% endif %}
             </small>
-        {% endif %}
-    </span>
-{% endif %}
-{% if demo.creator %}
-    <small>
-        <a href="{{ demo.creator.userprofile.get_absolute_url }}">({{ demo.creator.userprofile|truncatechars:15 }})</a>
-    </small>
-{% endif %}
+        </span>
+    {% elif demo.reviewing_count or demo.reviewing_count or demo.rejected_count %}
+        <span>
+            {% if demo.reviewer_state == "reviewing" %}
+                {% if demo.reviewing_count %}
+                    <span class="icon icon-reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
+                {% endif %}
+                {% if demo.approved_count %}
+                    <span class="icon icon-approved"><sup>{{ demo.approved_count }}</sup></span>
+                {% endif %}
+                {% if demo.rejected_count %}
+                    <span class="icon icon-rejected"><sup>{{ demo.rejected_count }}</sup></span>
+                {% endif %}
+            {% else %}
+                <small>
+                    {{ demo.reviewer_state }}
+                </small>
+            {% endif %}
+        </span>
+    {% endif %}
+    {% if demo.creator %}
+        <small>
+            {% if request.user != demo.creator %}
+                by <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}</a>
+            {% else %}
+                by you
+            {% endif %}
+        </small>
+    {% endif %}
+</div>

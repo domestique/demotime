@@ -161,20 +161,6 @@
         <script src="/static/scripts/library/clipboard.min.js"></script>
         <script>
             new Clipboard('.copy_link');
-            $('.copy_link').click(function(event) {
-                event.preventDefault();
-                var n = noty({
-                    text: 'Copied to clipboard!',
-                    type: 'success',
-                    timeout: 1500,
-                    animation: {
-                        open: 'animated flipInX',
-                        close: 'animated flipOutX',
-                        easing: 'swing', // easing
-                        speed: 250 // opening & closing animation speed
-                    },
-                });
-            });
         </script>
 
 

@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block styles %}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
 {{ block.super }}
 <style>
     section {
@@ -56,17 +57,6 @@
         height: auto;
         border: 1px solid #ddd;
         margin-bottom: 20px;
-    }
-    table {
-        background: #fff;
-        border: 1px solid #ddd;
-    }
-    th, td {
-        font-size: 14px;
-        vertical-align: top;
-        text-align: left;
-        padding: 8px;
-        border-bottom: 1px solid #ddd;
     }
 </style>
 {% endblock %}

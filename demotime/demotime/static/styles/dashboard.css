@@ -24,38 +24,41 @@
 }
 .dashboard section li {
     color: #ccc;
-    padding: 4px 0;
+    padding: 5px;
 }
 .dashboard section,
 .dashboard section a {
-    color:#fff;
+    color: #fff;
     font-weight: 200;
 }
 .dashboard li p:first-child {
     margin: 0;
 }
-.dashboard section strong a {
-    font-weight: 800;
+section .review_li a {
+    color: #ccc;
 }
-.dashboard .messages-list a,
-span.icon-Reviewing,
-span.icon-Reviewing a {
+section .messages-list a,
+section .review_li.open.approved a,
+section .review_li.Reviewing a {
+    font-weight: 800;
     color: #fff;
     font-weight: 400;
 }
-li.de-emphasize span,
-span.icon-Approved {
-    color: #999;
+section .review_li.de-emphasize {
+    opacity: 0.4
 }
-.dashboard .messages-list li.de-emphasize a,
-li.de-emphasize a,
-span.icon-Approved a {
-    font-weight: 200;
-    opacity: 0.4;
+section .review_li.de-emphasize * {
+    font-weight: 200 !important;
 }
-li.de-emphasize strong a {
-    font-weight: 400;
+
+/* Message center messages */
+li.de-emphasize {
+    opacity: 0.4
 }
+li.de-emphasize * {
+    font-weight: 200 !important;
+}
+
 
 .dashboard ul {
     list-style:none;
@@ -66,23 +69,23 @@ section.emph_high {
     background:rgba(48, 48, 48, 1);
 }
 section.emph_med {
-    background:rgba(48, 48, 48, .8);
+    background: rgba(48, 48, 48, .8);
 }
 section.emph_low {
-    background:rgba(48, 48, 48, .7);
+    background: rgba(48, 48, 48, .7);
 }
 section.emph_lower {
-    background:rgba(48, 48, 48, .6);
+    background: rgba(48, 48, 48, .6);
 }
 .dashboard section.done {
-    background-image:url(/static/images/done.png);
-    background-repeat:no-repeat;
-    background-size:10%;
-    background-position:50% 50%;
+    background-image: url(/static/images/done.png);
+    background-repeat: no-repeat;
+    background-size: 10%;
+    background-position: 50% 50%;
 }
 
 .state-highlight:before {
-    font-size:1.5em;
+    font-size: 1.5em;
 }
 .dashboard small {
     text-transform: uppercase;
@@ -96,28 +99,37 @@ section.emph_lower {
     font-weight: 800;
 }
 
+section li.review_li {
+    background: #444;
+    padding: 0;
+    margin: 8px 0;
+}
+section li.review_li:last-child {
+    margin-bottom: 0;
+}
+section .review_li-top {
+    background: #4f4f4f;
+    padding: 3px 8px;
+}
+section .review_li-bottom {
+    padding: 8px;
+}
+
 .dashboard .review_state {
     margin-left: 2px;
-}
-.dashboard .review_state .icon {
-    position: relative;
-    top: -2px;
+    white-space: nowrap;
+    display: inline-block;
 }
 .dashboard .icon sup {
     font-size: 9px;
     position: relative;
     left: -3px;
+    top: 1px;
 }
 
 .icon-Reviewing, .icon-reviewing {
     background: url(/static/images/emoji/clock.png) 0 50% no-repeat;
     background-size: 16px;
-}
-
-.copy_link img {
-    display: inline-block;
-    width: 13px;
-    height: 13px;
 }
 
 .legend {
@@ -126,4 +138,21 @@ section.emph_lower {
 .legend li span {
     color: #666;
     font-weight: 300;
+}
+
+table {
+    background: #fff;
+    border: 1px solid #ddd;
+}
+th, td {
+    font-size: 14px;
+    vertical-align: top;
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+.dashboard td small {
+    color: #555;
+    font-weight: 700;
+    white-space: nowrap;
 }
