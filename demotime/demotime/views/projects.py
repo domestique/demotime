@@ -154,8 +154,11 @@ class ProjectAdmin(CanViewMixin, TemplateView):
             # New Members
             members = member_fs.save(commit=False)
             for member in members:
-                member.project = self.project
-                member.save()
+                if not models.ProjectMember.objects.filter(
+                        user=member.user, project=self.project
+                ).exists():
+                    member.project = self.project
+                    member.save()
 
             # Edited Members
             edited_data = edit_member_fs.cleaned_data
@@ -176,8 +179,11 @@ class ProjectAdmin(CanViewMixin, TemplateView):
             # New Groups
             groups = group_fs.save(commit=False)
             for group in groups:
-                group.project = self.project
-                group.save()
+                if not models.ProjectGroup.objects.filter(
+                        group=group.group, project=self.project
+                ).exists():
+                    group.project = self.project
+                    group.save()
 
             edited_group_data = edit_group_fs.cleaned_data
             for group_data in edited_group_data:
