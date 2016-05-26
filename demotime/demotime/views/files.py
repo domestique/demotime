@@ -22,6 +22,7 @@ class UserMedia(CanViewMixin, View):
             models.Review,
             pk=pk,
         )
+        self.project = self.review.project
         return super(UserMedia, self).dispatch(*args, **kwargs)
 
     def get(self, request, file_path):
