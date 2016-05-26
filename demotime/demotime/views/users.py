@@ -124,6 +124,9 @@ class UserAPI(JsonView):
             reviewer__review=self.review,
         ).exclude(
             pk=self.review.creator.pk,
+        ).filter(
+            Q(projectmember__project=self.review.project) |
+            Q(groupmember__group__project=self.review.project)
         )
         if post_data.get('name'):
             users = self._filter_users_by_name(users, post_data['name'])
@@ -242,8 +245,13 @@ class UserAPI(JsonView):
             )
 
         users = self.default_user_list.exclude(
-            reviewer__review=self.review
-        ).exclude(pk=self.review.creator.pk)
+            reviewer__review=self.review,
+        ).exclude(
+            pk=self.review.creator.pk
+        ).filter(
+            Q(projectmember__project=self.review.project) |
+            Q(groupmember__group__project=self.review.project)
+        )
         if post_data.get('name'):
             users = self._filter_users_by_name(users, post_data['name'])
         return self._build_json(users, {})
