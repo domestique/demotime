@@ -87,6 +87,34 @@ class TestUserApiReviewers(BaseTestCase):
             }
         )
 
+    def test_find_reviewer_review_not_specified(self):
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_reviewer',
+            'user_pk': 1
+        })
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content), {
+            'users': [],
+            'errors': {'review': 'Find reviewer requires a Review PK'},
+            'success': False,
+        })
+
+    def test_find_reviewer_not_in_project(self):
+        # Remove all of our group members, so nobody's in the project
+        self.group.groupmember_set.all().delete()
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_reviewer',
+            'name': 'test_user',
+            'review_pk': self.review.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'users': [],
+            'errors': {},
+            'success': True,
+        })
+
     def test_add_reviewer(self):
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(self.review.reviewers.count(), 2)
@@ -301,18 +329,6 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertStatusCode(response, 400)
         self.assertEqual(self.review.reviewers.count(), 2)
 
-    def test_find_reviewer_review_not_specified(self):
-        response = self.client.post(reverse('user-api'), {
-            'action': 'find_reviewer',
-            'user_pk': 1
-        })
-        self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
-            'users': [],
-            'errors': {'review': 'Find reviewer requires a Review PK'},
-            'success': False,
-        })
-
 
 class TestUserApiFollowers(BaseTestCase):
     ''' Tests for the Followers functionality of the User API '''
@@ -377,6 +393,22 @@ class TestUserApiFollowers(BaseTestCase):
                 'errors': {}
             }
         )
+
+    def test_find_follower_not_in_project(self):
+        # Drop all members/groups from the project
+        self.group.groupmember_set.all().delete()
+        response = self.client.post(reverse('user-api'), {
+            'action': 'find_follower',
+            'name': 'test_user',
+            'review_pk': self.review.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data, {
+            'users': [],
+            'errors': {},
+            'success': True,
+        })
 
     def test_add_follower(self):
         self.assertEqual(len(mail.outbox), 0)

@@ -132,6 +132,22 @@ class TestProjectViews(BaseTestCase):
         self.assertTrue(pg_one.is_admin)
         self.assertFalse(pg_two.is_admin)
 
+    def test_add_existing_group_does_nothing(self):
+        self.assertEqual(models.ProjectGroup.objects.filter(
+            project=self.project, group=self.group).count(),
+            1
+        )
+        self.post_data.update({
+            'add_group-0-group': self.group.pk,
+            'add_group-0-is_admin': True,
+        })
+        response = self.client.post(self.admin_url, self.post_data)
+        self.assertStatusCode(response, 302)
+        self.assertEqual(models.ProjectGroup.objects.filter(
+            project=self.project, group=self.group).count(),
+            1
+        )
+
     def test_edit_and_delete_groups(self):
         group_type = models.GroupType.objects.get()
         group_to_delete = models.Group.objects.create(
@@ -212,6 +228,26 @@ class TestProjectViews(BaseTestCase):
         )
         self.assertTrue(pm_one.is_admin)
         self.assertFalse(pm_two.is_admin)
+
+    def test_add_existing_member_does_nothing(self):
+        pm, _ = models.ProjectMember.objects.get_or_create(
+            user=self.user,
+            project=self.project
+        )
+        self.assertEqual(models.ProjectMember.objects.filter(
+            project=self.project, user=pm.user).count(),
+            1
+        )
+        self.post_data.update({
+            'add_member-0-user': pm.user.pk,
+            'add_member-0-is_admin': pm.is_admin
+        })
+        response = self.client.post(self.admin_url, self.post_data)
+        self.assertStatusCode(response, 302)
+        self.assertEqual(models.ProjectMember.objects.filter(
+            project=self.project, user=pm.user).count(),
+            1
+        )
 
     def test_edit_and_delete_members(self):
         user_one, user_two, user_three = self.test_users
