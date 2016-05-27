@@ -3,29 +3,32 @@
 <h3 class="icon icon-calendar">
     {% if request.user.pk == user.pk %}
         Active Demos You've Created
-        <small>
-            <a href="{% url 'review-list' %}?creator={{ user.pk }}">View all</a>
-        </small>
+        {% if reviews %}
+            <small>
+                <a href="{% url 'review-list' %}?creator={{ user.pk }}" class="normal_text">View all</a>
+            </small>
+        {% endif %}
     {% else %}
         Demos {{ user.userprofile }} has created
     {% endif %}
 </h3>
 
-<section class="emph_low">
-    {% if reviews %}
-        <ul>
-            {% for demo in reviews %}
-                {% include "includes/reviews_li.html" %}
-            {% endfor %}
-        </ul>
-    {% else %}
-        <ul>
-            <li>
-                You have no active demos.
-            </li>
-            <li>
-                <a class="icon icon-plus" href="#" onclick="javascript:$('.new_demo .new_demo_link').trigger('click');">New demo</a>
-            </li>
-        </ul>
-    {% endif %}
-</section>
+{% if reviews %}
+    <ul>
+        {% for demo in reviews %}
+            {% include "includes/reviews_li.html" %}
+        {% endfor %}
+    </ul>
+{% else %}
+    <ul>
+        <li>
+            There are none to show here
+            <small>
+                <a href="{% url 'review-list' %}?creator={{ user.pk }}" class="normal_text">View your demos</a>
+            </small>
+        </li>
+        <li>
+            <a class="icon icon-plus" href="#" onclick="javascript:$('.new_demo .new_demo_link').trigger('click');">New demo</a>
+        </li>
+    </ul>
+{% endif %}

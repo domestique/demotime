@@ -21,43 +21,49 @@
 </h1>
 
 <div class="dashboard">
-    <div class="split~680 by:2 with-gap:2 dashboard-upper">
-        <div class="cel">
-            {% include "includes/reviews_box.html" with reviews=open_reviews follows=followed_demos user=request.user %}
-        </div>
-        <div class="cel">
-            {% include "includes/updates_box.html" with message_bundles=message_bundles user=request.user %}
-        </div>
-    </div>
-    <div class="split~680 by:3/1 with-gap:2 dashboard-lower">
-        <div class="cel">
-            {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
-        </div>
-        <div class="cel">
-            <h3>
-                Projects you're a member of
-                <span class="help" title="A Project consists of one or more demos.
-                    Think of it as a group of demos that all have something in common.
-                    Projects are a way of organizing demos."></span>
-            </h3>
-            <section class="emph_lower">
-                <ul>
-                    {% if available_projects %}
-                        {% for project in available_projects %}
-                            <li><a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a></li>
-                        {% endfor %}
-                    {% else %}
-                        <li>You aren't a member of any projects</li>
-                    {% endif %}
-                    {% if request.user.is_superuser %}
-                        <li>
-                            <a class="icon icon-plus" href="{% url 'project-create' %}">New project</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </section>
-        </div>
-    </div>
+    <article>
+        <h3>
+            Items requiring your attention
+            <span class="help" title="Your dashboard of action items are here. Below you will
+            see demos that you are following or reviewing. You will also see unread messages and
+            demos you've created, if they exist."></span>
+        </h3>
+        <section class="aggregated_dashboard emph_med">
+            {% if open_reviews or followed_demos %}
+                <div class="aggregated_dashboard-assigned">
+                    {% include "includes/reviews_box.html" with reviews=open_reviews follows=followed_demos user=request.user %}
+                </div>
+            {% endif %}
+            <div class="aggregated_dashboard-messages">
+                {% include "includes/updates_box.html" with message_bundles=message_bundles user=request.user %}
+            </div>
+            <div class="aggregated_dashboard-created">
+                {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
+            </div>
+        </section>
+        <h3>
+            Projects you're a member of
+            <span class="help" title="A Project consists of one or more demos.
+                Think of it as a group of demos that all have something in common.
+                Projects are a way of organizing demos."></span>
+        </h3>
+        <section class="emph_lower" style="margin-bottom: 0">
+            <ul>
+                {% if available_projects %}
+                    {% for project in available_projects %}
+                        <li><a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a></li>
+                    {% endfor %}
+                {% else %}
+                    <li>You aren't a member of any projects</li>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                    <li>
+                        <a class="icon icon-plus" href="{% url 'project-create' %}">New project</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </section>
+    </article>
     {% include "includes/legend.html" %}
 </div>
 

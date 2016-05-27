@@ -16,22 +16,20 @@
         follow their progress."></span>
 </h3>
 
-<section class="emph_high {% if not reviews and not follows %}done{% endif %}">
-    <ul>
-        {% if reviews and follows %}
-            <li>Reviewing:</li>
+<ul>
+    {% if reviews and follows %}
+        <li>Reviewing:</li>
+    {% endif %}
+    {% for demo in reviews %}
+        {% include "includes/reviews_li.html" %}
+        {% if follows and forloop.last %}
+            <li></li>
         {% endif %}
-        {% for demo in reviews %}
+    {% endfor %}
+    {% if follows %}
+        <li>Following:</li>
+        {% for demo in follows %}
             {% include "includes/reviews_li.html" %}
-            {% if follows and forloop.last %}
-                <li></li>
-            {% endif %}
         {% endfor %}
-        {% if follows %}
-            <li>Following:</li>
-            {% for demo in follows %}
-                {% include "includes/reviews_li.html" %}
-            {% endfor %}
-        {% endif %}
-    </ul>
-</section>
+    {% endif %}
+</ul>

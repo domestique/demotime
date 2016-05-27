@@ -1,22 +1,24 @@
 {% load demo_tags %}
 
 <h3 class="icon icon-inbox">
-    {% if request.user.pk == user.pk %}
-        Your
-    {% else %}
-        {{ user }}'s
+    Unread messages
+    {% if request.user.pk == user.pk and message_bundles %}
+        <small><a href="{% url 'inbox' %}" class="normal_text">view all</a></small>
     {% endif %}
-    <a href="{% url 'inbox' %}" class="normal_text">inbox</a>
-    <span class="help" title="Here is a list of reviews that have been
-        recently updated. Click a title to view the message bundle and recent
-        updates. Click the DT-XX link to jump in to the demo itself."></span>
 </h3>
 
-<section class="emph_med {% if not message_bundles %}done{% endif %}">
-    <div class="messages-list">
-        <ul>
+<div class="messages-list">
+    <ul>
+        {% if not message_bundles %}
+            <li>
+                No unread messages.
+                <small>
+                    <a href="{% url 'inbox' %}">View your inbox</a>
+                </small>
+            </li>
+        {% else %}
             {% for message in message_bundles %}
-                <li class="{% if message.read %}de-emphasize{% endif %}">
+                <li class="message_li {% if message.read %}de-emphasize{% endif %}">
                     {% if message.review %}
                         {% if message.review.creator != request.user %}
                             <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" title="Your approval status" class="has_bubble dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
@@ -28,6 +30,6 @@
                     {% include "includes/review_state.html" with demo=message.review %}
                 </li>
             {% endfor %}
-        </ul>
-    </div>
-</section>
+        {% endif %}
+    </ul>
+</div>

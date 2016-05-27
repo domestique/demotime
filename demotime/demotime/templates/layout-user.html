@@ -27,7 +27,7 @@
                                 {% endif %}
                             {% endfor %}
                             {% if request.user.is_superuser %}
-                                <option value="{% url 'project-create' %}">New project</option>
+                                <option value="{% url 'project-create' %}">+ Create New project</option>
                             {% endif %}
                         </select>
                         <a class="subnav-item new_demo_link icon icon-plus" href="#">New</a>

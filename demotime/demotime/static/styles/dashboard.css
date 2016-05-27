@@ -11,16 +11,12 @@
 .dashboard section {
     padding:10px;
 }
-.dashboard-upper section {
-    min-height:190px;
+.content .dashboard article section h3 {
+    font-size: 16px;
+    color: #eee;
 }
-.dashboard-lower section {
-    min-height: 70px;
-}
-@media screen and (max-width:375px) {
-    .dashboard-upper section {
-        min-height:0;
-    }
+.content section > div:not(:first-child) {
+    margin-top: 25px;
 }
 .dashboard section li {
     color: #ccc;
@@ -37,12 +33,14 @@
 section .review_li a {
     color: #ccc;
 }
-section .messages-list a,
+section .messages-list .message_li a,
 section .review_li.open.approved a,
 section .review_li.Reviewing a {
-    font-weight: 800;
     color: #fff;
     font-weight: 400;
+}
+.messages-list .de-emphasize .icon-mail:before {
+    display: none;
 }
 section .review_li.de-emphasize {
     opacity: 0.4
@@ -57,6 +55,10 @@ li.de-emphasize {
 }
 li.de-emphasize * {
     font-weight: 200 !important;
+}
+
+.aggregated_dashboard-assigned .Approved {
+    display: none;
 }
 
 
@@ -100,7 +102,7 @@ section.emph_lower {
 }
 
 section li.review_li {
-    background: #444;
+    background: #3f3f3f;
     padding: 0;
     margin: 8px 0;
 }
@@ -108,7 +110,7 @@ section li.review_li:last-child {
     margin-bottom: 0;
 }
 section .review_li-top {
-    background: #4f4f4f;
+    background: #2a2a2a;
     padding: 3px 8px;
 }
 section .review_li-bottom {
@@ -116,7 +118,7 @@ section .review_li-bottom {
 }
 
 .dashboard .review_state {
-    margin-left: 2px;
+    margin-left: 10px;
     white-space: nowrap;
     display: inline-block;
 }

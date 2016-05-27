@@ -1,19 +1,22 @@
 {% load demo_tags %}
-<li class="review_li {% if request.user.pk == user.pk %}{% reviewer_status demo user %} {{ demo.state }} {{ demo.reviewer_state }}{% endif %}">
-    <div class="review_li-top">
-        <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
-            <a class="has_bubble"
-               data-prj="{{ demo.project.pk }}"
-               data-pk="{{ demo.pk }}"
-               href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>:
 
-            {% include "includes/review_state.html" %}
+{% if demo.reviewer_state != "Approved" %}
+    <li class="review_li {% if request.user.pk == user.pk %}{% reviewer_status demo user %} {{ demo.state }} {{ demo.reviewer_state }}{% endif %}">
+        <div class="review_li-top">
+            <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
+                <a class="has_bubble"
+                data-prj="{{ demo.project.pk }}"
+                data-pk="{{ demo.pk }}"
+                href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>
 
-        </span>
-    </div>
-    <div class="review_li-bottom">
-        <a href="{{ demo.get_absolute_url }}">
-            {{ demo.title }}
-        </a>
-    </div>
-</li>
+                {% include "includes/review_state.html" %}
+
+            </span>
+        </div>
+        <div class="review_li-bottom">
+            <a href="{{ demo.get_absolute_url }}">
+                {{ demo.title }}
+            </a>
+        </div>
+    </li>
+{% endif %}
