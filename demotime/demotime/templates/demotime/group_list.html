@@ -11,7 +11,7 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <div class="container">
-        <a href="{% url 'index' %}">Your dashboard</a> &gt; Groups
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Groups and Group Types
     </div>
 </div>
 {% endblock %}
@@ -44,7 +44,6 @@
     table li.admin {
         color: #666;
         font-weight: 500;
-        cursor: pointer;
     }
     th small {
         color: #777;
@@ -55,16 +54,22 @@
 
 {% block content %}
     <h1 class="heading">
-        Groups
-        <span class="help" title="TODO"></span>
+        Groups and Group Types
     </h1>
     <section>
+        <h3 class="heading">
+            Groups
+            <span class="help" title="Groups are simply collections of DemoTime users. Administrators
+            may opt to organize their users in to groups to better organize, for instance, developers,
+            designers, product managers and so forth. Groups are global to DemoTime, and can be
+            attached to projects. For instance, a developer group can be assigned to many projects."></span>
+        </h3>
         <table id="results" cellspacing="0" cellpadding="0" width="100%">
             {% if object_list %}
                 <thead>
                     <tr>
                         <th width="25%">Name</th>
-                        <th>Members <small>(<strong>bold</strong> denotes admins)</small></th>
+                        <th>Members <small>(<strong class="icon icon-star">star</strong> denotes admins)</small></th>
                     </tr>
                 </thead>
                 {% for obj in object_list %}
@@ -75,13 +80,12 @@
                         </td>
                         <td>
                             {% for member in obj.groupmember_set.all %}
-                                <li {% if member.is_admin %}class="admin" title="administrator"{% endif %}>
+                                <li {% if member.is_admin %}class="admin icon icon-star" title="administrator"{% endif %}>
                                     {{ member.user.userprofile.name }}
                                 </li>
                             {% endfor %}
                             <small>
-                                <a class="icon icon-user" href="{% url 'group-manage-admins' obj.slug %}">Manage admins</a>
-
+                                <a href="{% url 'group-manage-admins' obj.slug %}">Manage admins</a>
                             </small>
                         </td>
                     </tr>

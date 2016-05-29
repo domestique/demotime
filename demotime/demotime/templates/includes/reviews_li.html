@@ -1,9 +1,9 @@
 {% load demo_tags %}
 
 {% if demo.reviewer_state != "Approved" %}
-    <li class="review_li {% if request.user.pk == user.pk %}{% reviewer_status demo user %} {{ demo.state }} {{ demo.reviewer_state }}{% endif %}">
+    <li class="review_li {% reviewer_status demo user %} {{ demo.state }} {{ demo.reviewer_state }}">
         <div class="review_li-top">
-            <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
+            <span class="icon-{% reviewer_status demo user %}">
                 <a class="has_bubble"
                 data-prj="{{ demo.project.pk }}"
                 data-pk="{{ demo.pk }}"

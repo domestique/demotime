@@ -6,32 +6,32 @@
 .icon-document:before { content: '\e801'; } /* '' */
 
 a.button-link {
-    background:#32CCAE;
-    box-shadow:4px 4px 0 #ccc;
-    padding:5px 8px;
-    display:inline-block;
-    color:#fff;
+    background: #32CCAE;
+    box-shadow: 4px 4px 0 #ccc;
+    padding: 5px 8px;
+    display: inline-block;
+    color: #fff;
 }
 a.button-link:hover {
-    text-decoration:none;
+    text-decoration: none;
 }
 .subnav a.subnav-item.alert {
-    background:#E03743;
+    background: #E03743;
     color: #fff;
 }
 .subnav a.subnav-item.confirm {
-    background:#335166;
+    background: #115745;
     color: #fff;
 }
 
 .review-attachments {
-    overflow:hidden;
+    overflow: hidden;
 }
 .attachment h4 {
-    margin-top:3em;
+    margin-top: 3em;
 }
 .attachment h4:first-child {
-    margin-top:0;
+    margin-top: 0;
 }
 .attachment-description {
     background: #eee;
@@ -44,7 +44,7 @@ a.button-link:hover {
     background: #666;
 }
 .attachment-card {
-    margin:10px;
+    margin: 10px;
 }
 .attachment-card section {
     min-height: 250px;
@@ -73,18 +73,18 @@ a.button-link:hover {
     max-width: 100%;
 }
 .attachment-card.audio {
-    width:100%;
-    height:auto;
+    width: 100%;
+    height: auto;
 }
 .attachment-card img {
-    width:auto;
-    max-width:100%;
-    height:auto;
-    max-height:200px;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 200px;
     margin: 0 auto;
 }
 .attachment-card .attachment-image {
-    position:relative;
+    position: relative;
     display: block;
     text-align: center;
 }
@@ -94,82 +94,82 @@ a.button-link:hover {
 }
 
 .summary a {
-    font-size:0.8em;
+    font-size: 0.8em;
 }
 .toggled_text {
-    display:none;
+    display: none;
 }
 
 .attachments {
     overflow: hidden;
 }
 .attachments section {
-    padding:1em;
+    padding: 1em;
 }
 .attachments label {
     font-size: 16px;
-    margin:0 0 10px;
+    margin: 0 0 10px;
 }
 .attachments input[type="text"] {
-    height:1.5rem;
+    height: 1.5rem;
 }
 
 .help {
-    display:inline-block;
-    width:12px;
-    height:12px;
-    background:url(/static/images/emoji/question.png) 0 0 no-repeat;
-    background-size:100%;
-    position:relative;
-    top:-2px;
-    left:1px;
-    cursor:pointer;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: url(/static/images/emoji/question.png) 0 0 no-repeat;
+    background-size: 100%;
+    position: relative;
+    top: -2px;
+    left: 1px;
+    cursor: pointer;
 }
 .help.alert {
-    background:url(/static/images/help_alt.png) 0 0 no-repeat;
-    background-size:100%;
+    background: url(/static/images/help_alt.png) 0 0 no-repeat;
+    background-size: 100%;
 }
 
 @media screen and (max-width:680px) {
     main [class~='split~680']>.cel {
-        margin-bottom:1.5em;
+        margin-bottom: 1.5em;
     }
 }
 
 .state-highlight:before {
-    transition:1s;
-    background:#E03743;
-    padding:2px;
+    transition: 1s;
+    background: #E03743;
+    padding: 2px;
 }
 
 .content h1:not(.heading) {
-    background:none;
-    color:#333;
-    padding:0;
-    box-shadow:none;
+    background: none;
+    color: #333;
+    padding: 0;
+    box-shadow: none;
 }
 .content section h1:not(.heading),
 .content section h2:not(.heading),
 .content section h3:not(.heading),
 .content section h4:not(.heading),
 .content section h5:not(.heading) {
-    text-transform:none;
-    margin:10px 0;
+    text-transform: none;
+    margin: 10px 0;
 }
 .content section h2:not(.heading) {
-    font-size:1.8em;
+    font-size: 1.8em;
 }
 .content section h3:not(.heading) {
-    font-size:1.7em;
+    font-size: 1.7em;
 }
 .content section h4:not(.heading) {
-    font-size:1.6em;
+    font-size: 1.6em;
 }
 .content section h5:not(.heading) {
-    font-size:1.4em;
+    font-size: 1.4em;
 }
 .content section h2 {
-    font-size:2em;
+    font-size: 2em;
 }
 
 .sweet-alert ul {
@@ -178,7 +178,7 @@ a.button-link:hover {
     padding: 0;
 }
 h3 small {
-    color:#aaa;
+    color: #aaa;
     margin-left: 10px;
 }
 

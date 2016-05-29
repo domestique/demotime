@@ -50,7 +50,8 @@
                         {% endif %}
                     </strong>
                     project.
-                    <span class="help" title="TODO"></span>
+                    <span class="help" title="Public projects are viewable to the outside world.
+                    Private projects require a DemoTime membership."></span>
                 </li>
             </ul>
         </section>
@@ -58,10 +59,11 @@
     <div class="cel">
         <h3 class="icon icon-cloud">
             Project groups
-            <span class="help" title="A Project consists of one or more demos.
-                The demos that you have created that are part of '{{ object.name }}'
-                with recent updates (new comments, approval state changes,
-                new revisions, etc) will appear here."></span>
+            <span class="help" title="Groups are simply collections of DemoTime users.
+            Developers, designers, product managers and so forth could be considered groups.
+            Groups are global to DemoTime, and can be attached to projects. For instance,
+            the developer group can be assigned to many projects. Below are the groups
+            associated with this project."></span>
             {% if request.user.is_superuser %}
                 <small>
                     <a href="{% url 'group-list' %}">Manage groups</a>
@@ -72,18 +74,24 @@
             <ul>
                 {% if object.projectgroup_set.count %}
                     {% for group in object.projectgroup_set.all %}
-                        <li>{{ group.group.name }} {% if group.is_admin %}<small>admin</small>{% endif %}</li>
+                        <li>
+                            {{ group.group.name }} {% if group.is_admin %}<small>admin</small>{% endif %}
+                        </li>
                     {% endfor %}
                 {% else %}
                     <li>This project has no groups</li>
                 {% endif %}
-                <li><a class="icon icon-plus" href="{% url 'project-admin' object.slug %}#groups">add groups</a></li>
+                <li><a class="icon icon-plus" href="{% url 'project-admin' object.slug %}#groups">add/remove groups</a></li>
             </ul>
         </section>
     </div>
     <div class="cel">
         <h3 class="icon icon-user">
             Project members
+            <span class="help" title="Below are the members of this project.
+            A person as an individual can be assigned to a project. If a person
+            is part of a group that is assigned to a project, that person would
+            also be part of the project."></span>
         </h3>
         <section class="emph_low">
             <ul>
@@ -101,7 +109,7 @@
                 {% endif %}
                 {% if request.user.is_superuser %}
                     <li>
-                        <a class="icon icon-plus" href="{% url 'project-admin' object.slug %}#members">add members</a>
+                        <a class="icon icon-plus" href="{% url 'project-admin' object.slug %}#members">add/remove members</a>
                     </li>
                 {% endif %}
             </ul>
