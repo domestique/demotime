@@ -99,6 +99,7 @@ class ProjectAdmin(CanViewMixin, TemplateView):
         context['member_formset'] = self.member_formset(
             queryset=models.ProjectMember.objects.none(),
             prefix='add_member',
+            form_kwargs={'project': self.project},
         )
         context['edit_member_formset'] = self.edit_member_formset(
             queryset=models.ProjectMember.objects.filter(project=self.project),
@@ -107,6 +108,7 @@ class ProjectAdmin(CanViewMixin, TemplateView):
         context['group_formset'] = self.group_formset(
             queryset=models.ProjectGroup.objects.none(),
             prefix='add_group',
+            form_kwargs={'project': self.project},
         )
         context['edit_group_formset'] = self.edit_group_formset(
             queryset=models.ProjectGroup.objects.filter(project=self.project),
@@ -120,6 +122,7 @@ class ProjectAdmin(CanViewMixin, TemplateView):
             queryset=models.ProjectMember.objects.none(),
             data=request.POST,
             prefix='add_member',
+            form_kwargs={'project': self.project},
         )
         edit_member_fs = self.edit_member_formset(
             queryset=models.ProjectMember.objects.filter(project=self.project),
@@ -130,6 +133,7 @@ class ProjectAdmin(CanViewMixin, TemplateView):
             queryset=models.ProjectGroup.objects.none(),
             data=request.POST,
             prefix='add_group',
+            form_kwargs={'project': self.project},
         )
         edit_group_fs = self.edit_group_formset(
             queryset=models.ProjectGroup.objects.filter(project=self.project),

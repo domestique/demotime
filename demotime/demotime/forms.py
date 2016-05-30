@@ -265,6 +265,17 @@ class UpdateCommentForm(CommentForm, AttachmentForm):
 
 class ProjectMemberForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)
+        if project:
+            self.base_fields['user'].queryset = User.objects.exclude(
+                userprofile__user_type=models.UserProfile.SYSTEM,
+            ).exclude(
+                projectmember__project=project
+            ).order_by('username')
+
+        return super(ProjectMemberForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = models.ProjectMember
         fields = (
@@ -284,6 +295,15 @@ class EditProjectMemberForm(forms.ModelForm):
 
 
 class ProjectGroupForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)
+        if project:
+            self.base_fields['group'].queryset = models.Group.objects.exclude(
+                projectgroup__project=project
+            ).order_by('name')
+
+        return super(ProjectGroupForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = models.ProjectGroup

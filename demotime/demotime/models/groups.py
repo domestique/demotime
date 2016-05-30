@@ -17,6 +17,9 @@ class GroupType(BaseModel):
             name=name, slug=slug
         )
 
+    class Meta:
+        ordering = ('name',)
+
 
 class Group(BaseModel):
 
@@ -46,6 +49,9 @@ class Group(BaseModel):
             )
         return obj
 
+    class Meta:
+        ordering = ('name',)
+
 
 class GroupMember(BaseModel):
 
@@ -71,3 +77,4 @@ class GroupMember(BaseModel):
 
     class Meta:
         unique_together = ('user', 'group')
+        ordering = ('user__username',)
