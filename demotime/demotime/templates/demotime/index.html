@@ -29,30 +29,32 @@
             demos you've created, if they exist."></span>
         </h3>
         <section class="aggregated_dashboard emph_med">
-            {% if open_reviews or followed_demos %}
-                <div class="aggregated_dashboard-assigned">
+            {% if open_reviews %}
+                <div class="aggregated_dashboard-reviewing">
                     <h3 class="icon icon-inbox">
-                        Open Reviews Following/Assigned to You
-                        <span class="help" title="Reviews are demos that have been assigned
-                            to you to review. You can leave feedback and ultimately approve or
-                            reject a demo. Your approval status appears to the left. Reviews you
-                            are following do not require your approval and you can simply
-                            follow their progress."></span>
+                        Open demos assigned to you
+                        <span class="help" title="These are demos that have been assigned
+                        to you to review. You can leave feedback and ultimately approve or
+                        reject a demo. Your approval status appears to the left."></span>
                     </h3>
-
                     <ul>
-                        {% if open_reviews %}
-                            <li>Reviewing:</li>
-                        {% endif %}
                         {% for demo in open_reviews %}
                             {% include "includes/reviews_li.html" %}
                         {% endfor %}
-                        {% if followed_demos %}
-                            <li>Following:</li>
-                            {% for demo in followed_demos %}
-                                {% include "includes/reviews_li.html" %}
-                            {% endfor %}
-                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if followed_demos %}
+                <div class="aggregated_dashboard-following">
+                    <h3 class="icon icon-inbox">
+                        Open demos you're following
+                        <span class="help" title="Demos you are following do not require any
+                        action on your part. You can simply follow their progress."></span>
+                    </h3>
+                    <ul>
+                        {% for demo in followed_demos %}
+                            {% include "includes/reviews_li.html" %}
+                        {% endfor %}
                     </ul>
                 </div>
             {% endif %}
