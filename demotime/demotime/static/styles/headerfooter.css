@@ -156,7 +156,6 @@ nav.subnav {
     background: #32CCAE;
     margin-top: 0px;
     padding: 8px 0;
-    text-align: right;
 }
 @media screen and (max-width: 940px) {
     nav.subnav {

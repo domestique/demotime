@@ -317,3 +317,11 @@ h3 small {
 .dashboard .quickfind a {
     color: #222;
 }
+
+.game {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 10px;
+    display: inline-block;
+    margin-right: 3px;
+}

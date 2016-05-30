@@ -1,6 +1,10 @@
 {% extends 'layout-user.html' %}
 {% block title %}Project {{ object.name }} Administration{% endblock %}
 
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Cancel</a></li>
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <div class="container">

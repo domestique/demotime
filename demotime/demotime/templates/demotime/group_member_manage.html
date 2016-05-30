@@ -1,12 +1,8 @@
 {% extends 'layout-user.html' %}
 {% block title %}{{ group.name }} Admins{% endblock %}
 
-{% block sub_nav %}
-<nav class="subnav">
-    <div class="container left">
-        <a class="icon icon-left-dir" href="javascript:history.back()">Go back</a>
-    </div>
-</nav>
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Cancel</a></li>
 {% endblock %}
 
 {% block breadcrumbs %}

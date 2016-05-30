@@ -1,11 +1,7 @@
 {% extends 'layout-user.html' %}
 
-{% block sub_nav %}
-<nav class="subnav">
-    <div class="container left">
-        <a class="icon icon-left-dir" href="javascript:history.back()">Go back</a>
-    </div>
-</nav>
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Go back</a></li>
 {% endblock %}
 
 {% block breadcrumbs %}
