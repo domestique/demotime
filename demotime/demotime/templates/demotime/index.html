@@ -47,7 +47,7 @@
                         {% for demo in open_reviews %}
                             {% include "includes/reviews_li.html" %}
                         {% endfor %}
-                        {% if follows %}
+                        {% if followed_demos %}
                             <li>Following:</li>
                             {% for demo in followed_demos %}
                                 {% include "includes/reviews_li.html" %}
