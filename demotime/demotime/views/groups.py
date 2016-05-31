@@ -52,6 +52,13 @@ class GroupEditView(CanViewMixin, TemplateView):
         self.form = forms.GroupForm(instance=self.group, data=request.POST)
         if self.form.is_valid():
             group = self.form.save(commit=False)
+            # We're not leveraging Group Types yet, but will in the future. For
+            # now we're going to auto assign the default group type, we'll yank
+            # this shim later when group types become more of a thing.
+            if not group.group_type_id:
+                group.group_type = models.GroupType.objects.get(
+                    slug='default-group-type'
+                )
             group.save()
             members = self.form.cleaned_data['members']
             models.GroupMember.objects.filter(
