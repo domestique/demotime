@@ -1,6 +1,7 @@
 import json
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 from demotime import constants, models
 from demotime.tests import BaseTestCase
@@ -67,6 +68,11 @@ class TestProjectViews(BaseTestCase):
         self.assertStatusCode(response, 200)
 
     def test_project_edit_view(self):
+        models.Group.objects.create(
+            name='Spare Group',
+            slug='spare-group',
+            group_type=models.GroupType.objects.get()
+        )
         response = self.client.get(self.admin_url)
         self.assertStatusCode(response, 200)
         context = response.context
@@ -77,6 +83,24 @@ class TestProjectViews(BaseTestCase):
         ]
         for form in forms:
             self.assertIn(form, context)
+
+        member_formset = context['member_formset']
+        group_formset = context['group_formset']
+        # Should be 6 members available as nobody has direct membership in the
+        # current test suite. 4 test users, 2 followers
+        self.assertQuerysetEqual(
+            member_formset.form.base_fields['user'].queryset,
+            map(repr, User.objects.exclude(
+                userprofile__user_type=models.UserProfile.SYSTEM
+            ).order_by('username'))
+        )
+        self.assertQuerysetEqual(
+            group_formset.form.base_fields['group'].queryset,
+            map(
+                repr,
+                models.Group.objects.filter(slug='spare-group')
+            )
+        )
 
     def test_edit_project(self):
         is_public = not self.project.is_public

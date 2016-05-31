@@ -337,7 +337,7 @@ class GroupForm(forms.ModelForm):
     class Meta:
         model = models.Group
         fields = (
-            'name', 'slug', 'description', 'group_type', 'members'
+            'name', 'slug', 'description', 'members'
         )
 
 
