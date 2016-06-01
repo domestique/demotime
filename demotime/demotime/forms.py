@@ -13,7 +13,7 @@ class ReviewForm(forms.ModelForm):
         self.fields['followers'].queryset = self.project.members
         self.fields['followers'].required = False
 
-        for key, value in self.fields.iteritems():
+        for key, value in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
         if self.instance.pk:
@@ -77,7 +77,7 @@ class ReviewFilterForm(forms.Form):
     def __init__(self, projects, *args, **kwargs):
         super(ReviewFilterForm, self).__init__(*args, **kwargs)
         self.projects = projects
-        for key, value in self.fields.iteritems():
+        for key, value in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     def get_reviews(self, initial_qs=None):
@@ -134,7 +134,7 @@ class CommentForm(forms.ModelForm):
             )
             self.fields['thread'].required = True
 
-        for key, value in self.fields.iteritems():
+        for key, value in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     class Meta:

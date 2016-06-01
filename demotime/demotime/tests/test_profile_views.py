@@ -50,12 +50,13 @@ class TestProfileViews(BaseTestCase):
         self.assertStatusCode(response, 404)
 
     def test_update_profile_without_password(self):
-        response = self.client.post(self.edit_url, {
-            'avatar': open(self.image_path),
-            'bio': 'Test Bio',
-            'display_name': 'Display Name',
-            'email': 'new_email@example.org',
-        })
+        with open(self.image_path, 'rb') as img_file:
+            response = self.client.post(self.edit_url, {
+                'avatar': img_file,
+                'bio': 'Test Bio',
+                'display_name': 'Display Name',
+                'email': 'new_email@example.org',
+            })
         self.assertStatusCode(response, 302)
         profile = models.UserProfile.objects.get(user=self.user)
         self.assertEqual(profile.bio, 'Test Bio')
@@ -63,14 +64,15 @@ class TestProfileViews(BaseTestCase):
         self.assertEqual(profile.user.email, 'new_email@example.org')
 
     def test_update_profile_with_password(self):
-        response = self.client.post(self.edit_url, {
-            'avatar': open(self.image_path),
-            'bio': 'Test Bio',
-            'display_name': 'Display Name',
-            'email': 'new_email@example.org',
-            'password_one': 'testing2',
-            'password_two': 'testing2'
-        })
+        with open(self.image_path, 'rb') as img_file:
+            response = self.client.post(self.edit_url, {
+                'avatar': img_file,
+                'bio': 'Test Bio',
+                'display_name': 'Display Name',
+                'email': 'new_email@example.org',
+                'password_one': 'testing2',
+                'password_two': 'testing2'
+            })
         self.assertStatusCode(response, 302)
         profile = models.UserProfile.objects.get(user=self.user)
         self.assertEqual(profile.bio, 'Test Bio')

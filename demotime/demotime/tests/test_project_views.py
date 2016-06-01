@@ -316,7 +316,7 @@ class TestProjectViews(BaseTestCase):
             'name': 'default',
         })
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
             'projects': [{
@@ -334,7 +334,7 @@ class TestProjectViews(BaseTestCase):
             'name': 'default',
         })
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
             'projects': [{
@@ -350,7 +350,7 @@ class TestProjectViews(BaseTestCase):
     def test_project_json_view_search_without_name_get(self):
         response = self.client.get(reverse('project-json'))
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
             'projects': [{
@@ -366,7 +366,7 @@ class TestProjectViews(BaseTestCase):
     def test_project_json_view_search_without_name_post(self):
         response = self.client.post(reverse('project-json'))
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
             'projects': [{
@@ -384,7 +384,7 @@ class TestProjectViews(BaseTestCase):
         models.ProjectMember.objects.all().delete()
         response = self.client.get(reverse('project-json'))
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'count': 0, 'projects': []
         })
 
@@ -393,6 +393,6 @@ class TestProjectViews(BaseTestCase):
         models.ProjectMember.objects.all().delete()
         response = self.client.post(reverse('project-json'))
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'count': 0, 'projects': []
         })

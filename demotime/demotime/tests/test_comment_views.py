@@ -1,5 +1,5 @@
 import json
-from StringIO import StringIO
+from io import StringIO
 
 from django.core import mail
 from django.core.urlresolvers import reverse
@@ -23,7 +23,7 @@ class TestCommentViews(BaseTestCase):
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO('test_file_1')),
+            attachment=File(BytesIO(b'test_file_1')),
             attachment_type='image',
             description='Test Description',
         )
@@ -153,7 +153,7 @@ class TestCommentViews(BaseTestCase):
         })
         response = self.client.post(url, {'delete': 'true'})
         self.assertStatusCode(response, 200)
-        self.assertTrue(json.loads(response.content)['success'])
+        self.assertTrue(json.loads(response.content.decode('utf-8'))['success'])
         self.assertFalse(
             models.Attachment.objects.filter(pk=attachment.pk).exists()
         )

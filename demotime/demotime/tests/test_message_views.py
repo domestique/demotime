@@ -238,7 +238,7 @@ class TestMessagesAPI(BaseTestCase):
         response = self.client.get(
             reverse('messages-json', kwargs={'review_pk': self.review.pk})
         )
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             u'message_count': 1,
             u'bundles': [{
                 u'bundle_pk': last_bundle.pk,
@@ -268,7 +268,7 @@ class TestMessagesAPI(BaseTestCase):
         msg.created = datetime.now()
         msg.save()
         response = self.client.get(reverse('messages-json'))
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             u'message_count': 1,
             u'bundles': [{
                 u'bundle_pk': last_bundle.pk,
@@ -293,14 +293,14 @@ class TestMessagesAPI(BaseTestCase):
         assert bundles.count() > 0
         response = self.client.get(reverse('messages-json'))
         self.assertEqual(
-            json.loads(response.content)['message_count'],
+            json.loads(response.content.decode('utf-8'))['message_count'],
             bundles.count()
         )
         response = self.client.post(reverse('messages-json'), {
             'messages': list(bundles.values_list('pk', flat=True)),
             'action': 'read',
         })
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'message_count': 0,
             'bundles': [],
         })
@@ -313,7 +313,7 @@ class TestMessagesAPI(BaseTestCase):
         assert bundles.count() > 0
         response = self.client.get(reverse('messages-json'))
         self.assertEqual(
-            json.loads(response.content)['message_count'],
+            json.loads(response.content.decode('utf-8'))['message_count'],
             0,
         )
         response = self.client.post(reverse('messages-json'), {
@@ -333,7 +333,7 @@ class TestMessagesAPI(BaseTestCase):
                 'message': msg.message,
                 'message_pk': msg.pk,
             })
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'message_count': 1,
             'bundles': [{
                 'bundle_pk': bundle.pk,
@@ -349,14 +349,14 @@ class TestMessagesAPI(BaseTestCase):
         assert bundles.count() > 0
         response = self.client.get(reverse('messages-json'))
         self.assertEqual(
-            json.loads(response.content)['message_count'],
+            json.loads(response.content.decode('utf-8'))['message_count'],
             bundles.count()
         )
         response = self.client.post(reverse('messages-json'), {
             'messages': list(bundles.values_list('pk', flat=True)),
             'action': 'delete',
         })
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'message_count': 0,
             'bundles': [],
         })
@@ -369,7 +369,7 @@ class TestMessagesAPI(BaseTestCase):
         assert bundles.count() > 0
         response = self.client.get(reverse('messages-json'))
         self.assertEqual(
-            json.loads(response.content)['message_count'],
+            json.loads(response.content.decode('utf-8'))['message_count'],
             0,
         )
         response = self.client.post(reverse('messages-json'), {
@@ -389,7 +389,7 @@ class TestMessagesAPI(BaseTestCase):
                 'message': msg.message,
                 'message_pk': msg.pk,
             })
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'message_count': 1,
             'bundles': [{
                 'bundle_pk': bundle.pk,

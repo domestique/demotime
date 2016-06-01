@@ -33,7 +33,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'users': [{
                 'pk': self.test_user_2.pk,
@@ -50,7 +50,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'users': [{
                 'pk': self.test_user_2.pk,
@@ -66,7 +66,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         users = User.objects.exclude(
             reviewer__review=self.review
         ).exclude(
@@ -93,7 +93,7 @@ class TestUserApiReviewers(BaseTestCase):
             'user_pk': 1
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'users': [],
             'errors': {'review': 'Find reviewer requires a Review PK'},
             'success': False,
@@ -108,7 +108,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'users': [],
             'errors': {},
@@ -124,7 +124,7 @@ class TestUserApiReviewers(BaseTestCase):
             'user_pk': self.test_user_2.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(mail.outbox), 1)
         reviewer = models.Reviewer.objects.get(
             review=self.review, reviewer=self.test_user_2
@@ -158,7 +158,7 @@ class TestUserApiReviewers(BaseTestCase):
             'user_pk': follower.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(mail.outbox), 1)
         reviewer = models.Reviewer.objects.get(
             review=self.review, reviewer=follower
@@ -193,7 +193,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'reviewer_name': '',
                 'reviewer_user_pk': '',
                 'reviewer_status': '',
@@ -209,7 +209,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'reviewer_name': '',
                 'reviewer_user_pk': '',
                 'reviewer_status': '',
@@ -225,7 +225,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'reviewer_name': '',
                 'reviewer_user_pk': '',
                 'reviewer_status': '',
@@ -241,7 +241,7 @@ class TestUserApiReviewers(BaseTestCase):
             'user_pk': self.review.creator.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'reviewer_name': '',
                 'reviewer_user_pk': '',
                 'reviewer_status': '',
@@ -259,7 +259,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk,
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': True,
             'errors': {}
         })
@@ -271,7 +271,7 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk':  self.review.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User identifier missing'}
         })
@@ -283,7 +283,7 @@ class TestUserApiReviewers(BaseTestCase):
             'user_pk': 100000,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User not found'}
         })
@@ -295,7 +295,7 @@ class TestUserApiReviewers(BaseTestCase):
             'user_pk': self.test_user_2.pk,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User not currently on review'}
         })
@@ -307,7 +307,7 @@ class TestUserApiReviewers(BaseTestCase):
             'user_pk': self.review.creator.pk,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User not currently on review'}
         })
@@ -355,7 +355,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'users': [
                 {
@@ -373,7 +373,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         users = User.objects.exclude(reviewer__review=self.review).exclude(
             username='demotime_sys'
         ).exclude(
@@ -403,7 +403,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'users': [],
             'errors': {},
@@ -419,7 +419,7 @@ class TestUserApiFollowers(BaseTestCase):
             'user_pk': self.test_user_2.pk
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(len(mail.outbox), 1)
         follower = models.Follower.objects.get(
             review=self.review, user=self.test_user_2
@@ -462,7 +462,7 @@ class TestUserApiFollowers(BaseTestCase):
         follower = models.Follower.objects.get(
             review=self.review, user=self.test_user_2
         )
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'follower_name': self.test_user_2.userprofile.name,
             'follower_user_pk': self.test_user_2.pk,
@@ -497,7 +497,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'follower_name': '',
                 'follower_user_pk': '',
                 'success': False,
@@ -512,7 +512,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk': self.review.pk,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'follower_name': '',
                 'follower_user_pk': '',
                 'success': False,
@@ -527,7 +527,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'follower_name': '',
                 'follower_user_pk': '',
                 'success': False,
@@ -542,7 +542,7 @@ class TestUserApiFollowers(BaseTestCase):
             'user_pk': self.review.creator.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
                 'follower_name': '',
                 'follower_user_pk': '',
                 'success': False,
@@ -559,7 +559,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk': self.review.pk,
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': True,
             'errors': {}
         })
@@ -571,7 +571,7 @@ class TestUserApiFollowers(BaseTestCase):
             'review_pk':  self.review.pk
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User identifier missing'}
         })
@@ -583,7 +583,7 @@ class TestUserApiFollowers(BaseTestCase):
             'user_pk': 100000,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User not found'}
         })
@@ -595,7 +595,7 @@ class TestUserApiFollowers(BaseTestCase):
             'user_pk': self.test_user_2.pk,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User not currently on review'}
         })
@@ -607,7 +607,7 @@ class TestUserApiFollowers(BaseTestCase):
             'user_pk': self.review.creator.pk,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': 'User not currently on review'}
         })
@@ -627,7 +627,7 @@ class TestUserApiFollowers(BaseTestCase):
             'user_pk': follower_0.pk,
         })
         self.assertStatusCode(response, 403)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': False,
             'errors': {'user_pk': "Not allowed to remove others from a demo you don't own"}
         })
@@ -639,7 +639,7 @@ class TestUserApiFollowers(BaseTestCase):
             'user_pk': 1
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'users': [],
             'errors': {'review': 'Find follower requires a Review PK'},
             'success': False,
@@ -663,7 +663,7 @@ class TestUserAPI(BaseTestCase):
             'name': 'test_user',
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertTrue(data['success'])
         self.assertEqual(data['errors'], {})
         self.assertEqual(len(data['users']), 3)
@@ -678,7 +678,7 @@ class TestUserAPI(BaseTestCase):
             'name': 'tinker'
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'users': [{
                 'pk': self.test_user_2.pk,

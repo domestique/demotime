@@ -1,5 +1,5 @@
 import json
-from StringIO import StringIO
+from io import StringIO
 
 from django.core import mail
 from django.contrib.auth.models import User
@@ -323,7 +323,7 @@ class TestReviewViews(BaseTestCase):
             'status': models.reviews.APPROVED
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': False,
             'new_state': '',
@@ -349,7 +349,7 @@ class TestReviewViews(BaseTestCase):
             'status': 'BOGUS',
         })
         self.assertStatusCode(response, 400)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': False,
             'new_state': '',
@@ -386,7 +386,7 @@ class TestReviewViews(BaseTestCase):
             'status': models.reviews.APPROVED
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': True,
             'new_state': models.reviews.APPROVED,
@@ -420,7 +420,7 @@ class TestReviewViews(BaseTestCase):
             'state': models.reviews.CLOSED
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': models.reviews.CLOSED,
             'state_changed': True,
             'success': True,
@@ -440,7 +440,7 @@ class TestReviewViews(BaseTestCase):
             'state': models.reviews.ABORTED
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': models.reviews.ABORTED,
             'state_changed': True,
             'success': True,
@@ -461,7 +461,7 @@ class TestReviewViews(BaseTestCase):
             'state': models.reviews.OPEN,
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': models.reviews.OPEN,
             'state_changed': True,
             'success': True,
@@ -482,7 +482,7 @@ class TestReviewViews(BaseTestCase):
             'state': models.reviews.OPEN,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': self.review.state,
             'state_changed': False,
             'success': False,
@@ -613,7 +613,7 @@ class TestReviewViews(BaseTestCase):
             {'title': 'zxy'}
         )
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'count': 0,
             'reviews': []
         })
@@ -624,7 +624,7 @@ class TestReviewViews(BaseTestCase):
             {'pk': self.review.pk}
         )
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 1)
         review = json_data['reviews'][0]
         self.assertEqual(review['title'], self.review.title)
@@ -663,7 +663,7 @@ class TestReviewViews(BaseTestCase):
             }
         )
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 1)
         review = json_data['reviews'][0]
         review_obj = models.Review.objects.get(pk=review['pk'])
@@ -687,7 +687,7 @@ class TestReviewViews(BaseTestCase):
             'title': 'test'
         })
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 1)
         review = json_data['reviews'][0]
         self.assertEqual(review['title'], 'Test Title')
@@ -710,7 +710,7 @@ class TestReviewViews(BaseTestCase):
             'project_pk': self.project.pk,
         })
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 1)
         review = json_data['reviews'][0]
         self.assertEqual(review['title'], 'Test Title')
@@ -730,7 +730,7 @@ class TestReviewViews(BaseTestCase):
             'project_pk': project.pk,
         })
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 0)
 
     def test_review_list_sort_by_newest(self):

@@ -10,5 +10,4 @@ class Command(BaseCommand):
         now = timezone.now()
         reminders = models.Reminder.objects.filter(remind_at__lte=now, active=True)
         for reminder in reminders:
-            print reminder
             reminder.send_reminder()
