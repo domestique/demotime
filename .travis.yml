@@ -6,7 +6,7 @@ install:
   - pip install -r testing_requirements.txt
   - export PYTHONPATH=$PYTHONPATH:`pwd`/demotime
 script:
-  - fab run_tests
+  - invoke run_tests
 notifications:
   email:
     recipients:
