@@ -73,6 +73,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
+        'PASSWORD': 'demotime_docker',
         'HOST': 'db',
         'PORT': 5432,
     }
@@ -119,8 +120,10 @@ TEMPLATES = [
 
 # MEDIA SETTINGS
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
+MEDIA_URL = '/protected/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+STATIC_ROOT = '/usr/local/demotime/static'
+MEDIA_ROOT = '/usr/local/demotime/uploads'
 
 # TEST SETTINGS
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -149,7 +152,9 @@ SITE_ID = 1
 DT_PROD = os.environ.get('DT_PROD', '').lower() == 'true'
 DEFAULT_REMINDER_DAYS = 2
 
-SENDFILE_BACKEND = ''
+SENDFILE_BACKEND = 'sendfile.backends.nginx'
+SENDFILE_ROOT = MEDIA_ROOT
+SENDFILE_URL = '/protected'
 
 if DT_PROD:
     try:

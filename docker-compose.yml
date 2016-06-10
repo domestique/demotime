@@ -1,9 +1,19 @@
 version: '2'
+volumes:
+    dt_pg_data:
+        external: true
+    dt_static_data:
+        external: true
 services: 
     db:
         image: postgres:latest
+        environment:
+            - POSTGRES_PASSWORD=demotime_docker
+        volumes:
+            - dt_pg_data:/var/lib/postgresql/data
     demotime:
-        image: xxf4ntxx/demotime:latest
         command: ./startup.sh
         depends_on:
             - db
+        volumes:
+            - dt_static_data:/usr/local/demotime

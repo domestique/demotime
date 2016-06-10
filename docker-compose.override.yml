@@ -2,6 +2,8 @@ version: '2'
 services: 
     db:
         image: postgres:latest
+        ports:
+            - "5432:55432"
     demotime:
         build: .
         command: ./startup.sh
