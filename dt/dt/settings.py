@@ -23,8 +23,12 @@ if not parser.has_section('demotime'):
     parser.set('demotime', 'timezone', 'America/Chicago')
     parser.set('demotime', 'default_reminder_days', '2')
     parser.set('demotime', 'dt_prod', 'false')
-    parser.set('demotime', 'static_root', '/usr/local/demotime/static')
-    parser.set('demotime', 'media_root', '/usr/local/demotime/uploads')
+    if os.environ.get('TRAVIS', '').lower() == 'true':
+        parser.set('demotime', 'static_root', os.path.join(BASE_DIR, 'static'))
+        parser.set('demotime', 'media_root', os.path.join(BASE_DIR, 'uploads'))
+    else:
+        parser.set('demotime', 'static_root', '/usr/local/demotime/static')
+        parser.set('demotime', 'media_root', '/usr/local/demotime/uploads')
 
 
 # Quick-start development settings - unsuitable for production
