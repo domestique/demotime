@@ -7,7 +7,7 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <div class="container">
-        <a href="{% url 'index' %}">Your dashboard</a> &gt; Groups and Group Types
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Groups{% comment %} and Group Types{% endcomment %}
     </div>
 </div>
 {% endblock %}
@@ -50,7 +50,7 @@
 
 {% block content %}
     <h1 class="heading">
-        Groups and Group Types
+        Groups{% comment %} and Group Types{% endcomment %}
     </h1>
     <section>
         <h3 class="heading">
@@ -97,6 +97,7 @@
         </table>
         </ul>
     </section>
+    {% comment %}
     <article>
         <h3 class="heading">
             Group Types
@@ -128,4 +129,5 @@
             </ul>
         </section>
     </article>
+    {% endcomment %}
 {% endblock %}
