@@ -21,7 +21,7 @@ if not parser.has_section('demotime'):
     parser.set('demotime', 'default_from_email', 'demos@demoti.me')
     parser.set('demotime', 'email_backend', 'django.core.mail.backends.console.EmailBackend')
     parser.set('demotime', 'timezone', 'America/Chicago')
-    parser.set('demotime', 'default_reminder_days', 1)
+    parser.set('demotime', 'default_reminder_days', '1')
     parser.set('demotime', 'dt_prod', 'false')
 
 
@@ -162,7 +162,7 @@ SITE_ID = 1
 
 # DemoTime Specific Settings
 DT_PROD = parser.get('demotime', 'dt_prod')
-DEFAULT_REMINDER_DAYS = parser.get('demotime', 'default_reminder_days')
+DEFAULT_REMINDER_DAYS = int(parser.get('demotime', 'default_reminder_days'))
 
 SENDFILE_BACKEND = 'sendfile.backends.nginx'
 SENDFILE_ROOT = MEDIA_ROOT
