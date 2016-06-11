@@ -21,7 +21,7 @@ if not parser.has_section('demotime'):
     parser.set('demotime', 'default_from_email', 'demos@demoti.me')
     parser.set('demotime', 'email_backend', 'django.core.mail.backends.console.EmailBackend')
     parser.set('demotime', 'timezone', 'America/Chicago')
-    parser.set('demotime', 'default_reminder_days', '1')
+    parser.set('demotime', 'default_reminder_days', '2')
     parser.set('demotime', 'dt_prod', 'false')
     parser.set('demotime', 'static_root', os.path.join(BASE_DIR, 'static'))
     parser.set('demotime', 'media_root', os.path.join(BASE_DIR, 'uploads'))
