@@ -80,12 +80,8 @@ class TestUserApiReviewers(BaseTestCase):
                 'pk': user.pk,
                 'name': user.userprofile.name
             })
-        self.assertEqual(data, {
-                'users': user_list,
-                'success': True,
-                'errors': {}
-            }
-        )
+        for user in user_list:
+            self.assertIn(user, data['users'])
 
     def test_find_reviewer_review_not_specified(self):
         response = self.client.post(reverse('user-api'), {
