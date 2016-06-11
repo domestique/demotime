@@ -5,5 +5,3 @@ services:
     demotime:
         image: xxf4ntxx/demotime:latest
         command: ./startup.sh
-        volumes:
-            - .:/home/docker/demotime

@@ -11,6 +11,7 @@ services:
             - POSTGRES_PASSWORD=demotime_docker
         volumes:
             - dt_pg_data:/var/lib/postgresql/data
+            - /tmp:/tmp/host_tmp
     demotime:
         command: ./startup.sh
         depends_on:

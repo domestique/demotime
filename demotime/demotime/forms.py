@@ -9,8 +9,9 @@ class ReviewForm(forms.ModelForm):
     def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
         self.project = project
-        self.fields['reviewers'].queryset = self.project.members
-        self.fields['followers'].queryset = self.project.members
+        user_queryset = self.project.members.exclude(pk=user.pk)
+        self.fields['reviewers'].queryset = user_queryset
+        self.fields['followers'].queryset = user_queryset
         self.fields['followers'].required = False
 
         for key, value in self.fields.items():
