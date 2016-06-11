@@ -1,8 +1,9 @@
 language: python
 services:
     - postgresql
-hosts:
-    - db
+addons:
+    hosts:
+        - db
 python:
   - "3.5"
 install:
