@@ -23,6 +23,8 @@ if not parser.has_section('demotime'):
     parser.set('demotime', 'timezone', 'America/Chicago')
     parser.set('demotime', 'default_reminder_days', '1')
     parser.set('demotime', 'dt_prod', 'false')
+    parser.set('demotime', 'static_root', os.path.join(BASE_DIR, 'static'))
+    parser.set('demotime', 'media_root', os.path.join(BASE_DIR, 'uploads'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -134,8 +136,8 @@ TEMPLATES = [
 STATIC_URL = '/static/'
 MEDIA_URL = '/protected/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
-STATIC_ROOT = '/usr/local/demotime/static'
-MEDIA_ROOT = '/usr/local/demotime/uploads'
+STATIC_ROOT = parser.get('demotime', 'static_root')
+MEDIA_ROOT = parser.get('demotime', 'media_root')
 
 # TEST SETTINGS
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
