@@ -11,7 +11,7 @@ services:
             - POSTGRES_PASSWORD=demotime_docker
         volumes:
             - dt_pg_data:/var/lib/postgresql/data
-            - /tmp:/tmp/host_tmp
+            - ~/dt_backups:/backups
     demotime:
         command: ./startup.sh
         depends_on:
@@ -19,5 +19,6 @@ services:
         volumes:
             - dt_static_data:/usr/local/demotime
             - /etc/demotime:/etc/demotime
+            - ~/dt_backups:/backups
         ports:
             - "8000:8000"
