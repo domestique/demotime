@@ -10,7 +10,19 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from ConfigParser import ConfigParser
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+parser = ConfigParser()
+parser.read('/etc/demotime/demotime.ini')
+if not parser.has_section('demotime'):
+    parser.add_section('demotime')
+    parser.set('demotime', 'server_url', 'demoti.me')
+    parser.set('demotime', 'default_from_email', 'demos@demoti.me')
+    parser.set('demotime', 'email_backend', 'django.core.mail.backends.console.EmailBackend')
+    parser.set('demotime', 'timezone', 'America/Chicago')
+    parser.set('demotime', 'default_reminder_days', 1)
+    parser.set('demotime', 'dt_prod', 'false')
 
 
 # Quick-start development settings - unsuitable for production
@@ -135,8 +147,8 @@ NOSE_ARGS = [
 ]
 
 # MAIL_SETTINGS
-DEFAULT_FROM_EMAIL = 'system@demotyme.com'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = parser.get('demotime', 'default_from_email')
+EMAIL_BACKEND = parser.get('demotime', 'email_backend')
 
 # ACCOUNT SETTINGS
 LOGIN_REDIRECT_URL = '/'
@@ -144,20 +156,21 @@ ACCOUNT_ACTIVATION_DAYS = 7
 AUTHENTICATION_BACKENDS = ['demotime.authentication_backends.UserProxyModelBackend']
 
 # SERVER SETTINGS
-SERVER_URL = os.environ.get('DT_URL', 'localhost:8000')
+SERVER_URL = parser.get('demotime', 'server_url')
 
 SITE_ID = 1
 
 # DemoTime Specific Settings
-DT_PROD = os.environ.get('DT_PROD', '').lower() == 'true'
-DEFAULT_REMINDER_DAYS = 2
+DT_PROD = parser.get('demotime', 'dt_prod')
+DEFAULT_REMINDER_DAYS = parser.get('demotime', 'default_reminder_days')
 
 SENDFILE_BACKEND = 'sendfile.backends.nginx'
 SENDFILE_ROOT = MEDIA_ROOT
 SENDFILE_URL = '/protected'
 
-if DT_PROD:
-    try:
-        from prod_settings import *
-    except ImportError:
-        pass
+if parser.has_section('email'):
+    EMAIL_HOST = parser.get('email', 'email_host')
+    EMAIL_HOST_USER = parser.get('email', 'email_host_user')
+    EMAIL_HOST_PASSWORD = parser.get('email', 'email_host_password')
+    EMAIL_PORT = parser.get('email', 'email_port')
+    EMAIL_USE_TLS = parser.get('email', 'email_use_tls').lower() == 'true'

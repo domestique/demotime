@@ -7,7 +7,3 @@ services:
         command: ./startup.sh
         volumes:
             - .:/home/docker/demotime
-        ports:
-            - "8000:8000"
-        depends_on:
-            - db
