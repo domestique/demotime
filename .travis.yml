@@ -9,6 +9,8 @@ addons:
 env:
     - TRAVIS=true
     - DOCKER_COMPOSE_VERSION=1.7.0
+    - DOCKER_VERSION=1.7.1
+    - UML_DOCKERCOMPOSE=1
 python:
   - "3.5"
 before_install:
@@ -22,7 +24,7 @@ script:
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml build
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml up
 after_success:
-    docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
         docker push xxf4ntxx/demotime;
       else
