@@ -50,6 +50,22 @@ class Attachment(BaseModel):
         ''' Just cleaning up the filename display a bit '''
         return ''.join(self.attachment.name.split('/')[1:])
 
+    @property
+    def review(self):
+        from demotime import models
+        if isinstance(self.content_object, models.Comment):
+            return self.content_object.thread.review_revision.review
+
+        elif isinstance(self.content_object, models.Review):
+            return self.content_object
+
+        elif isinstance(self.content_object, models.ReviewRevision):
+            return self.content_object.review
+
+    @property
+    def project(self):
+        return self.review.project
+
     class Meta:
         index_together = [
             ('content_type', 'object_id'),

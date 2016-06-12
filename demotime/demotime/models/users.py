@@ -50,7 +50,7 @@ class UserProxy(User):
 
     @property
     def display_name(self):
-        return u'{}'.format(self.userprofile.display_name or self.username)
+        return '{}'.format(self.userprofile.display_name or self.username)
 
     class Meta:
         proxy = True
@@ -78,12 +78,12 @@ class UserProfile(BaseModel):
         default=USER,
     )
 
-    def __unicode__(self):
-        return u'{}'.format(self.display_name or self.user.username)
+    def __str__(self):
+        return '{}'.format(self.display_name or self.user.username)
 
     @property
     def name(self):
-        return self.__unicode__()
+        return self.__str__()
 
     def get_absolute_url(self):
         return reverse('profile', args=[self.pk])
@@ -95,8 +95,8 @@ class UserReviewStatus(BaseModel):
     user = models.ForeignKey('auth.User')
     read = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'UserReviewStatus: {} - {}'.format(
+    def __str__(self):
+        return 'UserReviewStatus: {} - {}'.format(
             self.user.username,
             self.review.title
         )

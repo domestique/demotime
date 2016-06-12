@@ -8,8 +8,8 @@ class GroupType(BaseModel):
     name = models.CharField(max_length=128)
     slug = models.SlugField(unique=True)
 
-    def __unicode__(self):
-        return u'{}'.format(self.slug)
+    def __str__(self):
+        return '{}'.format(self.slug)
 
     @classmethod
     def create_group_type(cls, name, slug):
@@ -29,8 +29,8 @@ class Group(BaseModel):
     group_type = models.ForeignKey('GroupType')
     members = models.ManyToManyField('auth.User', through='GroupMember')
 
-    def __unicode__(self):
-        return u'Group: {}'.format(self.slug)
+    def __str__(self):
+        return 'Group: {}'.format(self.slug)
 
     @classmethod
     def create_group(cls, name, slug, description, group_type, members=None):
@@ -59,8 +59,8 @@ class GroupMember(BaseModel):
     group = models.ForeignKey('Group')
     is_admin = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'GroupMember: {} - {}'.format(
+    def __str__(self):
+        return 'GroupMember: {} - {}'.format(
             self.group.slug,
             self.user.userprofile.name
         )

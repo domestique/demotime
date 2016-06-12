@@ -25,8 +25,8 @@ class Reviewer(BaseModel):
         default='reviewing', db_index=True
     )
 
-    def __unicode__(self):
-        return u'{} Follower on {}'.format(
+    def __str__(self):
+        return '{} Follower on {}'.format(
             self.reviewer_display_name,
             self.review.title,
         )

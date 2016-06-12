@@ -61,8 +61,8 @@ class Review(BaseModel):
     is_public = models.BooleanField(default=False)
     project = models.ForeignKey('Project')
 
-    def __unicode__(self):
-        return u'Review: {} by {}'.format(
+    def __str__(self):
+        return 'Review: {} by {}'.format(
             self.title, self.creator.username
         )
 
@@ -369,8 +369,8 @@ class ReviewRevision(BaseModel):
     attachments = GenericRelation(Attachment)
     number = models.IntegerField()
 
-    def __unicode__(self):
-        return u'Review Revision: {}'.format(self.review)
+    def __str__(self):
+        return 'Review Revision: {}'.format(self.review)
 
     def get_absolute_url(self):
         return reverse('review-rev-detail', kwargs={

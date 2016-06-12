@@ -239,18 +239,18 @@ class TestMessagesAPI(BaseTestCase):
             reverse('messages-json', kwargs={'review_pk': self.review.pk})
         )
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-            u'message_count': 1,
-            u'bundles': [{
-                u'bundle_pk': last_bundle.pk,
-                u'messages': [{
-                    u'review_pk': msg.review.review.pk,
-                    u'review_url': msg.review.review.get_absolute_url(),
-                    u'thread_pk': msg.thread.pk if msg.thread else u'',
-                    u'is_comment': msg.thread != None,
-                    u'review_title': msg.review.review.title,
-                    u'message_title': msg.title,
-                    u'message': msg.message,
-                    u'message_pk': msg.pk,
+            'message_count': 1,
+            'bundles': [{
+                'bundle_pk': last_bundle.pk,
+                'messages': [{
+                    'review_pk': msg.review.review.pk,
+                    'review_url': msg.review.review.get_absolute_url(),
+                    'thread_pk': msg.thread.pk if msg.thread else '',
+                    'is_comment': msg.thread != None,
+                    'review_title': msg.review.review.title,
+                    'message_title': msg.title,
+                    'message': msg.message,
+                    'message_pk': msg.pk,
                 }],
             }],
         })
@@ -269,18 +269,18 @@ class TestMessagesAPI(BaseTestCase):
         msg.save()
         response = self.client.get(reverse('messages-json'))
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-            u'message_count': 1,
-            u'bundles': [{
-                u'bundle_pk': last_bundle.pk,
-                u'messages': [{
-                    u'review_pk': msg.review.review.pk,
-                    u'review_url': msg.review.review.get_absolute_url(),
-                    u'thread_pk': msg.thread.pk if msg.thread else u'',
-                    u'is_comment': msg.thread != None,
-                    u'review_title': msg.review.review.title,
-                    u'message_title': msg.title,
-                    u'message': msg.message,
-                    u'message_pk': msg.pk,
+            'message_count': 1,
+            'bundles': [{
+                'bundle_pk': last_bundle.pk,
+                'messages': [{
+                    'review_pk': msg.review.review.pk,
+                    'review_url': msg.review.review.get_absolute_url(),
+                    'thread_pk': msg.thread.pk if msg.thread else '',
+                    'is_comment': msg.thread != None,
+                    'review_title': msg.review.review.title,
+                    'message_title': msg.title,
+                    'message': msg.message,
+                    'message_pk': msg.pk,
                 }],
             }],
         })

@@ -356,7 +356,7 @@ class TestReviewViews(BaseTestCase):
             'reviewer_status': reviewer.status,
             'success': False,
             'errors': {
-                'status': [u'Select a valid choice. BOGUS is not one of the available choices.'],
+                'status': ['Select a valid choice. BOGUS is not one of the available choices.'],
             },
         })
 

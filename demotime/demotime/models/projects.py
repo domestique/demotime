@@ -14,8 +14,8 @@ class Project(BaseModel):
     members = models.ManyToManyField('auth.User', through='ProjectMember')
     is_public = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'Project {}'.format(self.name)
+    def __str__(self):
+        return 'Project {}'.format(self.name)
 
     def get_absolute_url(self):
         return reverse('project-detail', args=[self.slug])
@@ -34,8 +34,8 @@ class ProjectGroup(BaseModel):
     group = models.ForeignKey('Group')
     is_admin = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'ProjectGroup: {} - {}'.format(
+    def __str__(self):
+        return 'ProjectGroup: {} - {}'.format(
             self.project.slug,
             self.group.slug
         )
@@ -47,8 +47,8 @@ class ProjectMember(BaseModel):
     user = models.ForeignKey('auth.User')
     is_admin = models.BooleanField(default=False)
 
-    def __unicode__(self):
-        return u'ProjectMember: {} - {}'.format(
+    def __str__(self):
+        return 'ProjectMember: {} - {}'.format(
             self.project.slug,
             self.user.userprofile.name,
         )
