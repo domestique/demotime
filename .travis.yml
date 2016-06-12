@@ -1,37 +1,21 @@
-sudo: required
 language: python
 services:
     - postgresql
-    - docker
 addons:
     hosts:
         - db
 env:
     - TRAVIS=true
-    - DOCKER_COMPOSE_VERSION=1.7.0
 python:
   - "3.5"
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-  - docker --version
-  - docker --help
-  - docker volume create --name dt_pg_data
-  - docker volume create --name dt_static_data
+install:
+  - sudo mkdir /usr/local/demotime
+  - pip install -r requirements.txt
+  - pip install -r testing_requirements.txt
+  - pip install -r prod_requirements.txt
+  - export PYTHONPATH=$PYTHONPATH:`pwd`/demotime
 script:
-    - docker-compose -f docker-compose.yml -f docker-compose.build.yml build
-    - docker-compose -f docker-compose.yml -f docker-compose.build.yml up
-after_success:
-    docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-    - if [ "$TRAVIS_BRANCH" == "master" ]; then
-        docker push xxf4ntxx/demotime;
-      else
-        docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
-      fi
+  - invoke run_tests
 notifications:
   email:
     recipients:
