@@ -22,3 +22,5 @@ services:
             - ~/dt_backups:/backups
         ports:
             - "8000:8000"
+        links:
+            - db
