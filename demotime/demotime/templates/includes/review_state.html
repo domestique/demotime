@@ -4,7 +4,7 @@
     {% elif demo.reviewer_state == "approved" %}
         <small>
             {{ demo.reviewer_state }}!
-            {% if demo.state == "open" and request.user.pk == user.pk %}
+            {% if demo.state == "open" and request.user == demo.creator %}
                 <span style="margin-left: 3px;">please <a href="{{ demo.get_absolute_url }}">close this demo</a></span>
             {% endif %}
         </small>
