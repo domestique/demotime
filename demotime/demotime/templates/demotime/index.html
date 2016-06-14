@@ -20,52 +20,49 @@
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
 </h1>
 
-<div class="dashboard">
+<div class="dashboard aggregated_dashboard">
     <article>
-        <h3>
-            Items requiring your attention
-            <span class="help" title="Your dashboard of action items are here. Below you will
-            see demos that you are following or reviewing. You will also see unread messages and
-            demos you've created, if they exist."></span>
-        </h3>
-        <section class="aggregated_dashboard emph_med">
-            {% if open_reviews %}
-                <div class="aggregated_dashboard-reviewing">
-                    <h3 class="icon icon-inbox">
-                        Open demos you're <strong>reviewing</strong>
-                        <span class="help" title="These are demos that have been assigned
-                        to you to review. You can leave feedback and ultimately approve or
-                        reject a demo. Your approval status appears to the left."></span>
-                    </h3>
+        {% if open_reviews %}
+            <h3 class="icon icon-inbox">
+                Open demos you're <strong>reviewing</strong>
+                <span class="help" title="These are demos that have been assigned
+                to you to review. You can leave feedback and ultimately approve or
+                reject a demo. Your approval status appears to the left."></span>
+            </h3>
+            <section class="emph_med aggregated_dashboard-reviewing">
+                <div>
                     <ul>
                         {% for demo in open_reviews %}
                             {% include "includes/reviews_li.html" %}
                         {% endfor %}
                     </ul>
                 </div>
-            {% endif %}
-            {% if followed_demos %}
-                <div class="aggregated_dashboard-following">
-                    <h3 class="icon icon-inbox">
-                        Open demos you're <strong>following</strong>
-                        <span class="help" title="Demos you are following do not require any
-                        action on your part. You can simply follow their progress."></span>
-                    </h3>
+            </section>
+        {% endif %}
+        {% if followed_demos %}
+            <h3 class="icon icon-inbox">
+                Open demos you're <strong>following</strong>
+                <span class="help" title="Demos you are following do not require any
+                action on your part. You can simply follow their progress."></span>
+            </h3>
+            <section class="emph_med aggregated_dashboard-following">
+                <div>
                     <ul>
                         {% for demo in followed_demos %}
                             {% include "includes/reviews_li.html" %}
                         {% endfor %}
                     </ul>
                 </div>
+            </section>
+        {% endif %}
+        <h3 class="icon icon-inbox">
+            Unread messages
+            {% if message_bundles %}
+                <small><a href="{% url 'inbox' %}" class="normal_text">view all</a></small>
             {% endif %}
-            <div class="aggregated_dashboard-messages">
-                <h3 class="icon icon-inbox">
-                    Unread messages
-                    {% if message_bundles %}
-                        <small><a href="{% url 'inbox' %}" class="normal_text">view all</a></small>
-                    {% endif %}
-                </h3>
-
+        </h3>
+        <section class="emph_med aggregated_dashboard-messages">
+            <div>
                 <div class="messages-list">
                     <ul>
                         {% if not message_bundles %}
@@ -93,16 +90,17 @@
                     </ul>
                 </div>
             </div>
-            <div class="aggregated_dashboard-created">
-                <h3 class="icon icon-calendar">
-                    Active Demos You've Created
-                    {% if open_demos %}
-                        <small>
-                            <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
-                        </small>
-                    {% endif %}
-                </h3>
-
+        </section>
+        <h3 class="icon icon-calendar">
+            Active Demos You've Created
+            {% if open_demos %}
+                <small>
+                    <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
+                </small>
+            {% endif %}
+        </h3>
+        <section class="emph_med aggregated_dashboard-created">
+            <div>
                 {% if open_demos %}
                     <ul>
                         {% for demo in open_demos %}
