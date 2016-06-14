@@ -19,6 +19,7 @@ class UserMedia(CanViewMixin, View):
             models.Attachment,
             pk=kwargs.pop('pk')
         )
+        self.review = self.attachment.review
         self.project = self.attachment.project
         return super(UserMedia, self).dispatch(*args, **kwargs)
 
