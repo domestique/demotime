@@ -149,7 +149,11 @@
 
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
-        <script> $('.lightboxed').fancybox() </script>
+        <script>
+            $('.lightboxed').fancybox({
+                'type': 'image'
+            });
+        </script>
 
         {# alerts #}
         <script src="/static/scripts/library/swal.js"></script>
