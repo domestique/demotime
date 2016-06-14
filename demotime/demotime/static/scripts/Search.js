@@ -1,9 +1,11 @@
 var SearchModel = Backbone.Model.extend();
-DemoTime.Search= Backbone.View.extend({
+
+DemoTime.Search = Backbone.View.extend({
     el: '.quickfind',
 
     events: {
-        'keyup input': 'typing'
+        'keyup input': 'typing',
+        'click .quickfind-heading': 'toggle'
     },
 
     initialize: function(options) {
@@ -65,11 +67,43 @@ DemoTime.Search= Backbone.View.extend({
                     self.$el.find('.quickfind-reviews').html(template);
                     self.$el.find('.quickfind-results').slideDown();
                 });
+
+                var project_req = $.ajax({
+                    url: self.options.project_url,
+                    method: 'POST',
+                    data: {
+                        name: $input.val()
+                    }
+                });
+
+                project_req.success(function(data) {
+                    self.projects = new SearchModel(data);
+                    // Grab the container template
+                    var html = $('#project_results').html(),
+                        template = _.template(html);
+                    template = template({ projects: self.projects.get('projects') });
+
+                    self.$el.find('.quickfind-projects').html(template);
+                    self.$el.find('.quickfind-results').slideDown();
+                });
             } else {
                 if (self.$el.find('.quickfind-results').length) {
                     self.$el.find('.quickfind-results').slideUp();
                 }
             }
         }
+    },
+
+    toggle: function() {
+        var heading = $(event.target),
+            list = heading.next('.quickfind-list')
+
+        list.slideToggle(function() {
+            if (list.is(':visible')) {
+                heading.removeClass('icon-plus-squared-alt').addClass('icon-minus-squared-alt');
+            } else {
+                heading.removeClass('icon-minus-squared-alt').addClass('icon-plus-squared-alt');
+            }
+        });
     }
 });

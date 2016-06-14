@@ -11,10 +11,10 @@ class Follower(BaseModel):
 
     @property
     def display_name(self):
-        return u'{}'.format(self.user.userprofile.display_name or self.user.username)
+        return '{}'.format(self.user.userprofile.display_name or self.user.username)
 
-    def __unicode__(self):
-        return u'{} Follower on {}'.format(
+    def __str__(self):
+        return '{} Follower on {}'.format(
             self.display_name,
             self.review.title,
         )

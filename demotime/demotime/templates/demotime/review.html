@@ -1,8 +1,43 @@
-{% extends 'base.html' %}
+{% extends 'layout-user.html' %}
 {% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
-{% block sub_nav %}{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        <a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a> &gt;
+        DT-{{ object.pk }}: {{ object.title }}
+    </div>
+</div>
+{% endblock %}
+
+{% block sub_nav_actions %}
+<ul class="subnav-item">
+    {% if request.user == object.creator %}
+        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Add revision</a></li>
+        {% if object.state == 'closed' %}
+            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Open demo</a></li>
+        {% else %}
+            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close demo</a></li>
+        {% endif %}
+    {% else %}
+        {% if reviewer and object.state != "closed" %}
+            {% if reviewer.status == 'approved' %}
+                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove demo</a></li>
+            {% else %}
+                <li><a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve demo</a></li>
+            {% endif %}
+            {% if reviewer.status == 'rejected' %}
+                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject demo</a></li>
+            {% else %}
+                <li><a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject demo</a></li>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    <li><a class="subnav-item icon icon-plus" href="{% url 'create-review' object.project.slug %}">New demo</a></li>
+</ul>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
@@ -49,43 +84,17 @@
                             [<a href="#" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
                         </small>
                         <span class="help" title="When you are assigned as a 'reviewer' you
-                        will need to either approve or reject a review. A follower can simply follow
+                        will need to either approve or reject a demo. A follower can simply follow
                         the progress of a review without the ability or need to approve or reject."></span>
                     </div>
                 {% endif %}
             {% endfor %}
         {% endif %}
-        <div class="manage-review">
-            <ul>
-                {% if request.user == object.creator %}
-                    <li class="updated"><a href="{% url 'edit-review' object.pk %}" class="button-link icon icon-pencil">Add revision</a></li>
-                    {% if object.state == 'closed' %}
-                        <li class="open"><a data-type="open" href="#" class="button-link icon icon-eye">Open demo</a></li>
-                    {% else %}
-                        <li class="closed"><a data-type="closed" href="#" class="button-link icon icon-ok">Close demo</a></li>
-                    {% endif %}
-                {% else %}
-                    {% if reviewer and object.state != "closed" %}
-                        {% if reviewer.status == 'approved' %}
-                            <li class="approved state-highlight"><a data-type="reviewing" href="#" class="button-link icon icon-thumbs-up">Unapprove demo</a></li>
-                        {% else %}
-                            <li><a data-type="approved" href="#" class="button-link icon icon-thumbs-up">Approve demo</a></li>
-                        {% endif %}
-                        {% if reviewer.status == 'rejected' %}
-                            <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="button-link alert icon icon-thumbs-down">Unreject demo</a></li>
-                        {% else %}
-                            <li><a data-type="rejected" href="#" class="button-link alert icon icon-thumbs-down">Reject demo</a></li>
-                        {% endif %}
-                    {% endif %}
-                {% endif %}
-            </ul>
-        </div>
     </div>
 
     <div class="main-content">
         <h1 class="heading">
-            <a href="#" class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ object.pk }}" title="Copy URL"><img src="/static/images/ic_attach.svg"></a>
-            <strong>DT-{{ object.pk }}</strong>: {{ object.title }}
+            <strong class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ object.pk }}">DT-{{ object.pk }}</strong>: {{ object.title }}
                 <small class="alert">
                 {% if not revision.is_max_revision %}
                     Rev {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
@@ -100,7 +109,7 @@
                 {% if object.state != "closed" %}
                     <h4 class="heading">
                         Reviewer State:
-                        <span class="help" title="The reviewer state is the over-arching state of the review based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'"></span>
+                        <span class="help" title="The reviewer state is the over-arching state of the demo based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'"></span>
                     </h4>
                     {% if object.reviewer_state == "Approved" %}
                         <span class="icon-{{ object.reviewer_state }}">{{ object.reviewer_state|capfirst }}</span>
@@ -111,7 +120,7 @@
                 {% endif %}
                 <h4 class="heading">
                     Demo State:
-                    <span class="help" title="The demo state is the state of the actual review itself (Open, closed, etc)"></span>
+                    <span class="help" title="The demo state is the state of the actual demo itself (Open, closed, etc)"></span>
                 </h4>
                 {{ object.state|capfirst }}
                 {% if object.state == 'closed' %}
@@ -127,8 +136,8 @@
                 <h4 class="heading">
                     Reviewers & Followers:
                     <span class="help" title="When you assign someone as a 'reviewer' they
-                    will need to either approve or reject a review. A follower can simply follow
-                    the progress of a review without the ability or need to approve or reject."></span>
+                    will need to either approve or reject a demo. A follower can simply follow
+                    the progress of a demo without the ability or need to approve or reject."></span>
                 </h4>
                 <ul class="reviewer_ul">
                     {% for reviewer in object.reviewer_set.all %}
@@ -347,127 +356,30 @@
 </script>
 {% endblock %}
 
-{% block footer_scripts %}
+{% block scripts %}
 {{ block.super }}
+<script src="/static/scripts/Review.js"></script>
+<script src="/static/scripts/Reviewers.js"></script>
+<script src="/static/scripts/review_utils.js"></script>
 <script>
-// Expand collapse top level comments
-$('.collapser').click(function(e) {
-    if (e.target.tagName != "A") {
-        var collapser = $(this);
-        collapser.parents('.collapser_parent').find('.collapseable').slideToggle(function() {
-            if (collapser.attr('class').match('squared')) {
-                if ($(this).is(":visible")) {
-                    collapser.removeClass('icon-plus-squared-alt');
-                    collapser.addClass('icon-minus-squared-alt');
-                } else {
-                    collapser.addClass('icon-plus-squared-alt');
-                    collapser.removeClass('icon-minus-squared-alt');
-                }
-            }
-        });
-    }
+var review = new DemoTime.Review({
+    {% if reviewer %}
+        is_reviewer: true
+        , reviewer_pk: {{ reviewer.pk }}
+        , reviewer_url: '{% url "update-reviewer-status" revision.review.project.slug revision.review.pk reviewer.pk %}'
+    {% else %}
+        is_reviewer: false
+    {% endif %}
+    , reviewer_state: '{{ review.reviewer_state }}'
+    {% if request.user == object.creator %}
+        , is_creator: true
+        , review_url: '{% url "update-review-state" revision.review.project.slug revision.review.pk %}'
+    {% else %}
+        , is_creator: false
+    {% endif %}
+    , review_pk: {{ revision.review.pk }}
+    , creator_pk: {{ object.creator.pk }}
 });
-
-// Attach comment pk's to form submits for
-// smooth scroll to comment after sending it
-$('[data-comment]').each(function() {
-    var comment = $(this),
-        form = comment.parents('.comment_parent').find('form');
-
-    if (comment.prop('id')) {
-        form.attr('action', '#' + comment.prop('id'));
-    } else {
-        form.attr('action', '#comments');
-    }
-});
-
-{% if reviewer or request.user == object.creator %}
-    function check_for_close_warning(type) {
-        var reviewing = '{{ review.reviewer_state }}';
-        if ((type == 'closed' || type == 'aborted') && reviewing == 'reviewing') {
-            var r = confirm("There are active reviewers. Are you sure you wish to change this review to " + type + "?");
-            if (r == true) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return true;
-        }
-    }
-
-    $('.manage-review a').click(function(event) {
-        var type = $(this).data('type');
-
-        if (type) {
-            event.preventDefault();
-
-            {% if reviewer %}
-                // Sets the new reviewer status
-                var req = $.ajax({
-                    url: '{% url "update-reviewer-status" revision.review.pk reviewer.pk %}',
-                    method: 'POST',
-                    data: {
-                        review: {{ revision.review.pk }},
-                        reviewer: {{ reviewer.pk }},
-                        status:type
-                    }
-                });
-
-                req.success(function(msg) {
-                    if (msg.success) {
-                        window.location.hash = 'state_change';
-                        window.location.reload();
-                    }
-                });
-            {% endif %}
-            {% if request.user == object.creator %}
-                // Sets the new demo status
-                function finisher_ajax() {
-                    var req = $.ajax({
-                        url: '{% url "update-review-state" revision.review.pk %}',
-                        method: 'POST',
-                        data: {
-                            review: {{ revision.review.pk }},
-                            reviewer: {{ object.creator.pk }},
-                            state: type
-                        }
-                    });
-
-                    req.success(function(msg) {
-                        if (msg.success) {
-                            window.location.hash = 'state_change';
-                            window.location.reload();
-                        }
-                    });
-                }
-                var reviewing = '{{ review.reviewer_state }}';
-                if ((type == 'closed' || type == 'aborted') && reviewing == 'reviewing') {
-                    swal({
-                        title: "Are you sure?",
-                        text: "There are active reviewers. Are you sure you wish to change this review to " + type + "?",
-                        type: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#DD6B55",
-                        confirmButtonText: "Confirm",
-                        closeOnConfirm: false
-                    },
-                    function (isConfirm) {
-                        if (isConfirm) {
-                            finisher_ajax();
-                            swal.close();
-                        }
-                    });
-                } else {
-                    finisher_ajax();
-                }
-            {% endif %}
-        }
-    });
-
-    // Spawn new windows for links
-    $('.review-overview a').attr('target', '_blank');
-{% endif %}
 
 var ModifyReviewers = new DemoTime.Reviewers({
     url: '{% url 'user-api' %}',
@@ -480,14 +392,5 @@ var NewComments = new DemoTime.BackgroundTasks({
     dt_url: '{{ review.get_absolute_url }}'
 });
 
-$('.leave_reply_link').click(function(event) {
-    event.preventDefault();
-    var link = $(this);
-    link.next('.comment_container').slideDown(function() {
-        $(this).find('textarea').summernote('focus');
-        $(this).find('.note-editor .note-editor').remove();
-    });
-    link.remove();
-});
 </script>
 {% endblock %}

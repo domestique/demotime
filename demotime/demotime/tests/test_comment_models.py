@@ -18,7 +18,7 @@ class TestCommentModels(BaseTestCase):
             commenter=self.user,
             review=review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO('test_file_1')),
+            attachment=File(BytesIO(b'test_file_1')),
             attachment_type='image',
             description='Test Description',
         )
@@ -50,7 +50,7 @@ class TestCommentModels(BaseTestCase):
             commenter=self.user,
             review=review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO('test_file_1')),
+            attachment=File(BytesIO(b'test_file_1')),
             attachment_type='image',
             description='Test Description',
             thread=thread,

@@ -1,36 +1,22 @@
 {% load demo_tags %}
-<li>
-    <span class="icon-{% if request.user.pk == user.pk %}{% reviewer_status demo user %}{% endif %}">
-        <a href="#" class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ demo.pk }}" title="Copy URL"><img src="/static/images/ic_attach.svg"></a>
-        <strong>
-            <a data-pk="{{ demo.pk }}" href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>:
-        </strong>
-        <a href="{{ demo.get_absolute_url }}">
-            {{ demo.title|truncatechars:35 }}
-        </a>
-        {% if demo.state == "closed" %}
-            <small>{{ demo.state }}</small>
-        {% else %}
-            <span class="review_state">
-                {% if demo.reviewer_state == "reviewing" %}
-                    {% if demo.reviewing_count %}
-                        <span title="# Reviewing" class="icon icon-reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
-                    {% endif %}
-                    {% if demo.approved_count %}
-                        <span title="# Approved" class="icon icon-approved"><sup>{{ demo.approved_count }}</sup></span>
-                    {% endif %}
-                    {% if demo.rejected_count %}
-                        <span title="# Rejected" class="icon icon-rejected"><sup>{{ demo.rejected_count }}</sup></span>
-                    {% endif %}
-                {% else %}
-                    <small>
-                        {{ demo.reviewer_state }}
-                    </small>
-                {% endif %}
+
+{% if demo.reviewer_state != "Approved" %}
+    <li class="review_li {% reviewer_status demo user %} {{ demo.state }} {{ demo.reviewer_state }}">
+        <div class="review_li-top">
+            <span class="icon-{% reviewer_status demo user %}">
+                <a class="has_bubble"
+                data-prj="{{ demo.project.pk }}"
+                data-pk="{{ demo.pk }}"
+                href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>
+
+                {% include "includes/review_state.html" %}
+
             </span>
-        {% endif %}
-        <small>
-            <a href="{{ demo.creator.userprofile.get_absolute_url }}">({{ demo.creator.userprofile|truncatechars:15 }})</a>
-        </small>
-    </span>
-</li>
+        </div>
+        <div class="review_li-bottom">
+            <a href="{{ demo.get_absolute_url }}">
+                {{ demo.title }}
+            </a>
+        </div>
+    </li>
+{% endif %}

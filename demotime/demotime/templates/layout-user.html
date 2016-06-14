@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block sub_nav %}
+<nav class="subnav">
+    <div class="container">
+        {% block sub_nav_contents %}
+            <div class="split~940 by:2 align:t">
+                <div class="cel">
+                    {% block sub_nav_search %}
+                        {% include "includes/search.html" %}
+                    {% endblock %}
+                </div>
+                <div class="cel global_actions">
+                    {% block sub_nav_actions %}
+                        {% if available_projects|length == 0 %}
+                            {% for project in available_projects %}
+                                <a class="subnav-item icon icon-plus" href="{% url 'create-review' project.slug %}">New demo</a></li>
+                            {% endfor %}
+                        {% else %}
+                            <div class="new_demo">
+                                <label class="icon icon-pencil">
+                                    New demo:
+                                </label>
+                                <select class="slick new_demo_dropdown">
+                                    {% if object.name %}
+                                        <option value="{% url 'create-review' object.slug %}">{{ object.name }}</option>
+                                    {% endif %}
+                                    {% for project in available_projects %}
+                                        {% if project.name != object.name %}
+                                            <option value="{% url 'create-review' project.slug %}">{{ project.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if request.user.is_superuser %}
+                                        <option value="{% url 'project-create' %}">+ Create New project</option>
+                                    {% endif %}
+                                </select>
+                                <a class="subnav-item new_demo_link icon icon-plus" href="#">New</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+    {% endblock %}
+</nav>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/scripts/Dashboard.js"></script>
+{{ block.super }}
+<script>
+var dashboard = new DemoTime.Dashboard();
+</script>
+{% endblock %}

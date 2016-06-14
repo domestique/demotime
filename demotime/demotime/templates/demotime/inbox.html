@@ -1,6 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'layout-user.html' %}
 {% load demo_tags %}
 {% block title %} - Inbox{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Inbox
+    </div>
+</div>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
@@ -35,9 +43,9 @@
                         <div class="cel">
                             {% if message.review %}
                                 {% if message.review.creator != request.user %}
-                                    <a data-pk="{{ message.review.pk }}" title="Your approval status" class="dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                    <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" title="Your approval status" class="has_bubble dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                                 {% else %}
-                                    <a data-pk="{{ message.review.pk }}" class="dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                    <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                                 {% endif %}
                             {% endif %}
                             <a class="{{ message.read }}" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
@@ -65,7 +73,7 @@
 </div>
 {% endblock %}
 
-{% block footer_scripts %}
+{% block scripts %}
 {{ block.super }}
 <script>
     $('.messages-archive_all').click(function(event) {

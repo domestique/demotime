@@ -1,82 +1,158 @@
-{% extends 'base.html' %}
+{% extends 'layout-user.html' %}
 {% load demo_tags %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        Your dashboard
+    </div>
+</div>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
-<link rel="stylesheet" href="/static/styles/index.css">
+<link rel="stylesheet" href="/static/styles/dashboard.css">
 {% endblock %}
 
 {% block content %}
 <h1 class="heading">
-    Dashboard
+    <strong>Your</strong> Dashboard
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
 </h1>
 
-<div class="reviews-list">
+<div class="dashboard">
+    <article>
+        <h3>
+            Items requiring your attention
+            <span class="help" title="Your dashboard of action items are here. Below you will
+            see demos that you are following or reviewing. You will also see unread messages and
+            demos you've created, if they exist."></span>
+        </h3>
+        <section class="aggregated_dashboard emph_med">
+            {% if open_reviews %}
+                <div class="aggregated_dashboard-reviewing">
+                    <h3 class="icon icon-inbox">
+                        Open demos you're <strong>reviewing</strong>
+                        <span class="help" title="These are demos that have been assigned
+                        to you to review. You can leave feedback and ultimately approve or
+                        reject a demo. Your approval status appears to the left."></span>
+                    </h3>
+                    <ul>
+                        {% for demo in open_reviews %}
+                            {% include "includes/reviews_li.html" %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if followed_demos %}
+                <div class="aggregated_dashboard-following">
+                    <h3 class="icon icon-inbox">
+                        Open demos you're <strong>following</strong>
+                        <span class="help" title="Demos you are following do not require any
+                        action on your part. You can simply follow their progress."></span>
+                    </h3>
+                    <ul>
+                        {% for demo in followed_demos %}
+                            {% include "includes/reviews_li.html" %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <div class="aggregated_dashboard-messages">
+                <h3 class="icon icon-inbox">
+                    Unread messages
+                    {% if message_bundles %}
+                        <small><a href="{% url 'inbox' %}" class="normal_text">view all</a></small>
+                    {% endif %}
+                </h3>
 
-    <div class="quickfind">
-        <form action="{% url 'review-list' %}#results" method="get">
-            <input type="text" id="id_title" name="title" placeholder="Quickly find a demo or user by keyword">
-            <div class="quickfind-results"><section>
-                <div class="quickfind-reviews"></div>
-                <div class="quickfind-users"></div>
-            </section></div>
-        </form>
-    </div>
+                <div class="messages-list">
+                    <ul>
+                        {% if not message_bundles %}
+                            <li>
+                                No unread messages.
+                                <small>
+                                    <a href="{% url 'inbox' %}">View your inbox</a>
+                                </small>
+                            </li>
+                        {% else %}
+                            {% for message in message_bundles %}
+                                <li class="message_li {% if message.read %}de-emphasize{% endif %}">
+                                    {% if message.review %}
+                                        {% if message.review.creator != request.user %}
+                                            <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" title="Your approval status" class="has_bubble dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                        {% else %}
+                                            <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                        {% endif %}
+                                    {% endif %}
+                                    <a class="{{ message.read }} icon icon-mail" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
+                                    {% include "includes/review_state.html" with demo=message.review %}
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="aggregated_dashboard-created">
+                <h3 class="icon icon-calendar">
+                    Active Demos You've Created
+                    {% if open_demos %}
+                        <small>
+                            <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
+                        </small>
+                    {% endif %}
+                </h3>
 
-    <div class="split~680 by:2 with-gap:2">
-        <div class="cel">
-            {% include "includes/reviews_box.html" with reviews=open_reviews follows=followed_demos user=request.user %}
-        </div>
-        <div class="cel">
-            {% include "includes/updates_box.html" with message_bundles=message_bundles user=request.user %}
-        </div>
-    </div>
-    {% if open_demos %}
-        {% include "includes/demos_box.html" with reviews=open_demos user=request.user %}
-    {% endif %}
+                {% if open_demos %}
+                    <ul>
+                        {% for demo in open_demos %}
+                            {% include "includes/reviews_li.html" %}
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <ul>
+                        <li>
+                            There are none to show here
+                            <small>
+                                <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View your demos</a>
+                            </small>
+                        </li>
+                        <li>
+                            <a class="icon icon-plus" href="#" onclick="javascript:$('.new_demo .new_demo_link').trigger('click');">New demo</a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+        </section>
+        <h3>
+            <strong>Projects</strong> you're a member of
+            <span class="help" title="A Project consists of one or more demos.
+            Think of it as a group of demos that all have something in common.
+            Projects are a way of organizing demos."></span>
+        </h3>
+        <section class="emph_lower" style="margin-bottom: 0">
+            <ul>
+                {% if available_projects %}
+                    {% for project in available_projects %}
+                        <li><a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a></li>
+                    {% endfor %}
+                {% else %}
+                    <li>You aren't a member of any projects</li>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                    <li>
+                        <a class="icon icon-plus" href="{% url 'project-create' %}">New project</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </section>
+    </article>
+    {% include "includes/legend.html" %}
 </div>
 
+{% comment %}
 <div class="tip">
     <strong>Power tip</strong>: You can now simply type in {{ site_settings.SERVER_URL }}/DT-1234 to be redirected to a demo.
 </div>
-{% endblock %}
-
-{% block patterns %}
-{{ block.super }}
-<script type="text/x-pattern" id="user_results">
-<strong>Users</strong>
-<ul>
-<% if (user.length) { %>
-    <% _.each(user, function(user) { %>
-        <li><a href="/accounts/profile/<%= user.pk %>"><%= user.name %></a></li>
-    <% }) %>
-<% } else { %>
-    <li>No matching users found</li>
-<% } %>
-</ul>
-</script>
-<script type="text/x-pattern" id="review_results">
-<strong>Demos</strong>
-<ul>
-<% if (reviews.length) { %>
-    <% _.each(reviews, function(review) { %>
-        <li><a href="<%= review.url %>"><%= review.title %></a>, by <%= review.creator %></li>
-    <% }) %>
-<% } else { %>
-    <li>No matching reviews found</li>
-<% } %>
-</ul>
-</script>
-{% endblock %}
-
-{% block footer_scripts %}
-<script src="/static/scripts/Search.js"></script>
-{{ block.super }}
-<script>
-var search = new DemoTime.Search({
-    review_url: '{% url 'reviews-json' %}',
-    user_url: '{% url 'user-api' %}'
-});
-</script>
+{% endcomment %}
 {% endblock %}

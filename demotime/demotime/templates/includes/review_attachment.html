@@ -7,26 +7,26 @@
             <div class="attachment-description">{{ attachment.description }}</div>
         {% endif %}
         {% if attachment.attachment_type == "audio" %}
-            <audio src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true"></audio>
+            <audio src="{% url "user-media" attachment.pk %}" controls="true"></audio>
         {% endif %}
         {% if attachment.attachment_type == "movie" %}
-            <video src="{% url "user-media" attachment.attachment.name|urlencode %}" controls="true"></video>
+            <video src="{% url "user-media" attachment.pk %}" controls="true"></video>
             {% if attachment.attachment_type == "movie" %}
-                <br><small><a href="{% url "user-media" attachment.attachment.name|urlencode %}">download this</a></small>
+                <br><small><a href="{% url "user-media" attachment.pk %}">download this</a></small>
             {% endif %}
         {% endif %}
         {% if attachment.attachment_type == "image" %}
             <span class="attachment-image">
-                <a href="{% url "user-media" attachment.attachment.name|urlencode %}" class="lightboxed">
-                    <img src="{% url "user-media" attachment.attachment.name|urlencode %}" class="img-thumbnail" height=300 width=300>
+                <a href="{% url "user-media" attachment.pk %}" class="lightboxed">
+                    <img src="{% url "user-media" attachment.pk %}" class="img-thumbnail" height=300 width=300>
                 </a>
             </span>
         {% endif %}
         {% if attachment.attachment_type == "document" %}
-            <a href="{% url "user-media" attachment.attachment.name|urlencode %}">Document: {{ attachment.pretty_name|urlencode }}</a>
+            <a href="{% url "user-media" attachment.pk %}">Document: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
         {% if attachment.attachment_type == "other" %}
-            <a href="{% url "user-media" attachment.attachment.name|urlencode %}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
+            <a href="{% url "user-media" attachment.pk %}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
     </section>
 </div>

@@ -131,6 +131,7 @@ class MessagesJsonView(JsonView):
                 models.Review,
                 pk=kwargs.get('review_pk'),
             )
+            self.project = self.review.project
         return super(MessagesJsonView, self).dispatch(*args, **kwargs)
 
     def _format_json(self, bundles):

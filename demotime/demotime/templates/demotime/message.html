@@ -1,5 +1,13 @@
-{% extends 'base.html' %}
+{% extends 'layout-user.html' %}
 {% block title %} - Inbox {% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'inbox' %}">Inbox</a> &gt; Message
+    </div>
+</div>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
@@ -40,7 +48,7 @@
             <a href="{% url 'inbox' %}" class="button-link">Back to inbox</a>
         </li>
         <li>
-            <a href="{{ object.review.get_absolute_url }}" class="button-link alert">Open this demo</a>
+            <a href="{{ object.review.get_absolute_url }}" class="icon icon-right-dir" style="margin-left: 20px">Open this demo</a>
         </li>
     </ul>
     {% for msg in object.message_set.all %}

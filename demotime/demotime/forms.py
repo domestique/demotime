@@ -6,18 +6,15 @@ from demotime import models
 
 class ReviewForm(forms.ModelForm):
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
-        valid_users = User.objects.exclude(
-            pk=user.pk
-        ).exclude(
-            userprofile__user_type=models.UserProfile.SYSTEM
-        ).order_by('username')
-        self.fields['reviewers'].queryset = valid_users
-        self.fields['followers'].queryset = valid_users
+        self.project = project
+        user_queryset = self.project.members.exclude(pk=user.pk)
+        self.fields['reviewers'].queryset = user_queryset
+        self.fields['followers'].queryset = user_queryset
         self.fields['followers'].required = False
 
-        for key, value in self.fields.iteritems():
+        for key, value in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
         if self.instance.pk:
@@ -27,7 +24,7 @@ class ReviewForm(forms.ModelForm):
         model = models.Review
         fields = (
             'reviewers', 'description', 'title',
-            'case_link', 'followers'
+            'case_link', 'followers',
         )
 
 
@@ -78,9 +75,10 @@ class ReviewFilterForm(forms.Form):
         widget=forms.HiddenInput
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, projects, *args, **kwargs):
         super(ReviewFilterForm, self).__init__(*args, **kwargs)
-        for key, value in self.fields.iteritems():
+        self.projects = projects
+        for key, value in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     def get_reviews(self, initial_qs=None):
@@ -91,6 +89,7 @@ class ReviewFilterForm(forms.Form):
             return models.Review.objects.none()
 
         qs = models.Review.objects.all() if not initial_qs else initial_qs
+        qs = qs.filter(project__in=self.projects)
         data = self.cleaned_data
         if data.get('reviewer'):
             qs = qs.filter(reviewer__reviewer=data['reviewer'])
@@ -136,7 +135,7 @@ class CommentForm(forms.ModelForm):
             )
             self.fields['thread'].required = True
 
-        for key, value in self.fields.iteritems():
+        for key, value in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     class Meta:
@@ -263,3 +262,104 @@ class UpdateCommentForm(CommentForm, AttachmentForm):
             raise forms.ValidationError('Attachments require an Attachment Type')
 
         return data['attachment_type']
+
+
+class ProjectMemberForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)
+        if project:
+            self.base_fields['user'].queryset = User.objects.exclude(
+                userprofile__user_type=models.UserProfile.SYSTEM,
+            ).exclude(
+                projectmember__project=project
+            ).order_by('username')
+
+        return super(ProjectMemberForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = models.ProjectMember
+        fields = (
+            'user', 'is_admin'
+        )
+
+
+class EditProjectMemberForm(forms.ModelForm):
+
+    delete = forms.BooleanField(required=False)
+
+    class Meta:
+        model = models.ProjectMember
+        fields = (
+            'user', 'is_admin'
+        )
+
+
+class ProjectGroupForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        project = kwargs.pop('project', None)
+        if project:
+            self.base_fields['group'].queryset = models.Group.objects.exclude(
+                projectgroup__project=project
+            ).order_by('name')
+
+        return super(ProjectGroupForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = models.ProjectGroup
+        fields = (
+            'group', 'is_admin'
+        )
+
+
+class EditProjectGroupForm(forms.ModelForm):
+
+    delete = forms.BooleanField(required=False)
+
+    class Meta:
+        model = models.ProjectGroup
+        fields = (
+            'group', 'is_admin'
+        )
+
+
+class ProjectForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Project
+        fields = (
+            'name', 'slug', 'description', 'is_public',
+        )
+
+
+class GroupForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Group
+        fields = (
+            'name', 'slug', 'description', 'members'
+        )
+
+
+class GroupMemberForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(GroupMemberForm, self).__init__(*args, **kwargs)
+        self.fields['user'].widget = forms.HiddenInput()
+        self.fields['group'].widget = forms.HiddenInput()
+
+    class Meta:
+        model = models.GroupMember
+        fields = (
+            'user', 'group', 'is_admin',
+        )
+
+
+class GroupTypeForm(forms.ModelForm):
+
+    class Meta:
+        model = models.GroupType
+        fields = (
+            'name', 'slug'
+        )

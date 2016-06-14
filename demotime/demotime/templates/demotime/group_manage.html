@@ -1,0 +1,55 @@
+{% extends 'layout-user.html' %}
+
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Cancel</a></li>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'group-list' %}">Groups</a> &gt;
+        {% if group %}
+            Editing {{ group.name }}
+        {% else %}
+            New Group
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block title %}
+    {% if group %}
+        Editing {{ group.name }}
+    {% else %}
+        New Group
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if group %}
+    <h1>Editing {{ group.name }}</h1>
+{% else %}
+    <h1>New Group</h1>
+{% endif %}
+{% if group %}
+    <form action="{% url 'group-manage' group.slug %}" method='post'>
+{% else %}
+    <form action="{% url 'group-manage' %}" method='post'>
+{% endif %}
+    {% csrf_token %}
+    <div class="">
+        <section>
+            {{ form.as_p }}
+        </section>
+        <input type="submit" value="Submit" />
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="/static/scripts/EditGroupsProjects.js"></script>
+<script>
+var edit = new DemoTime.EditGroupsProjects();
+</script>
+{% endblock %}

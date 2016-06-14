@@ -1,0 +1,244 @@
+{% extends 'layout-user.html' %}
+{% block title %}Project {{ object.name }} Administration{% endblock %}
+
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Cancel</a></li>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        {% if object %}
+            <a href="{% url 'project-dashboard' object.slug %}">{{ object.name }}</a> &gt; <a href="{% url 'project-detail' object.slug %}">Administration</a> &gt; Edit
+        {% else %}
+            New Project
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+a.error {
+    transition:5s;
+}
+.project h3 {
+    font-size:1.1em;
+    font-weight:400;
+}
+.project select {
+    margin-bottom:2em;
+}
+.project {
+    font-size: 12px;
+}
+.form-group.first {
+    margin-top: 0;
+}
+.project label {
+    font-size: 1.7em;
+    color: #555;
+    font-weight: 400;
+}
+.project section p:first-child {
+    margin-top: 0;
+}
+.project section section section {
+    box-shadow: none;
+    background: #f7f7f7;
+    padding: 10px;
+}
+.project section label {
+    color: #777;
+    font-size: 1.3em;
+    margin-top: 0;
+    padding-top: 0;
+}
+section .form-group {
+    margin-top: 0;
+}
+@media screen and (max-width:680px) {
+    h3 small {
+        display: block;
+        font-size: 11px;
+    }
+}
+.groups,
+.members {
+    overflow: hidden;
+}
+
+label[for="id_is_public"],
+.groups label,
+.members label {
+    display: inline-block;
+}
+
+.groups select {
+    margin: 0 5px;
+}
+
+.groups a,
+.members a {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.group,
+.member {
+    float: left;
+    width: 33%;
+    margin-bottom: 15px;
+}
+.group {
+    width: 50%;
+}
+@media screen and (max-width:680px) {
+    .group,
+    .member {
+        width: 50%;
+    }
+    .group {
+        width: 100%;
+    }
+}
+
+.project input[type="checkbox"] {
+    position: relative;
+    top: -1px;
+    left: 3px;
+}
+section label[for="id_is_public"] {
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+{% if object %}
+    <h1>Editing {{ object.name }} details</h1>
+{% else %}
+    <h1>New Project</h1>
+{% endif %}
+
+<article class="project">
+    <section>
+        {% if object %}
+            <form action="{% url 'project-admin' object.slug %}" method='post'>
+        {% else %}
+            <form action="{% url 'project-create' %}" method='post'>
+        {% endif %}
+            {% csrf_token %}
+            {# PROJECT FORM #}
+            <h3 class="icon icon-pencil">
+                Basic information
+            </h3>
+            <section>
+                {{ project_form.as_p }}
+            </section>
+
+            {# EDIT GROUPS FORMS #}
+            <h3 class="icon icon-cog" id="groups">
+                Groups
+                <span class="help" title="Groups are simply collections of DemoTime users.
+                Developers, designers, product managers and so forth could be considered groups.
+                Groups are global to DemoTime, and can be attached to projects. For instance,
+                the developer group can be assigned to many projects. Below are the groups
+                associated with this project."></span>
+            </h3>
+
+            <section>
+                <div class="split~680 by:2 with-gap:3">
+                    <div class="cel">
+                        <h4>Edit</h4>
+                        <section class="groups">
+                            {{ edit_group_formset.management_form }}
+                            {% for field in edit_group_formset %}
+                                <div class="form-group {{ field.errors|yesno:'errors,'}}">
+                                    <div class="fields">
+                                        {{ field }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                    <div class="cel">
+                        {# ADD GROUPS FORMS #}
+                        <h4>Add</h4>
+                        <section class="groups">
+                            {{ group_formset.management_form }}
+                            {% for field in group_formset %}
+                                <div class="group" {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                                    <div class="form-group {{ field.errors|yesno:'errors,'}}">
+                                        <div class="fields">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    <a href="#" id="add_group" class="attachment-add icon icon-plus-circled">add another</a>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                </div>
+            </section>
+
+            <h3 class="icon icon-user" id="members">
+                Members
+                <span class="help" title="Below are the members of this project.
+                A person as an individual can be assigned to a project. If a person
+                is part of a group that is assigned to a project, that person would
+                also be part of the project."></span>
+            </h3>
+
+            <section>
+                <div class="split~680 by:2 with-gap:3">
+                    <div class="cel">
+                        <h4>Edit</h4>
+                        <section class="members">
+                            {{ edit_member_formset.management_form }}
+                            {% for field in edit_member_formset %}
+                                <div class="form-group {{ field.name }} {{ field.errors|yesno:'errors,'}}">
+                                    <div class="fields">
+                                        {{ field }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                    <div class="cel">
+                        {# ADD MEMBERS FORMS #}
+                        <h4>Add</h4>
+                        <section class="members">
+                            {{ member_formset.management_form }}
+                            {% for field in member_formset %}
+                                <div class="member" {% if forloop.counter > 1 %}style="display:none"{% endif %}>
+                                    <div class="form-group {{ field.errors|yesno:'errors,'}}">
+                                        <div class="fields">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    <a href="#" id="add_member" class="icon icon-plus-circled">add another</a>
+                                </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                </div>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </section>
+</article>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="/static/scripts/EditGroupsProjects.js"></script>
+<script>
+var edit = new DemoTime.EditGroupsProjects();
+</script>
+{% endblock %}

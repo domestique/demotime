@@ -1,5 +1,5 @@
 import json
-from StringIO import StringIO
+from io import StringIO
 
 from django.core import mail
 from django.contrib.auth.models import User
@@ -71,7 +71,10 @@ class TestReviewViews(BaseTestCase):
                 deleted=False,
             ).exists()
         )
-        response = self.client.get(reverse('review-detail', args=[self.review.pk]))
+        response = self.client.get(reverse(
+            'review-detail',
+            args=[self.project.slug, self.review.pk]
+        ))
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
         self.assertTemplateUsed(response, 'demotime/review.html')
@@ -114,7 +117,10 @@ class TestReviewViews(BaseTestCase):
                 deleted=False,
             ).exists()
         )
-        response = self.client.get(reverse('review-detail', args=[self.review.pk]))
+        response = self.client.get(reverse(
+            'review-detail',
+            args=[self.project.slug, self.review.pk]
+        ))
         self.assertStatusCode(response, 200)
         self.assertEqual(response.context['object'].pk, self.review.pk)
         self.assertTemplateUsed(response, 'demotime/review.html')
@@ -137,11 +143,15 @@ class TestReviewViews(BaseTestCase):
 
     def test_get_review_login_required(self):
         self.client.logout()
-        response = self.client.get(reverse('review-detail', args=[self.review.pk]))
+        response = self.client.get(reverse(
+            'review-detail',
+            args=[self.project.slug, self.review.pk]
+        ))
         self.assertStatusCode(response, 302)
 
     def test_review_rev_detail(self):
         response = self.client.get(reverse('review-rev-detail', kwargs={
+            'proj_slug': self.project.slug,
             'pk': self.review.pk,
             'rev_num': self.review.revision.number,
         }))
@@ -149,13 +159,14 @@ class TestReviewViews(BaseTestCase):
 
     def test_review_rev_detail_404(self):
         response = self.client.get(reverse('review-rev-detail', kwargs={
+            'proj_slug': self.project.slug,
             'pk': self.review.pk,
             'rev_num': 500,
         }))
         self.assertStatusCode(response, 404)
 
     def test_get_create_review(self):
-        response = self.client.get(reverse('create-review'))
+        response = self.client.get(reverse('create-review', args=[self.project.slug]))
         self.assertStatusCode(response, 200)
         self.assertIn('review_form', response.context)
         self.assertIn('review_inst', response.context)
@@ -163,21 +174,35 @@ class TestReviewViews(BaseTestCase):
 
     def test_get_create_review_login_required(self):
         self.client.logout()
-        response = self.client.get(reverse('create-review'))
+        response = self.client.get(reverse('create-review', args=[self.project.slug]))
         self.assertStatusCode(response, 302)
+
+    def test_create_review_filters_out_unauthorized_users(self):
+        ''' Test asserts that we don't show reviewer/followers that aren't
+        part of the project that the review is being created under
+        '''
+        unauthed_user = User.objects.create(username='bad_user')
+        response = self.client.get(reverse('create-review', args=[self.project.slug]))
+        self.assertStatusCode(response, 200)
+        form = response.context['review_form']
+        reviewers = form.fields['reviewers'].queryset
+        followers = form.fields['followers'].queryset
+        self.assertNotIn(unauthed_user, reviewers)
+        self.assertNotIn(unauthed_user, followers)
 
     def test_post_create_review(self):
         fh = StringIO('testing')
         fh.name = 'test_file_1'
         title = 'Test Title Create Review POST'
         self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(reverse('create-review'), {
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
             'creator': self.user,
             'title': title,
             'description': 'Test Description',
             'case_link': 'http://www.example.org',
             'reviewers': self.test_users.values_list('pk', flat=True),
             'followers': self.followers.values_list('pk', flat=True),
+            'project': self.project.pk,
             'form-TOTAL_FORMS': 4,
             'form-INITIAL_FORMS': 0,
             'form-MIN_NUM_FORMS': 0,
@@ -223,21 +248,25 @@ class TestReviewViews(BaseTestCase):
         fh.name = 'test_file_1'
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(reverse('edit-review', args=[self.review.pk]), {
-            'creator': self.user,
-            'title': title,
-            'description': 'Updated Description',
-            'case_link': 'http://www.example.org/1/',
-            'reviewers': self.test_users.values_list('pk', flat=True),
-            'followers': [],
-            'form-TOTAL_FORMS': 4,
-            'form-INITIAL_FORMS': 0,
-            'form-MIN_NUM_FORMS': 0,
-            'form-MAX_NUM_FORMS': 5,
-            'form-0-attachment': fh,
-            'form-0-attachment_type': 'image',
-            'form-0-description': 'Test Description',
-        })
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            {
+                'creator': self.user,
+                'title': title,
+                'description': 'Updated Description',
+                'case_link': 'http://www.example.org/1/',
+                'reviewers': self.test_users.values_list('pk', flat=True),
+                'followers': [],
+                'project': self.project.pk,
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+                'form-0-attachment': fh,
+                'form-0-attachment_type': 'image',
+                'form-0-description': 'Test Description',
+            }
+        )
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
         self.assertEqual(obj.creator, self.user)
@@ -266,7 +295,7 @@ class TestReviewViews(BaseTestCase):
         )
 
     def test_post_create_review_with_errors(self):
-        response = self.client.post(reverse('create-review'), {
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
             'creator': self.user,
             'form-TOTAL_FORMS': 4,
             'form-INITIAL_FORMS': 0,
@@ -286,7 +315,7 @@ class TestReviewViews(BaseTestCase):
             reviewer=user,
         )
         url = reverse(
-            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+            'update-reviewer-status', args=[self.project.slug, self.review.pk, reviewer.pk]
         )
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -294,7 +323,7 @@ class TestReviewViews(BaseTestCase):
             'status': models.reviews.APPROVED
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': False,
             'new_state': '',
@@ -312,7 +341,7 @@ class TestReviewViews(BaseTestCase):
             reviewer=user,
         )
         url = reverse(
-            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+            'update-reviewer-status', args=[self.project.slug, self.review.pk, reviewer.pk]
         )
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -320,14 +349,14 @@ class TestReviewViews(BaseTestCase):
             'status': 'BOGUS',
         })
         self.assertStatusCode(response, 400)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': False,
             'new_state': '',
             'reviewer_status': reviewer.status,
             'success': False,
             'errors': {
-                'status': [u'Select a valid choice. BOGUS is not one of the available choices.'],
+                'status': ['Select a valid choice. BOGUS is not one of the available choices.'],
             },
         })
 
@@ -347,7 +376,9 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(self.review.reviewer_state, models.reviews.REVIEWING)
         self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         url = reverse('update-reviewer-status', kwargs={
-            'review_pk': self.review.pk, 'reviewer_pk': reviewer.pk
+            'proj_slug': self.project.slug,
+            'review_pk': self.review.pk,
+            'reviewer_pk': reviewer.pk
         })
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -355,7 +386,7 @@ class TestReviewViews(BaseTestCase):
             'status': models.reviews.APPROVED
         })
         self.assertStatusCode(response, 200)
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': True,
             'new_state': models.reviews.APPROVED,
@@ -372,7 +403,7 @@ class TestReviewViews(BaseTestCase):
             reviewer=self.test_users[0],
         )
         url = reverse(
-            'update-reviewer-status', args=[self.review.pk, reviewer.pk]
+            'update-reviewer-status', args=[self.project.slug, self.review.pk, reviewer.pk]
         )
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -383,13 +414,13 @@ class TestReviewViews(BaseTestCase):
 
     def test_update_review_state_closed(self):
         self.assertEqual(len(mail.outbox), 0)
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.CLOSED
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': models.reviews.CLOSED,
             'state_changed': True,
             'success': True,
@@ -403,13 +434,13 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(len(mail.outbox), 5)
 
     def test_update_review_state_aborted(self):
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.ABORTED
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': models.reviews.ABORTED,
             'state_changed': True,
             'success': True,
@@ -424,13 +455,13 @@ class TestReviewViews(BaseTestCase):
     def test_update_review_state_reopened(self):
         self.review.state = models.reviews.CLOSED
         self.review.save(update_fields=['state'])
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.OPEN,
         })
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': models.reviews.OPEN,
             'state_changed': True,
             'success': True,
@@ -445,13 +476,13 @@ class TestReviewViews(BaseTestCase):
     def test_update_review_state_invalid(self):
         self.client.logout()
         self.client.login(username='test_user_0', password='testing')
-        url = reverse('update-review-state', args=[self.review.pk])
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
             'state': models.reviews.OPEN,
         })
         self.assertStatusCode(response, 400)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'state': self.review.state,
             'state_changed': False,
             'success': False,
@@ -577,21 +608,23 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(obj.title, 'Test Title')
 
     def test_review_json_no_match(self):
-        response = self.client.post(reverse('reviews-json'), {
-            'title': 'zxy'
-        })
+        response = self.client.post(
+            reverse('reviews-json', args=[self.project.slug]),
+            {'title': 'zxy'}
+        )
         self.assertStatusCode(response, 200)
-        self.assertEqual(json.loads(response.content), {
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'count': 0,
             'reviews': []
         })
 
     def test_review_json_by_pk(self):
-        response = self.client.post(reverse('reviews-json'), {
-            'pk': self.review.pk,
-        })
+        response = self.client.post(
+            reverse('reviews-json', args=[self.project.slug]),
+            {'pk': self.review.pk}
+        )
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 1)
         review = json_data['reviews'][0]
         self.assertEqual(review['title'], self.review.title)
@@ -619,15 +652,18 @@ class TestReviewViews(BaseTestCase):
 
     def test_review_json_all_the_filters(self):
         test_user = User.objects.get(username='test_user_0')
-        response = self.client.post(reverse('reviews-json'), {
-            'reviewer': test_user.pk,
-            'creator': self.user.pk,
-            'state': models.reviews.OPEN,
-            'reviewer_state': models.reviews.REVIEWING,
-            'title': 'test',
-        })
+        response = self.client.post(
+            reverse('reviews-json', args=[self.project.slug]),
+            {
+                'reviewer': test_user.pk,
+                'creator': self.user.pk,
+                'state': models.reviews.OPEN,
+                'reviewer_state': models.reviews.REVIEWING,
+                'title': 'test',
+            }
+        )
         self.assertStatusCode(response, 200)
-        json_data = json.loads(response.content)
+        json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 1)
         review = json_data['reviews'][0]
         review_obj = models.Review.objects.get(pk=review['pk'])
@@ -638,6 +674,64 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(review['url'], review_obj.get_absolute_url())
         reviewers = review['reviewers']
         self.assertIn(test_user.pk, [x['user_pk'] for x in reviewers])
+
+    def test_review_json_without_project_slug(self):
+        project = models.Project.objects.create(
+            name='Second Project', slug='second-project', description=''
+        )
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Test Title 2'
+        second_review_kwargs['project'] = project
+        second_review = models.Review.create_review(**second_review_kwargs)
+        response = self.client.post(reverse('reviews-json'), {
+            'title': 'test'
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        self.assertEqual(review['title'], 'Test Title')
+        self.assertEqual(review['pk'], self.review.pk)
+        self.assertNotEqual(review['pk'], second_review.pk)
+
+    def test_review_json_posting_project_pk(self):
+        project = models.Project.objects.create(
+            name='Second Project', slug='second-project', description=''
+        )
+        models.ProjectMember.objects.create(
+            project=project, user=self.user
+        )
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Test Title 2'
+        second_review_kwargs['project'] = project
+        second_review = models.Review.create_review(**second_review_kwargs)
+        response = self.client.post(reverse('reviews-json'), {
+            'title': 'test',
+            'project_pk': self.project.pk,
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        self.assertEqual(review['title'], 'Test Title')
+        self.assertEqual(review['pk'], self.review.pk)
+        self.assertNotEqual(review['pk'], second_review.pk)
+
+    def test_review_json_posting_project_pk_unauthorized(self):
+        project = models.Project.objects.create(
+            name='Second Project', slug='second-project', description=''
+        )
+        second_review_kwargs = self.default_review_kwargs.copy()
+        second_review_kwargs['title'] = 'Test Title 2'
+        second_review_kwargs['project'] = project
+        models.Review.create_review(**second_review_kwargs)
+        response = self.client.post(reverse('reviews-json'), {
+            'title': 'test',
+            'project_pk': project.pk,
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(json_data['count'], 0)
 
     def test_review_list_sort_by_newest(self):
         review_kwargs = self.default_review_kwargs.copy()
@@ -672,7 +766,10 @@ class TestReviewViews(BaseTestCase):
         self.assertStatusCode(response, 301)
         self.assertRedirects(
             response,
-            reverse('review-detail', kwargs={'pk': review.pk}),
+            reverse('review-detail', kwargs={
+                'proj_slug': self.project.slug,
+                'pk': review.pk
+            }),
             status_code=301,
         )
 

@@ -1,14 +1,22 @@
 language: python
+services:
+    - postgresql
+addons:
+    hosts:
+        - db
+env:
+    - TRAVIS=true
 python:
-  - "2.7"
+  - "3.5"
 install:
+  - sudo mkdir /usr/local/demotime
   - pip install -r requirements.txt
   - pip install -r testing_requirements.txt
+  - pip install -r prod_requirements.txt
   - export PYTHONPATH=$PYTHONPATH:`pwd`/demotime
 script:
-  - fab run_tests
+  - invoke run_tests
 notifications:
   email:
     recipients:
       - f4nt@f4ntasmic.com
-      - dannypeck@gmail.com

@@ -1,0 +1,87 @@
+{% extends 'layout-user.html' %}
+{% block title %}- Project {{ object.name }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; {{ object.name }}
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
+{% endblock %}
+
+{% block content %}
+<h1 class="heading">
+    <strong>{{ object.name }}</strong> Dashboard
+    {% if is_admin %}
+        <small>
+            <a class="icon icon-right-dir" href="{% url 'project-detail' object.slug %}">Go to Project Administration</a>
+        </small>
+    {% endif %}
+</h1>
+
+<div class="dashboard">
+    <article style="margin-top: 20px">
+        <h3 class="icon icon-calendar">
+            All open demos on <strong>{{ object.name }}</strong>
+            <span class="help" title="Here you will see all of the open
+                demos on '{{ object.name }}' regardless of who created them.
+                This is a good way to see activity on all of the demos in
+                the project."></span>
+        </h3><br>
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>
+                    <th>Demo</th>
+                    <th>Title</th>
+                    <th>Owner</th>
+                    <th>Demo State</th>
+                    <th>Reviewers</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for demo in open_demos %}
+                    <tr>
+                        <td width="54">
+                            <span>
+                                <a class="has_bubble"
+                                data-prj="{{ demo.project.pk }}"
+                                data-pk="{{ demo.pk }}"
+                                href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>
+                            </span>
+                        </td>
+                        <td>{{ demo.title }}</td>
+                        <td>
+                            <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}</a>
+                        </td>
+                        <td width="90">
+                            <span class="icon icon-{{ demo.reviewer_state }}">{{ demo.reviewer_state }}</span>
+                        </td>
+                        <td width="240">
+                            <ul>
+                                {% for reviewer in demo.reviewer_set.all %}
+                                    <li>
+                                        <a class="icon icon-{{ reviewer.get_status_display }}"
+                                        href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
+                                            {{ reviewer.reviewer.userprofile }}</a>
+                                        <small>
+                                            {% if reviewer.get_status_display != 'Approved' %}
+                                                {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
+                                            {% endif %}
+                                        </small>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </article>
+    {% include "includes/legend.html" %}
+</div>
+{% endblock %}

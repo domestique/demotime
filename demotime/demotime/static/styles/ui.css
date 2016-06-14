@@ -6,32 +6,32 @@
 .icon-document:before { content: '\e801'; } /* '' */
 
 a.button-link {
-    background:#32CCAE;
-    box-shadow:4px 4px 0 #ccc;
-    padding:5px 8px;
-    display:inline-block;
-    color:#fff;
+    background: #32CCAE;
+    box-shadow: 4px 4px 0 #ccc;
+    padding: 5px 8px;
+    display: inline-block;
+    color: #fff;
 }
 a.button-link:hover {
-    text-decoration:none;
+    text-decoration: none;
 }
-button.alert,
-a.button-link.alert {
-    background:#E03743;
+.subnav a.subnav-item.alert {
+    background: #E03743;
+    color: #fff;
 }
-button.confirm,
-a.button-link.confirm {
-    background:#335166;
+.subnav a.subnav-item.confirm {
+    background: #115745;
+    color: #fff;
 }
 
 .review-attachments {
-    overflow:hidden;
+    overflow: hidden;
 }
 .attachment h4 {
-    margin-top:3em;
+    margin-top: 3em;
 }
 .attachment h4:first-child {
-    margin-top:0;
+    margin-top: 0;
 }
 .attachment-description {
     background: #eee;
@@ -44,7 +44,7 @@ a.button-link.confirm {
     background: #666;
 }
 .attachment-card {
-    margin:10px;
+    margin: 10px;
 }
 .attachment-card section {
     min-height: 250px;
@@ -73,18 +73,18 @@ a.button-link.confirm {
     max-width: 100%;
 }
 .attachment-card.audio {
-    width:100%;
-    height:auto;
+    width: 100%;
+    height: auto;
 }
 .attachment-card img {
-    width:auto;
-    max-width:100%;
-    height:auto;
-    max-height:200px;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 200px;
     margin: 0 auto;
 }
 .attachment-card .attachment-image {
-    position:relative;
+    position: relative;
     display: block;
     text-align: center;
 }
@@ -94,82 +94,82 @@ a.button-link.confirm {
 }
 
 .summary a {
-    font-size:0.8em;
+    font-size: 0.8em;
 }
 .toggled_text {
-    display:none;
+    display: none;
 }
 
 .attachments {
     overflow: hidden;
 }
 .attachments section {
-    padding:1em;
+    padding: 1em;
 }
 .attachments label {
     font-size: 16px;
-    margin:0 0 10px;
+    margin: 0 0 10px;
 }
 .attachments input[type="text"] {
-    height:1.5rem;
+    height: 1.5rem;
 }
 
 .help {
-    display:inline-block;
-    width:12px;
-    height:12px;
-    background:url(/static/images/emoji/question.png) 0 0 no-repeat;
-    background-size:100%;
-    position:relative;
-    top:-2px;
-    left:1px;
-    cursor:pointer;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: url(/static/images/emoji/question.png) 0 0 no-repeat;
+    background-size: 100%;
+    position: relative;
+    top: -2px;
+    left: 1px;
+    cursor: pointer;
 }
 .help.alert {
-    background:url(/static/images/help_alt.png) 0 0 no-repeat;
-    background-size:100%;
+    background: url(/static/images/help_alt.png) 0 0 no-repeat;
+    background-size: 100%;
 }
 
 @media screen and (max-width:680px) {
-    [class~='split~680']>.cel {
-        margin-bottom:1.5em;
+    main [class~='split~680']>.cel {
+        margin-bottom: 1.5em;
     }
 }
 
 .state-highlight:before {
-    transition:1s;
-    background:#E03743;
-    padding:2px;
+    transition: 1s;
+    background: #E03743;
+    padding: 2px;
 }
 
 .content h1:not(.heading) {
-    background:none;
-    color:#333;
-    padding:0;
-    box-shadow:none;
+    background: none;
+    color: #333;
+    padding: 0;
+    box-shadow: none;
 }
 .content section h1:not(.heading),
 .content section h2:not(.heading),
 .content section h3:not(.heading),
 .content section h4:not(.heading),
 .content section h5:not(.heading) {
-    text-transform:none;
-    margin:10px 0;
+    text-transform: none;
+    margin: 10px 0;
 }
 .content section h2:not(.heading) {
-    font-size:1.8em;
+    font-size: 1.8em;
 }
 .content section h3:not(.heading) {
-    font-size:1.7em;
+    font-size: 1.7em;
 }
 .content section h4:not(.heading) {
-    font-size:1.6em;
+    font-size: 1.6em;
 }
 .content section h5:not(.heading) {
-    font-size:1.4em;
+    font-size: 1.4em;
 }
 .content section h2 {
-    font-size:2em;
+    font-size: 2em;
 }
 
 .sweet-alert ul {
@@ -178,7 +178,7 @@ a.button-link.confirm {
     padding: 0;
 }
 h3 small {
-    color:#aaa;
+    color: #aaa;
     margin-left: 10px;
 }
 
@@ -192,6 +192,10 @@ h3 small {
     color: #ffffe7
 }
 
+.left {
+    text-align: left;
+}
+
 .tip {
     background: #fafafa;
     border: 1px solid #ddd;
@@ -200,6 +204,13 @@ h3 small {
 }
 
 /* Review bubble */
+.copy_link {
+    background: url(/static/images/ic_attach.svg) 0 50% no-repeat;
+    display: inline-block;
+    padding-left: 20px;
+    background-size: 15px;
+}
+
 .review_info {
     margin: 0;
     padding: 10px;
@@ -249,7 +260,7 @@ h3 small {
 .review_info .icon-Reviewing, .icon-reviewing,
 .icon-Reviewing, .icon-reviewing {
     background: url(/static/images/emoji/clock_dark.png) 0 50% no-repeat !important;
-    background-size: 16px !important;
+    background-size: 15px !important;
 }
 
 .icon-Rejected, .icon-rejected {
@@ -260,9 +271,57 @@ h3 small {
 .icon-Approved, .icon-approved,
 .icon-Rejected, .icon-rejected {
     padding-left: 20px;
-    background-size: 16px;
+    background-size: 15px;
 }
 
-.copy_link {
+.quickfind input[type="text"] {
+    background: #fafafa;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    height: auto;
     margin: 0;
+}
+@media screen and (max-width:680px) {
+    .quickfind input[type="text"] {
+        font-size: 11px;
+    }
+}
+.quickfind-results {
+    display: none;
+}
+.quickfind-results section ul,
+.quickfind-results section li {
+    margin: 0;
+    padding: 3px 0;
+}
+.quickfind-results section a {
+    padding: 0;
+    line-height: 21px;
+    display: inline;
+}
+.quickfind-results section li {
+    color: #999;
+}
+.quickfind-results section {
+    min-height: 0;
+    padding: 10px;
+    margin-bottom: 5px
+}
+.quickfind-results strong {
+    display: block;
+    background: #ddd;
+    color: #555;
+    padding: 5px;
+    cursor: pointer;
+}
+.dashboard .quickfind a {
+    color: #222;
+}
+
+.game {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 10px;
+    display: inline-block;
+    margin-right: 3px;
 }

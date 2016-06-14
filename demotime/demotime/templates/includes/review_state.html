@@ -1,0 +1,39 @@
+<div class="review_state">
+    {% if demo.state == "closed" %}
+        <small>{{ demo.state }}</small>
+    {% elif demo.reviewer_state == "approved" %}
+        <small>
+            {{ demo.reviewer_state }}!
+            {% if demo.state == "open" and request.user.pk == user.pk %}
+                <span style="margin-left: 3px;">please <a href="{{ demo.get_absolute_url }}">close this demo</a></span>
+            {% endif %}
+        </small>
+    {% elif demo.reviewing_count or demo.reviewing_count or demo.rejected_count %}
+        <span>
+            {% if demo.reviewer_state == "reviewing" %}
+                {% if demo.reviewing_count %}
+                    <span class="icon icon-reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
+                {% endif %}
+                {% if demo.approved_count %}
+                    <span class="icon icon-approved"><sup>{{ demo.approved_count }}</sup></span>
+                {% endif %}
+                {% if demo.rejected_count %}
+                    <span class="icon icon-rejected"><sup>{{ demo.rejected_count }}</sup></span>
+                {% endif %}
+            {% else %}
+                <small>
+                    {{ demo.reviewer_state }}
+                </small>
+            {% endif %}
+        </span>
+    {% endif %}
+    {% if demo.reviewer_state != "approved" %}
+        <small style="margin-left: 0">
+            {% if request.user == demo.creator %}
+                by you
+            {% else %}
+                by <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}</a>
+            {% endif %}
+        </small>
+    {% endif %}
+</div>

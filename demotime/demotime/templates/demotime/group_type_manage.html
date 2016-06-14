@@ -1,0 +1,55 @@
+{% extends 'layout-user.html' %}
+
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Cancel</a></li>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; <a href="{% url 'group-list' %}">Groups</a> &gt;
+        {% if group_type %}
+            Editing {{ group_type.name }}
+        {% else %}
+            New Group Type
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block title %}
+    {% if group_type %}
+        Editing {{ group_type.name }}
+    {% else %}
+        New Group Type
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+{% if group_type %}
+    <h1>Editing {{ group_type.name }}</h1>
+{% else %}
+    <h1>New Group Type</h1>
+{% endif %}
+{% if group_type %}
+    <form action="{% url 'group-type-manage' group_type.slug %}" method='post'>
+{% else %}
+    <form action="{% url 'group-type-manage' %}" method='post'>
+{% endif %}
+    {% csrf_token %}
+    <div class="">
+        <section>
+            {{ form.as_p }}
+        </section>
+        <input type="submit" value="Submit" />
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="/static/scripts/EditGroupsProjects.js"></script>
+<script>
+var edit = new DemoTime.EditGroupsProjects();
+</script>
+{% endblock %}

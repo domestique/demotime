@@ -1,12 +1,28 @@
-{% extends 'base.html' %}
+{% extends 'layout-user.html' %}
 
 {% block sub_nav %}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        <a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a> &gt;
+        {% block crumbs_contents %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
 
 {% block styles %}
 {{ block.super }}
 <style>
 a.error {
     transition:5s;
+}
+h1 em {
+    font-style: normal;
+    font-size: 20px;
+    vertical-align: middle;
+    color: #999;
 }
 .review h3 {
     font-size:1.1em;
@@ -40,7 +56,7 @@ a.error {
         <div class="review">
             <form action="" method="post" enctype="multipart/form-data" id="submit_review">
                 {% csrf_token %}
-                <div class="form-group">
+                <div class="form-group" style="margin-top: 0">
                     <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>
                     {{ review_form.title.errors }}
                     {{ review_form.title }}
@@ -51,7 +67,7 @@ a.error {
                     {{ review_form.case_link }}
                 </div>
                 <div class="form-group">
-                    <h3 class="icon icon-pencil">{% block description_leader %}{% endblock%}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
+                    <h3 class="icon icon-pencil">{% block description_leader %}{% endblock %}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
                     {{ review_form.description }}
                     {{ review_form.description.errors }}
                 </div>
@@ -68,8 +84,8 @@ a.error {
                 <h3>
                     Reviewers and Followers
                     <span class="help" title="When you assign someone as a 'reviewer' they
-                    will need to either approve or reject a review. A follower can simply follow
-                    the progress of a review without the ability or need to approve or reject."></span>
+                    will need to either approve or reject a demo. A follower can simply follow
+                    the progress of a demo without the ability or need to approve or reject."></span>
                     <small>Hold down 'cmd' to select multiple people</small>
                 </h3>
                 <div class="split~680 by:2 with-gap:3">
@@ -96,4 +112,9 @@ a.error {
         </div>
     </section>
 </article>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="/static/scripts/review_utils.js"></script>
 {% endblock %}

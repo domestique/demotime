@@ -3,7 +3,7 @@ from socket import error as socket_error
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.template import Context, loader
+from django.template import loader
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 
@@ -68,8 +68,8 @@ class Message(BaseModel):
     message = models.TextField(blank=True)
     bundle = models.ForeignKey('MessageBundle')
 
-    def __unicode__(self):
-        return u'Message for {}, From {}'.format(
+    def __str__(self):
+        return 'Message for {}, From {}'.format(
             self.receipient.username, self.sender.username
         )
 
@@ -102,7 +102,7 @@ class Message(BaseModel):
         })
         msg_text = loader.get_template(
             template_name
-        ).render(Context(context_dict))
+        ).render(context_dict)
         obj = cls.create_message(
             receipient=receipient,
             sender=system_user,

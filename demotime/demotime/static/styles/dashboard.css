@@ -1,0 +1,160 @@
+/* Reviews list (profile/dashboard) */
+.dashboard h3 {
+    margin:0;
+    font-size:18px;
+}
+@media screen and (max-width:680px) {
+    .dashboard h3 {
+        font-size:14px;
+    }
+}
+.dashboard section {
+    padding:10px;
+}
+.content .dashboard article section h3 {
+    font-size: 16px;
+    color: #eee;
+}
+.content section > div:not(:first-child) {
+    margin-top: 25px;
+}
+.dashboard section li {
+    color: #ccc;
+    padding: 5px;
+}
+.dashboard section,
+.dashboard section a {
+    color: #fff;
+    font-weight: 200;
+}
+.dashboard li p:first-child {
+    margin: 0;
+}
+section .review_li a {
+    color: #ccc;
+}
+section .messages-list .message_li a,
+section .review_li.open.approved a,
+section .review_li.Reviewing a {
+    color: #fff;
+    font-weight: 400;
+}
+.messages-list .de-emphasize .icon-mail:before {
+    display: none;
+}
+section .review_li.de-emphasize {
+    opacity: 0.4
+}
+section .review_li.de-emphasize * {
+    font-weight: 200 !important;
+}
+
+/* Message center messages */
+li.de-emphasize {
+    opacity: 0.4
+}
+li.de-emphasize * {
+    font-weight: 200 !important;
+}
+
+.aggregated_dashboard-assigned .Approved {
+    display: none;
+}
+
+
+.dashboard ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+section.emph_high {
+    background:rgba(48, 48, 48, 1);
+}
+section.emph_med {
+    background: rgba(48, 48, 48, .8);
+}
+section.emph_low {
+    background: rgba(48, 48, 48, .7);
+}
+section.emph_lower {
+    background: rgba(48, 48, 48, .6);
+}
+.dashboard section.done {
+    background-image: url(/static/images/done.png);
+    background-repeat: no-repeat;
+    background-size: 10%;
+    background-position: 50% 50%;
+}
+
+.state-highlight:before {
+    font-size: 1.5em;
+}
+.dashboard small {
+    text-transform: uppercase;
+    margin-left: 3px;
+    font-size: 8px;
+    color: #ccc;
+    vertical-align: middle;
+}
+.dashboard small.reviewing {
+    color: #ffffe7;
+    font-weight: 800;
+}
+
+section li.review_li {
+    background: #3f3f3f;
+    padding: 0;
+    margin: 8px 0;
+}
+section li.review_li:last-child {
+    margin-bottom: 0;
+}
+section .review_li-top {
+    background: #2a2a2a;
+    padding: 3px 8px;
+}
+section .review_li-bottom {
+    padding: 8px;
+}
+
+.dashboard .review_state {
+    margin-left: 10px;
+    white-space: nowrap;
+    display: inline-block;
+}
+.dashboard .icon sup {
+    font-size: 9px;
+    position: relative;
+    left: -3px;
+    top: 1px;
+}
+
+.icon-Reviewing, .icon-reviewing {
+    background: url(/static/images/emoji/clock.png) 0 50% no-repeat;
+    background-size: 16px;
+}
+
+.legend {
+    margin-top: 50px;
+}
+.legend li span {
+    color: #666;
+    font-weight: 300;
+}
+
+table {
+    background: #fff;
+    border: 1px solid #ddd;
+}
+th, td {
+    font-size: 14px;
+    vertical-align: top;
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+.dashboard td small {
+    color: #555;
+    font-weight: 700;
+    white-space: nowrap;
+}

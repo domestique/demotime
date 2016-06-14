@@ -12,8 +12,8 @@ class CommentThread(BaseModel):
 
     review_revision = models.ForeignKey('ReviewRevision')
 
-    def __unicode__(self):
-        return u'Comment Thread for Review: {}'.format(self.review_revision)
+    def __str__(self):
+        return 'Comment Thread for Review: {}'.format(self.review_revision)
 
     @classmethod
     def create_comment_thread(cls, review_revision):
@@ -31,8 +31,8 @@ class Comment(BaseModel):
     thread = models.ForeignKey('CommentThread')
     attachments = GenericRelation('Attachment')
 
-    def __unicode__(self):
-        return u'Comment by {} on Review: {}'.format(
+    def __str__(self):
+        return 'Comment by {} on Review: {}'.format(
             self.commenter.username, self.thread.review_revision.review.title
         )
 

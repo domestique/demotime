@@ -1,8 +1,16 @@
 <script type="text/x-pattern" id="review_info">
 <article class="review_info">
     <section>
-        <a href="<%= review.url %>" class="title">DT-<%= review.pk %>: <%= review.title %></a>
+        <span class="title">
+            <strong data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ demo.pk }}" class="copy_link">
+                DT-<%= review.pk %>
+            </strong>:
+            <a href="<%= review.url %>"><%= review.title %></a>
+        </span>
         <p>Created by <strong><%= review.creator %></strong>
+        <% if (review.project) { %>
+            <p>Project: <strong><%= review.project.name %></strong>
+        <% } %>
         <p>Reviewer State:
             <% if (review.reviewer_state == "approved") { %>
             <strong class="icon-<%= review.reviewer_state %>"><%= review.reviewer_state %></strong>

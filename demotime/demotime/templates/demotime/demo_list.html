@@ -1,71 +1,71 @@
-{% extends 'base.html' %}
+{% extends 'layout-user.html' %}
 
 {% block sub_nav %}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Find a demo
+    </div>
+</div>
+{% endblock %}
+
 {% block styles %}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
 {{ block.super }}
 <style>
-    section section {
-        overflow:hidden;
-        padding: 20px;
-    }
     .form-actions {
         text-align: center;
     }
     .filters select {
-        margin-right:1.5em;
-        margin-bottom:1em;
+        margin-right: 1.5em;
+        margin-bottom: 1em;
         max-width: 100px;
     }
     .filters input[type="submit"] {
-        margin-top:2em;
-        margin-left:1em;
-        width:50%;
+        margin-top: 10px;
+        width: 50%;
+    }
+    .filters label {
+        display: inline-block;
     }
     @media screen and (max-width:680px) {
         .filters select {
-            width:100%;
-            margin-bottom:2em;
+            margin-bottom: 10px;
         }
         .filters input[type="submit"] {
-            float:none;
-            margin:1em 0;
-            width:100%;
-            display:block;
+            float: none;
+            margin: 10px 0;
+            width: 100%;
+            display: block;
+        }
+        .filters label {
+            display: block;
+            width: 100%;
+            margin: 0;
         }
     }
     .filters input[type="text"] {
         padding: 10px;
         height: auto;
         border: 1px solid #ddd;
-        margin-bottom: 50px;
-    }
-    table {
-        background: #fff;
-        border: 1px solid #ddd;
-    }
-    th, td {
-        font-size: 14px;
-        vertical-align: top;
-        text-align: left;
-        padding: 8px;
-        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <h1 class="heading">Created Demo List</h1>
+    <h1 class="heading">Find a Demo</h1>
     <section>
         <section>
             <form action="" method="get" class="filters">
                 {% for form in form %}
-                    <label style="display: inline;">{{ form.label }}</label>
+                    <label>{{ form.label }}</label>
                     {{ form.errors }}
                     {{ form }}
                 {% endfor %}
                 <div class="form-actions">
-                    <input type="submit" value="Filter Reviews">
+                    <input type="submit" value="Filter Demos">
                 </div>
             </form>
         </section>
@@ -83,7 +83,7 @@
                 {% for obj in object_list %}
                     <tr>
                         <td>DT-{{ obj.pk }}</td>
-                        <td><a data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">{{ obj.title|truncatechars:65 }}</a></td>
+                        <td><a class="has_bubble" data-prj="{{ obj.project.pk }}" data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">{{ obj.title|truncatechars:65 }}</a></td>
                         <td><a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a></td>
                         <td>
                             {% if obj.reviewer_state == "approved" %}

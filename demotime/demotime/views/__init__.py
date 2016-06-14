@@ -1,11 +1,72 @@
 import json
 
-from django.http import HttpResponse
-from django.views.generic import TemplateView, View
+from django.db.models import Q
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView, View
 
 from demotime import models
+
+
+class CanViewMixin(UserPassesTestMixin):
+
+    require_admin_privileges = False
+    require_superuser_privileges = False
+    raise_exception = True
+
+    def test_func(self):
+        if self.request.user.is_authenticated() and self.request.user.is_superuser:
+            return True
+
+        if self.require_superuser_privileges:
+            if not self.request.user.is_authenticated():
+                self.raise_exception = False
+            return False
+
+        if (not self.require_admin_privileges) and (
+                self.project.is_public or (self.review and self.review.is_public)
+        ):
+            # Public Project/Review, so they're in
+            return True
+
+        if not self.request.user.is_authenticated():
+            # Otherwise we're going to need to see some authentication
+            self.raise_exception = False
+            return False
+
+        user_list = User.objects.filter(
+            Q(projectmember__project=self.project) |
+            Q(groupmember__group__project=self.project)
+        ).distinct()
+
+        if user_list.filter(pk=self.request.user.pk).exists():
+            # User is in an applicable group or is a direct member of a project,
+            # but we need to check admin privileges first, if applicable
+            if self.require_admin_privileges:
+                admin_groups = self.request.user.groupmember_set.filter(
+                    group__projectgroup__project=self.project,
+                    group__projectgroup__is_admin=True
+                )
+                admin_user = self.request.user.projectmember_set.filter(
+                    project=self.project,
+                    is_admin=True
+                )
+                if admin_user.exists() or admin_groups.exists():
+                    # User is either in an admin group associated with this
+                    # project or is a direct ProjectMember with admin rights
+                    return True
+                else:
+                    return False
+            else:
+                # Don't care about admin privileges, just care that they are in
+                # a proper group or a direct member
+                return True
+
+        # If everything else was skipped, let's go ahead and send them packing.
+        return False
 
 
 class JsonView(View):
@@ -13,7 +74,6 @@ class JsonView(View):
     content_type = 'application/json'
     status = None
 
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         response = super(JsonView, self).dispatch(request, *args, **kwargs)
         if isinstance(response, HttpResponse):
@@ -28,6 +88,10 @@ class JsonView(View):
             content_type=self.content_type,
             status=self.status,
         )
+
+
+class CanViewJsonView(CanViewMixin, JsonView):
+    pass
 
 
 class IndexView(TemplateView):
@@ -61,9 +125,11 @@ class IndexView(TemplateView):
 
         message_bundles = models.MessageBundle.objects.filter(
             owner=self.request.user,
+            read=False,
             deleted=False,
         ).order_by('-modified')[:5]
         context['message_bundles'] = message_bundles
         return context
+
 
 index_view = IndexView.as_view()

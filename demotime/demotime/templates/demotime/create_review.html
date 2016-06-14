@@ -1,5 +1,6 @@
 {% extends 'layout-review.html' %}
-{% block title %} - Create a demo{% endblock %}
-{% block page_title %}Create a demo{% endblock %}
-{% block button_text %}Create demo{% endblock %}
+{% block title %} - New demo (on {{ project.name }}){% endblock %}
+{% block page_title %}New demo <em>(on <strong>{{ project.name }}</strong>)</em>{% endblock %}
+{% block button_text %}New demo{% endblock %}
 {% block description_follower %}<small><strong>Note</strong>: this is <em>not</em> where you show screenshots of your work. Use attachments for this.</small>{% endblock %}
+{% block crumbs_contents %}New demo{% endblock %}

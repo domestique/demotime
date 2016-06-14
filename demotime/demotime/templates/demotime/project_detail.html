@@ -1,0 +1,119 @@
+{% extends 'layout-user.html' %}
+{% block title %}{{ object.name }} Administration{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        <a href="{% url 'project-dashboard' object.slug %}">{{ object.name }}</a> &gt;
+        Administration
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
+{% endblock %}
+
+{% block content %}
+<h1 class="heading">
+    <strong>{{ object.name }}</strong> Administration
+    <small>
+        <a href="{% url 'project-dashboard' object.slug %}">Project Dashboard</a>
+    </small>
+</h1>
+
+<div class="dashboard split~680 by:3 with-gap:3">
+    <div class="cel">
+        <h3 class="icon icon-cog">
+            General project details
+            {% if request.user.is_superuser %}
+                <small>
+                    <a href="{% url 'project-admin' object.slug %}">Edit</a>
+                </small>
+            {% endif %}
+        </h3>
+        <section class="emph_high">
+            <ul>
+                <li><strong>Description</strong>:</li>
+                <li>
+                    {{ object.description|safe }}
+                </li>
+                <li>
+                    This is a
+                    <strong>
+                        {% if object.is_public %}
+                            pubic
+                        {% else %}
+                            private
+                        {% endif %}
+                    </strong>
+                    project.
+                    <span class="help" title="Public projects are viewable to the outside world.
+                    Private projects require a DemoTime membership."></span>
+                </li>
+            </ul>
+        </section>
+    </div>
+    <div class="cel">
+        <h3 class="icon icon-cloud">
+            Project groups
+            <span class="help" title="Groups are simply collections of DemoTime users.
+            Developers, designers, product managers and so forth could be considered groups.
+            Groups are global to DemoTime, and can be attached to projects. For instance,
+            the developer group can be assigned to many projects. Below are the groups
+            associated with this project."></span>
+            {% if request.user.is_superuser %}
+                <small>
+                    <a href="{% url 'group-list' %}">Manage groups</a>
+                </small>
+            {% endif %}
+        </h3>
+        <section class="emph_med">
+            <ul>
+                {% if object.projectgroup_set.count %}
+                    {% for group in object.projectgroup_set.all %}
+                        <li>
+                            {{ group.group.name }} {% if group.is_admin %}<small>admin</small>{% endif %}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>This project has no groups</li>
+                {% endif %}
+                <li><a class="icon icon-plus" href="{% url 'project-admin' object.slug %}#groups">add/remove groups</a></li>
+            </ul>
+        </section>
+    </div>
+    <div class="cel">
+        <h3 class="icon icon-user">
+            Project members
+            <span class="help" title="Below are the members of this project.
+            A person as an individual can be assigned to a project. If a person
+            is part of a group that is assigned to a project, that person would
+            also be part of the project."></span>
+        </h3>
+        <section class="emph_low">
+            <ul>
+                {% if object.projectmember_set.count %}
+                    {% for member in object.projectmember_set.all %}
+                        <li>
+                            {{ member.user.userprofile.name }}
+                            {% if member.is_admin %}
+                                <small>Admin</small>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>This project has no members</li>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                    <li>
+                        <a class="icon icon-plus" href="{% url 'project-admin' object.slug %}#members">add/remove members</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endblock %}

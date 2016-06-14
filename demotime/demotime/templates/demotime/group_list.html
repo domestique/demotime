@@ -1,0 +1,133 @@
+{% extends 'layout-user.html' %}
+
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Go back</a></li>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt; Groups{% comment %} and Group Types{% endcomment %}
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+    table {
+        background: #fff;
+        border: 1px solid #eee;
+    }
+    th {
+        font-weight: 400;
+    }
+    th, td {
+        font-size: 14px;
+        vertical-align: top;
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+    }
+    table li {
+        display: inline-block;
+        list-style: none;
+        padding: 0 3px;
+        margin: 1px;
+        font-weight: 300;
+        color: #aaa;
+    }
+    table li.admin {
+        color: #666;
+        font-weight: 500;
+    }
+    th small {
+        color: #777;
+        margin-left: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1 class="heading">
+        Groups{% comment %} and Group Types{% endcomment %}
+    </h1>
+    <section>
+        <h3 class="heading">
+            Groups
+            <span class="help" title="Groups are simply collections of DemoTime users. Administrators
+            may opt to organize their users in to groups to better organize, for instance, developers,
+            designers, product managers and so forth. Groups are global to DemoTime, and can be
+            attached to projects. For instance, a developer group can be assigned to many projects."></span>
+        </h3>
+        <table id="results" cellspacing="0" cellpadding="0" width="100%">
+            {% if object_list %}
+                <thead>
+                    <tr>
+                        <th width="25%">Name</th>
+                        <th>Members <small>(<strong class="icon icon-star">star</strong> denotes admins)</small></th>
+                    </tr>
+                </thead>
+                {% for obj in object_list %}
+                    <tr>
+                        <td>
+                            <a class="icon icon-pencil" href="{% url 'group-manage' obj.slug %}"></a>
+                            {{ obj.name }}
+                        </td>
+                        <td>
+                            {% for member in obj.groupmember_set.all %}
+                                <li {% if member.is_admin %}class="admin icon icon-star" title="administrator"{% endif %}>
+                                    {{ member.user.userprofile.name }}
+                                </li>
+                            {% endfor %}
+                            <small>
+                                <a href="{% url 'group-manage-admins' obj.slug %}">Manage admins</a>
+                            </small>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td>No groups.</td></tr>
+            {% endif %}
+            <tr>
+                <td colspan="4">
+                    <a class="icon icon-plus" href="{% url 'group-manage' %}">New group</a>
+                </td>
+            </tr>
+        </table>
+        </ul>
+    </section>
+    {% comment %}
+    <article>
+        <h3 class="heading">
+            Group Types
+            <span class="help" title="TODO"></span>
+        </h3>
+        <section>
+            <table id="results" cellspacing="0" cellpadding="0" width="100%">
+                <thead>
+                    <tr>
+                        <th width="75%">Name</th>
+                        <th>Slug</th>
+                    </tr>
+                </thead>
+                {% for obj in group_types %}
+                    <tr>
+                        <td>
+                            <a class="icon icon-pencil" href="{% url 'group-type-manage' obj.slug %}"></a>
+                            {{ obj.name }}
+                        </td>
+                        <td>{{ obj.slug }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4">
+                        <a class="icon icon-plus" href="{% url 'group-type-manage' %}">New group type</a>
+                    </td>
+                </tr>
+            </table>
+            </ul>
+        </section>
+    </article>
+    {% endcomment %}
+{% endblock %}

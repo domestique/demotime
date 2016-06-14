@@ -4,8 +4,8 @@ DemoTime.Info = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'mouseover a': 'lookup',
-        'mouseout a': 'destroy'
+        'mouseover .has_bubble': 'lookup',
+        'mouseout .has_bubble': 'destroy'
     },
 
     initialize: function(options) {
@@ -22,7 +22,8 @@ DemoTime.Info = Backbone.View.extend({
             url: self.options.review_url,
             method: 'POST',
             data: {
-                pk: link.data('pk')
+                pk: link.data('pk'),
+                project_pk: link.data('prj') || null
             }
         });
         review_req.success(function(data) {
@@ -43,6 +44,7 @@ DemoTime.Info = Backbone.View.extend({
                     minWidth: 500
                 });
                 setTimeout(function() {
+                    console.log(link);
                     if (link.is(":hover")) {
                         link.tooltipster('show');
                     }

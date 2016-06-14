@@ -1,0 +1,70 @@
+{% extends 'layout-user.html' %}
+{% block title %}{{ group.name }} Admins{% endblock %}
+
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Cancel</a></li>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+        <a href="{% url 'group-list' %}">Groups</a> &gt;
+        Editing {{ group.name }} admins
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+.edit_admins ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.edit_admins li {
+    padding: 0;
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 20px;
+}
+li.icon-star {
+    font-weight: 700;
+}
+.edit_admins input[type="checkbox"],
+.edit_admins label {
+    display: none;
+}
+.edit_admins input[type="submit"] {
+    margin-top: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Editing {{ group.name }} Admins</h1>
+    <div class="edit_admins">
+        <form action="{% url 'group-manage-admins' group.slug %}" method="post">
+            {% csrf_token %}
+            {{ member_formset.management_form }}
+            <ul>
+                {% for form in member_formset %}
+                    <li class="{% if form.instance.is_admin %}icon icon-star{% endif %} toggle_admin">
+                        {{ form.instance.user.userprofile.name }}
+                        {{ form.as_p }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/scripts/EditGroupsProjects.js"></script>
+{{ block.super }}
+<script>
+var edit = new DemoTime.EditGroupsProjects();
+</script>
+{% endblock %}
