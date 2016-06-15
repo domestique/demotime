@@ -60,12 +60,6 @@ li.de-emphasize * {
     font-weight: 200 !important;
 }
 
-.aggregated_dashboard-reviewing .Approved,
-.aggregated_dashboard-assigned .Approved {
-    display: none;
-}
-
-
 .dashboard ul {
     list-style:none;
     margin:0;
