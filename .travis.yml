@@ -5,7 +5,6 @@ addons:
     hosts:
         - db
 env:
-    - TRAVIS=true
     - DOCKER_COMPOSE_VERSION=1.7.0
 before_install:
   - sudo apt-get update
