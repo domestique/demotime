@@ -1,5 +1,4 @@
 import os
-import re
 
 from django.conf import settings
 from django.views import static
@@ -10,6 +9,16 @@ from demotime import models
 from demotime.views import CanViewMixin
 
 from sendfile import sendfile
+
+
+class UserProfileMedia(View):
+
+    def get(self, request, file_path, **kwargs):
+        if settings.SENDFILE_BACKEND or settings.DT_PROD:
+            full_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+            return sendfile(request, full_file_path, attachment=False)
+        else:
+            return static.serve(request, file_path, document_root=settings.MEDIA_ROOT)
 
 
 class UserMedia(CanViewMixin, View):
@@ -33,3 +42,4 @@ class UserMedia(CanViewMixin, View):
 
 
 user_media_view = UserMedia.as_view()
+user_profile_media_view = UserProfileMedia.as_view()

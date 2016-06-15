@@ -101,6 +101,7 @@ urlpatterns += [
 
 # Files
 urlpatterns += [
+    url(r'^file/profile/(?P<file_path>.+)$', files.user_profile_media_view, name='user-profile-media'),
     url(r'^file/(?P<pk>[\d]+)$', files.user_media_view, name='user-media'),
 ]
 
