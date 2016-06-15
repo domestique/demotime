@@ -28,10 +28,13 @@ script:
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
-    - docker build -t xxf4ntxx/"$TRAVIS_BRANCH" .
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
+        docker build -t xxf4ntxx/demotime .
+        docker images
         docker push xxf4ntxx/demotime;
       else
+        docker build -t xxf4ntxx/demotime:${TRAVIS_BRANCH} .
+        docker images
         docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
       fi
 notifications:
