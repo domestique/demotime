@@ -1,5 +1,4 @@
 sudo: required
-language: python
 services:
     - docker
 addons:
@@ -8,8 +7,6 @@ addons:
 env:
     - TRAVIS=true
     - DOCKER_COMPOSE_VERSION=1.7.0
-python:
-  - "3.5"
 before_install:
   - sudo apt-get update
   - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
