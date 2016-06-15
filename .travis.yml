@@ -28,6 +28,7 @@ script:
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+    - docker build -t xxf4ntxx/$TRAVIS_BRANCH .
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
         docker push xxf4ntxx/demotime;
       else
