@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, View
 
-from demotime import models
+from demotime import constants, models
 
 
 class CanViewMixin(UserPassesTestMixin):
@@ -105,17 +105,21 @@ class IndexView(TemplateView):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['open_demos'] = models.Review.objects.filter(
             creator=self.request.user,
-            state=models.reviews.OPEN,
+            state=constants.OPEN,
         )
 
+        open_review_pks = models.Reviewer.objects.filter(
+            reviewer=self.request.user,
+            review__state=constants.OPEN,
+            status=constants.REVIEWING
+        ).values_list('review__pk', flat=True)
         context['open_reviews'] = models.Review.objects.filter(
-            reviewers=self.request.user,
-            state=models.reviews.OPEN,
+            pk__in=open_review_pks
         )
 
         context['followed_demos'] = models.Review.objects.filter(
             followers=self.request.user,
-            state=models.reviews.OPEN,
+            state=constants.OPEN,
         )
 
         updated_demos = models.UserReviewStatus.objects.filter(

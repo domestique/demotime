@@ -5,7 +5,7 @@ from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from demotime import models
+from demotime import constants, models
 from demotime.tests import BaseTestCase
 
 
@@ -50,6 +50,28 @@ class TestReviewViews(BaseTestCase):
         )
         self.assertEqual(models.Review.objects.count(), 3)
         self.assertEqual(len(response.context['message_bundles']), 2)
+
+    def test_index_hides_approved_reviews_from_open_reviews(self):
+        review_one_kwargs = self.default_review_kwargs.copy()
+        review_one_kwargs['creator'] = self.test_users[0]
+        review_one_kwargs['reviewers'] = [self.user]
+        review_one = models.Review.create_review(**review_one_kwargs)
+
+        review_two_kwargs = self.default_review_kwargs.copy()
+        review_two_kwargs['creator'] = self.test_users[0]
+        review_two_kwargs['reviewers'] = [self.user]
+        review_two = models.Review.create_review(**review_two_kwargs)
+
+        models.Reviewer.objects.filter(
+            reviewer=self.user,
+            review=review_two
+        ).update(status=constants.APPROVED)
+
+        response = self.client.get(reverse('index'))
+        self.assertStatusCode(response, 200)
+        open_reviews = response.context['open_reviews']
+        self.assertEqual(len(open_reviews), 1)
+        self.assertEqual(open_reviews[0].pk, review_one.pk)
 
     def test_get_review_detail(self):
         models.UserReviewStatus.objects.filter(
