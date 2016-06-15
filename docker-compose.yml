@@ -21,6 +21,6 @@ services:
             - /etc/demotime:/etc/demotime
             - ~/dt_backups:/backups
         ports:
-            - "8000:8000"
+            - "8033:8033"
         links:
             - db

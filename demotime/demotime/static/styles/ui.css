@@ -298,6 +298,7 @@ h3 small {
     padding: 0;
     line-height: 21px;
     display: inline;
+    color: #444;
 }
 .quickfind-results section li {
     color: #999;

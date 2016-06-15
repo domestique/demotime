@@ -5,6 +5,5 @@ services:
     demotime:
         build: .
         image: xxf4ntxx/demotime
-        command: cd ../ && invoke run_tests
         volumes:
             - .:/home/docker/demotime

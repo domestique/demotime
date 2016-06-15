@@ -149,7 +149,11 @@
 
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
-        <script> $('.lightboxed').fancybox() </script>
+        <script>
+            $('.lightboxed').fancybox({
+                'type': 'image'
+            });
+        </script>
 
         {# alerts #}
         <script src="/static/scripts/library/swal.js"></script>
@@ -242,9 +246,8 @@
                 project_url: '{% url 'project-json' %}'
             });
 
-            // set up blog notifications
             if(typeof(Storage) !== "undefined") {
-                var blog_entry = 'blog20160507'
+                var blog_entry = 'blog20160613'
 
                 if (!localStorage.getItem(blog_entry)) {
                     localStorage.setItem(blog_entry, true);

@@ -5,7 +5,7 @@ from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from demotime import models
+from demotime import constants, models
 from demotime.tests import BaseTestCase
 
 
@@ -50,6 +50,28 @@ class TestReviewViews(BaseTestCase):
         )
         self.assertEqual(models.Review.objects.count(), 3)
         self.assertEqual(len(response.context['message_bundles']), 2)
+
+    def test_index_hides_approved_reviews_from_open_reviews(self):
+        review_one_kwargs = self.default_review_kwargs.copy()
+        review_one_kwargs['creator'] = self.test_users[0]
+        review_one_kwargs['reviewers'] = [self.user]
+        review_one = models.Review.create_review(**review_one_kwargs)
+
+        review_two_kwargs = self.default_review_kwargs.copy()
+        review_two_kwargs['creator'] = self.test_users[0]
+        review_two_kwargs['reviewers'] = [self.user]
+        review_two = models.Review.create_review(**review_two_kwargs)
+
+        models.Reviewer.objects.filter(
+            reviewer=self.user,
+            review=review_two
+        ).update(status=constants.APPROVED)
+
+        response = self.client.get(reverse('index'))
+        self.assertStatusCode(response, 200)
+        open_reviews = response.context['open_reviews']
+        self.assertEqual(len(open_reviews), 1)
+        self.assertEqual(open_reviews[0].pk, review_one.pk)
 
     def test_get_review_detail(self):
         models.UserReviewStatus.objects.filter(
@@ -242,6 +264,34 @@ class TestReviewViews(BaseTestCase):
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
         )
+
+    def test_post_create_review_empty_attachments_not_created(self):
+        fh = StringIO('testing')
+        fh.name = 'test_file_1'
+        title = 'Test Title Create Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
+            'creator': self.user,
+            'title': title,
+            'description': 'Test Description',
+            'case_link': 'http://www.example.org',
+            'reviewers': self.test_users.values_list('pk', flat=True),
+            'followers': self.followers.values_list('pk', flat=True),
+            'project': self.project.pk,
+            'form-TOTAL_FORMS': 4,
+            'form-INITIAL_FORMS': 0,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 5,
+            'form-0-attachment': fh,
+            'form-0-attachment_type': 'image',
+            'form-0-description': 'Test Description',
+            'form-1-attachment': '',
+            'form-1-attachment_type': 'image',
+            'form-1-description': 'Test Description',
+        })
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        self.assertEqual(obj.revision.attachments.count(), 1)
 
     def test_post_update_review(self):
         fh = StringIO('testing')

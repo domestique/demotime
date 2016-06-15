@@ -18,6 +18,9 @@
 .content section > div:not(:first-child) {
     margin-top: 25px;
 }
+.content .aggregated_dashboard > div:not(:first-child) {
+    margin-top: 50px;
+}
 .dashboard section li {
     color: #ccc;
     padding: 5px;
@@ -57,6 +60,7 @@ li.de-emphasize * {
     font-weight: 200 !important;
 }
 
+.aggregated_dashboard-reviewing .Approved,
 .aggregated_dashboard-assigned .Approved {
     display: none;
 }
@@ -92,7 +96,7 @@ section.emph_lower {
 .dashboard small {
     text-transform: uppercase;
     margin-left: 3px;
-    font-size: 8px;
+    font-size: 9px;
     color: #ccc;
     vertical-align: middle;
 }

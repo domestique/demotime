@@ -128,7 +128,7 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         self.assertEqual(self.review.reviewers.count(), 3)
         self.assertEqual(data, {
-            'reviewer_name': self.test_user_2.userprofile.__unicode__(),
+            'reviewer_name': self.test_user_2.userprofile.__str__(),
             'reviewer_user_pk': self.test_user_2.pk,
             'reviewer_status': models.reviews.REVIEWING,
             'removed_follower': False,
@@ -163,7 +163,7 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertEqual(self.review.reviewers.count(), 3)
         self.assertEqual(self.review.follower_set.count(), 1)
         self.assertEqual(data, {
-            'reviewer_name': follower.userprofile.__unicode__(),
+            'reviewer_name': follower.userprofile.__str__(),
             'reviewer_user_pk': follower.pk,
             'reviewer_status': models.reviews.REVIEWING,
             'removed_follower': True,

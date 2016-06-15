@@ -76,7 +76,7 @@
     </h1>
 
     {% if object.avatar.name %}
-        <img src="{% url "user-media" object.avatar.name %}" class="avatar">
+        <img src="{% url "user-profile-media" object.avatar.name %}" class="avatar">
     {% else %}
         {% if owner_viewing %}
             <div class="avatarless">
