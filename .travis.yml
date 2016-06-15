@@ -29,12 +29,12 @@ script:
 after_success:
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
-        docker build -t xxf4ntxx/demotime .
-        docker images
+        docker build -t xxf4ntxx/demotime .;
+        docker images;
         docker push xxf4ntxx/demotime;
       else
-        docker build -t xxf4ntxx/demotime:${TRAVIS_BRANCH} .
-        docker images
+        docker build -t xxf4ntxx/demotime:${TRAVIS_BRANCH} .;
+        docker images;
         docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
       fi
 notifications:
