@@ -142,6 +142,8 @@ class CreateReviewView(TemplateView):
             data['attachments'] = []
             for form in self.attachment_forms.forms:
                 if form.cleaned_data:
+                    if not form.cleaned_data['attachment']:
+                        continue
                     data['attachments'].append({
                         'attachment': form.cleaned_data['attachment'],
                         'attachment_type': form.cleaned_data['attachment_type'],
