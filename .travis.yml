@@ -13,8 +13,6 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - docker --version
-  - docker --help
   - docker volume create --name dt_pg_data
   - docker volume create --name dt_static_data
 script:
@@ -23,15 +21,11 @@ script:
     - docker exec -it demotime_demotime_1 /bin/bash -c "cd ../ && invoke run_tests"
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
-    - docker images;
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
-        docker build -t xxf4ntxx/demotime .;
-        docker images;
         docker push xxf4ntxx/demotime;
       else
-        docker build -t xxf4ntxx/demotime:${TRAVIS_BRANCH} .;
-        docker images;
+        docker xxf4ntxx/demotime:latest xxf4ntxx/demotime:${TRAVIS_BRANCH};
         docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
       fi
 notifications:
