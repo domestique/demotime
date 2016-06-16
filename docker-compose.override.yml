@@ -10,3 +10,5 @@ services:
         command: ./startup.sh
         volumes:
             - .:/home/docker/demotime
+        environment:
+            - STATIC_PATH=/home/docker/demotime/demotime/demotime/static

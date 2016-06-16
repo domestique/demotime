@@ -24,3 +24,5 @@ services:
             - "8033:8033"
         links:
             - db
+        environment:
+            - STATIC_PATH=/usr/local/demotime/static/

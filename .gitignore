@@ -59,3 +59,4 @@ dt/db.sqlite3
 dt/uploads
 *.swp
 *.swo
+demotime/demotime/static/admin
