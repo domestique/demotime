@@ -23,6 +23,7 @@ script:
     - docker exec -it demotime_demotime_1 /bin/bash -c "cd ../ && invoke run_tests"
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
+    - docker images;
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
         docker build -t xxf4ntxx/demotime .;
