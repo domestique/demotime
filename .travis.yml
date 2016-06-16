@@ -25,7 +25,7 @@ after_success:
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
         docker push xxf4ntxx/demotime;
       else
-        docker xxf4ntxx/demotime:latest xxf4ntxx/demotime:${TRAVIS_BRANCH};
+        docker tag xxf4ntxx/demotime:latest xxf4ntxx/demotime:${TRAVIS_BRANCH};
         docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
       fi
 notifications:
