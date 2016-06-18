@@ -136,9 +136,13 @@ class TestReminderModel(BaseTestCase):
         for reminder in models.Reminder.objects.all():
             reminder.send_reminder()
 
+        reminder_msgs = models.Message.objects.filter(
+            title__startswith='Reminder:',
+            review=self.review.revision,
+        )
         self.assertEqual(
             models.Reminder.objects.count(),
-            models.Message.objects.filter(title__startswith='Reminder:').count()
+            reminder_msgs.count()
         )
         # Creator Reminder
         self.assertEqual(
@@ -155,4 +159,12 @@ class TestReminderModel(BaseTestCase):
                 message__contains='getting stale'
             ).distinct().count(),
             3
+        )
+
+        # Bundle testing
+        self.assertEqual(
+            models.MessageBundle.objects.filter(
+                message__in=reminder_msgs
+            ).count(),
+            4
         )

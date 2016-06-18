@@ -119,6 +119,7 @@ class Reminder(BaseModel):
             'demotime/messages/reminder.html',
             context,
             self.user,
+            revision=self.review.revision,
         )
         self.remind_at = get_reminder_days()
         self.save(update_fields=['remind_at'])

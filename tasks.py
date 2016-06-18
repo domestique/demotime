@@ -7,12 +7,13 @@ DOCKER_PROD_COMMAND_ROOT = 'docker-compose -f docker-compose.yml -f docker-compo
 
 
 @task
-def run_tests(context, test_module='demotime'):
+def run_tests(context, test_module='demotime', opts=''):
     print("Cleaning out pycs")
     run('find . -type f -name \*.pyc -delete')
-    run('cd {} && python3 manage.py test {}'.format(
+    run('cd {} && python3 manage.py test {} {}'.format(
         os.path.join(LOCAL_ROOT, 'dt'),
-        test_module
+        test_module,
+        opts,
     ))
 
 
