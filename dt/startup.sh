@@ -8,6 +8,8 @@ else
     # Just in case this snuck in via a build somewhere
     rm -f /home/docker/demotime/demotime/demotime/static/admin;
 fi
+/usr/sbin/cron
+cat /home/docker/demotime/crons/root | crontab -
 python3 manage.py migrate --noinput
 python3 manage.py collectstatic --noinput
 uwsgi --ini /home/docker/demotime/configs/uwsgi/dt_uwsgi.ini --daemonize /var/log/uwsgi/dt.log 
