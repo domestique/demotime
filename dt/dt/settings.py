@@ -102,7 +102,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = parser.get('demotime', 'timezone')
 
 USE_I18N = True
 
