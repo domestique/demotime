@@ -4,7 +4,7 @@ from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from demotime import models
+from demotime import constants, models
 from demotime.tests import BaseTestCase
 
 
@@ -260,6 +260,27 @@ class TestUserApiReviewers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(self.review.reviewers.count(), 1)
+
+    def test_delete_reviewer_updates_review_state(self):
+        test_user_1 = User.objects.get(username='test_user_1')
+        self.assertEqual(self.review.reviewers.count(), 2)
+        models.Reviewer.objects.exclude(reviewer=test_user_1).update(
+            status=constants.APPROVED
+        )
+        self.assertEqual(self.review.reviewer_state, constants.REVIEWING)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'user_pk': test_user_1.pk,
+            'review_pk': self.review.pk,
+        })
+        self.review.refresh_from_db()
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'success': True,
+            'errors': {}
+        })
+        self.assertEqual(self.review.reviewers.count(), 1)
+        self.assertEqual(self.review.reviewer_state, constants.APPROVED)
 
     def test_delete_reviewer_missing_reviewer(self):
         response = self.client.post(reverse('user-api'), {

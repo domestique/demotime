@@ -295,8 +295,7 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User not currently on review'}
             }
         else:
-            reviewer._send_reviewer_message(deleted=True)
-            reviewer.delete()
+            reviewer.drop_reviewer()
             return {
                 'success': True,
                 'errors': {},
