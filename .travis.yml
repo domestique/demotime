@@ -28,6 +28,7 @@ after_success:
         docker tag xxf4ntxx/demotime:latest xxf4ntxx/demotime:${TRAVIS_BRANCH};
         docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
       fi
+    - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
     recipients:
