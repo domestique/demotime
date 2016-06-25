@@ -19,6 +19,7 @@ script:
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml build
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d
     - docker exec -it demotime_demotime_1 /bin/bash -c "cd ../ && invoke run_tests"
+    - bash <(curl -s https://codecov.io/bash)
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
@@ -28,7 +29,6 @@ after_success:
         docker tag xxf4ntxx/demotime:latest xxf4ntxx/demotime:${TRAVIS_BRANCH};
         docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
       fi
-    - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
     recipients:
