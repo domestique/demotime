@@ -55,14 +55,14 @@ class ReviewFilterForm(forms.Form):
     )
     creator = forms.ModelChoiceField(
         required=False,
-        queryset=User.objects.exclude(
-            userprofile__user_type=models.UserProfile.SYSTEM
+        queryset=User.objects.filter(
+            userprofile__user_type=models.UserProfile.USER
         ).order_by('username')
     )
     reviewer = forms.ModelChoiceField(
         required=False,
-        queryset=User.objects.exclude(
-            userprofile__user_type=models.UserProfile.SYSTEM
+        queryset=User.objects.filter(
+            userprofile__user_type=models.UserProfile.USER
         ).order_by('username')
     )
     sort_by = forms.ChoiceField(
@@ -269,8 +269,8 @@ class ProjectMemberForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         project = kwargs.pop('project', None)
         if project:
-            self.base_fields['user'].queryset = User.objects.exclude(
-                userprofile__user_type=models.UserProfile.SYSTEM,
+            self.base_fields['user'].queryset = User.objects.filter(
+                userprofile__user_type=models.UserProfile.USER,
             ).exclude(
                 projectmember__project=project
             ).order_by('username')
@@ -335,6 +335,12 @@ class ProjectForm(forms.ModelForm):
 
 class GroupForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(GroupForm, self).__init__(*args, **kwargs)
+        self.fields['members'].queryset = models.UserProxy.objects.filter(
+            userprofile__user_type=models.UserProfile.USER
+        )
+
     class Meta:
         model = models.Group
         fields = (
@@ -347,6 +353,9 @@ class GroupMemberForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(GroupMemberForm, self).__init__(*args, **kwargs)
         self.fields['user'].widget = forms.HiddenInput()
+        self.fields['user'].queryset = models.UserProxy.objects.filter(
+            userprofile__user_type=models.UserProfile.USER
+        )
         self.fields['group'].widget = forms.HiddenInput()
 
     class Meta:
