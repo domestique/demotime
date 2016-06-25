@@ -146,9 +146,6 @@ MEDIA_ROOT = parser.get('demotime', 'media_root')
 # TEST SETTINGS
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
-    '--with-coverage',
-    '--cover-package=demotime',
-    '--cover-xml',
     '--logging-filter=-django.db.backends.schema',
     '--with-id',
 ]

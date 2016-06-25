@@ -1,5 +1,5 @@
 import os
-from invoke import run, task
+from invoke import task, util
 
 LOCAL_ROOT = os.path.dirname(os.path.realpath(__file__))
 DOCKER_DEV_COMMAND_ROOT = 'docker-compose -f docker-compose.yml -f docker-compose.override.yml'
@@ -7,10 +7,10 @@ DOCKER_PROD_COMMAND_ROOT = 'docker-compose -f docker-compose.yml -f docker-compo
 
 
 @task
-def run_tests(context, test_module='demotime', opts=''):
+def run_tests_old(ctx, test_module='demotime', opts=''):
     print("Cleaning out pycs")
-    run('find . -type f -name \*.pyc -delete')
-    run('cd {} && python3 manage.py test {} {}'.format(
+    ctx.run('find . -type f -name \*.pyc -delete')
+    ctx.run('cd {} && python3 manage.py test {} {}'.format(
         os.path.join(LOCAL_ROOT, 'dt'),
         test_module,
         opts,
@@ -18,8 +18,8 @@ def run_tests(context, test_module='demotime', opts=''):
 
 
 @task
-def control_docker_dev(context, cmd='up -d'):
-    run('cd {} && {} {}'.format(
+def control_docker_dev(ctx, cmd='up -d'):
+    ctx.run('cd {} && {} {}'.format(
         LOCAL_ROOT,
         DOCKER_DEV_COMMAND_ROOT,
         cmd
@@ -27,12 +27,23 @@ def control_docker_dev(context, cmd='up -d'):
 
 
 @task
-def load_test_data(context, filename='demotime_data.sql.gz'):
+def run_tests(ctx, test_module='demotime', opts=''):
+    print("Cleaning out pycs")
+    ctx.run('find . -type f -name \*.pyc -delete')
+    with util.cd(os.path.join(LOCAL_ROOT, 'dt')):
+        ctx.run('coverage run --source=demotime manage.py test {} {}'.format(
+            test_module, opts
+        ))
+        ctx.run('coverage xml')
+
+
+@task
+def load_test_data(ctx, filename='demotime_data.sql.gz'):
     print("This will delete all of the data in the database, and recreate it from a backup. Are you sure?")
     print("Press ctrl-c to exit, enter to continue")
     input()
-    run('docker exec -i src_db_1 su - postgres -c "dropdb postgres && createdb -EUNICODE -Opostgres postgres && zcat /backups/{} | psql postgres"'.format(
+    ctx.run('docker exec -i src_db_1 su - postgres -c "dropdb postgres && createdb -EUNICODE -Opostgres postgres && zcat /backups/{} | psql postgres"'.format(
         filename
     ))
-    run('docker exec -i src_demotime_1 python3 manage.py migrate')
-    run('docker exec -i src_demotime_1 ./reset_all_user_passwords.sh')
+    ctx.run('docker exec -i src_demotime_1 python3 manage.py migrate')
+    ctx.run('docker exec -i src_demotime_1 ./reset_all_user_passwords.sh')
