@@ -93,17 +93,40 @@ class TestGroupManageViews(BaseTestCase):
         self.assertIn('group', response.context)
 
     def test_edit_group(self):
-        self.assertEqual(self.group.groupmember_set.count(), 6)
+        self.group.groupmember_set.filter(user__in=self.test_users).delete()
+        self.assertEqual(self.group.groupmember_set.count(), 3)
+        self.group.groupmember_set.update(is_admin=True)
         response = self.client.post(reverse('group-manage', args=[self.group.slug]), {
             'name': 'Swansons',
             'slug': 'swansons',
             'group_type': self.group_type.pk,
             'description': 'this will be no fun at all',
-            'members': [self.user.pk]
+            'members': models.UserProxy.objects.exclude(
+                username='demotime_sys'
+            ).values_list('pk', flat=True),
         })
         self.assertStatusCode(response, 302)
         self.group.refresh_from_db()
-        self.assertEqual(self.group.groupmember_set.count(), 1)
+        self.assertEqual(
+            self.group.groupmember_set.filter(
+                user__in=self.followers,
+                is_admin=True
+            ).count(),
+            2
+        )
+        self.assertTrue(
+            self.group.groupmember_set.filter(
+                user=self.user, is_admin=True
+            ).exists()
+        )
+        self.assertEqual(
+            self.group.groupmember_set.filter(
+                user__in=self.test_users,
+                is_admin=False
+            ).count(),
+            3
+        )
+        self.assertEqual(self.group.groupmember_set.count(), 6)
         self.assertEqual(self.group.name, 'Swansons')
         self.assertEqual(self.group.slug, 'swansons')
         self.assertEqual(self.group.description, 'this will be no fun at all')

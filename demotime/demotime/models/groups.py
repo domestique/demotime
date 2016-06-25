@@ -67,10 +67,12 @@ class GroupMember(BaseModel):
 
     @classmethod
     def create_group_member(cls, user, group, is_admin=False):
-        obj, _ = cls.objects.get_or_create(
+        obj, created = cls.objects.get_or_create(
             user=user,
             group=group,
         )
+        if not created:
+            is_admin = obj.is_admin
         obj.is_admin = is_admin
         obj.save(update_fields=['is_admin'])
         return obj
