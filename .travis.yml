@@ -24,10 +24,14 @@ script:
 after_success:
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
+        docker tag xxf4ntxx/demotime:latest domestique/demotime:latest;
         docker push xxf4ntxx/demotime;
+        docker push domestique/demotime;
       else
         docker tag xxf4ntxx/demotime:latest xxf4ntxx/demotime:${TRAVIS_BRANCH};
+        docker tag xxf4ntxx/demotime:latest domestique/demotime:${TRAVIS_BRANCH};
         docker push xxf4ntxx/demotime:${TRAVIS_BRANCH};
+        docker push domestique/demotime:${TRAVIS_BRANCH};
       fi
 notifications:
   email:
