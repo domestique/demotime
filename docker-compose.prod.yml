@@ -3,5 +3,5 @@ services:
     db:
         image: postgres:latest
     demotime:
-        image: xxf4ntxx/demotime:latest
+        image: domestique/demotime:latest
         command: ./startup.sh

@@ -4,6 +4,6 @@ services:
         image: postgres:latest
     demotime:
         build: .
-        image: xxf4ntxx/demotime
+        image: domestique/demotime
         volumes:
             - .:/home/docker/demotime
