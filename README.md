@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/f4nt/demotime.svg?branch=master)](https://travis-ci.org/f4nt/demotime)
-[![codecov](https://codecov.io/gh/f4nt/demotime/branch/master/graph/badge.svg)](https://codecov.io/gh/f4nt/demotime)
+[![Build Status](https://travis-ci.org/domestique/demotime.svg?branch=master)](https://travis-ci.org/f4nt/demotime)
+[![codecov](https://codecov.io/gh/domestique/demotime/branch/master/graph/badge.svg)](https://codecov.io/gh/f4nt/demotime)
 
 DemoTime - built by Danny Peck and Mark Rogers of Domestique Studios
 
