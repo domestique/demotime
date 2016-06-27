@@ -377,7 +377,23 @@ class UpdateCommentView(DetailView):
             return self.get(*args, **kwargs)
 
 
-class ReviewJsonView(JsonView):
+class ReviewJsonView(CanViewJsonView):
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.review = get_object_or_404(
+            models.Review,
+            pk=kwargs.get('pk'),
+            project__slug=kwargs.get('proj_slug'),
+        )
+        self.project = self.review.project
+        return super(ReviewJsonView, self).dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return self.review._to_json()
+
+
+class ReviewSearchJsonView(JsonView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -391,7 +407,7 @@ class ReviewJsonView(JsonView):
             self.projects = self.projects.filter(
                 slug=kwargs['proj_slug']
             )
-        return super(ReviewJsonView, self).dispatch(*args, **kwargs)
+        return super(ReviewSearchJsonView, self).dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):
         form = forms.ReviewFilterForm(
@@ -405,33 +421,7 @@ class ReviewJsonView(JsonView):
                 'reviews': [],
             }
             for review in reviews:
-                review_dict = {
-                    'title': review.title,
-                    'url': review.get_absolute_url(),
-                    'creator': review.creator.userprofile.name,
-                    'state': review.state,
-                    'reviewer_state': review.reviewer_state,
-                    'pk': review.pk,
-                    'reviewing_count': review.reviewing_count,
-                    'approved_count': review.approved_count,
-                    'rejected_count': review.rejected_count,
-                    'reviewers': [],
-                    'followers': [],
-                }
-                for reviewer in review.reviewer_set.all():
-                    review_dict['reviewers'].append({
-                        'name': reviewer.reviewer.userprofile.name,
-                        'user_pk': reviewer.reviewer.pk,
-                        'reviewer_status': reviewer.status,
-                    })
-
-                for follower in review.follower_set.all():
-                    review_dict['followers'].append({
-                        'name': follower.user.userprofile.name,
-                        'user_pk': follower.user.pk,
-                    })
-
-                review_json_dict['reviews'].append(review_dict)
+                review_json_dict['reviews'].append(review._to_json())
 
             return review_json_dict
 
@@ -457,6 +447,7 @@ review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
 review_state_view = ReviewStateView.as_view()
 review_json_view = ReviewJsonView.as_view()
+review_search_json_view = ReviewSearchJsonView.as_view()
 update_comment_view = UpdateCommentView.as_view()
 delete_comment_attachment_view = DeleteCommentAttachmentView.as_view()
 review_list_view = ReviewListView.as_view()

@@ -31,6 +31,15 @@ class Reviewer(BaseModel):
             self.review.title,
         )
 
+    def _to_json(self):
+        return {
+            'name': self.reviewer.userprofile.name,
+            'user_pk': self.reviewer.pk,
+            'reviewer_pk': self.pk,
+            'reviewer_status': self.status,
+            'review_pk': self.review.pk,
+        }
+
     @property
     def reviewer_display_name(self):
         return self.reviewer.userprofile.display_name or self.reviewer.username

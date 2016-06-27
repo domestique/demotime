@@ -94,3 +94,12 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(self.review.follower_set.count(), 0)
         self.assertTrue(isinstance(follower_obj, models.Reviewer))
+
+    def test_follower_to_json(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        follower = review.follower_set.all()[0]
+        follower_json = follower._to_json()
+        self.assertEqual(follower_json['name'], follower.user.userprofile.name)
+        self.assertEqual(follower_json['user_pk'], follower.user.pk)
+        self.assertEqual(follower_json['follower_pk'], follower.pk)
+        self.assertEqual(follower_json['review_pk'], follower.review.pk)

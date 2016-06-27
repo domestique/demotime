@@ -199,7 +199,7 @@
         <script src="/static/scripts/Info.js"></script>
         <script>
             var info = new DemoTime.Info({
-                review_url: '{% url "reviews-json" %}'
+                review_url: '{% url "reviews-search-json" %}'
             });
         </script>
 
@@ -242,7 +242,7 @@
         <script>
             var search = new DemoTime.Search({
                 user_url: '{% url 'user-api' %}',
-                review_url: '{% url 'reviews-json' %}',
+                review_url: '{% url 'reviews-search-json' %}',
                 project_url: '{% url 'project-json' %}'
             });
 

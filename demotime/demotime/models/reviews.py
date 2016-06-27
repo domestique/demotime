@@ -66,6 +66,33 @@ class Review(BaseModel):
             self.title, self.creator.username
         )
 
+    def _to_json(self):
+        reviewers = []
+        followers = []
+        for reviewer in self.reviewer_set.all():
+            reviewers.append(reviewer._to_json())
+
+        for follower in self.follower_set.all():
+            followers.append(follower._to_json())
+
+        return {
+            'creator': self.creator.userprofile.name,
+            'reviewers': reviewers,
+            'followers': followers,
+            'title': self.title,
+            'description': self.description,
+            'case_link': self.case_link,
+            'state': self.state,
+            'reviewer_state': self.reviewer_state,
+            'is_public': self.is_public,
+            'project': self.project._to_json(),
+            'reviewing_count': self.reviewing_count,
+            'approved_count': self.approved_count,
+            'rejected_count': self.rejected_count,
+            'url': self.get_absolute_url(),
+            'pk': self.pk,
+        }
+
     def get_absolute_url(self):
         return self.revision.get_absolute_url()
 

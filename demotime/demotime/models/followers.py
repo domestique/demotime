@@ -19,6 +19,14 @@ class Follower(BaseModel):
             self.review.title,
         )
 
+    def _to_json(self):
+        return {
+            'name': self.user.userprofile.name,
+            'user_pk': self.user.pk,
+            'follower_pk': self.pk,
+            'review_pk': self.review.pk,
+        }
+
     @classmethod
     def create_follower(cls, review, user, notify_follower=False, notify_creator=False):
         existing_reviewer = review.reviewer_set.filter(reviewer=user)

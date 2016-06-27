@@ -659,7 +659,7 @@ class TestReviewViews(BaseTestCase):
 
     def test_review_json_no_match(self):
         response = self.client.post(
-            reverse('reviews-json', args=[self.project.slug]),
+            reverse('reviews-search-json', args=[self.project.slug]),
             {'title': 'zxy'}
         )
         self.assertStatusCode(response, 200)
@@ -670,7 +670,7 @@ class TestReviewViews(BaseTestCase):
 
     def test_review_json_by_pk(self):
         response = self.client.post(
-            reverse('reviews-json', args=[self.project.slug]),
+            reverse('reviews-search-json', args=[self.project.slug]),
             {'pk': self.review.pk}
         )
         self.assertStatusCode(response, 200)
@@ -685,17 +685,22 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(review['rejected_count'], 0)
         reviewers = json_data['reviews'][0]['reviewers']
         followers = json_data['reviews'][0]['followers']
-        for follower in self.followers:
-            self.assertIn(
-                {'user_pk': follower.pk, 'name': follower.userprofile.name},
-                followers
-            )
-        for reviewer in self.test_users:
+        for follower in self.review.follower_set.all():
             self.assertIn(
                 {
-                    'user_pk': reviewer.pk,
-                    'name': reviewer.userprofile.name,
+                    'user_pk': follower.user.pk, 'name': follower.user.userprofile.name,
+                    'follower_pk': follower.pk, 'review_pk': follower.review.pk
+                },
+                followers
+            )
+        for reviewer in self.review.reviewer_set.all():
+            self.assertIn(
+                {
+                    'user_pk': reviewer.reviewer.pk,
+                    'reviewer_pk': reviewer.pk,
+                    'name': reviewer.reviewer.userprofile.name,
                     'reviewer_status': models.reviews.REVIEWING,
+                    'review_pk': reviewer.review.pk,
                 },
                 reviewers
             )
@@ -703,7 +708,7 @@ class TestReviewViews(BaseTestCase):
     def test_review_json_all_the_filters(self):
         test_user = User.objects.get(username='test_user_0')
         response = self.client.post(
-            reverse('reviews-json', args=[self.project.slug]),
+            reverse('reviews-search-json', args=[self.project.slug]),
             {
                 'reviewer': test_user.pk,
                 'creator': self.user.pk,
@@ -733,7 +738,7 @@ class TestReviewViews(BaseTestCase):
         second_review_kwargs['title'] = 'Test Title 2'
         second_review_kwargs['project'] = project
         second_review = models.Review.create_review(**second_review_kwargs)
-        response = self.client.post(reverse('reviews-json'), {
+        response = self.client.post(reverse('reviews-search-json'), {
             'title': 'test'
         })
         self.assertStatusCode(response, 200)
@@ -755,7 +760,7 @@ class TestReviewViews(BaseTestCase):
         second_review_kwargs['title'] = 'Test Title 2'
         second_review_kwargs['project'] = project
         second_review = models.Review.create_review(**second_review_kwargs)
-        response = self.client.post(reverse('reviews-json'), {
+        response = self.client.post(reverse('reviews-search-json'), {
             'title': 'test',
             'project_pk': self.project.pk,
         })
@@ -775,7 +780,7 @@ class TestReviewViews(BaseTestCase):
         second_review_kwargs['title'] = 'Test Title 2'
         second_review_kwargs['project'] = project
         models.Review.create_review(**second_review_kwargs)
-        response = self.client.post(reverse('reviews-json'), {
+        response = self.client.post(reverse('reviews-search-json'), {
             'title': 'test',
             'project_pk': project.pk,
         })
@@ -829,3 +834,14 @@ class TestReviewViews(BaseTestCase):
             reverse('dt-redirect', kwargs={'pk': 10000})
         )
         self.assertStatusCode(response, 404)
+
+    def test_review_detail_get(self):
+        response = self.client.get(
+            reverse(
+                'review-json',
+                kwargs={'proj_slug': self.project.slug, 'pk': self.review.pk}
+            )
+        )
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data, self.review._to_json())

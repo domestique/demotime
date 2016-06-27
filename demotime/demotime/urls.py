@@ -46,6 +46,12 @@ urlpatterns += [
     url(r'^reviews/(?P<proj_slug>[\w-]+)/create/$', reviews.review_form_view, name='create-review'),
     # DT-1234 redirect view
     url(r'^(?i)DT-(?P<pk>[\d]+)/$', reviews.dt_redirect_view, name='dt-redirect'),
+    # Review Json Endpoint
+    url(
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/json/$',
+        reviews.review_json_view,
+        name='review-json'
+    ),
     # Review Detail Page
     url(
         r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/$',
@@ -73,8 +79,8 @@ urlpatterns += [
         name='update-review-state'
     ),
     url(r'^reviews/list/$', reviews.review_list_view, name='review-list'),
-    url(r'^reviews/search/$', reviews.review_json_view, name='reviews-json'),
-    url(r'^reviews/(?P<proj_slug>[\w-]+)/search/$', reviews.review_json_view, name='reviews-json'),
+    url(r'^reviews/search/$', reviews.review_search_json_view, name='reviews-search-json'),
+    url(r'^reviews/(?P<proj_slug>[\w-]+)/search/$', reviews.review_search_json_view, name='reviews-search-json'),
 ]
 
 # Comments

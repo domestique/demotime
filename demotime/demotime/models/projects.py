@@ -17,6 +17,17 @@ class Project(BaseModel):
     def __str__(self):
         return 'Project {}'.format(self.name)
 
+    def _to_json(self):
+        return {
+            'name': self.name,
+            'slug': self.slug,
+            'description': self.description,
+            'groups': [],
+            'members': [],
+            'is_public': self.is_public,
+            'pk': self.pk,
+        }
+
     def get_absolute_url(self):
         return reverse('project-detail', args=[self.slug])
 
