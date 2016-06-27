@@ -121,3 +121,9 @@ class Reviewer(BaseModel):
                 revision=self.review.revision
             )
         return self.review.update_reviewer_state()
+
+    def drop_reviewer(self):
+        self._send_reviewer_message(deleted=True)
+        review = self.review
+        self.delete()
+        review.update_reviewer_state()
