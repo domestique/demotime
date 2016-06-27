@@ -219,16 +219,7 @@ class ProjectJsonView(JsonView):
             'projects': []
         }
         for project in projects:
-            json_resp['projects'].append(
-                {
-                    'pk': project.pk,
-                    'slug': project.slug,
-                    'name': project.name,
-                    'description': project.description,
-                    'is_public': project.is_public,
-                    'url': project.get_absolute_url(),
-                }
-            )
+            json_resp['projects'].append(project._to_json())
 
         return json_resp
 

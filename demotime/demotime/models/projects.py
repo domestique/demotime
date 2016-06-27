@@ -25,6 +25,7 @@ class Project(BaseModel):
             'groups': [],
             'members': [],
             'is_public': self.is_public,
+            'url': self.get_absolute_url(),
             'pk': self.pk,
         }
 

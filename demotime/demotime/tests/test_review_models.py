@@ -454,3 +454,4 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['reviewing_count'], review.reviewing_count)
         self.assertEqual(review_json['approved_count'], review.approved_count)
         self.assertEqual(review_json['rejected_count'], review.rejected_count)
+        self.assertEqual(review_json['project'], review.project._to_json())

@@ -319,14 +319,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [{
-                'pk': self.project.pk,
-                'slug': self.project.slug,
-                'description': self.project.description,
-                'url': self.project.get_absolute_url(),
-                'is_public': self.project.is_public,
-                'name': self.project.name,
-            }]
+            'projects': [self.project._to_json()],
         })
 
     def test_project_json_view_search_by_name_get(self):
@@ -337,14 +330,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [{
-                'pk': self.project.pk,
-                'slug': self.project.slug,
-                'description': self.project.description,
-                'url': self.project.get_absolute_url(),
-                'is_public': self.project.is_public,
-                'name': self.project.name,
-            }]
+            'projects': [self.project._to_json()],
         })
 
     def test_project_json_view_search_without_name_get(self):
@@ -353,14 +339,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [{
-                'pk': self.project.pk,
-                'slug': self.project.slug,
-                'description': self.project.description,
-                'url': self.project.get_absolute_url(),
-                'is_public': self.project.is_public,
-                'name': self.project.name,
-            }]
+            'projects': [self.project._to_json()]
         })
 
     def test_project_json_view_search_without_name_post(self):
@@ -369,14 +348,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [{
-                'pk': self.project.pk,
-                'slug': self.project.slug,
-                'description': self.project.description,
-                'url': self.project.get_absolute_url(),
-                'is_public': self.project.is_public,
-                'name': self.project.name,
-            }]
+            'projects': [self.project._to_json()],
         })
 
     def test_project_json_view_hides_unauthed_get(self):
