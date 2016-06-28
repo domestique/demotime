@@ -31,6 +31,10 @@ class TestProjectModels(BaseTestCase):
 
     def test_project_to_json(self):
         proj_json = self.project._to_json()
+        models.ProjectMember.objects.create(
+            user=self.user,
+            project=self.project
+        )
         self.assertEqual(proj_json['name'], self.project.name)
         self.assertEqual(proj_json['slug'], self.project.slug)
         self.assertEqual(proj_json['description'], self.project.description)

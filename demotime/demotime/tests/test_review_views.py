@@ -835,7 +835,7 @@ class TestReviewViews(BaseTestCase):
         )
         self.assertStatusCode(response, 404)
 
-    def test_review_detail_get(self):
+    def test_review_detail_json_get(self):
         response = self.client.get(
             reverse(
                 'review-json',
@@ -845,3 +845,44 @@ class TestReviewViews(BaseTestCase):
         self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, self.review._to_json())
+
+    def test_review_detail_quick_edit(self):
+        url = reverse(
+            'review-json',
+            kwargs={'proj_slug': self.project.slug, 'pk': self.review.pk}
+        )
+        self.review.reviewer_state = constants.APPROVED
+        response = self.client.post(url, {
+            'title': 'test_review_detail_quick_edit',
+            'description': 'test review detail quick edit',
+            'case_link': 'http://example.org/quick-edit',
+            'state': constants.CLOSED,
+            'is_public': True
+        })
+        data = json.loads(response.content.decode('utf-8'))['review']
+        self.review.refresh_from_db()
+        self.assertEqual(data['title'], 'test_review_detail_quick_edit')
+        self.assertEqual(self.review.title, 'test_review_detail_quick_edit')
+        self.assertEqual(data['description'], 'test review detail quick edit')
+        self.assertEqual(self.review.description, 'test review detail quick edit')
+        self.assertEqual(data['case_link'], 'http://example.org/quick-edit')
+        self.assertEqual(self.review.case_link, 'http://example.org/quick-edit')
+        self.assertEqual(data['state'], constants.CLOSED)
+        self.assertEqual(self.review.state, constants.CLOSED)
+        self.assertTrue(data['is_public'])
+        self.assertTrue(self.review.is_public)
+
+    def test_review_detail_quick_edit_errors(self):
+        url = reverse(
+            'review-json',
+            kwargs={'proj_slug': self.project.slug, 'pk': self.review.pk}
+        )
+        self.review.reviewer_state = constants.APPROVED
+        response = self.client.post(url, {
+            'state': 'Not a real state',
+        })
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(
+            data['errors'],
+            {'state': ['Select a valid choice. Not a real state is not one of the available choices.']}
+        )

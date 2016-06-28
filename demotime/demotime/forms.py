@@ -4,6 +4,18 @@ from django.contrib.auth.models import User
 from demotime import models
 
 
+class ReviewQuickEditForm(forms.Form):
+
+    state = forms.ChoiceField(
+        choices=models.Review.STATUS_CHOICES,
+        required=False
+    )
+    title = forms.CharField(required=False)
+    description = forms.CharField(required=False)
+    case_link = forms.CharField(required=False)
+    is_public = forms.BooleanField(required=False)
+
+
 class ReviewForm(forms.ModelForm):
 
     def __init__(self, user, project, *args, **kwargs):

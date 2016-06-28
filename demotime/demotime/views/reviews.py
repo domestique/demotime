@@ -392,6 +392,24 @@ class ReviewJsonView(CanViewJsonView):
     def get(self, request, *args, **kwargs):
         return self.review._to_json()
 
+    def post(self, request, *args, **kwargs):
+        form = forms.ReviewQuickEditForm(request.POST)
+        json_dict = {'errors': []}
+        if form.is_valid():
+            data = form.cleaned_data
+            update_fields = ['modified']
+            for key, value in data.items():
+                if value:
+                    setattr(self.review, key, value)
+                    update_fields.append(key)
+
+            self.review.save(update_fields=update_fields)
+        else:
+            json_dict['errors'] = form.errors
+
+        json_dict['review'] = self.review._to_json()
+        return json_dict
+
 
 class ReviewSearchJsonView(JsonView):
 
