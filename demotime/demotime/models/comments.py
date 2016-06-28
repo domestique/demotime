@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
@@ -26,6 +28,8 @@ class CommentThread(BaseModel):
 
 class Comment(BaseModel):
 
+    MENTION_REGEX = re.compile(r'@[\w\d_-]+')
+
     commenter = models.ForeignKey('auth.User')
     comment = models.TextField()
     thread = models.ForeignKey('CommentThread')
@@ -43,6 +47,21 @@ class Comment(BaseModel):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
 
+        # Find Mentions
+        starts_with_mention = False
+        mentioned_users = []
+        mentions = cls.MENTION_REGEX.findall(comment)
+        for mention in mentions:
+            username = mention[1:] # Drop the @
+            try:
+                mentioned_user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                pass # Bad Mention, user was probably doing something else weird
+
+            mentioned_users.append(mentioned_user.pk)
+            if not starts_with_mention:
+                starts_with_mention = comment.startswith(mention)
+
         obj = cls.objects.create(
             commenter=commenter,
             comment=comment,
@@ -57,16 +76,22 @@ class Comment(BaseModel):
             )
 
         system_user = User.objects.get(username='demotime_sys')
-        users = User.objects.filter(
-            (
-                # Reviewers
-                models.Q(reviewer__review=review.review) |
-                # Followers
-                models.Q(follower__review=review.review) |
-                # Creator
-                models.Q(pk=review.review.creator.pk)
-            )
-        ).distinct()
+        if starts_with_mention:
+            users = User.objects.filter(pk__in=mentioned_users)
+        else:
+            users = User.objects.filter(
+                (
+                    # Reviewers
+                    models.Q(reviewer__review=review.review) |
+                    # Followers
+                    models.Q(follower__review=review.review) |
+                    # Creator
+                    models.Q(pk=review.review.creator.pk) |
+                    # Mentions
+                    models.Q(pk__in=mentioned_users)
+                )
+            ).distinct()
+
         for user in users:
             if user == commenter:
                 continue

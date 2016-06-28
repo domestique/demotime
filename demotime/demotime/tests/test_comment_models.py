@@ -86,3 +86,56 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 5)
+
+    def test_create_comment_starting_with_mention(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        models.Message.objects.all().delete()
+        self.assertEqual(models.Message.objects.count(), 0)
+        thread = models.CommentThread.create_comment_thread(review.revision)
+        models.Comment.create_comment(
+            commenter=self.user,
+            review=review.revision,
+            comment="@test_user_1 check this out with @test_user_2",
+            thread=thread
+        )
+        self.assertEqual(models.Message.objects.count(), 2)
+        test_user_1, test_user_2 = models.UserProxy.objects.filter(
+            username__in=('test_user_1', 'test_user_2')
+        )
+        self.assertEqual(
+            models.Message.objects.filter(receipient=test_user_1).count(),
+            1
+        )
+        self.assertEqual(
+            models.Message.objects.filter(receipient=test_user_2).count(),
+            1
+        )
+
+    def test_create_comment_with_mention_in_middle_non_reviewer(self):
+        ''' Everyone still gets mentioned, but this is a great way to include
+        people otherwise not on the demo.
+        '''
+        review = models.Review.create_review(**self.default_review_kwargs)
+        models.Message.objects.all().delete()
+        review.reviewer_set.all().delete()
+        self.assertEqual(models.Message.objects.count(), 0)
+        thread = models.CommentThread.create_comment_thread(review.revision)
+        models.Comment.create_comment(
+            commenter=self.user,
+            review=review.revision,
+            comment="Hey, do you think @test_user_1 and @test_user_2 should see this?",
+            thread=thread
+        )
+        # Followers 1/2, Test Users 1/2
+        self.assertEqual(models.Message.objects.count(), 4)
+        test_user_1, test_user_2 = models.UserProxy.objects.filter(
+            username__in=('test_user_1', 'test_user_2')
+        )
+        self.assertEqual(
+            models.Message.objects.filter(receipient=test_user_1).count(),
+            1
+        )
+        self.assertEqual(
+            models.Message.objects.filter(receipient=test_user_2).count(),
+            1
+        )
