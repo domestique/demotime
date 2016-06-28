@@ -23,6 +23,10 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(self.review.follower_set.count(), 1)
         self.assertEqual(follower_obj.review, self.review)
         self.assertEqual(follower_obj.user, follower)
+        self.assertEqual(
+            follower_obj.__str__(),
+            '{} Follower on {}'.format(follower_obj.display_name, self.review.title)
+        )
 
     def test_create_follower_notify_follower(self):
         self.assertEqual(self.review.follower_set.count(), 0)

@@ -10,6 +10,10 @@ class TestGroupTypeModel(BaseTestCase):
         )
         self.assertEqual(obj.name, 'New Group Name')
         self.assertEqual(obj.slug, 'new-group-name')
+        self.assertEqual(
+            obj.__str__(),
+            obj.slug
+        )
 
     def test_to_json(self):
         group_type = models.GroupType.objects.get(slug='default-group-type')
@@ -31,6 +35,13 @@ class TestGroupMemberModel(BaseTestCase):
         self.assertEqual(gm.user, self.user)
         self.assertEqual(gm.group, self.group)
         self.assertTrue(gm.is_admin)
+        self.assertEqual(
+            gm.__str__(),
+            'GroupMember: {} - {}'.format(
+                gm.group.slug,
+                gm.user.userprofile.name
+            )
+        )
 
     def test_create_group_member_non_admin(self):
         models.GroupMember.objects.all().delete()

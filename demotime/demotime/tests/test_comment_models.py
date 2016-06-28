@@ -8,7 +8,12 @@ class TestCommentModels(BaseTestCase):
 
     def test_create_comment_thread(self):
         review = models.Review.create_review(**self.default_review_kwargs)
-        models.CommentThread.create_comment_thread(review.revision)
+        thread = models.CommentThread.create_comment_thread(review.revision)
+        self.assertEqual(thread.review_revision, review.revision)
+        self.assertEqual(
+            thread.__str__(),
+            'Comment Thread for Review: {}'.format(review.revision)
+        )
 
     def test_create_comment(self):
         self.assertEqual(models.Message.objects.count(), 0)
@@ -40,6 +45,13 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 5)
+        self.assertEqual(
+            comment.__str__(),
+            'Comment by {} on Review: {}'.format(
+                comment.commenter.username,
+                review.title
+            )
+        )
 
     def test_create_comment_with_thread(self):
         self.assertEqual(models.Message.objects.count(), 0)
