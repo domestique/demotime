@@ -11,6 +11,13 @@ class GroupType(BaseModel):
     def __str__(self):
         return '{}'.format(self.slug)
 
+    def _to_json(self):
+        return {
+            'name': self.name,
+            'slug': self.slug,
+            'pk': self.pk,
+        }
+
     @classmethod
     def create_group_type(cls, name, slug):
         return cls.objects.create(
@@ -31,6 +38,20 @@ class Group(BaseModel):
 
     def __str__(self):
         return 'Group: {}'.format(self.slug)
+
+    def _to_json(self):
+        members = []
+        for member in GroupMember.objects.filter(group=self):
+            members.append(member._to_json())
+
+        return {
+            'name': self.name,
+            'slug': self.slug,
+            'description': self.description,
+            'group_type': self.group_type._to_json(),
+            'members': members,
+            'pk': self.pk,
+        }
 
     @classmethod
     def create_group(cls, name, slug, description, group_type, members=None):
@@ -64,6 +85,16 @@ class GroupMember(BaseModel):
             self.group.slug,
             self.user.userprofile.name
         )
+
+    def _to_json(self):
+        return {
+            'user_pk': self.user.pk,
+            'username': self.user.username,
+            'display_name': self.user.userprofile.name,
+            'is_admin': self.is_admin,
+            'group_pk': self.group.pk,
+            'pk': self.pk
+        }
 
     @classmethod
     def create_group_member(cls, user, group, is_admin=False):

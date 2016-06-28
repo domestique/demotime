@@ -17,7 +17,7 @@ class UserProfileMedia(View):
         if settings.SENDFILE_BACKEND or settings.DT_PROD:
             full_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
             return sendfile(request, full_file_path, attachment=False)
-        else:
+        else: # pragma: nocover
             return static.serve(request, file_path, document_root=settings.MEDIA_ROOT)
 
 
@@ -37,7 +37,7 @@ class UserMedia(CanViewMixin, View):
         if settings.SENDFILE_BACKEND or settings.DT_PROD:
             full_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
             return sendfile(request, full_file_path, attachment=False)
-        else:
+        else: # pragma: nocover
             return static.serve(request, file_path, document_root=settings.MEDIA_ROOT)
 
 

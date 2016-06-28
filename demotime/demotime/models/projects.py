@@ -18,12 +18,20 @@ class Project(BaseModel):
         return 'Project {}'.format(self.name)
 
     def _to_json(self):
+        groups = []
+        for group in ProjectGroup.objects.filter(project=self):
+            groups.append(group._to_json())
+
+        members = []
+        for member in ProjectMember.objects.filter(project=self):
+            members.append(member._to_json())
+
         return {
             'name': self.name,
             'slug': self.slug,
             'description': self.description,
-            'groups': [],
-            'members': [],
+            'groups': groups,
+            'members': members,
             'is_public': self.is_public,
             'url': self.get_absolute_url(),
             'pk': self.pk,
@@ -52,6 +60,13 @@ class ProjectGroup(BaseModel):
             self.group.slug
         )
 
+    def _to_json(self):
+        return {
+            'project_pk': self.project.pk,
+            'group': self.group._to_json(),
+            'is_admin': self.is_admin,
+        }
+
 
 class ProjectMember(BaseModel):
 
@@ -64,3 +79,12 @@ class ProjectMember(BaseModel):
             self.project.slug,
             self.user.userprofile.name,
         )
+
+    def _to_json(self):
+        return {
+            'project_pk': self.project.pk,
+            'user_pk': self.user.pk,
+            'username': self.user.username,
+            'display_name': self.user.userprofile.name,
+            'is_admin': self.is_admin,
+        }

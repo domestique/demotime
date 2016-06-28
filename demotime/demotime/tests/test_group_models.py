@@ -11,6 +11,13 @@ class TestGroupTypeModel(BaseTestCase):
         self.assertEqual(obj.name, 'New Group Name')
         self.assertEqual(obj.slug, 'new-group-name')
 
+    def test_to_json(self):
+        group_type = models.GroupType.objects.get(slug='default-group-type')
+        gt_json = group_type._to_json()
+        self.assertEqual(gt_json['name'], group_type.name)
+        self.assertEqual(gt_json['slug'], group_type.slug)
+        self.assertEqual(gt_json['pk'], group_type.pk)
+
 
 class TestGroupMemberModel(BaseTestCase):
 
@@ -51,6 +58,16 @@ class TestGroupMemberModel(BaseTestCase):
         )
         self.assertEqual(models.GroupMember.objects.count(), 1)
 
+    def test_to_json(self):
+        member = models.GroupMember.objects.all()[0]
+        member_json = member._to_json()
+        self.assertEqual(member_json['user_pk'], member.user.pk)
+        self.assertEqual(member_json['pk'], member.pk)
+        self.assertEqual(member_json['display_name'], member.user.userprofile.name)
+        self.assertEqual(member_json['username'], member.user.username)
+        self.assertEqual(member_json['group_pk'], member.group.pk)
+        self.assertEqual(member_json['is_admin'], member.is_admin)
+
 
 class TestGroupModel(BaseTestCase):
 
@@ -90,3 +107,17 @@ class TestGroupModel(BaseTestCase):
         gm = models.GroupMember.objects.get(group=obj)
         self.assertEqual(gm.user, self.user)
         self.assertTrue(gm.is_admin)
+
+    def test_to_json(self):
+        group_json = self.group._to_json()
+        self.assertEqual(group_json['name'], self.group.name)
+        self.assertEqual(group_json['slug'], self.group.slug)
+        self.assertEqual(group_json['description'], self.group.description)
+        self.assertEqual(group_json['group_type'], self.group.group_type._to_json())
+        self.assertEqual(group_json['pk'], self.group.pk)
+
+        members = []
+        for member in models.GroupMember.objects.filter(group=self.group):
+            members.append(member._to_json())
+
+        self.assertEqual(group_json['members'], members)
