@@ -246,7 +246,8 @@ class BulkMessageUpdateForm(forms.Form):
     UNDELETED = 'undelete'
 
     messages = forms.ModelMultipleChoiceField(
-        queryset=models.MessageBundle.objects.none()
+        queryset=models.MessageBundle.objects.none(),
+        required=False,
     )
     action = forms.ChoiceField(choices=(
         (READ, READ.capitalize()),
@@ -254,6 +255,7 @@ class BulkMessageUpdateForm(forms.Form):
         (DELETED, DELETED.capitalize()),
         (UNDELETED, UNDELETED.capitalize()),
     ))
+    mark_all_read = forms.BooleanField(required=False)
 
     def __init__(self, user, *args, **kwargs):
         super(BulkMessageUpdateForm, self).__init__(*args, **kwargs)
