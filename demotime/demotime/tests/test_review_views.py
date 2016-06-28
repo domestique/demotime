@@ -859,6 +859,7 @@ class TestReviewViews(BaseTestCase):
             'state': constants.CLOSED,
             'is_public': True
         })
+        self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))['review']
         self.review.refresh_from_db()
         self.assertEqual(data['title'], 'test_review_detail_quick_edit')
@@ -881,8 +882,29 @@ class TestReviewViews(BaseTestCase):
         response = self.client.post(url, {
             'state': 'Not a real state',
         })
+        self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             data['errors'],
             {'state': ['Select a valid choice. Not a real state is not one of the available choices.']}
+        )
+
+    def test_review_detail_quick_edit_forbidden(self):
+        ''' Quick Edit of a Demo is only available to the Creator '''
+        url = reverse(
+            'review-json',
+            kwargs={'proj_slug': self.project.slug, 'pk': self.review.pk}
+        )
+        self.client.logout()
+        assert self.client.login(
+            username='test_user_1',
+            password='testing'
+        )
+        response = self.client.post(url, {
+            'state': constants.CLOSED
+        })
+        self.assertStatusCode(response, 403)
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8'))['errors'],
+            ['Only the creator of a Demo can edit it'],
         )

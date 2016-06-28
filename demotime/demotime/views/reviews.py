@@ -393,6 +393,13 @@ class ReviewJsonView(CanViewJsonView):
         return self.review._to_json()
 
     def post(self, request, *args, **kwargs):
+        if self.review.creator != request.user:
+            self.status = 403
+            return {
+                'errors': ['Only the creator of a Demo can edit it'],
+                'review': self.review._to_json()
+            }
+
         form = forms.ReviewQuickEditForm(request.POST)
         json_dict = {'errors': []}
         if form.is_valid():
