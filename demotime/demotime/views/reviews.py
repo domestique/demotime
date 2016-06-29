@@ -21,11 +21,22 @@ class ReviewDetail(CanViewMixin, DetailView):
             slug=self.kwargs['proj_slug']
         )
         if self.kwargs.get('rev_num'):
-            self.revision = get_object_or_404(
-                models.ReviewRevision,
-                number=self.kwargs['rev_num'],
-                review__pk=self.kwargs['pk']
-            )
+            try:
+                self.revision = models.ReviewRevision.objects.get(
+                    number=self.kwargs['rev_num'],
+                    review__pk=self.kwargs['pk']
+                )
+            except models.ReviewRevision.DoesNotExist:
+                review = get_object_or_404(
+                    models.Review,
+                    pk=kwargs['pk'],
+                )
+                return redirect(
+                    'review-rev-detail',
+                    proj_slug=self.project.slug,
+                    pk=review.pk,
+                    rev_num=review.revision.number,
+                )
         else:
             self.revision = self.get_object().revision
 
