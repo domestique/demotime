@@ -58,7 +58,10 @@
         <h3 class="icon icon-inbox">
             Unread messages
             {% if message_bundles %}
-                <small><a href="{% url 'inbox' %}" class="normal_text">view all</a></small>
+                <small>
+                    <a href="{% url 'inbox' %}" class="normal_text">view all</a> |
+                    <a href="#" id="archive_all" class="normal_text">archive all</a>
+                </small>
             {% endif %}
         </h3>
         <section class="emph_med aggregated_dashboard-messages">
@@ -153,4 +156,14 @@
     <strong>Power tip</strong>: You can now simply type in {{ site_settings.SERVER_URL }}/DT-1234 to be redirected to a demo.
 </div>
 {% endcomment %}
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/scripts/ArchiveAll.js"></script>
+{{ block.super }}
+<script>
+var archive_all = new DemoTime.ArchiveAll({
+    url: '{% url "messages-json" %}'
+});
+</script>
 {% endblock %}
