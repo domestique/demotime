@@ -396,3 +396,16 @@ class TestMessagesAPI(BaseTestCase):
                 'messages': messages
             }],
         })
+
+    def test_message_post_bulk_all_read(self):
+        bundles = models.MessageBundle.objects.filter(
+            owner=self.user
+        )
+        bundles.update(read=False)
+        assert bundles.count() > 0
+        self.client.post(reverse('messages-json'), {
+            'mark_all_read': True,
+            'action': 'read',
+        })
+        for bundle in bundles:
+            self.assertTrue(bundle.read)

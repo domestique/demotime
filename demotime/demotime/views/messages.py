@@ -201,7 +201,13 @@ class MessagesJsonView(JsonView):
             data=self.request.POST
         )
         if form.is_valid():
-            messages = form.cleaned_data['messages']
+            if form.cleaned_data['mark_all_read']:
+                messages = models.MessageBundle.objects.filter(
+                    owner=self.request.user,
+                )
+            else:
+                messages = form.cleaned_data['messages']
+
             action = form.cleaned_data['action']
             if action == form.READ:
                 messages.update(read=True)
