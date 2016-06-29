@@ -95,7 +95,7 @@ class TestCommentModels(BaseTestCase):
         models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
-            comment="@test_user_1 check this out with @test_user_2",
+            comment="<br><p>@test_user_1 check this out with @test_user_2</p><br>",
             thread=thread
         )
         self.assertEqual(models.Message.objects.count(), 2)
@@ -123,7 +123,7 @@ class TestCommentModels(BaseTestCase):
         models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
-            comment="Hey, do you think @test_user_1 and @test_user_2 should see this?",
+            comment="<br><p>Hey, do you think @test_user_1 and @test_user_2 should see this?</p><br>",
             thread=thread
         )
         # Followers 1/2, Test Users 1/2

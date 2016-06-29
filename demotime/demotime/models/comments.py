@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 
+from demotime.helpers import strip_tags
 from .attachments import Attachment
 from .base import BaseModel
 from .messages import Message
@@ -49,8 +50,9 @@ class Comment(BaseModel):
 
         # Find Mentions
         starts_with_mention = False
+        comment_without_html = strip_tags(comment)
         mentioned_users = []
-        mentions = cls.MENTION_REGEX.findall(comment)
+        mentions = cls.MENTION_REGEX.findall(comment_without_html)
         for mention in mentions:
             username = mention[1:] # Drop the @
             try:
@@ -60,7 +62,7 @@ class Comment(BaseModel):
 
             mentioned_users.append(mentioned_user.pk)
             if not starts_with_mention:
-                starts_with_mention = comment.startswith(mention)
+                starts_with_mention = comment_without_html.startswith(mention)
 
         obj = cls.objects.create(
             commenter=commenter,
