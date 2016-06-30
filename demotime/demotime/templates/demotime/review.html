@@ -64,7 +64,7 @@
             <div class="your-status">
                 <h3>
                     {% if object.state == 'closed' or  object.state == 'approved' %}
-                        This demo is <strong>{{ object.state }}</strong>, no further action is required.
+                        This demo is <strong>{{ object.state }}</strong>. No further action is required.
                     {% else %}
                         Your approval status:
                         {% if reviewer.status == 'approved' %}
