@@ -63,15 +63,19 @@
         {% if reviewer %}
             <div class="your-status">
                 <h3>
-                    Your approval status:
-                    {% if reviewer.status == 'approved' %}
-                        <canvas id="confetti" width="1" height="1"></canvas>
-                        <script type="text/javascript" src="/static/scripts/confetti.js"></script>
-                        <img src="/static/images/emoji/smiley.png" width="25" height="25">
-                    {% elif reviewer.status == 'rejected' %}
-                        <img src="/static/images/emoji/frowning2.png" width="25" height="25">
+                    {% if object.state == 'closed' or  object.state == 'approved' %}
+                        This demo is <strong>{{ object.state }}</strong>, no further action is required.
+                    {% else %}
+                        Your approval status:
+                        {% if reviewer.status == 'approved' %}
+                            <canvas id="confetti" width="1" height="1"></canvas>
+                            <script type="text/javascript" src="/static/scripts/confetti.js"></script>
+                            <img src="/static/images/emoji/smiley.png" width="25" height="25">
+                        {% elif reviewer.status == 'rejected' %}
+                            <img src="/static/images/emoji/frowning2.png" width="25" height="25">
+                        {% endif %}
+                        <strong>{{ reviewer.status|capfirst }}</strong>
                     {% endif %}
-                    <strong>{{ reviewer.status|capfirst }}</strong>
                 </h3>
             </div>
         {% endif %}
