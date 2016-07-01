@@ -12,6 +12,9 @@ class WebHook(BaseModel):
         (constants.ABORTED, 'Demo Aborted'),
         (constants.COMMENT, 'Comment Added'),
         (constants.UPDATED, 'Demo Updated'),
+        (constants.REOPENED, 'Demo Reopened'),
+        (constants.APPROVED, 'Demo Approved'),
+        (constants.REJECTED, 'Demo Rejected'),
     )
 
     project = models.ForeignKey('Project')

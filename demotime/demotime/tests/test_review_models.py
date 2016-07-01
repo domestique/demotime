@@ -1,11 +1,19 @@
+from mock import patch
+
 from django.core import mail
 from django.contrib.auth.models import User
 
-from demotime import models
+from demotime import constants, models
 from demotime.tests import BaseTestCase
 
 
 class TestReviewModels(BaseTestCase):
+
+    def setUp(self):
+        super(TestReviewModels, self).setUp()
+        self.hook_patch = patch('demotime.models.reviews.Review.trigger_webhooks')
+        self.hook_patch_run = self.hook_patch.start()
+        self.addCleanup(self.hook_patch.stop)
 
     def test_create_review(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -33,6 +41,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
+        )
+        self.hook_patch_run.assert_called_once_with(
+            constants.CREATED
         )
 
     def test_create_review_duped_reviewer_follower(self):
@@ -132,6 +143,19 @@ class TestReviewModels(BaseTestCase):
             first_rev.attachments.count(),
             second_rev.attachments.count()
         )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        # Second demo
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[2][0][0],
+            constants.UPDATED,
+        )
 
     def test_update_review_duped_reviewer_follower(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -216,6 +240,14 @@ class TestReviewModels(BaseTestCase):
             ).exists()
         )
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.APPROVED
+        )
 
     def test_update_reviewer_state_rejected(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -243,6 +275,14 @@ class TestReviewModels(BaseTestCase):
             ).exists()
         )
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.REJECTED
+        )
 
     def test_update_reviewer_state_reviewing(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -314,6 +354,14 @@ class TestReviewModels(BaseTestCase):
             models.Reminder.objects.filter(review=obj, active=False).count(),
             4
         )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.CLOSED,
+        )
 
     def test_review_state_change_aborted(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -345,6 +393,14 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=False).count(),
             4
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.ABORTED
         )
 
     def test_review_state_change_closed_to_open(self):
@@ -379,6 +435,14 @@ class TestReviewModels(BaseTestCase):
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
         )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.REOPENED,
+        )
 
     def test_review_state_change_aborted_to_open(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -411,6 +475,14 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             4
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.REOPENED,
         )
 
     def test_reviewer_status_count_properties(self):
@@ -455,3 +527,35 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['approved_count'], review.approved_count)
         self.assertEqual(review_json['rejected_count'], review.rejected_count)
         self.assertEqual(review_json['project'], review.project._to_json())
+
+    @patch('demotime.tasks.fire_webhook')
+    def test_trigger_webhooks_fires(self, task_patch):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        hook = models.WebHook.objects.create(
+            project=review.project,
+            trigger_event=constants.CREATED,
+            target='http://www.example.com'
+        )
+        self.hook_patch.stop()
+
+        review.trigger_webhooks(constants.CREATED)
+        task_patch.delay.assert_called_once_with(
+            review.pk,
+            hook.pk,
+            None
+        )
+        self.hook_patch.start()
+
+    @patch('demotime.tasks.fire_webhook')
+    def test_trigger_webhooks_skipped(self, task_patch):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        models.WebHook.objects.create(
+            project=review.project,
+            trigger_event=constants.CLOSED,
+            target='http://www.example.com'
+        )
+        self.hook_patch.stop()
+
+        review.trigger_webhooks(constants.CREATED)
+        self.assertFalse(task_patch.called)
+        self.hook_patch.start()
