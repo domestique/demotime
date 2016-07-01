@@ -175,7 +175,8 @@ SENDFILE_URL = '/protected'
 # Celery Setup
 BROKER_URL = 'amqp://demotime:demotime@rmq/demotime'
 CELERY_RESULT_BACKEND = 'rpc://demotime:demotime@rmq'
-CELERY_TIMEZONE = TIME_ZONE,
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ALWAYS_EAGER = not DT_PROD
 
 if parser.has_section('email'):
     EMAIL_HOST = parser.get('email', 'email_host')

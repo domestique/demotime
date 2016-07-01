@@ -11,6 +11,7 @@ from .followers import Follower
 from .reviewers import Reviewer
 from .groups import GroupType, Group, GroupMember
 from .projects import Project, ProjectGroup, ProjectMember
+from .webhooks import WebHook
 
 
 def create_profile(sender, instance, created, raw, **kwargs):
