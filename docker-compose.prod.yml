@@ -1,7 +1,10 @@
 version: '2'
 services: 
     db:
-        image: postgres:latest
+        image: postgres:9.5.3
     demotime:
         image: domestique/demotime:latest
         command: ./startup.sh
+    demotime_celery:
+        image: domestique/demotime
+        command: ./start_celery.sh

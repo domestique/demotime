@@ -1,7 +1,7 @@
 version: '2'
 services: 
     db:
-        image: postgres:latest
+        image: postgres:9.5.3
         ports:
             - "5432:55432"
     demotime:
@@ -12,3 +12,7 @@ services:
             - .:/home/docker/demotime
         environment:
             - STATIC_PATH=/home/docker/demotime/demotime/demotime/static
+    demotime_celery:
+        build: .
+        image: domestique/demotime
+        command: ./start_celery.sh

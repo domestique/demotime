@@ -9,4 +9,7 @@ pytz==2015.2
 bdateutil==0.1
 django-sendfile==0.3.10
 pycrypto==2.6.1
+psycopg2==2.6
+uWSGI==2.0.12
+celery==3.1.23
 invoke
