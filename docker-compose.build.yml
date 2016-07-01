@@ -7,3 +7,7 @@ services:
         image: domestique/demotime
         volumes:
             - .:/home/docker/demotime
+    demotime_celery:
+        image: domestique/demotime
+        volumes:
+            - .:/home/docker/demotime
