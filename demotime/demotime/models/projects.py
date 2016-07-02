@@ -13,7 +13,7 @@ class Project(BaseModel):
     groups = models.ManyToManyField('Group', through='ProjectGroup')
     members = models.ManyToManyField('auth.User', through='ProjectMember')
     is_public = models.BooleanField(default=False)
-    token = models.CharField(max_length=256, blank=True)
+    token = models.CharField(max_length=256)
 
     def __str__(self):
         return 'Project {}'.format(self.name)

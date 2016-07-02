@@ -17,4 +17,9 @@ class Migration(migrations.Migration):
             name='trigger_event',
             field=models.CharField(choices=[('created', 'Demo Created'), ('closed', 'Demo Closed'), ('aborted', 'Demo Aborted'), ('comment', 'Comment Added'), ('updated', 'Demo Updated'), ('reopened', 'Demo Reopened'), ('approved', 'Demo Approved'), ('rejected', 'Demo Rejected')], db_index=True, max_length=64),
         ),
+        migrations.AlterField(
+            model_name='project',
+            name='token',
+            field=models.CharField(max_length=256),
+        ),
     ]
