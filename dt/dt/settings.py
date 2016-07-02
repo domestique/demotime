@@ -30,6 +30,12 @@ if not parser.has_section('demotime'):
         parser.set('demotime', 'static_root', '/usr/local/demotime/static')
         parser.set('demotime', 'media_root', '/usr/local/demotime/uploads')
 
+if not parser.has_section('celery'):
+    parser.add_section('celery')
+    if os.environ.get('TESTS', '').lower() == 'true':
+        parser.set('celery', 'always_eager', 'true')
+    else:
+        parser.set('celery', 'always_eager', 'false')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -176,7 +182,7 @@ SENDFILE_URL = '/protected'
 BROKER_URL = 'amqp://demotime:demotime@rmq/demotime'
 CELERY_RESULT_BACKEND = 'rpc://demotime:demotime@rmq'
 CELERY_TIMEZONE = TIME_ZONE
-CELERY_ALWAYS_EAGER = not DT_PROD
+CELERY_ALWAYS_EAGER = parser.get('celery', 'always_eager') == 'true'
 
 if parser.has_section('email'):
     EMAIL_HOST = parser.get('email', 'email_host')

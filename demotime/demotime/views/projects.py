@@ -50,6 +50,11 @@ class ProjectDetail(CanViewMixin, DetailView):
         self.review = None
         return super(ProjectDetail, self).dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super(ProjectDetail, self).get_context_data(**kwargs)
+        context['is_admin'] = self.request.user.is_admin(self.project)
+        return context
+
 
 class ProjectAdmin(CanViewMixin, TemplateView):
     template_name = 'demotime/project_admin.html'

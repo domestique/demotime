@@ -386,3 +386,19 @@ class GroupTypeForm(forms.ModelForm):
         fields = (
             'name', 'slug'
         )
+
+
+class WebHookForm(forms.ModelForm):
+
+    delete = forms.BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(WebHookForm, self).__init__(*args, **kwargs)
+        if not self.instance.pk:
+            del self.fields['delete']
+
+    class Meta:
+        model = models.WebHook
+        fields = (
+            'trigger_event', 'target'
+        )
