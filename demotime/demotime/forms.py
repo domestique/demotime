@@ -77,6 +77,12 @@ class ReviewFilterForm(forms.Form):
             userprofile__user_type=models.UserProfile.USER
         ).order_by('username')
     )
+    follower = forms.ModelChoiceField(
+        required=False,
+        queryset=User.objects.filter(
+            userprofile__user_type=models.UserProfile.USER
+        ).order_by('username')
+    )
     sort_by = forms.ChoiceField(
         required=False,
         choices=SORT_OPTIONS,
@@ -105,6 +111,9 @@ class ReviewFilterForm(forms.Form):
         data = self.cleaned_data
         if data.get('reviewer'):
             qs = qs.filter(reviewer__reviewer=data['reviewer'])
+
+        if data.get('follower'):
+            qs = qs.filter(follower__user=data['follower'])
 
         if data.get('creator'):
             qs = qs.filter(creator=data['creator'])

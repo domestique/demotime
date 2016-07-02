@@ -593,6 +593,26 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(len(response.context['object_list']), 0)
         self.assertIn('form', response.context)
 
+    def test_review_list_filter_by_follower(self):
+        follower = User.objects.get(username='follower_0')
+        response = self.client.get(reverse('review-list'), {
+            'follower': follower.pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.creator, self.user)
+        self.assertIn(follower, obj.followers.all())
+
+        # Let's show that filtering works the other way too
+        response = self.client.get(reverse('review-list'), {
+            'reviewer': self.user.pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+        self.assertIn('form', response.context)
+
     def test_review_list_filter_by_state(self):
         response = self.client.get(reverse('review-list'), {
             'state': models.reviews.OPEN,
