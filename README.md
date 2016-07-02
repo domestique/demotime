@@ -43,6 +43,7 @@ Docker Setup:
 * Create two Docker data volumes: 
     - `docker volume create --name dt_static_data`
     - `docker volume create --name dt_pg_data`
+    - `docker volume create --name dt_rmq_data`
 * Startup with docker-compose: `invoke control_docker_dev`
 * To stop the containers: `invoke control_docker_dev --cmd=down`
 * Login via http://localhost:8033/
