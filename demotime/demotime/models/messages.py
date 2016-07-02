@@ -77,10 +77,10 @@ class Message(BaseModel):
         if recipient.email:
             try:
                 return send_mail(
-                    title,
-                    msg_text,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [recipient.email],
+                    subject=title,
+                    message=msg_text,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[recipient.email],
                     html_message=msg_text,
                     fail_silently=True,
                 )
@@ -133,7 +133,13 @@ class Message(BaseModel):
             bundle=bundle,
         )
         if email:
-            obj._send_email(receipient, title, message)
+            subject = title
+            if review_revision:
+                subject = '[DT-{}] - {}'.format(
+                    review_revision.review.pk,
+                    review_revision.review.title
+                )
+            obj._send_email(receipient, subject, message)
         return obj
 
     class Meta:

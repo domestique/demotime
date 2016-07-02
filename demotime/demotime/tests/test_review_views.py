@@ -185,7 +185,15 @@ class TestReviewViews(BaseTestCase):
             'pk': self.review.pk,
             'rev_num': 500,
         }))
-        self.assertStatusCode(response, 404)
+        self.assertStatusCode(response, 302)
+        self.assertRedirects(
+            response,
+            reverse('review-rev-detail', kwargs={
+                'proj_slug': self.project.slug,
+                'pk': self.review.pk,
+                'rev_num': self.review.revision.number,
+            })
+        )
 
     def test_get_create_review(self):
         response = self.client.get(reverse('create-review', args=[self.project.slug]))

@@ -100,6 +100,9 @@ h1 .alert {
 .main-content {
     clear: both;
 }
+li.updated a.subnav-item {
+    background: #FFF2EE;
+}
 li.closed.state-highlight,
 li.open.state-highlight {
     display: none;
@@ -270,7 +273,7 @@ input.find_person {
 #confetti {
     position: absolute;
     left: 0;
-    top: 0;
+    top: 90px;
     height: 100%;
     width: 100%;
     min-width: 1400px;

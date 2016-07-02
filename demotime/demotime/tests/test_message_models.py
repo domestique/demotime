@@ -28,7 +28,10 @@ class TestMessageModels(BaseTestCase):
         self.assertEqual(msg.message, 'Test Message')
         # 6 for the reviews created, 1 for the message we sent here
         self.assertEqual(len(mail.outbox), models.Message.objects.count())
-        self.assertIn('Test Create Message', [x.subject for x in mail.outbox])
+        self.assertIn(
+            '[DT-{}] - {}'.format(review.pk, review.title),
+            [x.subject for x in mail.outbox]
+        )
 
     def test_create_message_without_email(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -72,7 +75,10 @@ class TestMessageModels(BaseTestCase):
         self.assertIn('http://example.org', msg.message)
         self.assertEqual(msg.title, 'Test System Message')
         self.assertEqual(len(mail.outbox), models.Message.objects.count())
-        self.assertIn('Test System Message', [x.subject for x in mail.outbox])
+        self.assertIn(
+            '[DT-{}] - {}'.format(review.pk, review.title),
+            [x.subject for x in mail.outbox]
+        )
 
     def test_create_system_message_without_email(self):
         self.assertEqual(len(mail.outbox), 0)
