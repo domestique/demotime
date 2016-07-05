@@ -7,7 +7,13 @@ services:
         image: domestique/demotime
         volumes:
             - .:/home/docker/demotime
+            - dt_static_data:/usr/local/demotime
+            - /etc/demotime:/etc/demotime
+            - ~/dt_backups:/backups
     demotime_celery:
         image: domestique/demotime
         volumes:
             - .:/home/docker/demotime
+            - dt_static_data:/usr/local/demotime
+            - /etc/demotime:/etc/demotime
+            - ~/dt_backups:/backups

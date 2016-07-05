@@ -27,10 +27,6 @@ services:
         depends_on:
             - db
             - rmq
-        volumes:
-            - dt_static_data:/usr/local/demotime
-            - /etc/demotime:/etc/demotime
-            - ~/dt_backups:/backups
         ports:
             - "8033:8033"
         links:
@@ -43,8 +39,6 @@ services:
         depends_on:
             - db
             - rmq
-        volumes:
-            - /etc/demotime:/etc/demotime
         links:
             - db
             - rmq
