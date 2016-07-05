@@ -119,9 +119,9 @@ DemoTime.Review = Backbone.View.extend({
     // Expand collapse top level comments
     collapse_comment: function(event) {
         var e = event,
-            collapser = $(e.target);
+            collapser = $(event.target);
 
-        if (collapser.tagName != "A") {
+        if (collapser.prop("tagName") != "A") {
             collapser.parents('.collapser_parent').find('.collapseable').slideToggle(function() {
                 if (collapser.attr('class').match('squared')) {
                     if ($(this).is(":visible")) {
