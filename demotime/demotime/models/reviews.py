@@ -12,13 +12,17 @@ from .reminders import Reminder
 from .followers import Follower
 from .reviewers import Reviewer
 
+from demotime import tasks
 from demotime.constants import (
     REVIEWING,
     REJECTED,
     APPROVED,
     OPEN,
     CLOSED,
-    ABORTED
+    ABORTED,
+    REOPENED,
+    CREATED,
+    UPDATED,
 )
 
 
@@ -183,6 +187,7 @@ class Review(BaseModel):
         # Reminders
         Reminder.create_reminders_for_review(obj)
 
+        obj.trigger_webhooks(CREATED)
         return obj
 
     @classmethod
@@ -249,6 +254,7 @@ class Review(BaseModel):
         # Reminders
         Reminder.update_reminders_for_review(obj)
 
+        obj.trigger_webhooks(UPDATED)
         return obj
 
     def _change_reviewer_state(self, state):
@@ -294,9 +300,11 @@ class Review(BaseModel):
         reviewing = not approved and not rejected
         if approved and self.reviewer_state != APPROVED:
             self._change_reviewer_state(APPROVED)
+            self.trigger_webhooks(APPROVED)
             return True, APPROVED
         elif rejected and self.reviewer_state != REJECTED:
             self._change_reviewer_state(REJECTED)
+            self.trigger_webhooks(REJECTED)
             return True, REJECTED
         elif reviewing and self.reviewer_state != REVIEWING:
             self._change_reviewer_state(REVIEWING)
@@ -360,17 +368,26 @@ class Review(BaseModel):
         state_changed = False
         if self.state == OPEN and new_state == CLOSED:
             state_changed = self._close_review(new_state)
+            self.trigger_webhooks(CLOSED)
         elif self.state == OPEN and new_state == ABORTED:
             state_changed = self._close_review(new_state)
+            self.trigger_webhooks(ABORTED)
         elif self.state == CLOSED and new_state == OPEN:
             state_changed = self._reopen_review(new_state)
+            self.trigger_webhooks(REOPENED)
         elif self.state == ABORTED and new_state == OPEN:
             state_changed = self._reopen_review(new_state)
+            self.trigger_webhooks(REOPENED)
 
         if state_changed:
             self._common_state_change(new_state)
 
         return state_changed
+
+    def trigger_webhooks(self, trigger_event, additional_json=None):
+        hooks = self.project.webhook_set.filter(trigger_event=trigger_event)
+        for hook in hooks:
+            tasks.fire_webhook.delay(self.pk, hook.pk, additional_json)
 
     @property
     def revision(self):

@@ -1,7 +1,7 @@
 version: '2'
 services: 
     db:
-        image: postgres:latest
+        image: postgres:9.5.3
     demotime:
         build: .
         image: domestique/demotime
@@ -13,3 +13,7 @@ services:
             - ~/dt_backups:/backups
         environment:
             - STATIC_PATH=/home/docker/demotime/demotime/demotime/static
+    demotime_celery:
+        build: .
+        image: domestique/demotime
+        command: ./start_celery.sh

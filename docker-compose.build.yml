@@ -1,9 +1,13 @@
 version: '2'
 services: 
     db:
-        image: postgres:latest
+        image: postgres:9.5.3
     demotime:
         build: .
+        image: domestique/demotime
+        volumes:
+            - .:/home/docker/demotime
+    demotime_celery:
         image: domestique/demotime
         volumes:
             - .:/home/docker/demotime
