@@ -13,7 +13,7 @@ RUN dpkg-divert --local --rename --add /sbin/initctl && \
 
 ADD . /home/docker/demotime/
 WORKDIR /home/docker/demotime/demotime/
-RUN /usr/local/bin/pip3.5 install -r ../requirements.txt -r ../prod_requirements.txt -r ../testing_requirements.txt && \
+RUN /usr/local/bin/pip3.5 install -r ../requirements.txt  -r ../testing_requirements.txt && \
     python3 setup.py develop
 WORKDIR /home/docker/demotime/dt
 RUN unlink /etc/nginx/sites-enabled/default && \
