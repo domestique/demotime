@@ -2,14 +2,15 @@ version: '2'
 services: 
     db:
         image: postgres:9.5.3
-        ports:
-            - "5432:55432"
     demotime:
         build: .
         image: domestique/demotime
         command: ./startup.sh
         volumes:
             - .:/home/docker/demotime
+            - dt_static_data:/usr/local/demotime
+            - /private/etc/demotime:/etc/demotime
+            - ~/dt_backups:/backups
         environment:
             - STATIC_PATH=/home/docker/demotime/demotime/demotime/static
     demotime_celery:
