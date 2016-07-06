@@ -1,5 +1,5 @@
-<div class="attachment-container split~680 by:{{ cols }} with-gap:3">
-    <div class="attachment-type cel">
+<div class="attachment-container split~680 by:3 with-gap:3">
+    <div class="attachment-type" style="display: none">
         <label>File type:</label>
         {% for select in form.attachment_type %}
             <div>
@@ -17,12 +17,12 @@
         {{ form.description }}
         {{ form.description.errors }}
     </div>
-    {% if cols == 4 %}
-        <div class="cel">
+    <div class="cel">
+        {% if cols == 3 %}
             {% if forloop.counter < attachment_forms|length %}
                 <label>&nbsp;</label>
                 <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
             {% endif %}
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
