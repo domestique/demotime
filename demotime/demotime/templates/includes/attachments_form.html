@@ -22,6 +22,9 @@
             {% if forloop.counter < attachment_forms|length %}
                 <label>&nbsp;</label>
                 <a href="#" class="attachment-add icon icon-plus-circled">add another</a>
+                {% if forloop.counter > 1 %}
+                    <br><a href="#" class="attachment-remove icon icon-cancel-circled">remove</a>
+                {% endif %}
             {% endif %}
         </div>
     {% endif %}

@@ -11,7 +11,12 @@ $('.content input[type="text"]').first().focus();
 $('.attachment-add').click(function(event) {
     event.preventDefault();
     $(this).parents('section').next().slideDown();
-    $(this).remove();
+});
+$('.attachment-remove').click(function(event) {
+    event.preventDefault();
+    $(this).parents('.attachment-container').parent().slideUp(function() {
+        $(this).remove();
+    });
 });
 
 // Linkify URLs
