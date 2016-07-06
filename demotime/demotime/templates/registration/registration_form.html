@@ -19,6 +19,9 @@
                 {{ form.errors }}
                 {{ form }}
             {% endfor %}
+            <p>By registering you agree that you've read and understand our
+            <a href="{% url 'privacy-policy' %}">privacy policy</a> and
+            <a href="{% url 'terms-of-use' %}">terms of use</a>.</p>
             <input type="submit" value="Sign up!">
         </form>
     </section>
