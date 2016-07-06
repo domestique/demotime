@@ -20,7 +20,7 @@ $('blockquote p, .review-overview li, .review-overview p').linkify({
 });
 
 // Handle review form submits (some light validation on attachments)
-$('.review form').submit(function(e) {
+$('.review form, .new_comment form').submit(function(e) {
     var form = $(this),
         proceed = true,
         reason = '';
