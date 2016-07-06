@@ -17,3 +17,8 @@ services:
         build: .
         image: domestique/demotime
         command: ./start_celery.sh
+        volumes:
+            - .:/home/docker/demotime
+            - dt_static_data:/usr/local/demotime
+            - /private/etc/demotime:/etc/demotime
+            - ~/dt_backups:/backups

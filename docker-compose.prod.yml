@@ -5,6 +5,14 @@ services:
     demotime:
         image: domestique/demotime:latest
         command: ./startup.sh
+        volumes:
+            - dt_static_data:/usr/local/demotime
+            - /etc/demotime:/etc/demotime
+            - ~/dt_backups:/backups
     demotime_celery:
         image: domestique/demotime
         command: ./start_celery.sh
+        volumes:
+            - dt_static_data:/usr/local/demotime
+            - /etc/demotime:/etc/demotime
+            - ~/dt_backups:/backups
