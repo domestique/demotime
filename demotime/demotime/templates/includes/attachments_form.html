@@ -1,16 +1,16 @@
-<div class="attachment-container split~680 by:3 with-gap:3">
-    <div class="attachment-type" style="display: none">
+<div class="attachment-container split~680 by:{{ cols }} with-gap:3">
+    <div class="attachment-file cel">
+        <label>Attach your file:</label>
+        {{ form.attachment }}
+        {{ form.attachment.errors }}
+    </div>
+    <div class="attachment-type cel">
         <label>File type:</label>
         {% for select in form.attachment_type %}
             <div>
                 {{ select }}
             </div>
         {% endfor %}
-    </div>
-    <div class="attachment-file cel">
-        <label>Attach your file:</label>
-        {{ form.attachment }}
-        {{ form.attachment.errors }}
     </div>
     <div class="attachment-desc cel">
         <label>Short description:</label>

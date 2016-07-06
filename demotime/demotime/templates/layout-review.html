@@ -76,7 +76,7 @@ h1 em {
                     {{ attachment_forms.management_form }}
                     {% for form in attachment_forms %}
                         <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
-                            {% include "includes/attachments_form.html" with form=form cols=3 %}
+                            {% include "includes/attachments_form.html" with form=form cols=4 %}
                             {{ form.attachment.errors }}
                         </section>
                     {% endfor %}
