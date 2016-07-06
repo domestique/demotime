@@ -195,7 +195,12 @@
 
         {# Smooth scroll to links #}
         <script src="/static/scripts/ScrollToLink.js"></script>
-        <script> //var ScrollToLink = new DemoTime.ScrollToLink() </script>
+        <script>
+            // force scroll to top (to avoid embedded movie pop)
+            window.onload = function(){ window.scrollTo(0,0); }
+            // initialize scroll lib
+            var ScrollToLink = new DemoTime.ScrollToLink()
+        </script>
 
         {% if request.user %}
         {# DT-XX Info boxes #}
