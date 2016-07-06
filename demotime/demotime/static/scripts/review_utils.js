@@ -23,9 +23,9 @@ $('.attachment-file').click(function() {
                 attachment_type.val('image');
             } else if (ext.match(/doc|pdf|docx|txt/g)) {
                 attachment_type.val('document');
-            } else if (ext.match(/mkv|mov|avi/g)) {
+            } else if (ext.match(/mkv|mov|avi|divx|mpeg/g)) {
                 attachment_type.val('movie');
-            } else if (ext.match(/mp3|wav|aiff|ogg/g)) {
+            } else if (ext.match(/mp3|wav|aiff|ogg|mp4|mpeg3|mpeg4|webm/g)) {
                 attachment_type.val('audio');
             } else {
                 attachment_type.val('other');
