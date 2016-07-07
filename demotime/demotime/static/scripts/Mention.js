@@ -38,7 +38,6 @@ DemoTime.Mention = Backbone.View.extend({
     },
 
     changed: function(event) {
-        $('.form-control').show();
         var wysiwyg = $(event.target),
             parent_form = wysiwyg.parents('form'),
             control = parent_form.find('.form-control'),
