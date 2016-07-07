@@ -37,7 +37,13 @@ $('.attachment-file').click(function() {
 $('.attachment-add').click(function(event) {
     event.preventDefault();
     $(this).parents('section').next().slideDown();
-    $(this).remove();
+    $(this).css('visibility', 'hidden');
+});
+$('.attachment-remove').click(function(event) {
+    event.preventDefault();
+    $(this).parents('.attachment-container').parent().slideUp(function() {
+        $(this).remove();
+    });
 });
 
 // Linkify URLs

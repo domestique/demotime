@@ -72,7 +72,7 @@ h1 em {
                     {{ review_form.description.errors }}
                 </div>
                 <div class="attachments">
-                    <h3 class="icon icon-attach">Attachments <small>Visually present with screenshots, screencasts, documents, etc</small></h3>
+                    <h3 class="icon icon-attach">Attachments <small>Optionally present with screenshots, screencasts, documents, etc</small></h3>
                     {{ attachment_forms.management_form }}
                     {% for form in attachment_forms %}
                         <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
