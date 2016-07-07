@@ -41,46 +41,55 @@ DemoTime.Mention = Backbone.View.extend({
         $('.form-control').show();
         var wysiwyg = $(event.target),
             parent_form = wysiwyg.parents('form'),
-            control = parent_form.find('.form-control');
+            control = parent_form.find('.form-control'),
+            interval = 250,
+            self = this,
+            timer;
 
-        if (event.keyCode == 32) { // Press space
-            var words = control.val().replace(/<\/?[^>]+>/gi, '').split(' ');
-            var lastWord = words[words.length - 1];
-            lastWord = lastWord.replace('&nbsp;', '');
+        timer = setTimeout(do_mention, interval);
+        parent_form.find('.mentioner').hide();
 
-            if (lastWord.match('@')) {
+        var words = control.val().replace(/<\/?[^>]+>/gi, '').split(' ');
+        var lastWord = words[words.length - 1];
+        lastWord = lastWord.replace('&nbsp;', '');
+
+        function do_mention() {
+            if (lastWord.match('@') && lastWord.length > 1 && event.keyCode != 32) {
+                clearTimeout(timer);
+
                 var name_array = lastWord.split('@');
-                this.options.temp_user = name_array[name_array.length - 1];
-                user = this.options.temp_user.replace('@', '').replace('&nbsp;', '').toLowerCase();
+                self.options.temp_user = name_array[name_array.length - 1];
+                user = self.options.temp_user.replace('@', '').replace('&nbsp;', '').toLowerCase();
                 console.log(user.replace('&nbsp;', ''));
 
-                wysiwyg.before(this.options.template)
+                wysiwyg.before(self.options.template)
                 $('.mentioner-user').each(function() {
                     mentioned_user = $(this).html().toLowerCase();
                     if (!mentioned_user.indexOf(user) == 0) {
                         $(this).remove();
                     }
                 });
+                setTimeout(function() {
+                    parent_form.find('.mentioner').show();
+                }, 250);
                 if (!$('.mentioner-user').length) {
                     $('.mentioner').remove();
                 }
+            } else {
+                parent_form.find('.mentioner').hide();
             }
-        }
-
-
-        if (!event.keyCode == 64 && !event.shiftKey) {
-            wysiwyg.parents('form').find('.mentioner').fadeOut();
         }
     },
 
     add: function(event) {
         var link = $(event.target),
-            wysiwyg = link.parents('form').find('.note-editable'),
+            form = link.parents('form'),
+            wysiwyg = form.find('.note-editable'),
             self = this;
 
         event.preventDefault();
 
         wysiwyg.html(wysiwyg.html().replace(this.options.temp_user, link.html()));
-        link.parents('form').find('.mentioner').fadeOut();
+        link.parents('form').find('.mentioner').hide();
     }
 })

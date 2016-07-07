@@ -237,3 +237,8 @@ blockquote .emoji,
     top: 20px;
     box-shadow: 0 0 10px #ccc;
 }
+.mentioner-user:not(:first-child) {
+    border-left: 1px solid #ddd;
+    padding-left: 5px;
+    margin-left: 5px;
+}
