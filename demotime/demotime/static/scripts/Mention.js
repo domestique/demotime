@@ -60,7 +60,6 @@ DemoTime.Mention = Backbone.View.extend({
                 var name_array = lastWord.split('@');
                 self.options.temp_user = name_array[name_array.length - 1];
                 user = self.options.temp_user.replace('@', '').replace('&nbsp;', '').toLowerCase();
-                console.log(user.replace('&nbsp;', ''));
 
                 wysiwyg.before(self.options.template)
                 $('.mentioner-user').each(function() {
