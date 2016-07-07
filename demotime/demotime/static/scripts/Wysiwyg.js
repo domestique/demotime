@@ -46,7 +46,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         var self = this;
         setTimeout(function() {
             // Grab the container template
-            var html = $('#emoji').html(),
+            var html = $('#wysiwyg_footer').html(),
                 template = _.template(html);
             template = template();
 
@@ -57,8 +57,6 @@ DemoTime.Wysiwyg = Backbone.View.extend({
     add: function(event) {
         var img = $(event.target),
             self = this;
-
-        console.log(self.options.dt_url);
 
         img.parents('.note-editor').prev('textarea').summernote('insertImage', self.options.dt_url + img.attr('src'), function ($image) {
             $image.addClass('emoji');

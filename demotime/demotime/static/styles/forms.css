@@ -224,3 +224,16 @@ blockquote .emoji,
 .dd-option {
     border-bottom: 0 !important;
 }
+
+/* Mentions */
+.mentioner {
+    position: absolute;
+    background: #fff;
+    padding: 5px;
+    width: 375px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    left: 30%;
+    top: 20px;
+    box-shadow: 0 0 10px #ccc;
+}

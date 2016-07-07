@@ -120,6 +120,7 @@
         {# Main librarys #}
         <script src="/static/scripts/library/jquery.cookie.js"></script>
 
+        {# csrf #}
         <script>
             var csrftoken = $.cookie('csrftoken');
             function csrfSafeMethod(method) {
@@ -167,7 +168,6 @@
             new Clipboard('.copy_link');
         </script>
 
-
         {# linkify plain urls #}
         <script src="/static/scripts/library/linkify.min.js"></script>
         <script src="/static/scripts/library/linkify-jquery.min.js"></script>
@@ -194,6 +194,7 @@
         <script src="/static/scripts/ScrollToLink.js"></script>
         <script> var ScrollToLink = new DemoTime.ScrollToLink() </script>
 
+        {# Logged-in user scripts #}
         {% if request.user %}
         {# DT-XX Info boxes #}
         <script src="/static/scripts/Info.js"></script>
@@ -237,6 +238,14 @@
             var account = new DemoTime.Account();
         </script>
 
+        {# @mention support #}
+        <script src="/static/scripts/Mention.js"></script>
+        <script>
+            var mentions = new DemoTime.Mention({
+                user_url: '{% url 'user-api' %}'
+            });
+        </script>
+
         {# Global search #}
         <script src="/static/scripts/Search.js"></script>
         <script>
@@ -264,7 +273,8 @@
     </body>
     <div id="patterns">
         {% if request.user %}
-            {% include "includes/patterns/emoji.html" %}
+            {% include "includes/patterns/mentioner.html" %}
+            {% include "includes/patterns/wysiwyg_footer.html" %}
             {% include "includes/patterns/search.html" %}
             {% include "includes/patterns/review_info.html" %}
         {% endif %}
