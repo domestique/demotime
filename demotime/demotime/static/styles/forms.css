@@ -228,17 +228,28 @@ blockquote .emoji,
 /* Mentions */
 .mentioner {
     position: absolute;
-    background: #fff;
-    padding: 5px;
-    width: 375px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    width: auto;
     border: 1px solid #ddd;
     border-radius: 2px;
-    left: 30%;
+    left: 20%;
     top: 20px;
     box-shadow: 0 0 10px #ccc;
 }
-.mentioner-user:not(:first-child) {
-    border-left: 1px solid #ddd;
-    padding-left: 5px;
-    margin-left: 5px;
+.mentioner-user {
+    display: block;
+    padding: 3px 6px;
+}
+.mentioner-user:hover {
+    background: #18735D;
+    color: #fff;
+    text-decoration: none !important;
+}
+.mentioned {
+    color: #32CCAE;
+    font-weight: 700;
+}
+.mentioned:before {
+    content: '@';
 }

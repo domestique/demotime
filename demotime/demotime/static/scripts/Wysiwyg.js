@@ -14,6 +14,9 @@ DemoTime.Wysiwyg = Backbone.View.extend({
             'height': '150',
             maximumImageFileSize: 2621440, // 2.5MB
             shortcuts: false,
+            onkeyup: function (e) {
+                e.summernote('saveRange');
+            },
             toolbar: [
                 ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
                 ['para', ['ul', 'ol']],

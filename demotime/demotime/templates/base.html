@@ -117,6 +117,9 @@
             </div>
         </footer>
 
+        {# Namespacing #}
+        <script> var DemoTime = [] </script>
+
         {# Main librarys #}
         <script src="/static/scripts/library/jquery.cookie.js"></script>
 
@@ -142,11 +145,6 @@
 
         {# split/cel framework #}
         <script src="/static/scripts/library/cel-0.2.0.min.js"></script>
-
-        {# Summernote #}
-        <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/static/scripts/library/jquery.ui.widget.js"></script>
-        <script type="text/javascript" src="/static/scripts/library/summernote.js"></script>
 
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
@@ -187,9 +185,6 @@
         {# Google Analytics #}
         {% include "includes/analytics.html" %}
 
-        {# Namespacing #}
-        <script> var DemoTime = [] </script>
-
         {# Smooth scroll to links #}
         <script src="/static/scripts/ScrollToLink.js"></script>
         <script> var ScrollToLink = new DemoTime.ScrollToLink() </script>
@@ -216,7 +211,10 @@
         <script src="/static/scripts/library/selects.js"></script>
         <script> $('select.slick').ddslick() </script>
 
-        {# WYSIWYG editors #}
+        {# WYSIWYG editor #}
+        <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/static/scripts/library/jquery.ui.widget.js"></script>
+        <script type="text/javascript" src="/static/scripts/library/summernote.js"></script>
         <script src="/static/scripts/Wysiwyg.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {

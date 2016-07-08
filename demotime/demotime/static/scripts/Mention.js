@@ -13,6 +13,7 @@ DemoTime.Mention = Backbone.View.extend({
         this.render();
     },
 
+    // The initial AJAX receive of users
     render: function() {
         var self = this;
 
@@ -29,7 +30,7 @@ DemoTime.Mention = Backbone.View.extend({
             self.users = new MentionModel(data);
 
             setTimeout(function() {
-                // Grab the container template
+                // Grab the mentioner container template (popup)
                 var html = $('#mentioner').html();
                 self.options.template = _.template(html);
                 self.options.template = self.options.template ({ user: self.users.get('users') });
@@ -37,6 +38,7 @@ DemoTime.Mention = Backbone.View.extend({
         });
     },
 
+    // The actual 'user is typing' event
     changed: function(event) {
         var wysiwyg = $(event.target),
             parent_form = wysiwyg.parents('form'),
@@ -45,49 +47,67 @@ DemoTime.Mention = Backbone.View.extend({
             self = this,
             timer;
 
+        // Set an interval checker
         timer = setTimeout(do_mention, interval);
         parent_form.find('.mentioner').hide();
 
+        // Use JS to grab the last word typed
         var words = control.val().replace(/<\/?[^>]+>/gi, '').split(' ');
         var lastWord = words[words.length - 1];
-        lastWord = lastWord.replace('&nbsp;', '');
 
+        // The actual mention popup
         function do_mention() {
+            // Clear the interval
+            clearTimeout(timer);
+
+            // If the last word is a mention and has good length... (32 = space)
             if (lastWord.match('@') && lastWord.length > 1 && event.keyCode != 32) {
-                clearTimeout(timer);
-
+                // Split the array
                 var name_array = lastWord.split('@');
-                self.options.temp_user = name_array[name_array.length - 1];
-                user = self.options.temp_user.replace('@', '').replace('&nbsp;', '').toLowerCase();
+                // Assign a temporary string to clean up later (@ma should be replaced by @Mark)
+                self.options.temp_string = name_array[name_array.length - 1];
+                // Clean up the string for searching (damn you wysiwyg)
+                user = self.options.temp_string.replace('&nbsp;', '').toLowerCase();
 
+                // Write the HTML for the popup
                 wysiwyg.before(self.options.template)
+
+                // Cleanse the popup of non-matching users
                 $('.mentioner-user').each(function() {
                     mentioned_user = $(this).html().toLowerCase();
                     if (!mentioned_user.indexOf(user) == 0) {
                         $(this).remove();
                     }
                 });
-                setTimeout(function() {
-                    parent_form.find('.mentioner').show();
-                }, 250);
-                if (!$('.mentioner-user').length) {
-                    $('.mentioner').remove();
+
+                // Pop up the box after giving JS a chance to cleanse
+                if ($('.mentioner-user').length) {
+                    setTimeout(function() {
+                        parent_form.find('.mentioner').show();
+                    }, 250);
                 }
             } else {
+                // Not a mention, so hide the mentioner box
                 parent_form.find('.mentioner').hide();
             }
         }
     },
 
+    // The actual 'click' event inside the popup
     add: function(event) {
         var link = $(event.target),
             form = link.parents('form'),
-            wysiwyg = form.find('.note-editable'),
-            self = this;
+            wysiwyg = form.find('.note-editable');
 
         event.preventDefault();
 
-        wysiwyg.html(wysiwyg.html().replace(this.options.temp_user, link.html()));
-        link.parents('form').find('.mentioner').hide();
+        console.log(this.options.temp_string + ":" + link.html())
+        // Write the popped name in to the WYSIWYG, replacing the previously typed string
+        wysiwyg.html(wysiwyg.html().replace('@' + this.options.temp_string, '<span class="mentioned">' + link.html() + '</span>&nbsp;'));
+
+        // And hide the box after selecting a user.
+        form.find('.mentioner').hide();
+
+        //form.summernote('restoreRange');
     }
 })
