@@ -156,8 +156,7 @@ DemoTime.Review = Backbone.View.extend({
         var link = $(event.target);
 
         link.next('.comment_container').slideDown(function() {
-            $(this).find('textarea').summernote('focus');
-            $(this).find('.note-editor .note-editor').remove();
+            $(this).find('.trumbowyg-editor').focus();
         });
         link.remove();
     }

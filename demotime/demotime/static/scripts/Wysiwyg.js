@@ -9,42 +9,14 @@ DemoTime.Wysiwyg = Backbone.View.extend({
     initialize: function(options) {
         this.options = options;
 
-        $('textarea').summernote({
-            'width': '100%',
-            'height': '150',
-            maximumImageFileSize: 2621440, // 2.5MB
-            shortcuts: false,
-            onkeyup: function (e) {
-                e.summernote('saveRange');
-            },
-            toolbar: [
-                ['style', ['color', 'bold', 'italic', 'underline', 'strikethrough', 'clear']],
-                ['para', ['ul', 'ol']],
-                ['misc', ['undo', 'redo', 'codeview', 'link']],
-                ['insert', ['table', 'picture']]
-            ]
+        $('textarea').trumbowyg({
+            autogrow: true
         });
-
-        this.fix_tab_index();
 
         this.render();
     },
 
-    // focus the wysiwyg when the input prior to hits TAB
-    fix_tab_index: function() {
-        var wysiwyg_form_group = this.$el.find('.note-editor').parents('.form-group'),
-            previous_input = wysiwyg_form_group.prev('.form-group').find('input');
-
-        previous_input.keydown(function(event) {
-            if (event.keyCode == 9) {
-                event.preventDefault();
-                wysiwyg_form_group.find('textarea').summernote('focus');
-                // clean up
-                wysiwyg_form_group.find('.note-editor .note-editor').remove();
-            }
-        });
-    },
-
+    // Add the custom footer to wysiwygs (emoticons)
     render: function() {
         var self = this;
         setTimeout(function() {
@@ -53,18 +25,15 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                 template = _.template(html);
             template = template();
 
-            self.$el.find('.note-editor').append(template);
+            self.$el.find('.trumbowyg-box').append(template);
         }, 1000);
     },
 
+    // Emoticon click-to-add event
     add: function(event) {
         var img = $(event.target),
             self = this;
 
-        img.parents('.note-editor').prev('textarea').summernote('insertImage', self.options.dt_url + img.attr('src'), function ($image) {
-            $image.addClass('emoji');
-            $image.attr('width', '30');
-            $image.attr('height', '30');
-        });
+        img.parents('.trumbowyg-box').find('.trumbowyg-editor').append("<img class='emoji' width='30' height='30' src='" + self.options.dt_url + img.attr('src') + "'>").trigger('keyup');
     }
 });

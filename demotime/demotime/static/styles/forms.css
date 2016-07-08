@@ -130,37 +130,35 @@ select[multiple="multiple"]:focus {
     box-sizing: border-box;
 }
 
-.note-editor {
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-.note-editor button {
+.trumbowyg-button-pane button {
     box-shadow: none;
-    border: 0 !important;
+    border: 0;
     border-radius: 0;
-}
-.note-editor.note-frame {
-    border-color: #ddd;
-}
-.note-editor .panel-heading {
-    border-bottom: 1px solid #ddd;
-}
-.note-editor .note-btn-group {
-    margin: 0 3px;
-}
-.note-popover {
-    display: none;
-}
-.note-editable {
-    font-size: 16px;
-}
-.note-editable p {
-    margin: 2px 0;
+    background: none;
+    margin-bottom: 0;
 }
 @media screen and (max-width:680px) {
-    .note-toolbar {
+    .trumbowyg-button-pane {
         display: none;
     }
+}
+.trumbowyg-modal-button {
+    padding: 0 10px !important;
+}
+.trumbowyg-button-pane button.trumbowyg-active {
+    background: none;
+}
+.trumbowyg-viewHTML-button {
+    display: none !important;
+}
+.trumbowyg-dropdown {
+    padding: 10px;
+}
+.trumbowyg-dropdown button {
+    background: #ddd;
+    padding: 0 10px;
+    box-shadow: none;
+    color: #333 !important;
 }
 
 
@@ -228,18 +226,16 @@ blockquote .emoji,
 /* Mentions */
 .mentioner {
     position: absolute;
-    background: rgba(255, 255, 255, 0.9);
+    bottom: 45px;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: #f6f6f6;
     padding: 8px 12px;
-    width: auto;
-    border: 1px solid #ddd;
-    border-radius: 2px;
-    left: 20%;
-    top: 20px;
-    box-shadow: 0 0 10px #ccc;
 }
 .mentioner-user {
-    display: block;
     padding: 3px 6px;
+    font-size: 12px;
 }
 .mentioner-user:hover {
     background: #18735D;
