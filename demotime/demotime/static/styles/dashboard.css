@@ -187,7 +187,7 @@ th, td {
     padding: 5px;
     min-width: 25px;
     text-align: center;
-    margin-right: 8px;
+    margin: 5px 8px 5px 0;
     text-transform: uppercase;
     display: inline-block;
     position: relative;
