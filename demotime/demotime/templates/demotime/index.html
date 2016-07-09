@@ -20,8 +20,14 @@
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
 </h1>
 
+{% if available_projects %}
+    <nav class="tertiary your_dashboard">
+        {% include "includes/tertiary.html" %}
+    </nav>
+{% endif %}
+
 <div class="dashboard aggregated_dashboard">
-    <article>
+    <article style="margin-top: 30px">
         {% if open_reviews %}
             <h3 class="icon icon-inbox">
                 Open demos you're <strong>reviewing</strong>

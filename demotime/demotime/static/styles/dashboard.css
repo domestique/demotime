@@ -90,7 +90,7 @@ section.emph_lower {
 .dashboard small {
     text-transform: uppercase;
     margin-left: 3px;
-    font-size: 9px;
+    font-size: 10px;
     color: #ccc;
     vertical-align: middle;
 }
@@ -110,6 +110,12 @@ section li.review_li:last-child {
 section .review_li-top {
     background: #2a2a2a;
     padding: 3px 8px;
+}
+section .review_li.Approved {
+    opacity: 0.8;
+}
+section .review_li.Approved .review_li-top {
+    background: #3f3f3f;
 }
 section .review_li-bottom {
     padding: 8px;
@@ -155,4 +161,55 @@ th, td {
     color: #555;
     font-weight: 700;
     white-space: nowrap;
+}
+
+.tertiary {
+    background: #26C59E;
+    text-align: left;
+    padding: 10px;
+}
+.tertiary ul {
+    width: auto;
+    display: inline-block;
+    margin: 0 auto;
+    list-style: none;
+    padding: 0;
+}
+
+.tertiary li {
+    display: inline-block;
+}
+.tertiary a {
+    color: #fff;
+    border: 1px solid white;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    margin-right: 8px;
+    text-transform: uppercase;
+    display: inline-block;
+    position: relative;
+}
+.tertiary a:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+    text-decoration: none;
+}
+.tertiary li.new a {
+    padding-right: 30px;
+}
+.tertiary li.new a:after {
+    content: 'new!';
+    background: #E03743;
+    border-radius: 2px;
+    color: white;
+    font-weight: 700;
+    padding: 0 2px;
+    line-height: 14px;
+    font-style: normal;
+    font-size: 8px;
+    position: absolute;
+    top: 8px;
+    right: 3px;
+}
+.your_dashboard .your_dashboard a {
+    background: rgba(255, 255, 231, 0.4);
 }

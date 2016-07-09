@@ -110,11 +110,20 @@ class IndexView(TemplateView):
 
         open_review_pks = models.Reviewer.objects.filter(
             reviewer=self.request.user,
+            review__state=constants.OPEN
+        ).values_list('review__pk', flat=True)
+
+        context['open_reviews'] = models.Review.objects.filter(
+            pk__in=open_review_pks
+        )
+
+        approved_review_pks = models.Reviewer.objects.filter(
+            reviewer=self.request.user,
             review__state=constants.OPEN,
             status=constants.REVIEWING
         ).values_list('review__pk', flat=True)
-        context['open_reviews'] = models.Review.objects.filter(
-            pk__in=open_review_pks
+        context['approved_reviews'] = models.Review.objects.filter(
+            pk__in=approved_review_pks
         )
 
         context['followed_demos'] = models.Review.objects.filter(
