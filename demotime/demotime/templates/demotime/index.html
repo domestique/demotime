@@ -61,27 +61,18 @@
                 </div>
             </section>
         {% endif %}
-        <h3 class="icon icon-inbox">
-            Unread messages
-            {% if message_bundles %}
+        {% if message_bundles %}
+            <h3 class="icon icon-inbox">
+                Unread messages
                 <small>
                     <a href="{% url 'inbox' %}" class="normal_text">view all</a> |
                     <a href="#" id="archive_all" class="normal_text">archive all</a>
                 </small>
-            {% endif %}
-        </h3>
-        <section class="emph_med aggregated_dashboard-messages">
-            <div>
-                <div class="messages-list">
-                    <ul>
-                        {% if not message_bundles %}
-                            <li>
-                                No unread messages.
-                                <small>
-                                    <a href="{% url 'inbox' %}">View your inbox</a>
-                                </small>
-                            </li>
-                        {% else %}
+            </h3>
+            <section class="emph_med aggregated_dashboard-messages">
+                <div>
+                    <div class="messages-list">
+                        <ul>
                             {% for message in message_bundles %}
                                 <li class="message_li {% if message.read %}de-emphasize{% endif %}">
                                     {% if message.review %}
@@ -95,42 +86,28 @@
                                     {% include "includes/review_state.html" with demo=message.review %}
                                 </li>
                             {% endfor %}
-                        {% endif %}
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </section>
-        <h3 class="icon icon-calendar">
-            Active Demos You've Created
-            {% if open_demos %}
+            </section>
+        {% endif %}
+        {% if open_demos %}
+            <h3 class="icon icon-calendar">
+                Active Demos You've Created
                 <small>
                     <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
                 </small>
-            {% endif %}
-        </h3>
-        <section class="emph_med aggregated_dashboard-created">
-            <div>
-                {% if open_demos %}
+            </h3>
+            <section class="emph_med aggregated_dashboard-created">
+                <div>
                     <ul>
                         {% for demo in open_demos %}
                             {% include "includes/reviews_li.html" %}
                         {% endfor %}
                     </ul>
-                {% else %}
-                    <ul>
-                        <li>
-                            There are none to show here
-                            <small>
-                                <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View your demos</a>
-                            </small>
-                        </li>
-                        <li>
-                            <a class="icon icon-plus" href="#" onclick="javascript:$('.new_demo .new_demo_link').trigger('click');">New demo</a>
-                        </li>
-                    </ul>
-                {% endif %}
-            </div>
-        </section>
+                </div>
+            </section>
+        {% endif %}
         <h3>
             <strong>Projects</strong> you're a member of
             <span class="help" title="A Project consists of one or more demos.
