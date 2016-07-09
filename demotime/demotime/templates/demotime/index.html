@@ -12,6 +12,7 @@
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css">
+<link href="/static/styles/library/bootstrap.popover.css" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -148,5 +149,32 @@
 var archive_all = new DemoTime.ArchiveAll({
     url: '{% url "messages-json" %}'
 });
+
+{# Tour for project dash #}
+if (!Cookies.get('seen_dash_updates')) {
+    Cookies.set('seen_dash_updates', true)
+    var steps = [{
+        content: '<p>Check out these new project dashboards.</p>',
+        highlightTarget: true,
+        nextButton: true,
+        target: $('.tertiary'),
+        my: 'bottom center',
+        at: 'top center'
+    }, {
+        content: '<p>Get a nice overview of project demos in your organization.</p>',
+        highlightTarget: true,
+        nextButton: true,
+        target: $('.tertiary li:nth-child(2)'),
+        my: 'bottom center',
+        at: 'top center'
+    }]
+
+    var tour = new Tourist.Tour({
+        steps: steps,
+        tipClass: 'Bootstrap',
+        tipOptions:{ showEffect: 'slidein' }
+    });
+    tour.start();
+}
 </script>
 {% endblock %}

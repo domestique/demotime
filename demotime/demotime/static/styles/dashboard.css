@@ -183,7 +183,10 @@ th, td {
     color: #fff;
     border: 1px solid white;
     background: rgba(255, 255, 255, 0.2);
-    padding: 10px;
+    font-size: 12px;
+    padding: 5px;
+    min-width: 25px;
+    text-align: center;
     margin-right: 8px;
     text-transform: uppercase;
     display: inline-block;

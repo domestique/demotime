@@ -2,11 +2,12 @@
     <li class="your_dashboard active"><a href="{% url 'index' %}">Your dashboard</a></li>
     {% for project in available_projects %}
         <li class="{{ project.name|lower|cut:' ' }} new">
-            {% if 'Default' in project.name %}
-                <a href="{% url 'project-dashboard' project.slug %}">Project updates</a>
-            {% else %}
-                <a href="{% url 'project-dashboard' project.slug %}">{{ project.name }} updates</a>
-            {% endif %}
+            <a href="{% url 'project-dashboard' project.slug %}">{{ project.name }} Dashboard</a>
         </li>
     {% endfor %}
+    {% if request.user.is_superuser %}
+        <li>
+            <a href="{% url 'project-create' %}">+</a>
+        </li>
+    {% endif %}
 </ul>
