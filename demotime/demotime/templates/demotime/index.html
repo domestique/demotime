@@ -85,7 +85,7 @@
                                             <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                                         {% endif %}
                                     {% endif %}
-                                    <a class="{{ message.read }} icon icon-mail" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
+                                    <a class="{{ message.read }} icon icon-mail iframe lightbox_url" href="{{ message.get_absolute_url }}?display_state=hide_header">{{ message.title }}</a>
                                     {% include "includes/review_state.html" with demo=message.review %}
                                 </li>
                             {% endfor %}

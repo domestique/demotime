@@ -45,7 +45,7 @@
         {% endblock %}
     </head>
 
-    <body>
+    <body class="{{ request.GET.display_state }}">
         <nav class="navbar" role="navigation">
             <div class="container">
                 <div class="cradle">
@@ -153,7 +153,10 @@
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
         <script>
-            $('.lightboxed').fancybox({
+            $('.lightbox_url').fancybox({
+                'type': 'iframe'
+            });
+            $('.lightbox_img').fancybox({
                 'type': 'image'
             });
         </script>
