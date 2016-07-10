@@ -162,6 +162,10 @@
 <script src="/static/scripts/ArchiveAll.js"></script>
 {{ block.super }}
 <script>
+$('.icon-mail.iframe').click(function() {
+    $(this).parents('li').slideUp();
+});
+
 var archive_all = new DemoTime.ArchiveAll({
     url: '{% url "messages-json" %}'
 });
