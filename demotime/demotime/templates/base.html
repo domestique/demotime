@@ -122,6 +122,7 @@
 
         {# Main librarys #}
         <script src="/static/scripts/library/jquery.cookie.js"></script>
+        <script src="/static/scripts/library/js.cookie.js"></script>
 
         <script>
             var csrftoken = $.cookie('csrftoken');
@@ -269,6 +270,24 @@
         {% endif %}
 
         {% block scripts %}{% endblock %}
+
+        <div id="feedbacker">
+            <a href="https://domestiquestudios.typeform.com/to/RDJWGc" target="blank">Hey! Help us improve!</a>
+            <span class="close">x</span>
+        </div>
+        <script>
+            if (Cookies.get('gave_feedback')) {
+                $('#feedbacker').hide();
+            } else {
+                $('#feedbacker a').click(function() {
+                    Cookies.set('gave_feedback', true);
+                });
+                $('#feedbacker .close').click(function() {
+                    Cookies.set('gave_feedback', true);
+                    $('#feedbacker').fadeOut();
+                })
+            }
+        </script>
     </body>
     <div id="patterns">
         {% if request.user %}
