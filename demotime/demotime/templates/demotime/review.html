@@ -270,7 +270,10 @@
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <div class="form-group">
-                                <input class="btn btn-primary btn-large" type="submit" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
+                                <input type="submit" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
+                                {% if reviewer and request.user != object.creator and reviewer.status != 'approved' %}
+                                    <input class="reply_and_approve" data-type="approved" type="button" value="Reply and Approve">
+                                {% endif %}
                             </div>
                         </form>
                     {% endmacro %}
