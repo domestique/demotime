@@ -232,6 +232,9 @@ nav.subnav {
     border-radius: 0;
 }
 
+.hide_header .breadcrumbs {
+    display: none;
+}
 .breadcrumbs {
     background: #1F8470;
     padding: 10px 0;
