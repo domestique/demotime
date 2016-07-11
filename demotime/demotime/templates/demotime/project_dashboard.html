@@ -24,8 +24,17 @@
     {% endif %}
 </h1>
 
+<style>
+.{{ project.name|lower|cut:' ' }} .{{ project.name|lower|cut:' ' }} a {
+    background: rgba(255, 255, 231, 0.4);
+}
+</style>
+<nav class="tertiary {{ project.name|lower|cut:' ' }}">
+    {% include "includes/tertiary.html" %}
+</nav>
+
 <div class="dashboard">
-    <article style="margin-top: 20px">
+    <article style="margin-top: 30px">
         <h3 class="icon icon-calendar">
             All open demos on <strong>{{ object.name }}</strong>
             <span class="help" title="Here you will see all of the open

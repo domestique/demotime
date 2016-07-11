@@ -51,7 +51,7 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(models.Review.objects.count(), 3)
         self.assertEqual(len(response.context['message_bundles']), 2)
 
-    def test_index_hides_approved_reviews_from_open_reviews(self):
+    def test_index_does_not_hide_approved_reviews_from_open_reviews(self):
         review_one_kwargs = self.default_review_kwargs.copy()
         review_one_kwargs['creator'] = self.test_users[0]
         review_one_kwargs['reviewers'] = [self.user]
@@ -70,8 +70,9 @@ class TestReviewViews(BaseTestCase):
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         open_reviews = response.context['open_reviews']
-        self.assertEqual(len(open_reviews), 1)
+        self.assertEqual(len(open_reviews), 2)
         self.assertEqual(open_reviews[0].pk, review_one.pk)
+        self.assertEqual(open_reviews[1].pk, review_two.pk)
 
     def test_get_review_detail(self):
         models.UserReviewStatus.objects.filter(

@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="/static/styles/library/animate.css">
         <link rel="stylesheet" href="/static/styles/library/swal.css">
 
+        {# Tours #}
+        <link rel="stylesheet" href="/static/styles/library/tourist.css">
 
         {# Lightbox #}
         <link rel="stylesheet" href="/static/scripts/library/fancybox/jquery.fancybox.css">
@@ -121,10 +123,10 @@
         </footer>
 
         {# Main librarys #}
-        <script src="/static/scripts/library/jquery.cookie.js"></script>
+        <script src="/static/scripts/library/js.cookie.js"></script>
 
         <script>
-            var csrftoken = $.cookie('csrftoken');
+            var csrftoken = Cookies.get('csrftoken');
             function csrfSafeMethod(method) {
                 // these HTTP methods do not require CSRF protection
                 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -180,7 +182,6 @@
             new Clipboard('.copy_link');
         </script>
 
-
         {# linkify plain urls #}
         <script src="/static/scripts/library/linkify.min.js"></script>
         <script src="/static/scripts/library/linkify-jquery.min.js"></script>
@@ -196,6 +197,9 @@
         {# Backbone / Underscore #}
         <script src="/static/scripts/library/underscore.js"></script>
         <script src="/static/scripts/library/backbone.js"></script>
+
+        {# Tours #}
+        <script src="/static/scripts/library/tourist.min.js"></script>
 
         {# Google Analytics #}
         {% include "includes/analytics.html" %}
