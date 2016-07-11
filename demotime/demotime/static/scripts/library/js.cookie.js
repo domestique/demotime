@@ -148,4 +148,8 @@
 	}
 
 	return init(function () {});
+<<<<<<< HEAD
 }));
+=======
+}));
+>>>>>>> origin/user_feedback

@@ -326,3 +326,28 @@ h3 small {
     display: inline-block;
     margin-right: 3px;
 }
+
+#feedbacker {
+    position: fixed;
+    bottom: 0;
+    padding-right: 5px;
+    left: 10px;
+    background: #E03743;
+}
+#feedbacker a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    display: inline-block;
+    font-weight: 700;
+    font-size: 13px;
+}
+#feedbacker .close {
+    cursor: pointer;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: #ddd;
+    font-weight: 700;
+    font-size: 9px;
+}
