@@ -33,8 +33,8 @@ $('.attachment-file').click(function() {
 // Dynamically add additional attachments
 $('.attachment-add').click(function(event) {
     event.preventDefault();
-    $(this).parents('section').next().slideDown();
-    $(this).css('visibility', 'hidden');
+    $(this).parents('section').nextAll('section').not(':visible').first().slideDown();
+    //$(this).css('visibility', 'hidden');
 });
 $('.attachment-remove').click(function(event) {
     event.preventDefault();
