@@ -155,7 +155,8 @@
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
         <script>
-            if ($(window).width > 720) {
+
+            if ($(window).width() > 720) {
                 $('.lightbox_url').fancybox({
                     'type': 'iframe',
                     afterShow : function () {
