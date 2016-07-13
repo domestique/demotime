@@ -1,4 +1,7 @@
 sudo: required
+language: node_js
+node_js:
+    - 0.8
 services:
     - docker
 addons:
@@ -17,6 +20,7 @@ before_install:
   - docker volume create --name dt_static_data
   - docker volume create --name dt_rmq_data
 script:
+    - karma start demotime/demotime/static/scripts/tests/karma.conf.js --single-run
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml build
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d
     - docker exec -it demotime_demotime_1 /bin/bash -c "cd ../ && invoke run_tests"
