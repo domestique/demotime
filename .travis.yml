@@ -25,7 +25,7 @@ script:
     - docker exec -it demotime_demotime_1 /bin/bash -c "cd ../ && invoke run_tests"
     - bash <(curl -s https://codecov.io/bash)
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
-    - karma start demotime/demotime/static/scripts/tests/karma.conf.js --single-run
+    - npm test
 after_success:
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
