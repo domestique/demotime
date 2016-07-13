@@ -4,7 +4,7 @@ DemoTime.Mention = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'keyup .trumbowyg-editor': 'changed',
+        'keydown .trumbowyg-editor': 'changed',
         'click .mentioner-user': 'add'
     },
 
@@ -69,6 +69,7 @@ DemoTime.Mention = Backbone.View.extend({
 
             if (code == 13) {
                 mentioner.find('.mentioner-active').click();
+                event.preventDefault();
             }
 
             return false;
@@ -163,11 +164,11 @@ DemoTime.Mention = Backbone.View.extend({
         // Insert the clicked item with a hook for cleaning up user input
         this.insert_text('||@' + link.html());
 
+        // Clean up the final mention
+        wysiwyg.html(wysiwyg.html().replace(/[^<> \t\n\r\f\v]*\|\|/g, '').replace('@@', '@'));
+
         // move the caret after the @mention
         this.move_caret(wysiwyg.get(0));
-
-        // Clean up the final mention
-        wysiwyg.html(wysiwyg.html().replace(/\S*\|\|/g, '').replace('@@', '@'));
 
         // And hide the box after selecting a user.
         this.options.form.find('.mentioner').remove();
