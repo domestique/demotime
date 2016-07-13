@@ -10,6 +10,8 @@ from .base import BaseModel
 from .messages import Message
 from .users import UserReviewStatus
 
+from demotime import constants
+
 
 class CommentThread(BaseModel):
 
@@ -40,6 +42,14 @@ class Comment(BaseModel):
         return 'Comment by {} on Review: {}'.format(
             self.commenter.username, self.thread.review_revision.review.title
         )
+
+    def _to_json(self):
+        return {
+            'name': self.commenter.userprofile.name,
+            'comment': self.comment,
+            'thread': self.thread.pk,
+            'attachment_count': self.attachments.count()
+        }
 
     @classmethod
     def create_comment(cls, commenter, comment, review,
@@ -119,6 +129,10 @@ class Comment(BaseModel):
                 thread=thread,
             )
 
+        review.review.trigger_webhooks(
+            constants.COMMENT,
+            {'comment': obj._to_json()}
+        )
         return obj
 
     class Meta:

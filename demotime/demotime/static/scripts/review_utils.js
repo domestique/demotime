@@ -4,14 +4,43 @@ $('.summary a').click(function(event) {
     $(this).parents('.summary').next().slideToggle();
 });
 
-// Focus first box
-$('.content input[type="text"]').first().focus();
+// Dynamically add attachment type
+$('.attachment-file').click(function() {
+    var file = $(this).find('input');
 
+    file.change(function() {
+        var filename = $(this).val(),
+            attachment_type = $(this).parents('.attachment-container').find('.attachment-type select');
+
+        if (filename) {
+            filename = filename.split('.');
+            ext = filename.slice(-1)[0]
+
+            if (ext.match(/png|gif|bmp|jpg|jpeg|tiff|svg/g)) {
+                attachment_type.val('image');
+            } else if (ext.match(/doc|pdf|docx|txt/g)) {
+                attachment_type.val('document');
+            } else if (ext.match(/mkv|mov|avi|divx|mpeg|webm|mp4|mpeg4/g)) {
+                attachment_type.val('movie');
+            } else if (ext.match(/mp3|wav|aiff|ogg|mpeg3/g)) {
+                attachment_type.val('audio');
+            } else {
+                attachment_type.val('other');
+            }
+        }
+    });
+});
 // Dynamically add additional attachments
 $('.attachment-add').click(function(event) {
     event.preventDefault();
-    $(this).parents('section').next().slideDown();
-    $(this).remove();
+    $(this).parents('section').nextAll('section').not(':visible').first().slideDown();
+    //$(this).css('visibility', 'hidden');
+});
+$('.attachment-remove').click(function(event) {
+    event.preventDefault();
+    $(this).parents('.attachment-container').parent().slideUp(function() {
+        $(this).remove();
+    });
 });
 
 // Linkify URLs
@@ -20,7 +49,7 @@ $('blockquote p, .review-overview li, .review-overview p').linkify({
 });
 
 // Handle review form submits (some light validation on attachments)
-$('.review form').submit(function(e) {
+$('.review form, .new_comment form').submit(function(e) {
     var form = $(this),
         proceed = true,
         reason = '';

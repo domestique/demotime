@@ -19,6 +19,7 @@ from demotime.views import (
     projects,
     reviews,
     users,
+    webhooks,
 )
 
 
@@ -152,7 +153,18 @@ urlpatterns += [
 # Projects
 urlpatterns += [
     url(r'projects/$', projects.project_json, name='project-json'),
+    url(
+        r'projects/(?P<proj_slug>[-\w]+)/admin/hooks/create/$',
+        webhooks.manage_hooks,
+        name='webhook-create'
+    ),
+    url(
+        r'projects/(?P<proj_slug>[-\w]+)/admin/hooks/edit/(?P<hook_pk>[\d]+)/$',
+        webhooks.manage_hooks,
+        name='webhook-edit'
+    ),
     url(r'projects/(?P<proj_slug>[-\w]+)/admin/edit/$', projects.project_admin, name='project-admin'),
     url(r'projects/(?P<proj_slug>[-\w]+)/admin/$', projects.project_detail, name='project-detail'),
     url(r'projects/(?P<proj_slug>[-\w]+)/$', projects.project_dashboard, name='project-dashboard'),
+
 ]

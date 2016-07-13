@@ -4,7 +4,8 @@ DemoTime.Review = Backbone.View.extend({
     events: {
         'click .collapser': 'collapse_comment',
         'click .review-changer': 'change_review_state',
-        'click .leave_reply_link': 'leave_reply'
+        'click .leave_reply_link': 'leave_reply',
+        'click .reply_and_approve': 'reply_and_approve'
     },
 
     initialize: function(options) {
@@ -31,7 +32,7 @@ DemoTime.Review = Backbone.View.extend({
 
         if (self.options.is_reviewer || self.options.is_creator) {
             if (self.options.is_reviewer) {
-                self.change_reviewer_state(type);
+                self.change_reviewer_state(type, 'reload');
             }
             if (self.options.is_creator) {
                 self.change_demo_state(type);
@@ -40,7 +41,7 @@ DemoTime.Review = Backbone.View.extend({
     },
 
     // Changing reviewer state
-    change_reviewer_state: function(type) {
+    change_reviewer_state: function(type, action) {
         var self = this;
 
         // Sets the new reviewer status
@@ -50,16 +51,29 @@ DemoTime.Review = Backbone.View.extend({
             data: {
                 review: self.options.review_pk,
                 reviewer: self.options.reviewer_pk,
-                status:type
+                status: type
             }
         });
 
         req.success(function(msg) {
             if (msg.success) {
                 window.location.hash = 'state_change';
-                window.location.reload();
+                if (action == 'reload') {
+                    window.location.reload();
+                }
             }
         });
+    },
+
+    // Leave a comment and approve at the same time
+    reply_and_approve: function(event) {
+        var self = this,
+            button = $(event.target);
+        this.change_reviewer_state(button.data('type'));
+        setTimeout(function() {
+            button.parents('form').attr('action', '');
+            button.parents('form').submit();
+        }, 500);
     },
 
     // Changing demo state
@@ -119,9 +133,9 @@ DemoTime.Review = Backbone.View.extend({
     // Expand collapse top level comments
     collapse_comment: function(event) {
         var e = event,
-            collapser = $(e.target);
+            collapser = $(event.target);
 
-        if (collapser.tagName != "A") {
+        if (collapser.prop("tagName") != "A") {
             collapser.parents('.collapser_parent').find('.collapseable').slideToggle(function() {
                 if (collapser.attr('class').match('squared')) {
                     if ($(this).is(":visible")) {

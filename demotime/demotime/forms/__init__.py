@@ -8,3 +8,4 @@ from .project_forms import (
     ProjectMemberForm, EditProjectMemberForm
 )
 from .group_forms import GroupForm, GroupTypeForm, GroupMemberForm
+from .webhook_forms import WebHookForm

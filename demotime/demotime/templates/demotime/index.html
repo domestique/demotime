@@ -12,6 +12,7 @@
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css">
+<link href="/static/styles/library/bootstrap.popover.css" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -20,8 +21,14 @@
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
 </h1>
 
+{% if available_projects %}
+    <nav class="tertiary your_dashboard">
+        {% include "includes/tertiary.html" %}
+    </nav>
+{% endif %}
+
 <div class="dashboard aggregated_dashboard">
-    <article>
+    <article style="margin-top: 30px">
         {% if open_reviews %}
             <h3 class="icon icon-inbox">
                 Open demos you're <strong>reviewing</strong>
@@ -55,27 +62,18 @@
                 </div>
             </section>
         {% endif %}
-        <h3 class="icon icon-inbox">
-            Unread messages
-            {% if message_bundles %}
+        {% if message_bundles %}
+            <h3 class="icon icon-inbox">
+                Unread messages
                 <small>
                     <a href="{% url 'inbox' %}" class="normal_text">view all</a> |
                     <a href="#" id="archive_all" class="normal_text">archive all</a>
                 </small>
-            {% endif %}
-        </h3>
-        <section class="emph_med aggregated_dashboard-messages">
-            <div>
-                <div class="messages-list">
-                    <ul>
-                        {% if not message_bundles %}
-                            <li>
-                                No unread messages.
-                                <small>
-                                    <a href="{% url 'inbox' %}">View your inbox</a>
-                                </small>
-                            </li>
-                        {% else %}
+            </h3>
+            <section class="emph_med aggregated_dashboard-messages">
+                <div>
+                    <div class="messages-list">
+                        <ul>
                             {% for message in message_bundles %}
                                 <li class="message_li {% if message.read %}de-emphasize{% endif %}">
                                     {% if message.review %}
@@ -85,46 +83,32 @@
                                             <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                                         {% endif %}
                                     {% endif %}
-                                    <a class="{{ message.read }} icon icon-mail" href="{{ message.get_absolute_url }}">{{ message.title }}</a>
+                                    <a class="{{ message.read }} icon icon-mail iframe lightbox_url" href="{{ message.get_absolute_url }}?display_state=hide_header">{{ message.title }}</a>
                                     {% include "includes/review_state.html" with demo=message.review %}
                                 </li>
                             {% endfor %}
-                        {% endif %}
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </section>
-        <h3 class="icon icon-calendar">
-            Active Demos You've Created
-            {% if open_demos %}
+            </section>
+        {% endif %}
+        {% if open_demos %}
+            <h3 class="icon icon-calendar">
+                Active Demos You've Created
                 <small>
                     <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
                 </small>
-            {% endif %}
-        </h3>
-        <section class="emph_med aggregated_dashboard-created">
-            <div>
-                {% if open_demos %}
+            </h3>
+            <section class="emph_med aggregated_dashboard-created">
+                <div>
                     <ul>
                         {% for demo in open_demos %}
                             {% include "includes/reviews_li.html" %}
                         {% endfor %}
                     </ul>
-                {% else %}
-                    <ul>
-                        <li>
-                            There are none to show here
-                            <small>
-                                <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View your demos</a>
-                            </small>
-                        </li>
-                        <li>
-                            <a class="icon icon-plus" href="#" onclick="javascript:$('.new_demo .new_demo_link').trigger('click');">New demo</a>
-                        </li>
-                    </ul>
-                {% endif %}
-            </div>
-        </section>
+                </div>
+            </section>
+        {% endif %}
         <h3>
             <strong>Projects</strong> you're a member of
             <span class="help" title="A Project consists of one or more demos.
@@ -162,8 +146,39 @@
 <script src="/static/scripts/ArchiveAll.js"></script>
 {{ block.super }}
 <script>
+$('.icon-mail.iframe').click(function() {
+    $(this).parents('li').slideUp();
+});
+
 var archive_all = new DemoTime.ArchiveAll({
     url: '{% url "messages-json" %}'
 });
+
+{# Tour for project dash #}
+if (!Cookies.get('seen_dash_updates')) {
+    Cookies.set('seen_dash_updates', true)
+    var steps = [{
+        content: '<p>Check out these new project dashboards.</p>',
+        highlightTarget: true,
+        nextButton: true,
+        target: $('.tertiary'),
+        my: 'bottom center',
+        at: 'top center'
+    }, {
+        content: '<p>Get a nice overview of project demos in your organization.</p>',
+        highlightTarget: true,
+        nextButton: true,
+        target: $('.tertiary li:nth-child(2)'),
+        my: 'bottom center',
+        at: 'top center'
+    }]
+
+    var tour = new Tourist.Tour({
+        steps: steps,
+        tipClass: 'Bootstrap',
+        tipOptions:{ showEffect: 'slidein' }
+    });
+    tour.start();
+}
 </script>
 {% endblock %}

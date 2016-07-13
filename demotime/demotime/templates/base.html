@@ -31,6 +31,8 @@
         <link rel="stylesheet" href="/static/styles/library/animate.css">
         <link rel="stylesheet" href="/static/styles/library/swal.css">
 
+        {# Tours #}
+        <link rel="stylesheet" href="/static/styles/library/tourist.css">
 
         {# Lightbox #}
         <link rel="stylesheet" href="/static/scripts/library/fancybox/jquery.fancybox.css">
@@ -44,7 +46,7 @@
         {% endblock %}
     </head>
 
-    <body>
+    <body class="{{ request.GET.display_state }}">
         <nav class="navbar" role="navigation">
             <div class="container">
                 <div class="cradle">
@@ -73,8 +75,8 @@
                                                 </a>
                                                 <ul>
                                                     <li><a class="manage_user-item" href="{{ request.user.userprofile.get_absolute_url }}">Profile</a></li>
-                                                    <li><a class="manage_user-item" href="{% url 'help' %}">Help</a></li>
-                                                    <li class="header-blog"><a class="manage_user-item" href="https://demoti.me/blog/" target="_blank">Blog</a></li>
+                                                    <li class="header-blog"><a class="manage_user-item" href="https://demoti.me/blog/" target="_blank">What's new?</a></li>
+                                                    <li><a class="manage_user-item" href="{% url 'help' %}">Documentation</a></li>
                                                     <li><a class="manage_user-item" href="{% url 'logout' %}">Log out</a></li>
                                                 </ul>
                                             </div>
@@ -94,6 +96,7 @@
                     <div class="container">
                         <ul class="subnav-item">
                             <li><a class="subnav-item" href="{% url 'about' %}">About</a>
+                            <li><a class="subnav-item" href="{% url 'help' %}">Documentation</a>
                             <li><a class="subnav-item" href="https://demoti.me/blog/" class="header-blog" target="_blank">Blog</a>
                         </ul>
                     </div>
@@ -122,11 +125,11 @@
         <script> var DemoTime = [] </script>
 
         {# Main librarys #}
-        <script src="/static/scripts/library/jquery.cookie.js"></script>
+        <script src="/static/scripts/library/js.cookie.js"></script>
 
         {# csrf #}
         <script>
-            var csrftoken = $.cookie('csrftoken');
+            var csrftoken = Cookies.get('csrftoken');
             function csrfSafeMethod(method) {
                 // these HTTP methods do not require CSRF protection
                 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -150,7 +153,18 @@
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
         <script>
-            $('.lightboxed').fancybox({
+
+            if ($(window).width() > 720) {
+                $('.lightbox_url').fancybox({
+                    'type': 'iframe',
+                    afterShow : function () {
+                        // set the onclick attribute on each link of the iframed page
+                        // then passes the corresponding href to the parent page function
+                        $(".fancybox-iframe").contents().find("a").attr("onclick", "parent.$.fancybox.close(); parent.location.href=this.href;");
+                    }
+                });
+            }
+            $('.lightbox_img').fancybox({
                 'type': 'image'
             });
         </script>
@@ -183,12 +197,20 @@
         <script src="/static/scripts/library/underscore.js"></script>
         <script src="/static/scripts/library/backbone.js"></script>
 
+        {# Tours #}
+        <script src="/static/scripts/library/tourist.min.js"></script>
+
         {# Google Analytics #}
         {% include "includes/analytics.html" %}
 
         {# Smooth scroll to links #}
         <script src="/static/scripts/ScrollToLink.js"></script>
-        <script> var ScrollToLink = new DemoTime.ScrollToLink() </script>
+        <script>
+            // force scroll to top (to avoid embedded movie pop)
+            window.onload = function(){ window.scrollTo(0,0); }
+            // initialize scroll lib
+            var ScrollToLink = new DemoTime.ScrollToLink()
+        </script>
 
         {# Logged-in user scripts #}
         {% if request.user %}
@@ -253,7 +275,7 @@
             });
 
             if(typeof(Storage) !== "undefined") {
-                var blog_entry = 'blog20160703'
+                var blog_entry = 'blog20160710'
 
                 if (!localStorage.getItem(blog_entry)) {
                     localStorage.setItem(blog_entry, true);
@@ -267,6 +289,24 @@
         {% endif %}
 
         {% block scripts %}{% endblock %}
+
+        <div id="feedbacker">
+            <a href="https://domestiquestudios.typeform.com/to/RDJWGc" target="blank">How are we doing?</a>
+            <span class="close">x</span>
+        </div>
+        <script>
+            if (Cookies.get('gave_feedback')) {
+                $('#feedbacker').hide();
+            } else {
+                $('#feedbacker a').click(function() {
+                    Cookies.set('gave_feedback', true);
+                });
+                $('#feedbacker .close').click(function() {
+                    Cookies.set('gave_feedback', true);
+                    $('#feedbacker').fadeOut();
+                })
+            }
+        </script>
     </body>
     <div id="patterns">
         {% if request.user %}

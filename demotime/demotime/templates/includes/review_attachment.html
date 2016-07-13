@@ -17,7 +17,7 @@
         {% endif %}
         {% if attachment.attachment_type == "image" %}
             <span class="attachment-image">
-                <a href="{% url "user-media" attachment.pk %}" class="lightboxed">
+                <a href="{% url "user-media" attachment.pk %}" class="lightbox_img">
                     <img src="{% url "user-media" attachment.pk %}" class="img-thumbnail" height=300 width=300>
                 </a>
             </span>

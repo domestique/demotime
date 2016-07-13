@@ -14,35 +14,30 @@
 <link rel="stylesheet" href="/static/styles/dashboard.css">
 {{ block.super }}
 <style>
-    .form-actions {
-        text-align: center;
+    .filters {
+        max-width: 90%;
+        display: block;
+    }
+    @media screen and (max-width:680px) {
+        .filters {
+            max-width: 100%;
+        }
     }
     .filters select {
         margin-right: 1.5em;
         margin-bottom: 1em;
-        max-width: 100px;
+        max-width: 175px;
+        width: 100%;
     }
     .filters input[type="submit"] {
         margin-top: 10px;
-        width: 50%;
     }
     .filters label {
-        display: inline-block;
+        display: block;
     }
     @media screen and (max-width:680px) {
         .filters select {
             margin-bottom: 10px;
-        }
-        .filters input[type="submit"] {
-            float: none;
-            margin: 10px 0;
-            width: 100%;
-            display: block;
-        }
-        .filters label {
-            display: block;
-            width: 100%;
-            margin: 0;
         }
     }
     .filters input[type="text"] {
@@ -50,14 +45,42 @@
         height: auto;
         border: 1px solid #ddd;
         margin-bottom: 20px;
+        background: #fff;
     }
-</style>
-{% endblock %}
+    @media screen and (max-width:680px) {
+        .desktop {
+            display: none;
+        }
+    }
+    .review_list {
+        padding: 10px;
+        overflow: hidden;
+    }
+    .review_list_left {
+        float: left;
+        width: 20%;
+    }
+    .review_list_right {
+        float: right;
+        width: 78%;
+    }
+    @media screen and (max-width:640px) {
+        .review_list_left,
+        .review_list_right {
+            float: none;
+            width: 100%;
+        }
+        .filters select {
+            max-width: 100%;
+        }
+    }
+    </style>
+    {% endblock %}
 
 {% block content %}
     <h1 class="heading">Find a Demo</h1>
-    <section>
-        <section>
+    <section class="review_list">
+        <div class="review_list_left">
             <form action="" method="get" class="filters">
                 {% for form in form %}
                     <label>{{ form.label }}</label>
@@ -68,39 +91,40 @@
                     <input type="submit" value="Filter Demos">
                 </div>
             </form>
-        </section>
-        <table id="results" cellspacing="0" cellpadding="0" width="100%">
-            {% if object_list %}
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Demo</th>
-                        <th>Creator</th>
-                        <th>Reviewer State</th>
-                        <th>Demo State</th>
-                    </tr>
-                </thead>
-                {% for obj in object_list %}
-                    <tr>
-                        <td>DT-{{ obj.pk }}</td>
-                        <td><a class="has_bubble" data-prj="{{ obj.project.pk }}" data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">{{ obj.title|truncatechars:65 }}</a></td>
-                        <td><a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a></td>
-                        <td>
-                            {% if obj.reviewer_state == "approved" %}
-                                <span class="icon-{{ obj.reviewer_state }}">{{ obj.reviewer_state|capfirst }}</span>
-                            {% else %}
-                                {{ obj.reviewer_state|capfirst }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ obj.state|capfirst }}
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr><td>No demos found matching your search.</td></tr>
-            {% endif %}
-        </table>
-        </ul>
+        </div>
+        <div class="review_list_right">
+            <table id="results" cellspacing="0" cellpadding="0" width="100%">
+                {% if object_list %}
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Demo</th>
+                            <th class="desktop">Creator</th>
+                            <th class="desktop">Reviewer State</th>
+                            <th>Demo State</th>
+                        </tr>
+                    </thead>
+                    {% for obj in object_list %}
+                        <tr>
+                            <td><a class="has_bubble" data-prj="{{ obj.project.pk }}" data-pk="{{ obj.pk }}" href="{{ obj.get_absolute_url }}">DT-{{ obj.pk }}</a></td>
+                            <td><a href="{{ obj.get_absolute_url }}">{{ obj.title|truncatechars:65 }}</a></td>
+                            <td class="desktop"><a href="{{ obj.creator.userprofile.get_absolute_url }}">{{ obj.creator.userprofile }}</a></td>
+                            <td class="desktop">
+                                {% if obj.reviewer_state == "approved" %}
+                                    <span class="icon-{{ obj.reviewer_state }}">{{ obj.reviewer_state|capfirst }}</span>
+                                {% else %}
+                                    {{ obj.reviewer_state|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ obj.state|capfirst }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td>No demos found matching your search.</td></tr>
+                {% endif %}
+            </table>
+        </div>
     </section>
 {% endblock %}

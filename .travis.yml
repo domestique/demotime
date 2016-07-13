@@ -15,6 +15,7 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
   - docker volume create --name dt_pg_data
   - docker volume create --name dt_static_data
+  - docker volume create --name dt_rmq_data
 script:
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml build
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d

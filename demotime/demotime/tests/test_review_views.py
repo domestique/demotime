@@ -51,7 +51,7 @@ class TestReviewViews(BaseTestCase):
         self.assertEqual(models.Review.objects.count(), 3)
         self.assertEqual(len(response.context['message_bundles']), 2)
 
-    def test_index_hides_approved_reviews_from_open_reviews(self):
+    def test_index_does_not_hide_approved_reviews_from_open_reviews(self):
         review_one_kwargs = self.default_review_kwargs.copy()
         review_one_kwargs['creator'] = self.test_users[0]
         review_one_kwargs['reviewers'] = [self.user]
@@ -70,8 +70,10 @@ class TestReviewViews(BaseTestCase):
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         open_reviews = response.context['open_reviews']
-        self.assertEqual(len(open_reviews), 1)
-        self.assertEqual(open_reviews[0].pk, review_one.pk)
+        self.assertEqual(len(open_reviews), 2)
+        # Newest review first
+        self.assertEqual(open_reviews[0].pk, review_two.pk)
+        self.assertEqual(open_reviews[1].pk, review_one.pk)
 
     def test_get_review_detail(self):
         models.UserReviewStatus.objects.filter(
@@ -584,6 +586,26 @@ class TestReviewViews(BaseTestCase):
         obj = response.context['object_list'][0]
         self.assertEqual(obj.creator, self.user)
         self.assertIn(test_user, obj.reviewers.all())
+
+        # Let's show that filtering works the other way too
+        response = self.client.get(reverse('review-list'), {
+            'reviewer': self.user.pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+        self.assertIn('form', response.context)
+
+    def test_review_list_filter_by_follower(self):
+        follower = User.objects.get(username='follower_0')
+        response = self.client.get(reverse('review-list'), {
+            'follower': follower.pk
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 1)
+        self.assertIn('form', response.context)
+        obj = response.context['object_list'][0]
+        self.assertEqual(obj.creator, self.user)
+        self.assertIn(follower, obj.followers.all())
 
         # Let's show that filtering works the other way too
         response = self.client.get(reverse('review-list'), {

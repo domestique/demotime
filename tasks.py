@@ -7,17 +7,6 @@ DOCKER_PROD_COMMAND_ROOT = 'docker-compose -f docker-compose.yml -f docker-compo
 
 
 @task
-def run_tests_old(ctx, test_module='demotime', opts=''):
-    print("Cleaning out pycs")
-    ctx.run('find . -type f -name \*.pyc -delete')
-    ctx.run('cd {} && python3 manage.py test {} {}'.format(
-        os.path.join(LOCAL_ROOT, 'dt'),
-        test_module,
-        opts,
-    ))
-
-
-@task
 def control_docker_dev(ctx, cmd='up -d'):
     ctx.run('cd {} && {} {}'.format(
         LOCAL_ROOT,
@@ -27,13 +16,16 @@ def control_docker_dev(ctx, cmd='up -d'):
 
 
 @task
-def run_tests(ctx, test_module='demotime', opts=''):
+def run_tests(ctx, test_module='demotime', opts='', pty=False):
     print("Cleaning out pycs")
     ctx.run('find . -type f -name \*.pyc -delete')
     with util.cd(os.path.join(LOCAL_ROOT, 'dt')):
-        ctx.run('coverage run --source=demotime manage.py test {} {}'.format(
-            test_module, opts
-        ))
+        ctx.run(
+            'TESTS=true coverage run --source=demotime manage.py test {} {}'.format(
+                test_module, opts
+            ),
+            pty=pty
+        )
         ctx.run('coverage xml')
 
 

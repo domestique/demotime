@@ -4,9 +4,19 @@ volumes:
         external: true
     dt_static_data:
         external: true
+    dt_rmq_data:
+        external: true
 services: 
+    rmq:
+        image: rabbitmq:3.6.2
+        environment:
+            - RABBITMQ_DEFAULT_USER=demotime
+            - RABBITMQ_DEFAULT_PASS=demotime
+            - RABBITMQ_DEFAULT_VHOST=demotime
+        volumes:
+            - dt_rmq_data:/var/lib/rabbitmq
     db:
-        image: postgres:latest
+        image: postgres:9.5.3
         environment:
             - POSTGRES_PASSWORD=demotime_docker
         volumes:
@@ -16,13 +26,19 @@ services:
         command: ./startup.sh
         depends_on:
             - db
-        volumes:
-            - dt_static_data:/usr/local/demotime
-            - /etc/demotime:/etc/demotime
-            - ~/dt_backups:/backups
+            - rmq
         ports:
             - "8033:8033"
         links:
             - db
+            - rmq
         environment:
             - STATIC_PATH=/usr/local/demotime/static/
+    demotime_celery:
+        command: ./start_celery.sh
+        depends_on:
+            - db
+            - rmq
+        links:
+            - db
+            - rmq
