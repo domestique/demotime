@@ -237,9 +237,10 @@ blockquote .emoji,
     padding: 3px 6px;
     font-size: 12px;
 }
+.mentioner-active,
 .mentioner-user:hover {
     background: #18735D;
-    color: #fff;
+    color: #fff !important;
     text-decoration: none !important;
 }
 .mentioned {

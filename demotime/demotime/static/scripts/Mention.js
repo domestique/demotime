@@ -10,6 +10,11 @@ DemoTime.Mention = Backbone.View.extend({
 
     initialize: function(options) {
         this.options = options;
+        this.options.interval = 250;
+
+        // Catch arrows for nav
+        var self = this;
+
         this.render();
     },
 
@@ -36,43 +41,87 @@ DemoTime.Mention = Backbone.View.extend({
         });
     },
 
+    navigate_mentions: function(event) {
+        // 37 = left, 38 = up, 39 = right, 40 = down
+        var code = event.keyCode,
+            mentioner = this.options.form.find('.mentioner');
+
+        if (mentioner.find('.mentioner-active').length) {
+            if (code == 37) {
+                current = mentioner.find('.mentioner-active');
+                if (current.prev().length) {
+                    current.prev().addClass('mentioner-active');
+                    current.removeClass('mentioner-active');
+                }
+            } else if (code == 38) {
+                mentioner.find('.mentioner-active').removeClass('mentioner-active');
+                mentioner.find('a').first().addClass('mentioner-active');
+            } else if (code == 39) {
+                current = mentioner.find('.mentioner-active');
+                if (current.next().length) {
+                    current.next().addClass('mentioner-active');
+                    current.removeClass('mentioner-active');
+                }
+            } else if (code == 40) {
+                mentioner.find('.mentioner-active').removeClass('mentioner-active');
+                mentioner.find('a').last().addClass('mentioner-active');
+            }
+
+            if (code == 13) {
+                mentioner.find('.mentioner-active').click();
+            }
+
+            return false;
+        }
+    },
+
     // The actual 'user is typing' event
     changed: function(event) {
         var wysiwyg = $(event.target),
-            parent_form = wysiwyg.parents('form'),
-            control = parent_form.find('.form-control'),
-            editor = parent_form.find('.trumbowyg-editor'),
-            interval = 250,
+            code = event.keyCode,
             self = this,
-            timer;
+            timer,
+            proceeder = true;
 
-        // Set an interval checker
-        timer = setTimeout(do_mention, interval);
-        lastWord = this.get_word(wysiwyg[0]);
+        this.options.form = wysiwyg.parents('form');
 
-        // The actual mention popup (triggered by interval)
-        function do_mention() {
-            // Clear the interval
-            clearTimeout(timer);
+        // Catch arrows
+        if ((code >= 37 && code <= 40) || code == 13) {
+            proceeder = this.navigate_mentions(event);
+        }
 
-            parent_form.find('.mentioner').remove();
+        if (proceeder) {
+            // Set an interval checker
+            timer = setTimeout(do_mention, self.options.interval);
+            lastWord = this.get_word(wysiwyg[0]);
 
-            // Write the HTML for the popup
-            wysiwyg.before(self.options.template)
+            // The actual mention popup (triggered by interval)
+            function do_mention() {
+                if (lastWord.length > 1) {
+                    // Clear the interval
+                    clearTimeout(timer);
 
-            // Cleanse the popup of non-matching users
-            $('.mentioner-user').each(function() {
-                mentioned_user = $(this).html().toLowerCase();
-                if (!mentioned_user.indexOf(lastWord.replace('@', '').toLowerCase()) == 0) {
-                    $(this).remove();
+                    self.options.form.find('.mentioner').remove();
+
+                    // Write the HTML for the popup
+                    wysiwyg.before(self.options.template)
+
+                    // Cleanse the popup of non-matching users
+                    $('.mentioner-user').each(function() {
+                        mentioned_user = $(this).html().toLowerCase();
+                        if (!mentioned_user.indexOf(lastWord.replace('@', '').toLowerCase()) == 0) {
+                            $(this).remove();
+                        }
+                    });
+                    $('.mentioner-user').first().addClass('mentioner-active');
+
+                    // Pop up the box after giving JS a chance to cleanse
+                    if ($('.mentioner-user').length) {
+                        setTimeout(function() {
+                            self.options.form.find('.mentioner').show();
+                        }, 300);
+                    }
                 }
-            });
-
-            // Pop up the box after giving JS a chance to cleanse
-            if ($('.mentioner-user').length) {
-                setTimeout(function() {
-                    parent_form.find('.mentioner').show();
-                }, 300);
             }
         }
     },
@@ -104,8 +153,7 @@ DemoTime.Mention = Backbone.View.extend({
     // The actual 'click' event inside the popup
     add: function(event) {
         var link = $(event.target),
-            form = link.parents('form'),
-            wysiwyg = form.find('.trumbowyg-editor');
+            wysiwyg = this.options.form.find('.trumbowyg-editor');
 
         event.preventDefault();
 
@@ -122,7 +170,7 @@ DemoTime.Mention = Backbone.View.extend({
         wysiwyg.html(wysiwyg.html().replace(/\S*\|\|/g, '').replace('@@', '@'));
 
         // And hide the box after selecting a user.
-        form.find('.mentioner').remove();
+        this.options.form.find('.mentioner').remove();
     },
 
     // Insert text at caret position within a contenteditable div
