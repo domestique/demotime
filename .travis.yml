@@ -21,13 +21,13 @@ before_install:
   - docker volume create --name dt_rmq_data
 script:
     - npm test
+    - rm -rf node_modules
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml build
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d
     - docker exec -it demotime_demotime_1 /bin/bash -c "cd ../ && invoke run_tests"
     - bash <(curl -s https://codecov.io/bash)
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
-    - rm -rf node_modules
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
         docker push domestique/demotime;
