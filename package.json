@@ -1,6 +1,6 @@
 {
     "devDependencies": {
-        "karma": "~0.8"
+        "karma": "1.1.1"
     },
     "scripts": {
        "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS demotime/demotime/static/scripts/tests/karma.conf.js"
