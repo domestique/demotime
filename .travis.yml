@@ -27,6 +27,7 @@ script:
     - bash <(curl -s https://codecov.io/bash)
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
+    - rm -rf node_modules
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
     - if [ "$TRAVIS_BRANCH" == "master" ]; then
         docker push domestique/demotime;
