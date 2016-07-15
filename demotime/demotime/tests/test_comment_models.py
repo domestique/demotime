@@ -111,7 +111,7 @@ class TestCommentModels(BaseTestCase):
         models.Message.objects.all().delete()
         self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
-        models.Comment.create_comment(
+        comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="<p></p>@test_user_1 check this out with @test_user_2</p><br>",
@@ -144,7 +144,7 @@ class TestCommentModels(BaseTestCase):
         review.reviewer_set.all().delete()
         self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
-        models.Comment.create_comment(
+        comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="<br><p>Hey, do you think @test_user_1 and @test_user_2 should see this?</p><br>",
