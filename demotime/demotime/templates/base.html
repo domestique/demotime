@@ -294,10 +294,10 @@
                 $('#feedbacker').hide();
             } else {
                 $('#feedbacker a').click(function() {
-                    Cookies.set('gave_feedback', true);
+                    Cookies.set('gave_feedback', true, { expires: 31 });
                 });
                 $('#feedbacker .close').click(function() {
-                    Cookies.set('gave_feedback', true);
+                    Cookies.set('gave_feedback', true, { expires: 7 });
                     $('#feedbacker').fadeOut();
                 })
             }

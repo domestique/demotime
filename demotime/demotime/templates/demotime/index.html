@@ -156,7 +156,7 @@ var archive_all = new DemoTime.ArchiveAll({
 
 {# Tour for project dash #}
 if (!Cookies.get('seen_dash_updates')) {
-    Cookies.set('seen_dash_updates', true)
+    Cookies.set('seen_dash_updates', true, { expires: 365 })
     var steps = [{
         content: '<p>Check out these new project dashboards.</p>',
         highlightTarget: true,
