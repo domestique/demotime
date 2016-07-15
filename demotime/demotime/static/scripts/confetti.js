@@ -125,6 +125,8 @@ setTimeout(function() {
             $('canvas').remove();
         }, 3000);
     } else {
-        document.getElementById("confetti").style.display = "none";
+        if (document.getElementById("confetti")) {
+            document.getElementById("confetti").style.display = "none";
+        }
     }
 }, 350);

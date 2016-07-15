@@ -44,9 +44,11 @@ $('.attachment-remove').click(function(event) {
 });
 
 // Linkify URLs
-$('blockquote p, .review-overview li, .review-overview p').linkify({
-    target: "_blank"
-});
+if ($('blockquote p, .review-overview li, .review-overview p').length) {
+    $('blockquote p, .review-overview li, .review-overview p').linkify({
+        target: "_blank"
+    });
+}
 
 // Handle review form submits (some light validation on attachments)
 $('.review form, .new_comment form').submit(function(e) {
