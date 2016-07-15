@@ -102,7 +102,9 @@ DemoTime.Mention = Backbone.View.extend({
                     // Clear the interval
                     clearTimeout(timer);
 
-                    self.options.form.find('.mentioner').remove();
+                    if (self.options.form.find('.mentioner').is(':visible')) {
+                        self.options.form.find('.mentioner').remove();
+                    }
 
                     // Write the HTML for the popup
                     wysiwyg.before(self.options.template)
@@ -118,9 +120,9 @@ DemoTime.Mention = Backbone.View.extend({
 
                     // Pop up the box after giving JS a chance to cleanse
                     if ($('.mentioner-user').length) {
-                        setTimeout(function() {
+                        if (self.options.form.find('.mentioner').not(':visible')) {
                             self.options.form.find('.mentioner').show();
-                        }, 300);
+                        }
                     }
                 }
             }
@@ -171,7 +173,9 @@ DemoTime.Mention = Backbone.View.extend({
         this.move_caret(wysiwyg.get(0));
 
         // And hide the box after selecting a user.
-        this.options.form.find('.mentioner').remove();
+        if (this.options.form.find('.mentioner').is(':visible')) {
+            this.options.form.find('.mentioner').remove();
+        }
     },
 
     // Insert text at caret position within a contenteditable div
