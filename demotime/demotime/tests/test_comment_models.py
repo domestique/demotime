@@ -114,7 +114,7 @@ class TestCommentModels(BaseTestCase):
         models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
-            comment="<br><p>@test_user_1 check this out with @test_user_2</p><br>",
+            comment="<p></p>@test_user_1 check this out with @test_user_2</p><br>",
             thread=thread
         )
         self.assertEqual(models.Message.objects.count(), 2)
