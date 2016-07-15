@@ -147,9 +147,6 @@
         <script src="/static/scripts/library/jquery.tooltipster.min.js"></script>
         <script> $('.help').tooltipster() </script>
 
-        {# split/cel framework #}
-        <script src="/static/scripts/library/cel-0.2.0.min.js"></script>
-
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
         <script>
@@ -202,6 +199,9 @@
 
         {# Google Analytics #}
         {% include "includes/analytics.html" %}
+
+        {# Namespacing #}
+        <script src="/static/scripts/DemoTime.js"></script>
 
         {# Smooth scroll to links #}
         <script src="/static/scripts/ScrollToLink.js"></script>
@@ -299,10 +299,10 @@
                 $('#feedbacker').hide();
             } else {
                 $('#feedbacker a').click(function() {
-                    Cookies.set('gave_feedback', true);
+                    Cookies.set('gave_feedback', true, { expires: 31 });
                 });
                 $('#feedbacker .close').click(function() {
-                    Cookies.set('gave_feedback', true);
+                    Cookies.set('gave_feedback', true, { expires: 7 });
                     $('#feedbacker').fadeOut();
                 })
             }
