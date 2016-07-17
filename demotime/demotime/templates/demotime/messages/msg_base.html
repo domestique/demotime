@@ -1,13 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        {% block style %}{% endblock %}
-    </head>
-    <body>
-        {% block content %}
-        {% endblock %}
-        {% block scripts %}
-        {% endblock %}
-    </body>
-</html>
-
+{% comment %}
+If we're sending an email, wrap it with the proper html stuff. Otherwise, we 
+leave it unwrapped so it looks better in the Inbox. 
+{% endcomment %}
+{% if is_email %}
+    <!DOCTYPE html>
+    <html lang="en">
+        <head>
+            {% block style %}{% endblock %}
+        </head>
+        <body>
+{% endif %}
+            {% block content %}
+            {% endblock %}
+            {% block scripts %}
+            {% endblock %}
+{% if is_email %}
+        </body>
+    </html>
+{% endif %}
