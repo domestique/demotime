@@ -1,8 +1,17 @@
-Hello {{ receipient }},
+{% extends "demotime/messages/msg_base.html" %}
+{% block content %}
+<p>Hello {{ receipient.userprofile.name }},</p>
+
+<p>
 {% if is_follower %}
     You have been assigned as a follower on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>!
 {% else %}
-    {{ follower.display_name }} is now following <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>!
+    {{ follower.userprofile.name }} is now following <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>!
 {% endif %}
-Thanks,
+</p>
+
+<p>
+Thanks,<br>
 {{ sender }}
+</p>
+{% endblock %}

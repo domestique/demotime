@@ -1,6 +1,15 @@
-Hello {{ reviewer }},
+{% extends "demotime/messages/msg_base.html" %}
+{% block content %}
+<p>
+Hello {{ user.userprofile.name }},
+</p>
 
-The demo, <a href="http://{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're reviewing has been reopened for review. Please give it another look!
+<p>
+The demo, <a href="http://{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're {% if is_reviewer %}reviewing{% else %}following{% endif %} has been reopened for review. Please give it another look!
+</p>
 
-Thanks,
+<p>
+Thanks,<br>
 {{ sender }}
+</p>
+{% endblock %}

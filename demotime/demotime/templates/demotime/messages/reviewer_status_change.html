@@ -1,6 +1,15 @@
-Hello {{ creator }},
+{% extends "demotime/messages/msg_base.html" %}
+{% block content %}
+<p>
+Hello {{ creator.userprofile.name }},
+</p>
 
-{{ reviewer.reviewer_display_name }} {% if reviewer.status == 'reviewing' %}resumed{% else %}has{% endif %} {{ reviewer.status }} your demo, <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+<p>
+{{ reviewer.reviewer.userprofile.name }} {% if reviewer.status == 'reviewing' %}resumed{% else %}has{% endif %} {{ reviewer.status }} your demo, <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+</p>
 
-Thanks,
+<p>
+Thanks,<br>
 {{ sender }}
+</p>
+{% endblock %}
