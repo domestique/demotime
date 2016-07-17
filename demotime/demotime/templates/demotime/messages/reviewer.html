@@ -9,7 +9,7 @@ Hello {{ receipient.userprofile.name }},
     You have been removed as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
 {% else %}
     {% if creator %}
-        {{ reviewer.reviewer.name }} has been added as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
+        {{ reviewer.reviewer.userprofile.name }} has been added as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
     {% endif %}
     {% if not creator %} You have been added as a reviewer on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>. {% endif %}
 {% endif %}
