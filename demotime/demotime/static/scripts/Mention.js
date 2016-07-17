@@ -47,6 +47,7 @@ DemoTime.Mention = Backbone.View.extend({
             mentioner = this.options.form.find('.mentioner');
 
         if (mentioner.find('.mentioner-active').length) {
+            event.preventDefault();
             if (code == 37) {
                 current = mentioner.find('.mentioner-active');
                 if (current.prev().length) {
@@ -69,7 +70,6 @@ DemoTime.Mention = Backbone.View.extend({
 
             if (code == 13) {
                 mentioner.find('.mentioner-active').click();
-                event.preventDefault();
             }
 
             return false;
