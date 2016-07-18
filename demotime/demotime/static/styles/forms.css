@@ -130,6 +130,9 @@ select[multiple="multiple"]:focus {
     box-sizing: border-box;
 }
 
+.trumbowyg-editor {
+    font-size: 16px;
+}
 .trumbowyg-button-pane button {
     box-shadow: none;
     border: 0;

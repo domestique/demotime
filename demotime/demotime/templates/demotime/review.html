@@ -365,6 +365,12 @@
 
 {% block scripts %}
 {{ block.super }}
+<script src="/static/scripts/Mention.js"></script>
+<script>
+var mentions = new DemoTime.Mention({
+    user_url: '{% url 'user-api' %}'
+});
+</script>
 <script src="/static/scripts/Review.js"></script>
 <script src="/static/scripts/Reviewers.js"></script>
 <script src="/static/scripts/review_utils.js"></script>
