@@ -120,10 +120,10 @@ setTimeout(function() {
 
         setTimeout(function() {
             $('canvas').addClass('fadeOut animated');
-        }, 2000);
+        }, 5000);
         setTimeout(function() {
             $('canvas').remove();
-        }, 3000);
+        }, 6000);
     } else {
         if (document.getElementById("confetti")) {
             document.getElementById("confetti").style.display = "none";
