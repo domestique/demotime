@@ -321,11 +321,18 @@ class Review(BaseModel):
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
         ).distinct()
+        reviewers = self.reviewers.all()
         for user in users:
+            is_reviewer = user in reviewers
             Message.send_system_message(
                 '"{}" has been Reopened'.format(self.title),
                 'demotime/messages/reopened.html',
-                {'review': self, 'previous_state': prev_state, 'reviewer': user},
+                {
+                    'is_reviewer': is_reviewer,
+                    'review': self,
+                    'previous_state': prev_state,
+                    'user': user
+                },
                 user,
                 revision=self.revision,
             )
@@ -339,15 +346,22 @@ class Review(BaseModel):
         # we don't judge
         prev_state = self.get_state_display()
         self.state = state
-        self.save(update_fields=['state'])
+        self.save(update_fields=['state', 'modified'])
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
         ).distinct()
+        reviewers = self.reviewers.all()
         for user in users:
+            is_reviewer = user in reviewers
             Message.send_system_message(
                 '"{}" has been {}'.format(self.title, state.capitalize()),
                 'demotime/messages/closed.html',
-                {'review': self, 'previous_state': prev_state, 'reviewer': user},
+                {
+                    'is_reviewer': is_reviewer,
+                    'review': self,
+                    'previous_state': prev_state,
+                    'user': user,
+                },
                 user,
                 revision=self.revision,
             )

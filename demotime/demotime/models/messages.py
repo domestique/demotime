@@ -91,6 +91,11 @@ class Message(BaseModel):
         return 0
 
     @classmethod
+    def _render_message_text(self, context_dict, template_name, email=False):
+        context_dict['is_email'] = email
+        return loader.get_template(template_name).render(context_dict)
+
+    @classmethod
     def send_system_message(
             cls, title, template_name, context_dict, receipient,
             revision=None, thread=None, email=True
@@ -100,9 +105,8 @@ class Message(BaseModel):
             'sender': system_user,
             'dt_url': settings.SERVER_URL,
         })
-        msg_text = loader.get_template(
-            template_name
-        ).render(context_dict)
+        msg_text = cls._render_message_text(context_dict, template_name)
+        email_text = cls._render_message_text(context_dict, template_name, True)
         obj = cls.create_message(
             receipient=receipient,
             sender=system_user,
@@ -111,6 +115,7 @@ class Message(BaseModel):
             message=msg_text,
             thread=thread,
             email=email,
+            email_text=email_text,
         )
         return obj
 
@@ -118,6 +123,7 @@ class Message(BaseModel):
     def create_message(
             cls, receipient, sender, title,
             review_revision, thread, message, email=True,
+            email_text='',
     ):
         bundle = MessageBundle.create_message_bundle(
             review=review_revision.review if review_revision else None,
@@ -139,7 +145,7 @@ class Message(BaseModel):
                     review_revision.review.pk,
                     review_revision.review.title
                 )
-            obj._send_email(receipient, subject, message)
+            obj._send_email(receipient, subject, email_text)
         return obj
 
     class Meta:
