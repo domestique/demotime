@@ -17,7 +17,7 @@ parser = ConfigParser()
 parser.read('/etc/demotime/demotime.ini')
 if not parser.has_section('demotime'):
     parser.add_section('demotime')
-    parser.set('demotime', 'server_url', 'local.demotime.com')
+    parser.set('demotime', 'server_url', 'local.demotime.com:8033')
     parser.set('demotime', 'default_from_email', 'demos@demoti.me')
     parser.set('demotime', 'email_backend', 'demotime.email_backends.FileOutputEmailBackend')
     parser.set('demotime', 'timezone', 'America/Chicago')
