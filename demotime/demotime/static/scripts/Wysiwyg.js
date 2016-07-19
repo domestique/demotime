@@ -3,7 +3,8 @@ DemoTime.Wysiwyg = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'click .add_emoji': 'add'
+        'click .add_emoji': 'add',
+        'click .toggle_html': 'toggle_html'
     },
 
     initialize: function(options) {
@@ -52,6 +53,10 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                     image: '\uf0ca',
                     showselection: false
                 },
+                insertlink: {
+                    title: 'Insert link',
+                    image: '\uf08e'
+                },
                 removeformat: {
                     title: 'Remove format',
                     image: '\uf12d'
@@ -62,7 +67,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                 image: '\uf00c'
             },
             selectImage: 'Click or drop image',
-            placeholderUrl: 'http://example.com/some.gif',
+            placeholderUrl: 'http://example.com',
             maxImageSize: [600,600]
         });
 
@@ -103,5 +108,17 @@ DemoTime.Wysiwyg = Backbone.View.extend({
             self = this;
 
         img.parents('.wysiwyg-container').find('textarea').wysiwyg('shell').insertHTML("<img class='emoji' width='30' height='30' src='" + self.options.dt_url + img.attr('src') + "'>").trigger('keyup');
+    },
+
+    toggle_html: function(event) {
+        var wysiwyg = $(event.target).parents('form');
+
+        event.preventDefault();
+
+        wysiwyg.find('textarea').slideToggle(function() {
+            if (!$(this).is(':visible')) {
+                wysiwyg.find('.wysiwyg-editor').html($(this).val());
+            }
+        });
     }
 });

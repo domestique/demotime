@@ -135,6 +135,13 @@ select[multiple="multiple"]:focus {
     min-height: 150px;
     padding: 15px;
 }
+.comments pre {
+    font-family: Courier;
+    padding: 10px;
+    background: #fafafa;
+    border: 2px dashed #eee;
+    font-size: 13px;
+}
 .wysiwyg-popup {
     min-width: 350px;
 }
@@ -145,10 +152,18 @@ select[multiple="multiple"]:focus {
     position: relative;
 }
 
-.emoji_panel {
+.footer_panel {
     padding: 5px;
-    text-align: right;
     background: #F5F5F5;
+    overflow: hidden;
+}
+.footer_panel .toggle_html {
+    font-size: 11px;
+    margin: 10px 0 0 10px;
+    display: inline-block;
+}
+.emoji_panel {
+    float: right;
 }
 .emoji_panel .emoji {
     width: 30px;
