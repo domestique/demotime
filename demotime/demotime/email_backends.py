@@ -14,11 +14,12 @@ class FileOutputEmailBackend(BaseEmailBackend):
             if not os.path.exists(settings.EMAIL_ROOT):
                 os.mkdir(settings.EMAIL_ROOT)
 
-            filename = slugify('{}-{}-{}'.format(
+            filename_slug = slugify('{}-{}-{}'.format(
                 message.to,
                 message.subject,
                 md5(message.body.encode('utf-8')).hexdigest(),
             ))
+            filename = '{}.html'.format(filename_slug)
             fh = open(os.path.join(settings.EMAIL_ROOT, filename), 'wb')
             fh.write(message.body.encode('utf-8'))
             fh.close()

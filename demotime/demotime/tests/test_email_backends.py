@@ -21,11 +21,12 @@ class TestFileOutputEmailBackend(TestCase):
             body='This is a test email',
         )
         FileOutputEmailBackend().send_messages([message])
-        filename = slugify('{}-{}-{}'.format(
+        filename_slug = slugify('{}-{}-{}'.format(
             message.to,
             message.subject,
             md5(message.body.encode('utf-8')).hexdigest()
         ))
+        filename = '{}.html'.format(filename_slug)
         expected_file = os.path.join(TEST_DATA_PATH, filename)
         self.assertTrue(os.path.exists(expected_file))
         self.assertEqual(
