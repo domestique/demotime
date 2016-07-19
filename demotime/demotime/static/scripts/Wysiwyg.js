@@ -111,13 +111,17 @@ DemoTime.Wysiwyg = Backbone.View.extend({
     },
 
     toggle_html: function(event) {
-        var wysiwyg = $(event.target).parents('form');
+        var wysiwyg = $(event.target).parents('form'),
+            editor = wysiwyg.find('.wysiwyg-editor');
 
         event.preventDefault();
 
         wysiwyg.find('textarea').slideToggle(function() {
-            if (!$(this).is(':visible')) {
-                wysiwyg.find('.wysiwyg-editor').html($(this).val());
+            if ($(this).is(':visible')) {
+                editor.hide();
+            } else {
+                editor.html($(this).val());
+                editor.show();
             }
         });
     }

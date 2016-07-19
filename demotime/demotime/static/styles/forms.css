@@ -132,8 +132,11 @@ select[multiple="multiple"]:focus {
 
 .wysiwyg-editor {
     font-size: 16px;
-    min-height: 150px;
     padding: 15px;
+}
+.wysiwyg-editor,
+.wysiwyg-container textarea {
+    min-height: 150px;
 }
 .comments pre {
     font-family: Courier;
