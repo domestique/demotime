@@ -17,9 +17,9 @@ parser = ConfigParser()
 parser.read('/etc/demotime/demotime.ini')
 if not parser.has_section('demotime'):
     parser.add_section('demotime')
-    parser.set('demotime', 'server_url', 'demoti.me')
+    parser.set('demotime', 'server_url', 'local.demotime.com:8033')
     parser.set('demotime', 'default_from_email', 'demos@demoti.me')
-    parser.set('demotime', 'email_backend', 'django.core.mail.backends.console.EmailBackend')
+    parser.set('demotime', 'email_backend', 'demotime.email_backends.FileOutputEmailBackend')
     parser.set('demotime', 'timezone', 'America/Chicago')
     parser.set('demotime', 'default_reminder_days', '2')
     parser.set('demotime', 'dt_prod', 'false')
@@ -148,6 +148,7 @@ MEDIA_URL = '/protected/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 STATIC_ROOT = parser.get('demotime', 'static_root')
 MEDIA_ROOT = parser.get('demotime', 'media_root')
+EMAIL_ROOT = os.path.join(STATIC_ROOT, 'emails')
 
 # TEST SETTINGS
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

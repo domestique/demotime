@@ -39,3 +39,12 @@ def load_test_data(ctx, filename='demotime_data.sql.gz'):
     ))
     ctx.run('docker exec -i src_demotime_1 python3 manage.py migrate')
     ctx.run('docker exec -i src_demotime_1 ./reset_all_user_passwords.sh')
+
+
+@task
+def purge_docker_emails(ctx):
+    print('Deleting the following email files')
+    ctx.run('docker exec src_demotime_1 ls -l /usr/local/demotime/static/emails/')
+    ctx.run('docker exec src_demotime_1 /home/docker/demotime/dt/purge_emails.sh')
+    print('Deletion complete')
+    ctx.run('docker exec src_demotime_1 ls -l /usr/local/demotime/static/emails/')
