@@ -1,5 +1,5 @@
 setTimeout(function () {
-    $('textarea, .panel-body').addClass('mousetrap');
+    $('textarea, .wysiwyg-editor').addClass('mousetrap');
 }, 100);
 
 Mousetrap.bind('command+enter', function(e) {

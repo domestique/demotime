@@ -170,7 +170,7 @@ DemoTime.Review = Backbone.View.extend({
         var link = $(event.target);
 
         link.next('.comment_container').slideDown(function() {
-            $(this).find('.trumbowyg-editor').focus();
+            $(this).find('.wysiwyg-editor').focus();
         });
         link.remove();
     }

@@ -4,7 +4,7 @@ DemoTime.Mention = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'keydown .trumbowyg-editor': 'changed',
+        'keydown .wysiwyg-editor': 'changed',
         'click .mentioner-user': 'add'
     },
 
@@ -94,11 +94,12 @@ DemoTime.Mention = Backbone.View.extend({
         if (proceeder) {
             // Set an interval checker
             timer = setTimeout(do_mention, self.options.interval);
-            lastWord = this.get_word(wysiwyg[0]);
+            var clean_html = wysiwyg.html().replace(/<.*?>/g, ' ');
+            lastWord = clean_html.substr(clean_html.trim().lastIndexOf(" ")+1).trim();
 
             // The actual mention popup (triggered by interval)
             function do_mention() {
-                if (lastWord.length > 1) {
+                if (lastWord.length) {
                     // Clear the interval
                     clearTimeout(timer);
 
@@ -112,7 +113,7 @@ DemoTime.Mention = Backbone.View.extend({
                     // Cleanse the popup of non-matching users
                     $('.mentioner-user').each(function() {
                         mentioned_user = $(this).html().toLowerCase();
-                        if (!mentioned_user.indexOf(lastWord.replace('@', '').toLowerCase()) == 0) {
+                        if (!mentioned_user.indexOf(lastWord.replace('@', '').replace('&nbsp;', '').toLowerCase()) == 0) {
                             $(this).remove();
                         }
                     });
@@ -129,34 +130,10 @@ DemoTime.Mention = Backbone.View.extend({
         }
     },
 
-    get_word: function(sel) {
-        // Use JS to grab the last word typed
-        var word = "";
-        if (window.getSelection && (sel = window.getSelection()).modify) {
-            var selectedRange = sel.getRangeAt(0);
-            sel.collapseToStart();
-            sel.modify("move", "backward", "word");
-            sel.modify("extend", "forward", "word");
-
-            word = sel.toString();
-
-            // Restore selection
-            sel.removeAllRanges();
-            sel.addRange(selectedRange);
-        } else if ( (sel = document.selection) && sel.type != "Control") {
-            var range = sel.createRange();
-            range.collapse(true);
-            range.expand("word");
-            word = range.text;
-        }
-
-        return '@' + word;
-    },
-
     // The actual 'click' event inside the popup
     add: function(event) {
         var link = $(event.target),
-            wysiwyg = this.options.form.find('.trumbowyg-editor');
+            wysiwyg = this.options.form.find('.wysiwyg-editor');
 
         event.preventDefault();
 

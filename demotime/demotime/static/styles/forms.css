@@ -130,40 +130,20 @@ select[multiple="multiple"]:focus {
     box-sizing: border-box;
 }
 
-.trumbowyg-editor {
+.wysiwyg-editor {
     font-size: 16px;
+    min-height: 150px;
+    padding: 15px;
 }
-.trumbowyg-button-pane button {
-    box-shadow: none;
-    border: 0;
-    border-radius: 0;
-    background: none;
-    margin-bottom: 0;
+.wysiwyg-popup {
+    min-width: 350px;
 }
-@media screen and (max-width:680px) {
-    .trumbowyg-button-pane {
-        display: none;
-    }
+.wysiwyg-popup .wysiwyg-toolbar-icon {
+    display: none;
 }
-.trumbowyg-modal-button {
-    padding: 0 10px !important;
+.wysiwyg-container {
+    position: relative;
 }
-.trumbowyg-button-pane button.trumbowyg-active {
-    background: none;
-}
-.trumbowyg-viewHTML-button {
-    display: none !important;
-}
-.trumbowyg-dropdown {
-    padding: 10px;
-}
-.trumbowyg-dropdown button {
-    background: #ddd;
-    padding: 0 10px;
-    box-shadow: none;
-    color: #333 !important;
-}
-
 
 .emoji_panel {
     padding: 5px;
