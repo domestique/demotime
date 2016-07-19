@@ -165,6 +165,12 @@ select[multiple="multiple"]:focus {
     margin: 10px 0 0 10px;
     display: inline-block;
 }
+@media screen and (max-width:375px) {
+    .footer_panel .toggle_html,
+    .wysiwyg-toolbar {
+        display: none;
+    }
+}
 .emoji_panel {
     float: right;
 }
@@ -172,6 +178,12 @@ select[multiple="multiple"]:focus {
     width: 30px;
     height: 30px;
     cursor: pointer;
+}
+@media screen and (max-width:375px) {
+    .emoji_panel .emoji {
+        width: 20px;
+        height: 20px;
+    }
 }
 p img.emoji,
 blockquote .emoji,
