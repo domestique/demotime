@@ -14,7 +14,7 @@ $('.attachment-file').click(function() {
 
         if (filename) {
             filename = filename.split('.');
-            ext = filename.slice(-1)[0]
+            ext = filename.slice(-1)[0].toLowerCase();
 
             if (ext.match(/png|gif|bmp|jpg|jpeg|tiff|svg/g)) {
                 attachment_type.val('image');

@@ -1,6 +1,11 @@
-Hello {{ reviewer }},
+{% extends "demotime/messages/msg_base.html" %}
+{% block content %}
+<p>Hello {{ user.userprofile.name }},</p>
 
-The demo, <a href="http://{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're reviewing is now closed.
+<p>The demo, <a href="http://{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're {% if is_reviewer %}reviewing{% else %}following{% endif %} is now closed.</p>
 
-Thanks,
+<p>
+Thanks,<br>
 {{ sender }}
+</p>
+{% endblock %}

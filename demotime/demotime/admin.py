@@ -12,3 +12,4 @@ class ReviewAdmin(admin.ModelAdmin):
     inlines = [ReviewerInline, ]
 
 admin.site.register(models.Review, ReviewAdmin)
+admin.site.register(models.UserProfile)
