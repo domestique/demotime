@@ -4,13 +4,14 @@ DemoTime.Mention = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'keydown .wysiwyg-editor': 'changed',
+        'keyup .wysiwyg-editor': 'mention_checker',
+        'keydown .wysiwyg-editor': 'navigate_mentions',
         'click .mentioner-user': 'add'
     },
 
     initialize: function(options) {
         this.options = options;
-        this.options.interval = 250;
+        this.options.interval = 400;
 
         // Catch arrows for nav
         var self = this;
@@ -41,13 +42,20 @@ DemoTime.Mention = Backbone.View.extend({
         });
     },
 
+    // Keyboard navigation within the @mentions bar
     navigate_mentions: function(event) {
-        // 37 = left, 38 = up, 39 = right, 40 = down
-        var code = event.keyCode,
-            mentioner = this.options.form.find('.mentioner');
+        var wysiwyg = $(event.target),
+            code = event.keyCode,
+            self = this;
 
-        if (mentioner.find('.mentioner-active').length) {
+        this.options.form = wysiwyg.parents('form');
+        var mentioner = this.options.form.find('.mentioner');
+        clearTimeout(self.options.timer);
+
+        if (mentioner.is(':visible') && this.using_arrows(code)) {
             event.preventDefault();
+
+            // 37 = left, 38 = up, 39 = right, 40 = down
             if (code == 37) {
                 current = mentioner.find('.mentioner-active');
                 if (current.prev().length) {
@@ -71,61 +79,78 @@ DemoTime.Mention = Backbone.View.extend({
             if (code == 13) {
                 mentioner.find('.mentioner-active').click();
             }
+        }
+    },
 
+    // Clear countdown on keyup, trigger mention
+    mention_checker: function(event) {
+        var self = this,
+            code = event.keyCode,
+            mentioner = self.options.form.find('.mentioner');
+
+        clearTimeout(self.options.timer);
+
+        // If the user isn't pressing an arrow key (navigating mentions)
+        // then remove the mentioner (to avoid previous mention popups
+        // while typing.
+        if (!self.using_arrows(code)) {
+            mentioner.remove();
+        }
+
+        // Execute after the interval is done
+        function finished() {
+            // If the mentioner isn't already visible...
+            if (!mentioner.is(':visible')) {
+                self.get_last_word(event);
+            }
+        }
+        self.options.timer = setTimeout(finished, self.options.interval);
+    },
+
+    // Return true if the user is navigating with arrows
+    using_arrows: function(code) {
+        if ((code >= 37 && code <= 40) || code == 13) {
+            return true;
+        } else {
             return false;
         }
     },
 
-    // The actual 'user is typing' event
-    changed: function(event) {
+    // Grabbing the last word typed
+    get_last_word: function(event) {
         var wysiwyg = $(event.target),
-            code = event.keyCode,
-            self = this,
-            timer,
-            proceeder = true;
+            clean_html = wysiwyg.html().replace(/<.*?>/g, ' ');
 
-        this.options.form = wysiwyg.parents('form');
+        this.options.last_word = clean_html.substr(clean_html.trim().lastIndexOf(" ")+1).trim();
 
-        // Catch arrows
-        if ((code >= 37 && code <= 40) || code == 13) {
-            proceeder = this.navigate_mentions(event);
+        if (this.options.last_word.length > 1) {
+            this.do_mention(event);
         }
+    },
 
-        if (proceeder) {
-            // Set an interval checker
-            timer = setTimeout(do_mention, self.options.interval);
-            var clean_html = wysiwyg.html().replace(/<.*?>/g, ' ');
-            lastWord = clean_html.substr(clean_html.trim().lastIndexOf(" ")+1).trim();
+    // The actual mention popup (triggered by interval)
+    do_mention: function(event) {
+        var wysiwyg = $(event.target),
+            self = this;
 
-            // The actual mention popup (triggered by interval)
-            function do_mention() {
-                if (lastWord.length) {
-                    // Clear the interval
-                    clearTimeout(timer);
+        self.options.form.find('.mentioner').remove();
 
-                    if (self.options.form.find('.mentioner').is(':visible')) {
-                        self.options.form.find('.mentioner').remove();
-                    }
+        // Write the HTML for the popup
+        wysiwyg.before(self.options.template)
 
-                    // Write the HTML for the popup
-                    wysiwyg.before(self.options.template)
+        // Cleanse the popup of non-matching users
+        $('.mentioner-user').each(function() {
+            mentioned_user = $(this).html().toLowerCase();
+            if (!mentioned_user.indexOf(self.options.last_word.replace('@', '').replace('&nbsp;', '').toLowerCase()) == 0) {
+                $(this).remove();
+            }
+        });
+        $('.mentioner-user').first().addClass('mentioner-active');
 
-                    // Cleanse the popup of non-matching users
-                    $('.mentioner-user').each(function() {
-                        mentioned_user = $(this).html().toLowerCase();
-                        if (!mentioned_user.indexOf(lastWord.replace('@', '').replace('&nbsp;', '').toLowerCase()) == 0) {
-                            $(this).remove();
-                        }
-                    });
-                    $('.mentioner-user').first().addClass('mentioner-active');
-
-                    // Pop up the box after giving JS a chance to cleanse
-                    if ($('.mentioner-user').length) {
-                        if (self.options.form.find('.mentioner').not(':visible')) {
-                            self.options.form.find('.mentioner').show();
-                        }
-                    }
-                }
+        // Pop up the box after giving JS a chance to cleanse
+        if ($('.mentioner-user').length) {
+            if (self.options.form.find('.mentioner').not(':visible')) {
+                self.options.form.find('.mentioner').show();
             }
         }
     },
@@ -141,32 +166,20 @@ DemoTime.Mention = Backbone.View.extend({
         wysiwyg.get(0).focus();
 
         // Insert the clicked item with a hook for cleaning up user input
-        this.insert_text('||@' + link.html());
+        // (we have to delete what they typed after inserting the mention)
+        wysiwyg.parents('form').find('textarea').wysiwyg('shell').insertHTML('||@' + link.html());
 
-        // Clean up the final mention
+        // Clean up the final mention (support for the user typing @name and cleansing any
+        // wysiwyg HTML)
         wysiwyg.html(wysiwyg.html().replace(/[^<> \t\n\r\f\v]*\|\|/g, '').replace('@@', '@'));
 
-        // move the caret after the @mention
+        // move the caret after the @mention to
+        // let the user continue typing normally
         this.move_caret(wysiwyg.get(0));
 
         // And hide the box after selecting a user.
         if (this.options.form.find('.mentioner').is(':visible')) {
             this.options.form.find('.mentioner').remove();
-        }
-    },
-
-    // Insert text at caret position within a contenteditable div
-    insert_text: function(text) {
-        var sel, range, html;
-        if (window.getSelection) {
-            sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                range = sel.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode( document.createTextNode(text) );
-            }
-        } else if (document.selection && document.selection.createRange) {
-            document.selection.createRange().text = link.html();
         }
     },
 

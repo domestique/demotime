@@ -39,10 +39,6 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                     title: 'Text color',
                     image: '\uf1fc'
                 },
-                highlight: {
-                    title: 'Background color',
-                    image: '\uf043'
-                },
                 orderedList: {
                     title: 'Ordered list',
                     image: '\uf0cb',
