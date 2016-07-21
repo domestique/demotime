@@ -16,9 +16,9 @@
 
         <script src="/static/scripts/library/jquery-2.1.3.min.js"></script>
 
-        {# Summernote #}
-        <link href="/static/styles/library/bootstrap_summernote.css" type="text/css" media="all" rel="stylesheet" />
-        <link href="/static/styles/library/summernotelib.css" type="text/css" media="all" rel="stylesheet" />
+        {# Wysiwyg #}
+        <script src="https://use.fontawesome.com/9cf78202f6.js"></script>
+        <link rel="stylesheet" href="/static/styles/library/wysiwyg.min.css">
 
         {# Web fonts #}
         <link href='//fonts.googleapis.com/css?family=Roboto:100,200,300,400,700,300,900' rel='stylesheet' type='text/css'>
@@ -122,9 +122,13 @@
             </div>
         </footer>
 
+        {# Namespacing #}
+        <script> var DemoTime = [] </script>
+
         {# Main librarys #}
         <script src="/static/scripts/library/js.cookie.js"></script>
 
+        {# csrf #}
         <script>
             var csrftoken = Cookies.get('csrftoken');
             function csrfSafeMethod(method) {
@@ -143,11 +147,6 @@
         {# tooltips #}
         <script src="/static/scripts/library/jquery.tooltipster.min.js"></script>
         <script> $('.help').tooltipster() </script>
-
-        {# Summernote #}
-        <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/static/scripts/library/jquery.ui.widget.js"></script>
-        <script type="text/javascript" src="/static/scripts/library/summernote.js"></script>
 
         {# Lightbox #}
         <script src="/static/scripts/library/fancybox/jquery.fancybox.pack.js"></script>
@@ -214,6 +213,7 @@
             var ScrollToLink = new DemoTime.ScrollToLink()
         </script>
 
+        {# Logged-in user scripts #}
         {% if request.user %}
         {# DT-XX Info boxes #}
         <script src="/static/scripts/Info.js"></script>
@@ -235,7 +235,9 @@
         <script src="/static/scripts/library/selects.js"></script>
         <script> $('select.slick').ddslick() </script>
 
-        {# WYSIWYG editors #}
+        {# WYSIWYG editor #}
+        <script src="/static/scripts/library/wysiwyg.min.js"></script>
+        <script src="/static/scripts/library/wysiwyg.editor.min.js"></script>
         <script src="/static/scripts/Wysiwyg.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -302,7 +304,8 @@
     </body>
     <div id="patterns">
         {% if request.user %}
-            {% include "includes/patterns/emoji.html" %}
+            {% include "includes/patterns/mentioner.html" %}
+            {% include "includes/patterns/wysiwyg_footer.html" %}
             {% include "includes/patterns/search.html" %}
             {% include "includes/patterns/review_info.html" %}
         {% endif %}

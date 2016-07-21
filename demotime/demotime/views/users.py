@@ -37,6 +37,7 @@ class UserAPI(JsonView):
         for user in users:
             json_dict['users'].append({
                 'name': user.userprofile.name,
+                'username': user.username,
                 'pk': user.pk
             })
 

@@ -37,7 +37,8 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertEqual(data, {
             'users': [{
                 'pk': self.test_user_2.pk,
-                'name': self.test_user_2.username,
+                'name': self.test_user_2.userprofile.name,
+                'username': self.test_user_2.username,
             }],
             'errors': {},
             'success': True,
@@ -54,7 +55,8 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertEqual(data, {
             'users': [{
                 'pk': self.test_user_2.pk,
-                'name': self.test_user_2.username,
+                'name': self.test_user_2.userprofile.name,
+                'username': self.test_user_2.username,
             }],
             'errors': {},
             'success': True,
@@ -78,7 +80,8 @@ class TestUserApiReviewers(BaseTestCase):
         for user in users:
             user_list.append({
                 'pk': user.pk,
-                'name': user.userprofile.name
+                'name': user.userprofile.name,
+                'username': user.username,
             })
         for user in user_list:
             self.assertIn(user, data['users'])
@@ -377,7 +380,8 @@ class TestUserApiFollowers(BaseTestCase):
             'users': [
                 {
                     'pk': self.test_user_2.pk,
-                    'name': self.test_user_2.username,
+                    'name': self.test_user_2.userprofile.name,
+                    'username': self.test_user_2.username,
                 }
             ],
             'errors': {},
@@ -402,7 +406,8 @@ class TestUserApiFollowers(BaseTestCase):
         for user in users:
             user_list.append({
                 'pk': user.pk,
-                'name': user.userprofile.name
+                'name': user.userprofile.name,
+                'username': user.username,
             })
         self.assertEqual(data, {
                 'users': user_list,
@@ -700,6 +705,7 @@ class TestUserAPI(BaseTestCase):
             'users': [{
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.userprofile.display_name,
+                'username': self.test_user_2.username,
             }],
             'errors': {},
             'success': True,
