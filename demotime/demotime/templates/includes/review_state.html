@@ -30,9 +30,9 @@
     {% if demo.reviewer_state != "approved" %}
         <small style="margin-left: 0">
             {% if request.user == demo.creator %}
-                by you
+                your demo
             {% else %}
-                by <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}</a>
+                <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}</a>'s demo
             {% endif %}
         </small>
     {% endif %}
