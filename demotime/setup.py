@@ -18,9 +18,9 @@ install_requires = [
 setup(
     name='demotime',
     version='0.1',
-    author='Mark Rogers',
-    author_email='f4nt@f4ntasmic.com',
-    url='https://github.com/f4nt/demotime/',
+    author='Domestique Studios',
+    author_email='support@domestiquestudios.com',
+    url='https://github.com/domestique/demotime/',
     description='A service for facilitating demos between dev and product',
     packages=find_packages(),
     zip_safe=False,
@@ -34,4 +34,3 @@ setup(
         'Topic :: Software Development'
     ],
 )
-
