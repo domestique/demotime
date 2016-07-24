@@ -1,5 +1,5 @@
 FROM ubuntu:xenial
-MAINTAINER Mark Rogers <f4nt@f4ntasmic.com>
+MAINTAINER Domestique Studios <support@domestiquestudios.com>>
 
 ENV LANG=C.UTF-8
 RUN dpkg-divert --local --rename --add /sbin/initctl && \
