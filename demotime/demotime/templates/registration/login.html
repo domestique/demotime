@@ -67,14 +67,19 @@
                 {% endif %}
             </form>
         </div>
-        {% if site_settings.REGISTRATION_ENABLED %}
-            <div class="cel">
-                <section class="signup">
-                    <h2 class="heading">Want an account?</h2>
+        {% if site_settings.REGISTRATION_ENABLED or site_settings.TRIALS_ENABLED %}
+        <div class="cel">
+            <section class="signup">
+                <h2 class="heading">Want an account?</h2>
+                {% if site_settings.REGISTRATION_ENABLED %}
                     <p>Signing up is easy and free.</p>
                     <a class="button-link confirm" href="{% url 'registration_register' %}">Sign Up!</a>
-                </section>
-            </div>
+                {% else %}
+                    <p>Sign up now for an exclusive <strong>free trial</strong>.</p>
+                    <a class="button-link confirm" href="https://demoti.me/trials">Free trial!</a>
+                {% endif %}
+            </section>
+        </div>
         {% endif %}
     </div>
 {% endblock %}
