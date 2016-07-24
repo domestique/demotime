@@ -9,7 +9,9 @@
         Please visit <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">the demo</a> to see the comment on the site.
     </p>
 {% else %}
-    {{ comment.comment|safe|truncatechars:1000 }}
+    <blockquote style="background: #fff;box-shadow: 0 0 5px #ccc; margin: 0; padding: 15px;">
+        {{ comment.comment|safe|truncatechars:1000 }}
+    </blockquote>
     {% if comment.comment.length > 1000 %}
         <p>
             <em>this message was truncated</em>.<br>
