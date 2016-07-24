@@ -1,10 +1,6 @@
 {% extends "demotime/messages/msg_base.html" %}
 {% block content %}
 <p>
-Hello {{ receipient.userprofile.name }},
-</p>
-
-<p>
 {% if update %}
     There has been an update to <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
 {% else %}
@@ -14,10 +10,5 @@ Hello {{ receipient.userprofile.name }},
         A new demo has been created and assigned to you: <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>.
     {% endif %}
 {% endif %}
-</p>
-
-<p>
-Thanks,<br>
-{{ sender }}
 </p>
 {% endblock %}

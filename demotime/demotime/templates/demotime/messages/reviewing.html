@@ -1,15 +1,6 @@
 {% extends "demotime/messages/msg_base.html" %}
 {% block content %}
 <p>
-Hello {{ review.creator.userprofile.name }},
-</p>
-
-<p>
 Your demo, <a href="http://{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, has changed from {{ previous_state }} to the status of Under Review.
-</p>
-
-<p>
-Thanks,<br>
-{{ sender }}
 </p>
 {% endblock %}

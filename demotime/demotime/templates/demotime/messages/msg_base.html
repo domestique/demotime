@@ -1,20 +1,25 @@
 {% comment %}
-If we're sending an email, wrap it with the proper html stuff. Otherwise, we 
-leave it unwrapped so it looks better in the Inbox. 
+If we're sending an email, wrap it with the proper html stuff. Otherwise, we
+leave it unwrapped so it looks better in the Inbox.
 {% endcomment %}
 {% if is_email %}
     <!DOCTYPE html>
     <html lang="en">
-        <head>
-            {% block style %}{% endblock %}
-        </head>
         <body>
+            <div style="color: #fff; background: #303030; padding: 10px; margin-bottom: 0">
+                <span style="font-family: Arial; letter-spacing: 1px;line-height: 35px;vertical-align: middle;text-transform: uppercase;font-size: .8em;display: inline-block;">
+                    <strong>Demo</strong>time
+                </span>
+            </div>
+            <div style="padding: 10px; font-family: Helvetica; font-weight: 200;">
+                <p>Hello from DemoTime!</p>
 {% endif %}
-            {% block content %}
-            {% endblock %}
-            {% block scripts %}
-            {% endblock %}
+
+{% block content %}{% endblock %}
+
 {% if is_email %}
+            <p style="margin-top: 40px; color: #777; font-size: 13px; font-style: italic;">Thank you for using DemoTime!</p>
+            </div>
         </body>
     </html>
 {% endif %}

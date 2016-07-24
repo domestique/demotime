@@ -12,6 +12,9 @@
 {% block styles %}
 {{ block.super }}
 <style>
+    .message br {
+        display: none;
+    }
     .message section {
         margin-top:2em;
         overflow:hidden;
@@ -53,10 +56,8 @@
     </ul>
     {% for msg in object.message_set.all %}
         <section>
-            <p>
-                From: {{ msg.sender }}<br>
-                Sent: {{ msg.created }}
-            </p>
+            <p><strong>{{ msg.created }}</strong></p>
+
             {{ msg.message|safe|linebreaksbr }}
         </section>
     {% endfor %}

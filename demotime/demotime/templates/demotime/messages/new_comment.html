@@ -1,11 +1,7 @@
 {% extends "demotime/messages/msg_base.html" %}
 {% block content %}
 <p>
-Hello {{ receipient.userprofile.name }},
-</p>
-
-<p>
-{{ comment.commenter.userprofile.name }} just added a new comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>:
+{{ comment.commenter.userprofile.name }} just added a new comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>
 </p>
 {% if "data:image" in comment.comment %}
     <p>
@@ -21,9 +17,4 @@ Hello {{ receipient.userprofile.name }},
         </p>
     {% endif %}
 {% endif %}
-
-<p>
-Thanks,<br>
-{{ sender }}
-</p>
 {% endblock %}
