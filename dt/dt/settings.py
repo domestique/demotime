@@ -23,6 +23,8 @@ if not parser.has_section('demotime'):
     parser.set('demotime', 'timezone', 'America/Chicago')
     parser.set('demotime', 'default_reminder_days', '2')
     parser.set('demotime', 'dt_prod', 'false')
+    parser.set('demotime', 'registration', 'false')
+    parser.set('demotime', 'trials', 'false')
     if os.environ.get('TRAVIS', '').lower() == 'true':
         parser.set('demotime', 'static_root', os.path.join(BASE_DIR, 'static'))
         parser.set('demotime', 'media_root', os.path.join(BASE_DIR, 'uploads'))
@@ -64,7 +66,7 @@ INSTALLED_APPS = (
     'demotime',
     # Third Party Libs
     'macros',
-    'registration'
+    'registration',
 )
 
 try:
@@ -174,7 +176,10 @@ SITE_ID = 1
 # DemoTime Specific Settings
 DT_PROD = parser.get('demotime', 'dt_prod')
 DEFAULT_REMINDER_DAYS = int(parser.get('demotime', 'default_reminder_days'))
+REGISTRATION_ENABLED = parser.get('demotime', 'registration').lower() == 'true'
+TRIALS_ENABLED = parser.get('demotime', 'trials').lower() == 'true'
 
+# SENDFILE SETINGS
 SENDFILE_BACKEND = 'sendfile.backends.nginx'
 SENDFILE_ROOT = MEDIA_ROOT
 SENDFILE_URL = '/protected'

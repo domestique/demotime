@@ -45,6 +45,8 @@ img {
     <li><a href="#webhooks">Web Hooks</a></li>
 </ul>
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/UW1fya1hlhM" frameborder="0" allowfullscreen></iframe>
+
 <h3 id="how-it-works">How it Works</h3>
 
 <p>Here at DemoTime we set out to emulate the demo process that we experienced
@@ -177,7 +179,7 @@ looks to a typical reviewer:</p>
 
 <h3 id="webhooks">Web Hooks</h3>
 
-<p>Web Hooks exist to allow you to tightly integrate DemoTime into you or your 
+<p>Web Hooks exist to allow you to tightly integrate DemoTime into you or your
 company's workflow. We can fire web hooks on the following events:</p>
 
 <ul>
@@ -191,14 +193,14 @@ company's workflow. We can fire web hooks on the following events:</p>
     <li>Comment Created</li>
 </ul>
 
-<p>A Project Admin can define these on a per-project basis. Simply choose an event 
-you wish a hook to fire on, and give it a URL you wish for us to post to, and 
+<p>A Project Admin can define these on a per-project basis. Simply choose an event
+you wish a hook to fire on, and give it a URL you wish for us to post to, and
 then we'll start POSTing to the defined URL when those events occur.</p>
 
-<p>For example, say you wanted to put a link to each Demo created in your company's 
-issue tracker. You would define a Web Hook for "Demo Created" and point it at a 
-service in your infrastructure. You could then capture the data we POST to you, 
-and then use that data to create a comment in your system's issue tracker via 
+<p>For example, say you wanted to put a link to each Demo created in your company's
+issue tracker. You would define a Web Hook for "Demo Created" and point it at a
+service in your infrastructure. You could then capture the data we POST to you,
+and then use that data to create a comment in your system's issue tracker via
 their API.</p>
 
 <p>The payload that we send look like the following:</p>
@@ -207,43 +209,43 @@ their API.</p>
 {
     "webhook": {
         "pk": 1, "project_pk": 1, "trigger_event": "comment", "target": "http://requestb.in/ouy32rou"
-    }, 
+    },
     "review": {
-        "description": "description", 
-        "url": "/reviews/default-project/review/212/rev/1/", 
+        "description": "description",
+        "url": "/reviews/default-project/review/212/rev/1/",
         "project": {
             "groups": [{
-                "project_pk": 1, 
+                "project_pk": 1,
                 "group": {
-                    "description": "Default DemoTime Group", 
-                    "name": "Default Group", 
-                    "slug": "default-group", 
-                    "members": [{"username": "user", "is_admin": true, "pk": 23}], 
-                    "pk": 1, 
+                    "description": "Default DemoTime Group",
+                    "name": "Default Group",
+                    "slug": "default-group",
+                    "members": [{"username": "user", "is_admin": true, "pk": 23}],
+                    "pk": 1,
                     "group_type": {"pk": 1, "name": "Default Group Type", "slug": "default-group-type"}
-                }, 
+                },
                 "is_admin": true
-            }], 
-            "description": "Default DemoTime Project", 
-            "url": "/projects/default-project/admin/", 
-            "name": "Default Project", 
-            "slug": "default-project", 
-            "members": [{"project_pk": 1, "username": "user", "user_pk": 16, "is_admin": false, "display_name": "User"}], 
+            }],
+            "description": "Default DemoTime Project",
+            "url": "/projects/default-project/admin/",
+            "name": "Default Project",
+            "slug": "default-project",
+            "members": [{"project_pk": 1, "username": "user", "user_pk": 16, "is_admin": false, "display_name": "User"}],
             "pk": 1, "is_public": false
-        }, 
-        "approved_count": 2, 
-        "pk": 212, 
-        "reviewing_count": 2, 
-        "is_public": false, 
-        "reviewers": [{"review_pk": 212, "reviewer_status": "reviewing", "reviewer_pk": 742, "name": "User", "user_pk": 7}], 
-        "case_link": "https://example-issue-tracker.tld/issue-123", 
-        "title": "Issue Title", 
-        "followers": [{"review_pk": 212, "name": "Follower", "follower_pk": 184, "user_pk": 6}], 
-        "rejected_count": 0, 
-        "reviewer_state": "reviewing", 
+        },
+        "approved_count": 2,
+        "pk": 212,
+        "reviewing_count": 2,
+        "is_public": false,
+        "reviewers": [{"review_pk": 212, "reviewer_status": "reviewing", "reviewer_pk": 742, "name": "User", "user_pk": 7}],
+        "case_link": "https://example-issue-tracker.tld/issue-123",
+        "title": "Issue Title",
+        "followers": [{"review_pk": 212, "name": "Follower", "follower_pk": 184, "user_pk": 6}],
+        "rejected_count": 0,
+        "reviewer_state": "reviewing",
         "creator": "Creator", "state": "open"
-    }, 
-    "comment": {"comment": "Comment Text", "attachment_count": 0, "thread": 239, "name": "Commenter"}, 
+    },
+    "comment": {"comment": "Comment Text", "attachment_count": 0, "thread": 239, "name": "Commenter"},
     "token": "88587e9966234dd08faffd6f5cf5c10b"
 }
 </pre>
