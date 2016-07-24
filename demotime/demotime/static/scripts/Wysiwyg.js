@@ -4,7 +4,14 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
     events: {
         'click .add_emoji': 'add',
-        'click .toggle_html': 'toggle_html'
+        'click .toggle_html': 'toggle_html',
+        'keypress .wysiwyg-editor': 'send_contents'
+    },
+
+    // Send wysiwyg contents to hidden form on keypress
+    send_contents: function(event) {
+        var wysiwyg = $(event.target);
+        wysiwyg.parents('form').find('.form-control').val(wysiwyg.html());
     },
 
     initialize: function(options) {
