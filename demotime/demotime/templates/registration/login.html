@@ -62,15 +62,24 @@
                     <input type="hidden" name="next" value="{{ next }}" />
                 </div>
                 <p>Forgot your password? <a href="{% url 'auth_password_reset' %}">Reset it</a>.</p>
-                <p>Not a member? <a href="{% url 'registration_register' %}">Register</a>.</p>
+                {% if site_settings.REGISTRATION_ENABLED %}
+                    <p>Not a member? <a href="{% url 'registration_register' %}">Register</a>.</p>
+                {% endif %}
             </form>
         </div>
+        {% if site_settings.REGISTRATION_ENABLED or site_settings.TRIALS_ENABLED %}
         <div class="cel">
             <section class="signup">
                 <h2 class="heading">Want an account?</h2>
-                <p>Signing up is easy and free.</p>
-                <a class="button-link confirm" href="{% url 'registration_register' %}">Sign Up!</a>
+                {% if site_settings.REGISTRATION_ENABLED %}
+                    <p>Signing up is easy and free.</p>
+                    <a class="button-link confirm" href="{% url 'registration_register' %}">Sign Up!</a>
+                {% else %}
+                    <p>Sign up now for an exclusive <strong>free trial</strong>.</p>
+                    <a class="button-link confirm" href="https://demoti.me/trials">Free trial!</a>
+                {% endif %}
             </section>
         </div>
+        {% endif %}
     </div>
 {% endblock %}
