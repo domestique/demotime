@@ -168,3 +168,80 @@ class TestCommentModels(BaseTestCase):
             self.hook.pk,
             {'comment': comment._to_json()},
         )
+
+    def test_create_comment_mention_missing_user(self):
+        ''' If a comment starts with a missing user, we should ignore the
+        mention and follow our normal comment emailing rules
+        '''
+        review = models.Review.create_review(**self.default_review_kwargs)
+        models.Message.objects.all().delete()
+        self.assertEqual(models.Message.objects.count(), 0)
+        thread = models.CommentThread.create_comment_thread(review.revision)
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=review.revision,
+            comment="<p></p>@not_real check this out with @so_not_real</p><br>",
+            thread=thread
+        )
+        # 3 reviewers, 2 followers, commenter was creator
+        self.assertEqual(models.Message.objects.count(), 5)
+        self.task_patch.delay.assert_called_with(
+            review.pk,
+            self.hook.pk,
+            {'comment': comment._to_json()},
+        )
+
+    def test_create_comment_case_insensitive_mentions(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        models.Message.objects.all().delete()
+        self.assertEqual(models.Message.objects.count(), 0)
+        thread = models.CommentThread.create_comment_thread(review.revision)
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=review.revision,
+            comment="<p></p>@TEST_USER_1 check this out with @TeSt_UsEr_2</p><br>",
+            thread=thread
+        )
+        self.assertEqual(models.Message.objects.count(), 2)
+        test_user_1, test_user_2 = models.UserProxy.objects.filter(
+            username__in=('test_user_1', 'test_user_2')
+        )
+        self.assertEqual(
+            models.Message.objects.filter(receipient=test_user_1).count(),
+            1
+        )
+        self.assertEqual(
+            models.Message.objects.filter(receipient=test_user_2).count(),
+            1
+        )
+        self.task_patch.delay.assert_called_with(
+            review.pk,
+            self.hook.pk,
+            {'comment': comment._to_json()},
+        )
+
+    def test_create_comment_mention_ignores_misses(self):
+        ''' If a username is bad within a comment with a mention, we still hit
+        the other mentions
+        '''
+        review = models.Review.create_review(**self.default_review_kwargs)
+        models.Message.objects.all().delete()
+        self.assertEqual(models.Message.objects.count(), 0)
+        thread = models.CommentThread.create_comment_thread(review.revision)
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=review.revision,
+            comment="<p></p>@test_user_1 check this out with @BAD_USERNAME</p><br>",
+            thread=thread
+        )
+        self.assertEqual(models.Message.objects.count(), 1)
+        test_user_1 = models.UserProxy.objects.get(username='test_user_1')
+        self.assertEqual(
+            models.Message.objects.filter(receipient=test_user_1).count(),
+            1
+        )
+        self.task_patch.delay.assert_called_with(
+            review.pk,
+            self.hook.pk,
+            {'comment': comment._to_json()},
+        )

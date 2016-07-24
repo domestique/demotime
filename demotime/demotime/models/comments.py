@@ -66,9 +66,9 @@ class Comment(BaseModel):
         for mention in mentions:
             username = mention[1:] # Drop the @
             try:
-                mentioned_user = User.objects.get(username=username)
+                mentioned_user = User.objects.get(username__iexact=username)
             except User.DoesNotExist:
-                pass # Bad Mention, user was probably doing something else weird
+                continue # Bad Mention, user was probably doing something else weird
 
             mentioned_users.append(mentioned_user.pk)
             if not starts_with_mention:
