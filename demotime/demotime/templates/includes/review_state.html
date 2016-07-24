@@ -32,7 +32,7 @@
             {% if request.user == demo.creator %}
                 your demo
             {% else %}
-                <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}</a>'s demo
+                <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}'s</a> demo
             {% endif %}
         </small>
     {% endif %}
