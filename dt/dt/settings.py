@@ -178,6 +178,7 @@ DT_PROD = parser.get('demotime', 'dt_prod')
 DEFAULT_REMINDER_DAYS = int(parser.get('demotime', 'default_reminder_days'))
 REGISTRATION_ENABLED = parser.get('demotime', 'registration').lower() == 'true'
 TRIALS_ENABLED = parser.get('demotime', 'trials').lower() == 'true'
+CACHE_BUSTER = os.environ.get('HOSTNAME')
 
 # SENDFILE SETINGS
 SENDFILE_BACKEND = 'sendfile.backends.nginx'
