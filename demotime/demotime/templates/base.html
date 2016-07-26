@@ -40,10 +40,10 @@
 
         {% block styles %}
             <link href="/static/styles/library/cel-0.2.0.min.css" rel="stylesheet">
-            <link href="/static/styles/headerfooter.css" rel="stylesheet">
-            <link href="/static/styles/forms.css" rel="stylesheet">
-            <link href="/static/styles/main.css" rel="stylesheet">
-            <link href="/static/styles/ui.css" rel="stylesheet">
+            <link href="/static/styles/headerfooter.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
+            <link href="/static/styles/forms.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
+            <link href="/static/styles/main.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
+            <link href="/static/styles/ui.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
         {% endblock %}
     </head>
 
@@ -123,7 +123,7 @@
         </footer>
 
         {# Namespacing #}
-        <script> var DemoTime = [] </script>
+        <script src="/static/scripts/DemoTime.js?{{ site_settings.CACHE_BUSTER }}"></script>
 
         {# Main librarys #}
         <script src="/static/scripts/library/js.cookie.js"></script>
@@ -189,7 +189,7 @@
 
         {# keyboard #}
         <script src="/static/scripts/library/mousetrap.js"></script>
-        <script src="/static/scripts/shortcuts.js"></script>
+        <script src="/static/scripts/shortcuts.js?{{ site_settings.CACHE_BUSTER }}"></script>
 
         {# Backbone / Underscore #}
         <script src="/static/scripts/library/underscore.js"></script>
@@ -201,11 +201,8 @@
         {# Google Analytics #}
         {% include "includes/analytics.html" %}
 
-        {# Namespacing #}
-        <script src="/static/scripts/DemoTime.js"></script>
-
         {# Smooth scroll to links #}
-        <script src="/static/scripts/ScrollToLink.js"></script>
+        <script src="/static/scripts/ScrollToLink.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
             // force scroll to top (to avoid embedded movie pop)
             window.onload = function(){ window.scrollTo(0,0); }
@@ -216,7 +213,7 @@
         {# Logged-in user scripts #}
         {% if request.user %}
         {# DT-XX Info boxes #}
-        <script src="/static/scripts/Info.js"></script>
+        <script src="/static/scripts/Info.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
             var info = new DemoTime.Info({
                 review_url: '{% url "reviews-search-json" %}'
@@ -224,7 +221,7 @@
         </script>
 
         {# set up background tasks (new messages, comments etc) #}
-        <script src="/static/scripts/BackgroundTasks.js"></script>
+        <script src="/static/scripts/BackgroundTasks.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
             var BackgroundTasks = new DemoTime.BackgroundTasks({
                 messages_url: '{% url "messages-json" %}'
@@ -238,7 +235,7 @@
         {# WYSIWYG editor #}
         <script src="/static/scripts/library/wysiwyg.min.js"></script>
         <script src="/static/scripts/library/wysiwyg.editor.min.js"></script>
-        <script src="/static/scripts/Wysiwyg.js"></script>
+        <script src="/static/scripts/Wysiwyg.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 var Wysiwyg = new DemoTime.Wysiwyg({
@@ -253,14 +250,14 @@
         </script>
 
         {# Account management dropdown in the header #}
-        <script src="/static/scripts/Account.js"></script>
+        <script src="/static/scripts/Account.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
             // top right account toggler
             var account = new DemoTime.Account();
         </script>
 
         {# Global search #}
-        <script src="/static/scripts/Search.js"></script>
+        <script src="/static/scripts/Search.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
             var search = new DemoTime.Search({
                 user_url: '{% url 'user-api' %}',

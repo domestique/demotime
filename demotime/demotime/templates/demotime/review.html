@@ -41,7 +41,7 @@
 
 {% block styles %}
 {{ block.super }}
-<link href="/static/styles/review.css" rel="stylesheet">
+<link href="/static/styles/review.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -365,15 +365,15 @@
 
 {% block scripts %}
 {{ block.super }}
-<script src="/static/scripts/Mention.js"></script>
+<script src="/static/scripts/Mention.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script>
 var mentions = new DemoTime.Mention({
     user_url: '{% url 'user-api' %}'
 });
 </script>
-<script src="/static/scripts/Review.js"></script>
-<script src="/static/scripts/Reviewers.js"></script>
-<script src="/static/scripts/review_utils.js"></script>
+<script src="/static/scripts/Review.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/Reviewers.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script>
 var review = new DemoTime.Review({
     {% if reviewer %}

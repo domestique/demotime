@@ -48,7 +48,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/scripts/Dashboard.js"></script>
+<script src="/static/scripts/Dashboard.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
 var dashboard = new DemoTime.Dashboard();

@@ -149,7 +149,7 @@ section label[for="id_is_public"] {
 
 {% block scripts %}
 {{ block.super }}
-<script src="/static/scripts/EditGroupsProjects.js"></script>
+<script src="/static/scripts/EditGroupsProjects.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script>
 var edit = new DemoTime.EditGroupsProjects();
 </script>

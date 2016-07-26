@@ -11,7 +11,7 @@
 
 {% block styles %}
 {{ block.super }}
-<link rel="stylesheet" href="/static/styles/dashboard.css">
+<link rel="stylesheet" href="/static/styles/dashboard.css?{{ site_settings.CACHE_BUSTER }}">
 <link href="/static/styles/library/bootstrap.popover.css" type="text/css" media="all" rel="stylesheet" />
 {% endblock %}
 
@@ -143,7 +143,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/scripts/ArchiveAll.js"></script>
+<script src="/static/scripts/ArchiveAll.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
 $('.icon-mail.iframe').click(function() {

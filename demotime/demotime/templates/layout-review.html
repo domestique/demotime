@@ -116,5 +116,5 @@ h1 em {
 
 {% block scripts %}
 {{ block.super }}
-<script src="/static/scripts/review_utils.js"></script>
+<script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {% endblock %}

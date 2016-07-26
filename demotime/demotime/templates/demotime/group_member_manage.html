@@ -62,7 +62,7 @@ li.icon-star {
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/scripts/EditGroupsProjects.js"></script>
+<script src="/static/scripts/EditGroupsProjects.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
 var edit = new DemoTime.EditGroupsProjects();
