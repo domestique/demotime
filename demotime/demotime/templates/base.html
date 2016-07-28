@@ -204,8 +204,6 @@
         {# Smooth scroll to links #}
         <script src="/static/scripts/ScrollToLink.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
-            // force scroll to top (to avoid embedded movie pop)
-            window.onload = function(){ window.scrollTo(0,0); }
             // initialize scroll lib
             var ScrollToLink = new DemoTime.ScrollToLink()
         </script>
