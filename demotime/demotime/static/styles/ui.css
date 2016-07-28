@@ -71,6 +71,7 @@ a.button-link:hover {
 }
 .attachment-card video {
     max-width: 100%;
+    width: 100%;
 }
 .attachment-card.audio {
     width: 100%;
