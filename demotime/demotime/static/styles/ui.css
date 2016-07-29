@@ -333,7 +333,7 @@ h3 small {
     bottom: 0;
     padding-right: 5px;
     left: 10px;
-    background: #E03743;
+    background: #26C59E;
 }
 #feedbacker a {
     color: #fff;
@@ -342,6 +342,11 @@ h3 small {
     display: inline-block;
     font-weight: 700;
     font-size: 13px;
+}
+@media screen and (max-width:480px) {
+    #feedbacker a {
+        padding: 0 8px;
+    }
 }
 #feedbacker .close {
     cursor: pointer;
