@@ -51,11 +51,19 @@ section .review_li.de-emphasize {
 section .review_li.de-emphasize * {
     font-weight: 200 !important;
 }
+section .review_li-top {
+    overflow: hidden;
+}
 section .review_li .time_stamp {
     float: right;
     line-height: 30px;
     vertical-align: middle;
     color: #777;
+}
+@media screen and (max-width:350px) {
+    section .review_li .time_stamp {
+        display: none;
+    }
 }
 
 /* Message center messages */
