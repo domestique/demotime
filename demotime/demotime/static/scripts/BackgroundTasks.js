@@ -5,8 +5,8 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
     initialize: function(options) {
         this.options = options;
         this.options.counter = 0;
-        this.options.check_every = 60000; // check for msgs every minute
-        this.options.max_attempts = 60; // after 30 mins of inactivity, ajax stops
+        this.options.check_every = 60000; // check for msgs every minute (60,000ms)
+        this.options.max_attempts = 120; // after 120 mins of inactivity, ajax stops
         this.render();
     },
 
