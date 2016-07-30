@@ -11,7 +11,7 @@ DemoTime.Mention = Backbone.View.extend({
 
     initialize: function(options) {
         this.options = options;
-        this.options.interval = 400;
+        this.options.interval = 250;
 
         // Catch arrows for nav
         var self = this;

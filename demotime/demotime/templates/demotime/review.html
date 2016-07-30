@@ -380,7 +380,7 @@ var mentions = new DemoTime.Mention({
 $('.review-overview, .comment_parent, .attachment-description').each(function() {
     var $area = $(this),
         $html = $area.html(),
-        linkedText = Autolinker.link($html);
+        linkedText = Autolinker.link($html, { twitter: false });
 
     $area.html(linkedText);
 });
