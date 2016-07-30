@@ -4,6 +4,11 @@ $('.summary a').click(function(event) {
     $(this).parents('.summary').next().slideToggle();
 });
 
+$('.subnav').stick_in_parent({
+    'parent': 'body',
+    'recalc_every': 100,
+});
+
 // Dynamically add attachment type
 $('.attachment-file').click(function() {
     var file = $(this).find('input');
