@@ -62,7 +62,7 @@
                                     {% if request.user.is_authenticated %}
                                         {% if not request.user.userprofile.avatar.name %}
                                             <li>
-                                                <a href="{% url 'edit-profile' request.user.pk %}" class="icon icon-attention">You need an avatar</a>
+                                                <a href="{% url 'edit-profile' request.user.username %}" class="icon icon-attention">You need an avatar</a>
                                             </li>
                                         {% endif %}
                                         <li>
