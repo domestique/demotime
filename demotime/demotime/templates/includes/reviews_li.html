@@ -10,6 +10,14 @@
 
             {% include "includes/review_state.html" %}
 
+            <small class="time_stamp">
+                {{ demo.state|capfirst }}
+                {% if object.state == 'closed' %}
+                    on {{ demo.modified }}
+                {% else %}
+                    since {{ demo.created|date:'M-d'}}, {{ demo.created|date:'h:iA'|lower }}
+                {% endif %}
+            </small>
         </span>
     </div>
     <div class="review_li-bottom">
