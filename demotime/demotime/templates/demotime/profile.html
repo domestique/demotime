@@ -68,7 +68,7 @@
         {% if owner_viewing %}Your Profile{% else %}{{ object }}'s Profile{% endif %}
         <small>
             {% if owner_viewing %}
-                <a href="{% url 'edit-profile' object.pk %}">edit</a>
+                <a href="{% url 'edit-profile' object.user.username %}">edit</a>
             {% else %}
                 <a href="{% url 'review-list' %}?creator={{ object.pk }}">View this user's demos</a>
             {% endif %}
@@ -80,7 +80,7 @@
     {% else %}
         {% if owner_viewing %}
             <div class="avatarless">
-                <a href="{% url 'edit-profile' object.pk %}">Edit your profile to add an avatar</a>
+                <a href="{% url 'edit-profile' object.user.username %}">Edit your profile to add an avatar</a>
             </div>
         {% else %}
             <img src="/static/images/no_image.jpg" class="avatar">

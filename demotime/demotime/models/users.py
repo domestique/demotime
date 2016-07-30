@@ -86,7 +86,7 @@ class UserProfile(BaseModel):
         return self.__str__()
 
     def get_absolute_url(self):
-        return reverse('profile', args=[self.pk])
+        return reverse('profile', args=[self.user.username])
 
 
 class UserReviewStatus(BaseModel):
