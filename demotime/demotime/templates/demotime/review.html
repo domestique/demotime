@@ -374,7 +374,17 @@ var mentions = new DemoTime.Mention({
 <script src="/static/scripts/Review.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Reviewers.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/library/autolinker.min.js"></script>
 <script>
+// Scope regions where auto-linking is enabled
+$('.review-overview, .comment_parent, .attachment-description').each(function() {
+    var $area = $(this),
+        $html = $area.html(),
+        linkedText = Autolinker.link($html);
+
+    $area.html(linkedText);
+});
+
 var review = new DemoTime.Review({
     {% if reviewer %}
         is_reviewer: true
