@@ -1,11 +1,20 @@
 // Dynamically add/remove reviewers
+var GiphyModel = Backbone.Model.extend({});
 DemoTime.Wysiwyg = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'click .add_emoji': 'add',
+        'click .add_emoji': 'add_emoji',
+        'click .add_gif': 'add_gif',
         'click .toggle_html': 'toggle_html',
+        'keyup .giphy_input': 'capture_giphy_keyword',
+        'click .giphy_result_image': 'insert_giphy',
+        'keypress form': 'disable_form_enter',
         'keypress .wysiwyg-editor': 'send_contents'
+    },
+
+    disable_form_enter: function(event) {
+        return event.keyCode != 13;
     },
 
     // Send wysiwyg contents to hidden form on keypress
@@ -105,16 +114,17 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         }, 1000);
     },
 
-    // Emoticon click-to-add event
-    add: function(event) {
+    // Emoji click-to-add event
+    add_emoji: function(event) {
         var img = $(event.target),
             self = this;
 
-        img.parents('.wysiwyg-container').find('textarea').wysiwyg('shell').insertHTML("<img class='emoji' width='30' height='30' src='" + self.options.dt_url + img.attr('src') + "'>").trigger('keyup');
+        img.parents('.wysiwyg-container').find('textarea').wysiwyg('shell').insertHTML("<img class='emoji' width='30' height='30' src='" + self.options.dt_url + img.attr('src') + "'>");
+        img.parents('.wysiwyg-container').find('.wysiwyg-editor').trigger('keyup');
     },
 
     toggle_html: function(event) {
-        var wysiwyg = $(event.target).parents('form'),
+        var wysiwyg = $(event.target).parents('.wysiwyg-container'),
             editor = wysiwyg.find('.wysiwyg-editor');
 
         event.preventDefault();
@@ -127,5 +137,57 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                 editor.show();
             }
         });
+    },
+
+    add_gif: function(event) {
+        var giphy_search_panel = $(event.target).parents('.wysiwyg-container').find('.giphy_input_panel');
+
+        giphy_search_panel.slideToggle(function() {
+            if ($(this).is(':visible')) {
+                $(this).find('input').focus();
+            }
+        });
+    },
+
+    capture_giphy_keyword: function(event) {
+        var input = $(event.target),
+            code = event.keyCode;
+
+        if (code == 13) {
+            event.preventDefault();
+            this.search_giphy(input.val());
+        }
+    },
+
+    // Giphy click-to-add event
+    search_giphy: function(term) {
+        var req = $.ajax({
+            url: 'http://api.giphy.com/v1/gifs/search',
+            method: 'get',
+            data: {
+                'api_key': '3o85g3XtoNNLeNPWO4',
+                'q': term.replace(' ', '+')
+            }
+        });
+        req.success(function(data) {
+            var giphy_model = new GiphyModel(data.data);
+            // Grab the container template
+            var html = $('#giphy_results').html(),
+                template = _.template(html);
+            template = template ({ gif: giphy_model.attributes });
+
+            console.log(giphy_model.attributes);
+
+            self.$el.find('.giphy_results').html(template).slideDown();
+        });
+    },
+
+    insert_giphy: function(event) {
+        var gif = $(event.target),
+            wysiwyg = gif.parents('.wysiwyg-container');
+
+        gif.parents('.wysiwyg-container').find('textarea').wysiwyg('shell').insertHTML("<img src='" + gif.data('full') + "'>");
+        wysiwyg.find('.wysiwyg-editor').trigger('keypress');
+        wysiwyg.find('.giphy_results, .giphy_input_panel').slideUp();
     }
 });

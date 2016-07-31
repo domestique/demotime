@@ -2,6 +2,7 @@
     <div class="footer_panel">
         <a href="#" class="toggle_html">&lt;html /&gt;</a>
         <div class="emoji_panel" title="Click to insert a reaction">
+            <img src="/static/images/emoji/gif.png" class="add_gif emoji" title="<img src='/static/images/giphy.png'>">
             <img src="/static/images/emoji/smiley.png" class="add_emoji emoji">
             <img src="/static/images/emoji/grin.png" class="add_emoji emoji">
             <img src="/static/images/emoji/frowning2.png" class="add_emoji emoji">
@@ -13,4 +14,24 @@
             <img src="/static/images/emoji/beers.png" class="add_emoji emoji">
         </div>
     </div>
+    <div class="giphy_input_panel" style="display: none">
+        <input type="text" placeholder="Enter a keyword here" class="giphy_input">
+    </div>
+    <div class="giphy_results"></div>
+    <div class="giphy_branding">
+        <img src="/static/images/giphy.png" class="giphy_logo">
+    </div>
+</script>
+<script type="text/x-pattern" id="giphy_results">
+<div>
+    <ul>
+        <% _.each(gif, function(gif) { %>
+            <li>
+                <% if (gif) { %>
+                    <img data-full="<%= gif.images.downsized_medium.url %>" src='<%= gif.images.fixed_height_small.url %>' class="giphy_result_image">
+                <% } %>
+            </li>
+        <% }); %>
+    </ul>
+</div>
 </script>

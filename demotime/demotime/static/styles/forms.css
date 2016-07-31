@@ -136,7 +136,7 @@ select[multiple="multiple"]:focus {
 }
 .wysiwyg-editor,
 .wysiwyg-container textarea {
-    min-height: 150px;
+    min-height: 100px;
 }
 .comments pre {
     font-family: Courier;
@@ -171,6 +171,7 @@ select[multiple="multiple"]:focus {
         display: none;
     }
 }
+
 .emoji_panel {
     float: right;
 }
@@ -196,6 +197,38 @@ blockquote .emoji,
 }
 .modal.link-dialog .form-group {
     margin-top: 0;
+}
+
+.giphy_branding {
+    text-align: right;
+    background: #fafafa;
+    padding: 5px 5px 0;
+}
+input.giphy_input {
+    margin: 0;
+    padding: 10px;
+}
+.giphy_branding img.giphy_logo {
+    max-width: 130px;
+    height: auto;
+}
+.giphy_results ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.giphy_results li,
+.giphy_results img {
+    display: inline-block;
+}
+.giphy_results li {
+    background: #fafafa;
+    margin: 3px;
+    padding: 15px;
+}
+.giphy_results img {
+    display: inline-block;
+    cursor: pointer;
 }
 
 .dd-container,

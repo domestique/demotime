@@ -23,6 +23,8 @@ module.exports = function(config) {
         { pattern: '../library/mousetrap.js', watched: false },
         { pattern: '../library/underscore.js', watched: false },
         { pattern: '../library/backbone.js', watched: false },
+        { pattern: '../library/wysiwyg.min.js', watched: false },
+        { pattern: '../library/wysiwyg.editor.min.js', watched: false },
         { pattern: '../library/selects.js', watched: false },
         '../DemoTime.js',
         '../*.js',
