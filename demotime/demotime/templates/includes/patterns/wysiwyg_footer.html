@@ -28,7 +28,7 @@
         <% _.each(gif, function(gif) { %>
             <li>
                 <% if (gif) { %>
-                    <img data-full="<%= gif.images.downsized_medium.url %>" src='<%= gif.images.fixed_height_small.url %>' class="giphy_result_image">
+                    <img data-full="<%= gif.images.downsized_large.url %>" src='<%= gif.images.fixed_height_small.url %>' class="giphy_result_image">
                 <% } %>
             </li>
         <% }); %>
