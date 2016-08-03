@@ -187,6 +187,8 @@ DEFAULT_REMINDER_DAYS = int(parser.get('demotime', 'default_reminder_days'))
 REGISTRATION_ENABLED = parser.get('demotime', 'registration').lower() == 'true'
 TRIALS_ENABLED = parser.get('demotime', 'trials').lower() == 'true'
 CACHE_BUSTER = os.environ.get('HOSTNAME')
+GIF_PROVIDER_URL = 'https://api.giphy.com/v1/gifs/search'
+GIF_PROVIDER_API_KEY = '3o85g3XtoNNLeNPWO4'
 
 # SENDFILE SETINGS
 SENDFILE_BACKEND = 'sendfile.backends.nginx'

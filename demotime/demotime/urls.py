@@ -20,6 +20,7 @@ from demotime.views import (
     reviews,
     users,
     webhooks,
+    gif_search,
 )
 
 
@@ -29,7 +30,8 @@ urlpatterns = [
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^terms-of-use/$', TemplateView.as_view(template_name='terms_of_use.html'), name='terms-of-use'),
     url(r'^privacy-policy/$', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy-policy'),
-    url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help')
+    url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help'),
+    url(r'^gifs/$', gif_search.GIFSearch.as_view(), name='gif-search'),
 ]
 
 # Admin urls
