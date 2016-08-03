@@ -5,7 +5,13 @@
         <small>
             Fully {{ demo.reviewer_state }}!
             {% if demo.state == "open" and request.user == demo.creator %}
-                <span style="margin-left: 3px;">please <a href="{{ demo.get_absolute_url }}">close this demo</a></span>
+            <span style="margin-left: 3px;">please
+                <a class="demo-changer"
+                   data-creator="{{ demo.creator.pk }}"
+                   data-pk="{{ demo.pk }}"
+                   data-state="closed"
+                   data-url="{% url "update-review-state" demo.project.slug demo.pk %}"
+                   data-url="" href="#">close this demo</a></span>
             {% endif %}
         </small>
     {% elif demo.reviewing_count or demo.reviewing_count or demo.rejected_count %}
