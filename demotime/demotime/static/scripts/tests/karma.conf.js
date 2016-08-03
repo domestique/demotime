@@ -24,6 +24,7 @@ module.exports = function(config) {
         { pattern: '../library/underscore.js', watched: false },
         { pattern: '../library/backbone.js', watched: false },
         { pattern: '../library/selects.js', watched: false },
+        { pattern: '../library/sticky.kit.min.js.js', watched: false },
         '../DemoTime.js',
         '../*.js',
         'spec/*.js'
