@@ -76,7 +76,6 @@
                                                 </a>
                                                 <ul>
                                                     <li><a class="manage_user-item" href="{{ request.user.userprofile.get_absolute_url }}">Profile</a></li>
-                                                    <li class="header-blog"><a class="manage_user-item" href="https://demoti.me/blog/" target="_blank">What's new?</a></li>
                                                     <li><a class="manage_user-item" href="{% url 'help' %}">Documentation</a></li>
                                                     <li><a class="manage_user-item" href="{% url 'logout' %}">Log out</a></li>
                                                 </ul>
@@ -119,6 +118,7 @@
                 &copy; {% now "Y" %}
                 - <a href="{% url 'terms-of-use' %}">terms of use</a>
                 - <a href="{% url 'privacy-policy' %}">privacy policy</a>
+                - <a class="footer-blog" href="https://demoti.me/blog/" target="_blank">what's new?</a>
             </div>
         </footer>
 
@@ -267,14 +267,11 @@
             });
 
             if(typeof(Storage) !== "undefined") {
-                var blog_entry = 'blog20160724'
+                var blog_entry = 'blog20160730'
 
                 if (!localStorage.getItem(blog_entry)) {
                     localStorage.setItem(blog_entry, true);
-                    $('.header-blog, .manage_user').addClass('highlight');
-                    setTimeout(function() {
-                        $('.header-blog, .manage_user').removeClass('highlight');
-                    }, 20000);
+                    $('.footer-blog').addClass('highlight');
                 }
             }
         </script>
