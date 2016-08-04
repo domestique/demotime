@@ -52,6 +52,10 @@ a.button-link:hover {
 .attachment-card.image {
     width: 47%;
     float: left;
+    margin-top: 0;
+}
+.attachment-card.image section {
+    margin-top: 0;
 }
 .comment_parent .attachment-card.image {
     width: 100%;
