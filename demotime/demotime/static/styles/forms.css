@@ -272,9 +272,10 @@ input.giphy_input {
 /* Mentions */
 .mentioner {
     position: absolute;
-    bottom: 45px;
+    bottom: 70px;
     left: 0;
     width: 100%;
+    box-sizing: border-box;
     z-index: 1000;
     background: #f6f6f6;
     padding: 8px 12px;
