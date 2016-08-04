@@ -44,7 +44,6 @@ DemoTime.Info = Backbone.View.extend({
                     minWidth: 500
                 });
                 setTimeout(function() {
-                    console.log(link);
                     if (link.is(":hover")) {
                         link.tooltipster('show');
                     }

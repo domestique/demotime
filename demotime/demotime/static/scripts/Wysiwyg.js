@@ -161,11 +161,12 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
     // Giphy click-to-add event
     search_giphy: function(term) {
+        var self = this;
+
         var req = $.ajax({
-            url: 'http://api.giphy.com/v1/gifs/search',
+            url: self.options.giphy_url,
             method: 'get',
             data: {
-                'api_key': '3o85g3XtoNNLeNPWO4',
                 'q': term.replace(' ', '+')
             }
         });
@@ -175,8 +176,6 @@ DemoTime.Wysiwyg = Backbone.View.extend({
             var html = $('#giphy_results').html(),
                 template = _.template(html);
             template = template ({ gif: giphy_model.attributes });
-
-            console.log(giphy_model.attributes);
 
             self.$el.find('.giphy_results').html(template).slideDown();
         });
