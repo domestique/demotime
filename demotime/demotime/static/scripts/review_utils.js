@@ -12,7 +12,7 @@ $(document).ready(function() {
 });
 
 // Dynamically add attachment type
-$('.attachment-file').click(function() {
+$('body').on('click', '.attachment-file', function() {
     var file = $(this).find('input');
 
     file.change(function() {
