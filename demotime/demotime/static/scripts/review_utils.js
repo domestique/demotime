@@ -1,5 +1,5 @@
 // Slide toggle summary boxes
-$('.summary a').click(function(event) {
+$('body').on('click', '.summary a', function(event) {
     event.preventDefault();
     $(this).parents('.summary').next().slideToggle();
 });
