@@ -25,7 +25,9 @@ module.exports = function(config) {
         { pattern: '../library/backbone.js', watched: false },
         { pattern: '../library/wysiwyg.min.js', watched: false },
         { pattern: '../library/wysiwyg.editor.min.js', watched: false },
+        { pattern: '../library/fireworks.js', watched: false },
         { pattern: '../library/selects.js', watched: false },
+        { pattern: '../library/sticky.kit.min.js.js', watched: false },
         '../DemoTime.js',
         '../*.js',
         'spec/*.js'

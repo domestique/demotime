@@ -96,13 +96,19 @@ body.bookmarklet h1 {
     top: -1px;
     color: #777;
 }
-.navbar .header-blog.highlight a:after,
+a.footer-blog.highlight {
+    font-weight: 700;
+    color: #000;
+    text-decoration: none;
+}
+
+a.footer-blog.highlight:after,
 .navbar .manage_user.highlight:after {
     font-family: "fontello";
     content: '\e828';
     color: red;
 }
-.navbar .header-blog.highlight a:after {
+a.footer-blog.highlight:after {
     margin-left: 3px;
 }
 .navbar .manage_user ul {
@@ -133,7 +139,7 @@ body.bookmarklet h1 {
 }
 
 footer {
-    margin-top: 8em;
+    margin-top: 4em;
     margin-bottom: 3em;
     font-size: .9em;
     text-align: center;
@@ -141,6 +147,7 @@ footer {
 }
 footer a {
     color: #aaa;
+    text-decoration: none;
 }
 
 .clock {

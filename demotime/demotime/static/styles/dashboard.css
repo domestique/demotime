@@ -230,3 +230,12 @@ th, td {
 .your_dashboard .your_dashboard a {
     background: rgba(255, 255, 231, 0.4);
 }
+
+#fireworks {
+    position: fixed;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    min-width: 1400px;
+    display: block;
+}
