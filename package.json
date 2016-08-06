@@ -5,6 +5,6 @@
         "karma-phantomjs-launcher": "1.0.1"
     },
     "scripts": {
-       "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS demotime/demotime/static/scripts/tests/karma.conf.js"
+       "test": "./node_modules/.bin/karma start --log-level warn --single-run --browsers PhantomJS demotime/demotime/static/scripts/tests/karma.conf.js"
     }
 }
