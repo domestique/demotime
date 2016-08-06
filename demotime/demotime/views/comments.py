@@ -141,7 +141,7 @@ class CommentJsonView(CanViewJsonView):
                 for pk in body['delete_attachments']:
                     try:
                         attachment = comment.attachments.get(pk=pk)
-                    except comment.attachments.DoesNotExist:
+                    except models.Attachment.DoesNotExist:
                         pass
                     else:
                         attachment.delete()
