@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import DetailView
@@ -13,8 +15,166 @@ class CommentJsonView(CanViewJsonView):
     status = 200
 
     @method_decorator(login_required)
-    def disptach(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(
+            models.Project,
+            slug=self.kwargs['proj_slug']
+        )
+        if self.kwargs.get('rev_num'):
+            try:
+                self.revision = models.ReviewRevision.objects.get(
+                    number=self.kwargs['rev_num'],
+                    review__pk=self.kwargs['review_pk']
+                )
+            except models.ReviewRevision.DoesNotExist:
+                review = get_object_or_404(
+                    models.Review,
+                    pk=kwargs['review_pk'],
+                )
+                return redirect(
+                    'review-rev-detail',
+                    proj_slug=self.project.slug,
+                    pk=review.pk,
+                    rev_num=review.revision.number,
+                )
+        else:
+            review = get_object_or_404(
+                models.Review,
+                pk=kwargs['pk'],
+            )
+            self.revision = self.get_object().revision
+
+        self.review = self.revision.review
         return super(CommentJsonView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if 'comment_pk' in request.GET:
+            try:
+                comment = models.Comment.objects.get(pk=request.GET['comment_pk'])
+            except models.Comment.DoesNotExist:
+                self.status = 400
+                return {
+                    'errors': 'Comment does not exist',
+                    'status': 'failure',
+                    'comment': {}
+                }
+            else:
+                return {
+                    'errors': '',
+                    'status': 'success',
+                    'comment': comment._to_json(),
+                }
+
+        json_data = {
+            'errors': '',
+            'status': 'success',
+            'threads': {}
+        }
+        for thread in self.revision.commentthread_set.all():
+            comment_data = []
+            for comment in thread.comment_set.all():
+                comment_data.append(comment._to_json())
+
+            json_data['threads'][thread.pk] = comment_data
+
+        return json_data
+
+    def post(self, request, *args, **kwargs):
+        thread = None
+        if 'thread' in request.POST:
+            try:
+                thread = models.CommentThread.objects.get(pk=request.POST['thread'])
+            except models.CommentThread.DoesNotExist:
+                self.status = 400
+                return {
+                    'errors': 'Comment Thread {} does not exist'.format(request.POST['thread']),
+                    'status': 'failure',
+                    'comment': {}
+                }
+
+        comment_form = forms.UpdateCommentForm(
+            data=request.POST, files=request.FILES, thread=thread
+        )
+        if comment_form.is_valid():
+            data = comment_form.cleaned_data
+            comment = models.Comment.create_comment(
+                commenter=request.user,
+                comment=data['comment'],
+                review=self.revision,
+                thread=thread,
+                attachment=data['attachment'],
+                attachment_type=data['attachment_type'],
+                description=data.get('description', '')
+            )
+            return {
+                'errors': '',
+                'status': 'success',
+                'comment': comment._to_json(),
+            }
+
+        return {
+            'errors': comment_form.errors,
+            'status': 'failure',
+            'comment': {},
+        }
+
+    def patch(self, request, *args, **kwargs):
+        try:
+            body = json.loads(request.body.decode('utf-8'))
+        except:
+            self.status = 400
+            return {
+                'errors': 'Improperly formed json request',
+                'status': 'failure',
+                'comment': {}
+            }
+
+        try:
+            comment = models.Comment.objects.get(pk=body.get('comment_pk'))
+        except models.Comment.DoesNotExist:
+            self.status = 400
+            return {
+                'errors': 'Comment {} does not exist'.format(body['comment_pk']),
+                'status': 'failure',
+                'comment': {}
+            }
+
+        body['thread'] = comment.thread.pk
+        comment_form = forms.UpdateCommentForm(
+            data=body, files=request.FILES,
+            thread=comment.thread, instance=comment,
+        )
+        if comment_form.is_valid():
+            data = comment_form.cleaned_data
+            comment.comment = data['comment']
+            comment.save(update_fields=['modified', 'comment'])
+            if data.get('attachment'):
+                models.Attachment.objects.create(
+                    attachment=data['attachment'],
+                    attachment_type=data['attachment_type'],
+                    description=data.get('description', ''),
+                    content_object=self.comment,
+                )
+
+            if body.get('delete_attachments'):
+                for pk in body['delete_attachments']:
+                    try:
+                        attachment = comment.attachments.get(pk=pk)
+                    except comment.attachments.DoesNotExist:
+                        pass
+                    else:
+                        attachment.delete()
+            return {
+                'status': 'success',
+                'errors': '',
+                'comment': comment._to_json()
+            }
+
+        return {
+            'status': 'failure',
+            'errors': comment_form.errors,
+            'comment': {}
+        }
 
 
 class DeleteCommentAttachmentView(CanViewJsonView):
@@ -83,7 +243,7 @@ class UpdateCommentView(DetailView):
         if self.comment_form.is_valid():
             data = self.comment_form.cleaned_data
             self.comment.comment = data['comment']
-            self.comment.save(update_fields=['comment'])
+            self.comment.save(update_fields=['modified', 'comment'])
             if data.get('attachment'):
                 models.Attachment.objects.create(
                     attachment=data['attachment'],
