@@ -27,7 +27,7 @@ class GIFSearch(JsonView):
                     'api_key': settings.GIF_PROVIDER_API_KEY
                 }
             )
-        except: # Naught bare except, but I ain't taking chances here
+        except: # Naughty bare except, but I ain't taking chances here
             content = {
                 'error': 'Failed to communicate with GIF service',
                 'status': 'failed'
@@ -43,7 +43,7 @@ class GIFSearch(JsonView):
             else:
                 content = {
                     'error': 'Bad response from GIF service',
-                    'status': 'success',
+                    'status': 'failed',
                     'data': {}
                 }
 
