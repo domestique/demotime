@@ -20,30 +20,11 @@ class CommentJsonView(CanViewJsonView):
             models.Project,
             slug=self.kwargs['proj_slug']
         )
-        if self.kwargs.get('rev_num'):
-            try:
-                self.revision = models.ReviewRevision.objects.get(
-                    number=self.kwargs['rev_num'],
-                    review__pk=self.kwargs['review_pk']
-                )
-            except models.ReviewRevision.DoesNotExist:
-                review = get_object_or_404(
-                    models.Review,
-                    pk=kwargs['review_pk'],
-                )
-                return redirect(
-                    'review-rev-detail',
-                    proj_slug=self.project.slug,
-                    pk=review.pk,
-                    rev_num=review.revision.number,
-                )
-        else:
-            review = get_object_or_404(
-                models.Review,
-                pk=kwargs['pk'],
-            )
-            self.revision = self.get_object().revision
-
+        self.revision = get_object_or_404(
+            models.ReviewRevision,
+            number=self.kwargs.get('rev_num'),
+            review__pk=self.kwargs.get('review_pk'),
+        )
         self.review = self.revision.review
         return super(CommentJsonView, self).dispatch(request, *args, **kwargs)
 
@@ -121,7 +102,7 @@ class CommentJsonView(CanViewJsonView):
     def patch(self, request, *args, **kwargs):
         try:
             body = json.loads(request.body.decode('utf-8'))
-        except:
+        except json.JSONDecodeError:
             self.status = 400
             return {
                 'errors': 'Improperly formed json request',
@@ -134,7 +115,7 @@ class CommentJsonView(CanViewJsonView):
         except models.Comment.DoesNotExist:
             self.status = 400
             return {
-                'errors': 'Comment {} does not exist'.format(body['comment_pk']),
+                'errors': 'Comment {} does not exist'.format(body.get('comment_pk')),
                 'status': 'failure',
                 'comment': {}
             }
