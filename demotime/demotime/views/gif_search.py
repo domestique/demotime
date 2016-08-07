@@ -16,14 +16,20 @@ class GIFSearch(JsonView):
 
     def get(self, request, *args, **kwargs):
         search_term = request.GET.get('q')
+        limit = request.GET.get('limit')
+
         if not search_term:
             return {}
+
+        if not limit:
+            limit = 24
 
         try:
             response = requests.get(
                 settings.GIF_PROVIDER_URL,
                 params={
                     'q': search_term.replace(' ', '+'),
+                    'limit': limit,
                     'api_key': settings.GIF_PROVIDER_API_KEY
                 }
             )
