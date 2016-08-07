@@ -159,6 +159,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         if (code == 13) {
             event.preventDefault();
             this.search_giphy(input.val());
+            input.val('');
         }
     },
 
@@ -190,10 +191,17 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
     insert_giphy: function(event) {
         var gif = $(event.target),
-            wysiwyg = gif.parents('.wysiwyg-container');
+            wysiwyg = gif.parents('.wysiwyg-container'),
+            editor = wysiwyg.find('.wysiwyg-editor'),
+            html = editor.html(); // grab current html
 
-        gif.parents('.wysiwyg-container').find('textarea').wysiwyg('shell').insertHTML("<img src='" + gif.data('full') + "'>");
+        // Clear existing HTML (to append gif at end)
+        editor.html('');
+        // Write html/gif to wysiwyg
+        gif.parents('.wysiwyg-container').find('textarea').wysiwyg('shell').insertHTML(html + "<img src='" + gif.data('full') + "'>");
+        // Trigger wysiwyg key-up to send contents to form control
         wysiwyg.find('.wysiwyg-editor').trigger('keypress');
+        // Slide up wysiwyg panel
         wysiwyg.find('.giphy_results, .giphy_input_panel').slideUp();
     }
 });
