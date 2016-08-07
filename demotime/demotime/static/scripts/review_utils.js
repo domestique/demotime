@@ -1,5 +1,5 @@
 // Slide toggle summary boxes
-$('.summary a').click(function(event) {
+$('body').on('click', '.summary a', function(event) {
     event.preventDefault();
     $(this).parents('.summary').next().slideToggle();
 });
@@ -12,7 +12,7 @@ $(document).ready(function() {
 });
 
 // Dynamically add attachment type
-$('.attachment-file').click(function() {
+$('body').on('click', '.attachment-file', function() {
     var file = $(this).find('input');
 
     file.change(function() {
