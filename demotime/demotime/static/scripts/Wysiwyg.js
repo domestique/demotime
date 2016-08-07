@@ -163,8 +163,9 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         }
     },
 
-    giphy_button_click: function() {
-        this.search_giphy(this.$el.find('.giphy_input').val());
+    giphy_button_click: function(event) {
+        var panel = $(event.target).parents('.giphy_input_panel');
+        this.search_giphy(panel.find('.giphy_input').val());
     },
 
     // Giphy click-to-add event

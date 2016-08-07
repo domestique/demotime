@@ -114,7 +114,7 @@ button.giphy_button {
     vertical-align: middle;
 }
 @media screen and (max-width:375px) {
-    .giphy_results img {
+    .review .giphy_results img {
         min-width: 0;
         width: 100px;
     }

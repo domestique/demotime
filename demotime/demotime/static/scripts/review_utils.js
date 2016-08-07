@@ -5,10 +5,12 @@ $('body').on('click', '.summary a', function(event) {
 });
 
 $(document).ready(function() {
-    $('.subnav').stick_in_parent({
-        'parent': 'body',
-        'recalc_every': 100,
-    });
+    if ($(window).width() > 375) {
+        $('.subnav').stick_in_parent({
+            'parent': 'body',
+            'recalc_every': 100,
+        });
+    }
 });
 
 // Dynamically add attachment type
