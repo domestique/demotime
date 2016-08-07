@@ -15,7 +15,9 @@ DemoTime.Wysiwyg = Backbone.View.extend({
     },
 
     disable_form_enter: function(event) {
-        return event.keyCode != 13;
+        if ($(event.target).hasClass('giphy_input')) {
+            return event.keyCode != 13;
+        }
     },
 
     // Send wysiwyg contents to hidden form on keypress
