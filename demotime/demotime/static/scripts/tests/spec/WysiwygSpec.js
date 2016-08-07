@@ -11,16 +11,16 @@ describe("Wysiwyg.js", function() {
                 <div class="footer_panel">\
                     <a href="#" class="toggle_html">&lt;html /&gt;</a>\
                     <div class="emoji_panel" title="Click to insert a reaction">\
-                        <img src="/static/images/emoji/gif.png" class="add_gif emoji" title="<img src=\'/static/images/giphy.png\'>">\
-                        <img src="/static/images/emoji/smiley.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/grin.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/frowning2.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/astonished.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/confounded.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/cry.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/heart.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/thumbsup.png" class="add_emoji emoji">\
-                        <img src="/static/images/emoji/beers.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/gif.png" class="add_gif emoji">\
+                        <img src="https://demoti.me/static/images/emoji/smiley.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/grin.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/frowning2.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/astonished.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/confounded.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/cry.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/heart.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/thumbsup.png" class="add_emoji emoji">\
+                        <img src="https://demoti.me/static/images/emoji/beers.png" class="add_emoji emoji">\
                     </div>\
                 </div>\
                 <div class="giphy_input_panel" style="display: none">\
@@ -28,7 +28,7 @@ describe("Wysiwyg.js", function() {
                 </div>\
                 <div class="giphy_results"></div>\
                 <div class="giphy_branding">\
-                    <img src="/static/images/giphy.png" class="giphy_logo">\
+                    <img src="https://demoti.me/static/images/giphy.png" class="giphy_logo">\
                 </div>\
             </script>\
             <script type="text/x-pattern" id="giphy_results">\
