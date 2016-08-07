@@ -16,6 +16,14 @@
 
         <script src="/static/scripts/library/jquery-2.1.3.min.js"></script>
 
+        {% block styles %}
+            <link href="/static/styles/library/cel-0.2.0.min.css" rel="stylesheet">
+            <link href="/static/styles/headerfooter.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
+            <link href="/static/styles/forms.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
+            <link href="/static/styles/main.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
+            <link href="/static/styles/ui.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
+        {% endblock %}
+
         {# Wysiwyg #}
         <script src="https://use.fontawesome.com/9cf78202f6.js"></script>
         <link rel="stylesheet" href="/static/styles/library/wysiwyg.min.css">
@@ -38,14 +46,6 @@
 
         {# Lightbox #}
         <link rel="stylesheet" href="/static/scripts/library/fancybox/jquery.fancybox.css">
-
-        {% block styles %}
-            <link href="/static/styles/library/cel-0.2.0.min.css" rel="stylesheet">
-            <link href="/static/styles/headerfooter.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
-            <link href="/static/styles/forms.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
-            <link href="/static/styles/main.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
-            <link href="/static/styles/ui.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
-        {% endblock %}
     </head>
 
     <body class="{{ request.GET.display_state }}">

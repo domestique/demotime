@@ -8,6 +8,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         'click .add_gif': 'add_gif',
         'click .toggle_html': 'toggle_html',
         'keyup .giphy_input': 'capture_giphy_keyword',
+        'click .giphy_button': 'giphy_button_click',
         'click .giphy_result_image': 'insert_giphy',
         'keypress form': 'disable_form_enter',
         'keypress .wysiwyg-editor': 'send_contents'
@@ -157,6 +158,10 @@ DemoTime.Wysiwyg = Backbone.View.extend({
             event.preventDefault();
             this.search_giphy(input.val());
         }
+    },
+
+    giphy_button_click: function() {
+        this.search_giphy(this.$el.find('.giphy_input').val());
     },
 
     // Giphy click-to-add event

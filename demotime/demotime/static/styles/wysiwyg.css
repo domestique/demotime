@@ -76,6 +76,17 @@ blockquote .emoji,
 input.giphy_input[type="text"] {
     margin: 0;
     padding: 10px;
+    box-sizing: border-box;
+    width: calc(100% - 155px);
+}
+button.giphy_button {
+    box-shadow: none;
+    box-sizing: border-box;
+    width: 140px;
+    margin: 0 5px;
+    background: #f2f2f2;
+    font-weight: 700;
+    color: #888;
 }
 .giphy_branding img.giphy_logo {
     max-width: 130px;
