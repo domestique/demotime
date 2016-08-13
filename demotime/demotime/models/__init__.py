@@ -12,6 +12,7 @@ from .reviewers import Reviewer
 from .groups import GroupType, Group, GroupMember
 from .projects import Project, ProjectGroup, ProjectMember
 from .webhooks import WebHook
+from .settings import Setting
 
 
 def create_profile(sender, instance, created, raw, **kwargs):
