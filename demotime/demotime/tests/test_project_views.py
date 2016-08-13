@@ -369,6 +369,23 @@ class TestProjectViews(BaseTestCase):
             'count': 0, 'projects': []
         })
 
+    def test_create_project(self):
+        self.user.is_superuser = True
+        self.user.save(update_fields=['is_superuser'])
+        self.post_data.update({
+            'name': 'New Project',
+            'slug': 'new-project',
+            'description': 'New Project Description',
+        })
+        response = self.client.post(reverse('project-create'), self.post_data)
+        self.assertStatusCode(response, 302)
+        self.assertRedirects(response, reverse('project-detail', args=['new-project']))
+        project = models.Project.objects.get(slug='new-project')
+        self.assertEqual(
+            models.Setting.objects.filter(project=None).count(),
+            models.Setting.objects.filter(project=project).count()
+        )
+
 
 class TestProjectSettingViews(BaseTestCase):
 

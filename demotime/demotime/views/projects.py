@@ -159,6 +159,11 @@ class ProjectAdmin(CanViewMixin, TemplateView):
         if forms_valid:
             # Project Form
             self.project = project_form.save()
+            if not self.project.setting_set.exists():
+                for setting in models.Setting.objects.filter(project=None):
+                    setting.pk = None
+                    setting.project = self.project
+                    setting.save()
 
             # New Members
             members = member_fs.save(commit=False)
