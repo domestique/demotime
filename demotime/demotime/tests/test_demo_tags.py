@@ -44,3 +44,17 @@ class TestDemoTags(BaseTestCase):
             demo_tags.reviewer_status(self.review, self.user),
             ''
         )
+
+    def test_setting_value_emojis(self):
+        template = Template(
+            "{% load demo_tags %}{% setting_value project 'emojis_enabled' %}"
+        )
+        content = template.render(Context({'project': self.project}))
+        self.assertEqual(content, 'True')
+
+    def test_setting_value_missing_project(self):
+        template = Template(
+            "{% load demo_tags %}{% setting_value project 'emojis_enabled' %}"
+        )
+        with self.assertRaises(TypeError):
+            template.render(Context({'project': None}))
