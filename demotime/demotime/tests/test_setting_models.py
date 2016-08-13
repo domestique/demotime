@@ -10,7 +10,8 @@ class TestSettingModels(BaseTestCase):
             key='testing',
             raw_value=raw_value,
             setting_type=setting_type,
-            active=active
+            active=active,
+            project=self.project,
         )
 
     def test_setting__str__(self):
@@ -69,29 +70,40 @@ class TestSettingManager(BaseTestCase):
             description='testing',
             raw_value='1',
             setting_type=models.Setting.STRING,
-            active=True
+            active=True,
+            project=self.project,
         )
 
     def test_get_value_missing_setting(self):
-        value = models.Setting.objects.get_value('testing-bad')
+        value = models.Setting.objects.get_value(self.project, 'testing-bad')
         self.assertIsNone(value)
 
     def test_get_value_missing_setting_default(self):
-        value = models.Setting.objects.get_value('testing-bad', default='default')
+        value = models.Setting.objects.get_value(
+            self.project, 'testing-bad', default='default'
+        )
         self.assertEqual(value, 'default')
 
     def test_get_value_inactive_setting_no_default(self):
         self.setting.active = False
         self.setting.save(update_fields=['active'])
-        value = models.Setting.objects.get_value('testing')
+        value = models.Setting.objects.get_value(
+            self.project, 'testing'
+        )
         self.assertIsNone(value)
 
     def test_get_value_inactive_setting_default(self):
         self.setting.active = False
         self.setting.save(update_fields=['active'])
-        value = models.Setting.objects.get_value('testing', default='default')
+        value = models.Setting.objects.get_value(
+            self.project, 'testing', default='default'
+        )
         self.assertEqual(value, 'default')
 
     def test_get_value_success(self):
-        value = models.Setting.objects.get_value('testing')
+        value = models.Setting.objects.get_value(self.project, 'testing')
         self.assertEqual(value, '1')
+
+    def test_get_value_missing_project(self):
+        with self.assertRaises(TypeError):
+            models.Setting.objects.get_value(None, 'testing')

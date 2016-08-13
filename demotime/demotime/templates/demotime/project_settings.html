@@ -9,11 +9,7 @@
 <div class="breadcrumbs">
     <div class="container">
         <a href="{% url 'index' %}">Your dashboard</a> &gt;
-        {% if hook.pk %}
-            Edit {{ hook.get_trigger_event_display }} Web Hook
-        {% else %}
-            New Web Hook
-        {% endif %}
+            Edit Setting - {{ setting.title }} 
     </div>
 </div>
 {% endblock %}
@@ -119,24 +115,19 @@ section label[for="id_is_public"] {
 {% endblock %}
 
 {% block content %}
-{% if hook.pk %}
-    <h1>Editing {{ project.name }} {{ hook.get_trigger_event_display }} Web Hook</h1>
-{% else %}
-    <h1>New Web Hook</h1>
-{% endif %}
+<h1>Edit Setting - {{ setting.title }}
 
 <article class="project">
     <section>
-        {% if hook.pk %}
-            <form action="{% url 'webhook-edit' project.slug hook.pk %}" method='post'>
-        {% else %}
-            <form action="{% url 'webhook-create' project.slug %}" method='post'>
-        {% endif %}
+        <form action="{% url 'project-settings-edit' project.slug setting.pk %}" method='post'>
             {% csrf_token %}
-            {# WebHook FORM #}
             <h3 class="icon icon-pencil">
-                Web Hook Details
+                Setting Information:
             </h3>
+            <ul>
+                <li>Description: {{ setting.descripton }}</li>
+                <li>Setting Type: {{ setting.get_setting_type_display }}</li>
+            </ul>
             <section>
                 {{ form.as_p }}
             </section>
@@ -145,12 +136,4 @@ section label[for="id_is_public"] {
         </form>
     </section>
 </article>
-{% endblock %}
-
-{% block scripts %}
-{{ block.super }}
-<script src="/static/scripts/EditGroupsProjects.js?{{ site_settings.CACHE_BUSTER }}"></script>
-<script>
-var edit = new DemoTime.EditGroupsProjects();
-</script>
 {% endblock %}

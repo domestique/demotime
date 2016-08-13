@@ -3,7 +3,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-from demotime import constants, models
+from demotime import constants, forms, models
 from demotime.tests import BaseTestCase
 
 
@@ -368,3 +368,42 @@ class TestProjectViews(BaseTestCase):
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'count': 0, 'projects': []
         })
+
+
+class TestProjectSettingViews(BaseTestCase):
+
+    def setUp(self):
+        super(TestProjectSettingViews, self).setUp()
+        assert self.client.login(
+            username=self.user.username,
+            password='testing'
+        )
+        self.setting = models.Setting.objects.get(
+            key='reminder_days',
+            project=self.project
+        )
+        self.setting_url = reverse('project-settings-edit', kwargs={
+            'proj_slug': self.project.slug,
+            'setting_pk': self.setting.pk
+        })
+        self.detail_url = reverse('project-detail', args=[self.project.slug])
+
+    def test_edit_reminder_days_get(self):
+        response = self.client.get(self.setting_url)
+        self.assertStatusCode(response, 200)
+        setting = response.context['setting']
+        self.assertEqual(setting, self.setting)
+        self.assertTrue(isinstance(response.context['form'], forms.ProjectSettingForm))
+
+    def test_edit_reminder_days_post(self):
+        response = self.client.post(self.setting_url, {'raw_value': '3'})
+        self.assertStatusCode(response, 302)
+        self.assertRedirects(response, self.detail_url)
+        self.setting.refresh_from_db()
+        self.assertEqual(self.setting.value, 3)
+
+    def test_edit_reminder_days_invalid(self):
+        response = self.client.post(self.setting_url, {'raw_value': 'asdfafs'})
+        self.assertStatusCode(response, 200)
+        self.assertFormError(response, 'form', 'raw_value',
+                             'Invalid value provided for Setting Type Integer')

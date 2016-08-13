@@ -144,5 +144,25 @@
             </ul>
         </section>
     </div>
+    <div class="cel">
+        <h3 class="icon icon-user">
+            Project Settings
+            <span class="help" title="Below are settings defined by the system 
+                that you can modify to better suit your project's needs."</span>
+        </h3>
+        <section class="emph_low">
+            <ul>
+                {% if object.setting_set.exists %}
+                    {% for setting in object.setting_set.all %}
+                        <li>
+                            <a href="{% url 'project-settings-edit' object.slug setting.pk %}">{{ setting.title }} - {{ setting.value }}</a>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>This project has no settings</li>
+                {% endif %}
+            </ul>
+        </section>
+    </div>
 </div>
 {% endblock %}

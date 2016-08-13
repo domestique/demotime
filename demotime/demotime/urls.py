@@ -167,6 +167,11 @@ urlpatterns += [
         webhooks.manage_hooks,
         name='webhook-edit'
     ),
+    url(
+        r'projects/(?P<proj_slug>[-\w]+)/admin/settings/(?P<setting_pk>[\d]+)/$',
+        projects.project_settings,
+        name='project-settings-edit'
+    ),
     url(r'projects/(?P<proj_slug>[-\w]+)/admin/edit/$', projects.project_admin, name='project-admin'),
     url(r'projects/(?P<proj_slug>[-\w]+)/admin/$', projects.project_detail, name='project-detail'),
     url(r'projects/(?P<proj_slug>[-\w]+)/$', projects.project_dashboard, name='project-dashboard'),

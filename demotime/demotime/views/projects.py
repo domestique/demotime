@@ -3,7 +3,7 @@ from django.forms import modelformset_factory
 from django.views.generic import DetailView, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 
 from demotime import constants, forms, models
 from demotime.views import CanViewMixin, JsonView
@@ -244,7 +244,45 @@ class ProjectJsonView(JsonView):
 
         return self._build_json(projects)
 
+
+class ProjectSettingsEditView(CanViewMixin, TemplateView):
+    template_name = 'demotime/project_settings.html'
+    require_admin_privileges = True
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(
+            models.Project,
+            slug=kwargs.get('proj_slug', '')
+        )
+        self.setting = get_object_or_404(
+            models.Setting,
+            pk=kwargs.get('setting_pk', ''),
+            project=self.project,
+        )
+        self.form = forms.ProjectSettingForm(instance=self.setting)
+        return super(ProjectSettingsEditView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectSettingsEditView, self).get_context_data(**kwargs)
+        context.update({
+            'project': self.project,
+            'setting': self.setting,
+            'form': self.form
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.form = forms.ProjectSettingForm(instance=self.setting, data=request.POST)
+        if self.form.is_valid():
+            self.form.save()
+            return redirect('project-detail', proj_slug=self.project.slug)
+
+        return self.get(request, *args, **kwargs)
+
+
 project_dashboard = ProjectDashboard.as_view()
 project_detail = ProjectDetail.as_view()
 project_admin = ProjectAdmin.as_view()
 project_json = ProjectJsonView.as_view()
+project_settings = ProjectSettingsEditView.as_view()

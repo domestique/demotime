@@ -8,9 +8,12 @@ from demotime.models.base import BaseModel
 
 class SettingManager(models.Manager):
 
-    def get_value(self, key, default=None):
+    def get_value(self, project, key, default=None):
+        if not project:
+            raise TypeError('Setting.objects.get_value requires a Project')
+
         try:
-            obj = self.get(key=key)
+            obj = self.get(project=project, key=key)
         except self.model.DoesNotExist:
             if settings.DEBUG:
                 raise
@@ -36,6 +39,11 @@ class Setting(BaseModel):
         (INT, 'Integer'),
     )
 
+    # Settings without FKs to Project are 'system' Settings, and if they do have
+    # a FK, they are an 'instance' of a 'system' setting for a project. This is
+    # because the system defines the settings, and the Projects have independent
+    # control of the setting within the project.
+    project = models.ForeignKey('Project', null=True)
     title = models.CharField(max_length=128)
     key = models.SlugField(max_length=128, db_index=True)
     description = models.TextField(blank=True)
@@ -54,14 +62,15 @@ class Setting(BaseModel):
 
     @classmethod
     def create_setting(cls, title, key, raw_value, setting_type,
-                       description='', active=False):
+                       project, description='', active=False):
         return cls.objects.create(
             title=title,
             key=key,
             description=description,
             raw_value=raw_value,
             setting_type=setting_type,
-            active=active
+            active=active,
+            project=project,
         )
 
     def _value_dict(self):
@@ -99,3 +108,8 @@ class Setting(BaseModel):
 
         # Strings
         return self.raw_value
+
+    class Meta:
+        index_together = [
+            ('project', 'key'),
+        ]
