@@ -20,6 +20,6 @@ def reviewer_status(review, user):
     return status
 
 
-@register.simple_tag
+@register.assignment_tag
 def setting_value(project, setting_key):
     return models.Setting.objects.get_value(project, setting_key)
