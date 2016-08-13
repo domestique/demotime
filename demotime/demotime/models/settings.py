@@ -25,12 +25,14 @@ class SettingManager(models.Manager):
 
 class Setting(BaseModel):
 
+    # Setting Types
     LIST = 'list'
     BOOL = 'bool'
     DICT = 'dict'
     STRING = 'string'
     INT = 'int'
 
+    # Setting Types Choices
     SWITCH_TYPES = (
         (LIST, 'List'),
         (BOOL, 'Boolean'),
@@ -38,6 +40,11 @@ class Setting(BaseModel):
         (STRING, 'String'),
         (INT, 'Integer'),
     )
+
+    # Established Settings
+    REMINDER_DAYS = 'reminder_days'
+    EMOJIS_ENALBED = 'emojis_enabled'
+    GIFS_ENABLED = 'gifs_enabled'
 
     # Settings without FKs to Project are 'system' Settings, and if they do have
     # a FK, they are an 'instance' of a 'system' setting for a project. This is
