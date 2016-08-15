@@ -11,6 +11,7 @@ from django.contrib.auth.views import (
 )
 
 from demotime.views import (
+    comments,
     files,
     groups,
     index_view,
@@ -43,6 +44,21 @@ urlpatterns += [
     url(r'^admin/group-types/create/$', groups.manage_group_type, name='group-type-manage'),
     url(r'^admin/group-types/edit/(?P<slug>[\w-]+)/$', groups.manage_group_type, name='group-type-manage'),
     url(r'^admin/projects/create/$', projects.project_admin, name='project-create'),
+]
+
+# Comments
+urlpatterns += [
+    url(
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/rev/(?P<rev_num>[\d]+)/comments/$',
+        comments.comments_json_view,
+        name='comments-api',
+    ),
+    url(r'^comment/update/(?P<pk>[\d]+)/$', comments.update_comment_view, name='update-comment'),
+    url(
+        r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
+        comments.delete_comment_attachment_view,
+        name='update-comment-attachment'
+    ),
 ]
 
 # Reviews
@@ -86,16 +102,6 @@ urlpatterns += [
     url(r'^reviews/list/$', reviews.review_list_view, name='review-list'),
     url(r'^reviews/search/$', reviews.review_search_json_view, name='reviews-search-json'),
     url(r'^reviews/(?P<proj_slug>[\w-]+)/search/$', reviews.review_search_json_view, name='reviews-search-json'),
-]
-
-# Comments
-urlpatterns += [
-    url(r'^comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
-    url(
-        r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
-        reviews.delete_comment_attachment_view,
-        name='update-comment-attachment'
-    ),
 ]
 
 # Messages

@@ -171,3 +171,180 @@ class TestCommentViews(BaseTestCase):
         self.assertTrue(
             models.Attachment.objects.filter(pk=attachment.pk).exists()
         )
+
+
+class TestCommentAPIViews(BaseTestCase):
+
+    def setUp(self):
+        super(TestCommentAPIViews, self).setUp()
+        assert self.client.login(
+            username=self.user.username,
+            password='testing'
+        )
+        # Sample review
+        self.review = models.Review.create_review(**self.default_review_kwargs)
+        self.comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=self.review.revision,
+            comment='Test Comment',
+            attachment=File(BytesIO(b'test_file_1')),
+            attachment_type='image',
+            description='Test Description',
+        )
+        self.api_url = reverse('comments-api', kwargs={
+            'review_pk': self.review.pk,
+            'proj_slug': self.review.project.slug,
+            'rev_num': self.review.revision.number,
+        })
+        self.maxDiff = None
+        # Reset out mail queue
+        mail.outbox = []
+
+    def test_comment_json_get_review_comments(self):
+        response = self.client.get(self.api_url)
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'threads': {
+                str(self.comment.thread.pk): [self.comment._to_json()]
+            }
+        })
+
+    def test_comment_json_get_comment(self):
+        response = self.client.get(self.api_url, {'comment_pk': self.comment.pk})
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': self.comment._to_json()
+        })
+
+    def test_comment_json_missing_comment(self):
+        response = self.client.get(self.api_url, {'comment_pk': 100000})
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'failure',
+            'errors': 'Comment does not exist',
+            'comment': {}
+        })
+
+    def test_comment_json_create_comment_thread(self):
+        fh = StringIO('testing')
+        fh.name = 'test_file_1'
+        response = self.client.post(self.api_url, {
+            'comment': "test_comment_json_create_comment_thread",
+            'attachment': fh,
+            'attachment_type': 'image',
+            'description': 'Test Description',
+        })
+        self.assertStatusCode(response, 200)
+        comment = models.Comment.objects.latest('created')
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': comment._to_json()
+        })
+        comment = self.review.revision.commentthread_set.latest().comment_set.get()
+        self.assertEqual(comment.comment, 'test_comment_json_create_comment_thread')
+        self.assertEqual(comment.attachments.count(), 1)
+
+    def test_comment_json_create_comment_error(self):
+        response = self.client.post(self.api_url, {})
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'failure',
+            'errors': {'comment': ['This field is required.']},
+            'comment': {}
+        })
+
+    def test_comment_json_reply_comment(self):
+        fh = StringIO('testing')
+        fh.name = 'test_file_1'
+        thread = self.review.revision.commentthread_set.latest()
+        response = self.client.post(self.api_url, {
+            'comment': "test_comment_json_reply_comment",
+            'attachment': fh,
+            'attachment_type': 'image',
+            'description': 'Test Description',
+            'thread': thread.pk
+        })
+        self.assertStatusCode(response, 200)
+        comment = models.Comment.objects.latest('created')
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': comment._to_json()
+        })
+        self.assertEqual(comment.comment, 'test_comment_json_reply_comment')
+        self.assertEqual(comment.thread, thread)
+        self.assertEqual(comment.attachments.count(), 1)
+
+    def test_comment_json_reply_invalid_thread(self):
+        response = self.client.post(self.api_url, {
+            'comment': "Oh nice comment!",
+            'description': 'Test Description',
+            'thread': 100000000,
+        })
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'failure',
+            'errors': 'Comment Thread 100000000 does not exist',
+            'comment': {},
+        })
+
+    def test_update_comment_invalid_comment_pk(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': 10000,
+            'comment': 'modified comment',
+            'delete_attachment': True,
+        }))
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'failure',
+            'errors': 'Comment 10000 does not exist',
+            'comment': {},
+        })
+
+    def test_update_comment(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'comment': 'modified comment',
+            'delete_attachments': [
+                self.comment.attachments.get().pk,
+                10000, # We'll just gracefully ignore this delete
+            ],
+        }))
+        self.assertStatusCode(response, 200)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.attachments.count(), 0)
+        self.assertEqual(self.comment.comment, 'modified comment')
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': self.comment._to_json()
+        })
+
+    def test_update_comment_without_delete(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'comment': 'modified comment without delete',
+        }))
+        self.assertStatusCode(response, 200)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.attachments.count(), 1)
+        self.assertEqual(self.comment.comment, 'modified comment without delete')
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': self.comment._to_json()
+        })
+
+    def test_update_comment_non_json(self):
+        response = self.client.patch(self.api_url, {'test': 'wut'})
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'failure',
+            'errors': 'Improperly formed json request',
+            'comment': {}
+        })
