@@ -206,6 +206,9 @@ article {
 .new_comment label.icon-comment {
     display: none;
 }
+.new_comment .comments-reply {
+    margin: 0;
+}
 
 .revision a {
     font-weight: 400;

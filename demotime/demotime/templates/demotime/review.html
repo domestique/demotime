@@ -335,7 +335,9 @@
         <article class="comment_wrapper">
             <h3 class="heading">Post a New Comment</h3>
             <section class="comment_parent new_comment">
-                {% use_macro comment 'Reply' %}
+                <div class="comment_container">
+                    {% use_macro comment 'Reply' %}
+                </div>
             </section>
         </article>
     </div>
