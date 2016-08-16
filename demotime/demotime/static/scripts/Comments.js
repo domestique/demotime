@@ -26,9 +26,9 @@ DemoTime.Comments = Backbone.View.extend({
             container = button.parents('.comment_container'),
             comment = comment_parent.find('.form-control').val(),
             thread = comment_parent.data('thread');
-            //attachment_file = comment_parent.find('select[name="attachment"]'),
-            //attachment_type = comment_parent.find('select[name="attachment_type"]'),
-            //attachment_desc = comment_parent.find('select[name="description"]'),
+            attachment_file = comment_parent.find('input[type="file"]'),
+            attachment_type = comment_parent.find('select[name="attachment_type"]'),
+            attachment_desc = comment_parent.find('input[name="description"]');
 
         // Check for 'editing' data attr, otherwise it's a new comment
         if (container.data('editing')) {
@@ -44,13 +44,20 @@ DemoTime.Comments = Backbone.View.extend({
                 dataType: 'json',
                 data: JSON.stringify(data)
             });
-        } else {
+        } else { // new comment
+            var formData = new FormData();
+            formData.append('file', attachment_file[0].files[0]);
+
             var req = $.ajax({
                 url: self.options.comments_url,
                 method: 'POST',
+                contentType: 'multipart/form-data',
+                processData: false,
                 data: {
                     thread: thread,
-                    comment: comment
+                    comment: comment,
+                    attachment: formData,
+                    attachment_type: attachment_type
                 }
             });
         }
