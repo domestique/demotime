@@ -32,7 +32,7 @@ DemoTime.Comments = Backbone.View.extend({
 
         // Check for 'editing' data attr, otherwise it's a new comment
         if (container.data('editing')) {
-            // PATCH needs data jsonified for some reason
+            // PATCH needs data jsonified
             var data = {
                 comment_pk: self.options.comment_pk,
                 thread: thread,
@@ -75,7 +75,8 @@ DemoTime.Comments = Backbone.View.extend({
         });
 
         req.error(function(data) {
-            console.log(data);
+            // Write the error message html
+            container.before('<ul class="errorlist"><li>' + data.responseJSON.errors + '</li></ul>');
         });
     },
 
