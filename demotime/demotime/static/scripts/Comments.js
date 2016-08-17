@@ -46,19 +46,21 @@ DemoTime.Comments = Backbone.View.extend({
             });
         } else { // new comment
             var formData = new FormData();
-            formData.append('file', attachment_file[0].files[0]);
+            if (thread) {
+                formData.append('thread', thread);
+            }
+            formData.append('comment', comment);
+            if (attachment_file[0].files[0]) {
+                formData.append('attachment', attachment_file[0].files[0]);
+                formData.append('attachment_type', attachment_type);
+            }
 
             var req = $.ajax({
                 url: self.options.comments_url,
                 method: 'POST',
                 contentType: 'multipart/form-data',
                 processData: false,
-                data: {
-                    thread: thread,
-                    comment: comment,
-                    attachment: formData,
-                    attachment_type: attachment_type
-                }
+                data: formData
             });
         }
 
