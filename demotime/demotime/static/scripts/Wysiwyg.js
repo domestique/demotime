@@ -173,6 +173,8 @@ DemoTime.Wysiwyg = Backbone.View.extend({
     search_giphy: function(term) {
         var self = this;
 
+            self.$el.find('.giphy_results').html('<img src="/static/images/loading.gif" class="giphy_loading">').slideDown();
+
         var req = $.ajax({
             url: self.options.giphy_url,
             method: 'get',
@@ -182,12 +184,17 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         });
         req.success(function(data) {
             var giphy_model = new GiphyModel(data.data);
-            // Grab the container template
-            var html = $('#giphy_results').html(),
-                template = _.template(html);
-            template = template ({ gif: giphy_model.attributes });
 
-            self.options.wysiwyg.find('.giphy_results').html(template).slideDown();
+            if (data.data.length) {
+                // Grab the container template
+                var html = $('#giphy_results').html(),
+                    template = _.template(html);
+                template = template ({ gif: giphy_model.attributes });
+
+                self.$el.find('.giphy_results').html(template);
+            } else {
+                self.$el.find('.giphy_results').html('<div style="margin: 10px 0">Sorry, there were no matching GIFs for "' + term + '"</div>');
+            }
         });
     },
 
