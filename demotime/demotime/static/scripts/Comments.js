@@ -27,7 +27,7 @@ DemoTime.Comments = Backbone.View.extend({
             comment = comment_parent.find('.form-control').val(),
             thread = comment_parent.data('thread');
             attachment_file = comment_parent.find('input[type="file"]'),
-            attachment_type = comment_parent.find('select[name="attachment_type"]'),
+            attachment_type = 'image',
             attachment_desc = comment_parent.find('input[name="description"]');
 
         // Check for 'editing' data attr, otherwise it's a new comment
@@ -58,7 +58,7 @@ DemoTime.Comments = Backbone.View.extend({
             var req = $.ajax({
                 url: self.options.comments_url,
                 method: 'POST',
-                contentType: 'multipart/form-data',
+                contentType: false,
                 processData: false,
                 data: formData
             });
