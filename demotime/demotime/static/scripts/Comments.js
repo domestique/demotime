@@ -27,7 +27,7 @@ DemoTime.Comments = Backbone.View.extend({
             comment = comment_parent.find('.form-control').val(),
             thread = comment_parent.data('thread');
             attachment_file = comment_parent.find('input[type="file"]'),
-            attachment_type = 'image',
+            attachment_type = comment_parent.find('select[name="attachment_type"]').val(),
             attachment_desc = comment_parent.find('input[name="description"]');
 
         // Check for 'editing' data attr, otherwise it's a new comment
@@ -69,7 +69,30 @@ DemoTime.Comments = Backbone.View.extend({
             container.slideUp();
 
             // Write the new comment HTML
-            var html = '<div class="comments-reply"><blockquote>' + comment + '<br><br>(<a href="#" class="comment_edit">edit</a>)</blockquote></div>';
+            var html = '<div class="comments-reply">'
+
+            html += '<blockquote>' + comment;
+
+            if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
+                html += '<br><br><div class="attachment-card image collapseable">\
+                    <section>\
+                        <h3 class="heading icon icon-image">\
+                            Image\
+                        </h3>\
+                        <span class="attachment-image">\
+                            <a href="' + data.comment.attachments[0].static_url + '" class="lightbox_img">\
+                                <img src="' + data.comment.attachments[0].static_url + '" class="img-thumbnail" height="300" width="300">\
+                            </a>\
+                        </span>\
+                    </section>\
+                </div>';
+            } else if (data.comment.attachment_count) {
+                html += '<p><em>Your attachment was uploaded successfully.</em></p>';
+            }
+
+            html += '<br><br>(<a href="#" class="comment_edit">edit</a>)</blockquote>';
+
+            html += '</div>'
 
             // Save some values for editing
             self.options.container = container;
@@ -97,7 +120,7 @@ DemoTime.Comments = Backbone.View.extend({
         $(event.target).parents('.comments-reply').slideUp().remove();
 
         // Disable attachment editing (for now)
-        this.options.container.find('.summary').remove();
+        this.options.container.find('.attachments, .summary').remove();
 
         // Enable 'editing' mode
         this.options.container.data('editing', true);

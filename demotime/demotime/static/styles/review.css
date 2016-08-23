@@ -118,38 +118,38 @@ li.open.state-highlight {
 }
 
 /* Special attachments display for comments */
-.comments .attachment-card {
+.attachment-card {
     margin:-13px 0;
 }
-.comments .attachment-card section {
+.attachment-card section {
     overflow: hidden;
     background: #555;
     color: #fff;
     min-height: 0;
 }
-.comments .attachment-card h3 {
+.attachment-card h3 {
     font-size: 16px;
     color: #fff;
 }
-.comments .attachment-card.image {
+.attachment-card.image {
     overflow: hidden;
 }
-.comments .attachment-card.other,
-.comments .attachment-card.document {
+.attachment-card.other,
+.attachment-card.document {
     overflow: hidden;
 }
-.comments .attachment-card.audio {
+.attachment-card.audio {
     overflow: hidden;
 }
-.comments .attachment-card section img {
+.attachment-card section img {
     max-height: 100px;
 }
-.comments .attachment-card .attachment-image {
+.attachment-card .attachment-image {
     text-align: left;
 }
 
 .attachment-card h3 {
-    font-size:1.6em;
+    font-size: 16px;
 }
 .comments-reply {
     margin:1em 0 0 3em;
