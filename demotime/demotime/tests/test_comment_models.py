@@ -46,6 +46,7 @@ class TestCommentModels(BaseTestCase):
         attachment = comment.attachments.get()
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(attachment.attachment_type, 'image')
+        self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(

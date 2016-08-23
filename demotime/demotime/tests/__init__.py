@@ -45,11 +45,13 @@ class BaseTestCase(TestCase):
                     'attachment': File(BytesIO(b'test_file_1')),
                     'attachment_type': 'image',
                     'description': 'Testing',
+                    'sort_order': 1,
                 },
                 {
                     'attachment': File(BytesIO(b'test_file_2')),
                     'attachment_type': 'image',
                     'description': 'Testing',
+                    'sort_order': 2,
                 },
             ],
         }

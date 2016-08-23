@@ -54,7 +54,7 @@ class Comment(BaseModel):
     @classmethod
     def create_comment(cls, commenter, comment, review,
                        thread=None, attachment=None, attachment_type=None,
-                       description=None):
+                       description=None, sort_order=1):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
 
@@ -85,6 +85,7 @@ class Comment(BaseModel):
                 attachment_type=attachment_type,
                 description=description,
                 content_object=obj,
+                sort_order=sort_order,
             )
 
         system_user = User.objects.get(username='demotime_sys')

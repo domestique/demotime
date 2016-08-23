@@ -145,7 +145,10 @@ class CreateReviewView(TemplateView):
             data=request.POST
         )
         AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)
-        self.attachment_forms = AttachmentFormSet(data=request.POST, files=request.FILES)
+        self.attachment_forms = AttachmentFormSet(
+            data=request.POST,
+            files=request.FILES
+        )
         if self.review_form.is_valid() and self.attachment_forms.is_valid():
             data = self.review_form.cleaned_data
             data['creator'] = request.user
@@ -159,6 +162,7 @@ class CreateReviewView(TemplateView):
                         'attachment': form.cleaned_data['attachment'],
                         'attachment_type': form.cleaned_data['attachment_type'],
                         'description': form.cleaned_data['description'],
+                        'sort_order': form.cleaned_data['sort_order'],
                     })
 
             if pk:
@@ -190,7 +194,8 @@ class CreateReviewView(TemplateView):
                 initial={'description': ''},
             )
             AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)
-            self.attachment_forms = AttachmentFormSet()
+            initial_data = [{'sort_order': x} for x in range(1, AttachmentFormSet.extra + 1)]
+            self.attachment_forms = AttachmentFormSet(initial=initial_data)
         return super(CreateReviewView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -353,7 +358,7 @@ class UpdateCommentView(DetailView):
         return super(UpdateCommentView, self).dispatch(request, *args, **kwargs)
 
     def init_form(self, data=None, files=None):
-        kwargs = {}
+        kwargs = {'initial': {'sort_order': 1}}
         if data:
             kwargs['data'] = data
         if files:

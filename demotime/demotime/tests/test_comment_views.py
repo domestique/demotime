@@ -41,6 +41,7 @@ class TestCommentViews(BaseTestCase):
                 'attachment': fh,
                 'attachment_type': 'image',
                 'description': 'Test Description',
+                'sort_order': 1,
             }
         )
         self.assertStatusCode(response, 302)
@@ -137,6 +138,7 @@ class TestCommentViews(BaseTestCase):
             'attachment': fh,
             'attachment_type': 'image',
             'description': 'Test Comment Edit Description',
+            'sort_order': 1,
         })
         self.assertStatusCode(response, 302)
         comment = models.Comment.objects.get(pk=self.comment.pk)
@@ -144,6 +146,34 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(self.comment.attachments.count(), 2)
         attachment = self.comment.attachments.latest()
         self.assertEqual(attachment.description, 'Test Comment Edit Description')
+
+    def test_update_comment_with_attachment_requires_type(self):
+        fh = StringIO('testing')
+        fh.name = 'test_file_1'
+        self.assertEqual(self.comment.attachments.count(), 1)
+        response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
+            'comment': 'This is an attachment update',
+            'attachment': fh,
+            'description': 'Test Comment Edit Description',
+            'sort_order': 1,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertFormError(response, 'form', 'attachment_type',
+                             'Attachments require an Attachment Type')
+
+    def test_update_comment_with_attachment_without_sort_order(self):
+        fh = StringIO('testing')
+        fh.name = 'test_file_1'
+        self.assertEqual(self.comment.attachments.count(), 1)
+        response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
+            'comment': 'This is an attachment update',
+            'attachment': fh,
+            'description': 'Test Comment Edit Description',
+            'attachment_type': 'image',
+        })
+        self.assertStatusCode(response, 200)
+        self.assertFormError(response, 'form', 'attachment_type',
+                             'Attachments require a sort_order')
 
     def test_delete_comment_attachment(self):
         attachment = self.comment.attachments.get()

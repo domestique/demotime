@@ -44,6 +44,7 @@ class Attachment(BaseModel):
         db_index=True,
     )
     description = models.CharField(max_length=2048, blank=True, null=True)
+    sort_order = models.IntegerField(default=1)
 
     @property
     def pretty_name(self):
@@ -72,3 +73,4 @@ class Attachment(BaseModel):
         ]
         app_label = 'demotime'
         get_latest_by = 'created'
+        ordering = ('sort_order',)

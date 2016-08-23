@@ -242,6 +242,7 @@ class TestReviewViews(BaseTestCase):
             'form-0-attachment': fh,
             'form-0-attachment_type': 'image',
             'form-0-description': 'Test Description',
+            'form-0-sort_order': 1,
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
@@ -255,6 +256,7 @@ class TestReviewViews(BaseTestCase):
         attachment = obj.revision.attachments.get()
         self.assertEqual(attachment.attachment_type, 'image')
         self.assertEqual(attachment.description, 'Test Description')
+        self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(
             models.Message.objects.filter(title__contains='POST').count(),
             5
@@ -295,9 +297,11 @@ class TestReviewViews(BaseTestCase):
             'form-0-attachment': fh,
             'form-0-attachment_type': 'image',
             'form-0-description': 'Test Description',
+            'form-0-sort_order': 1,
             'form-1-attachment': '',
             'form-1-attachment_type': 'image',
             'form-1-description': 'Test Description',
+            'form-1-sort_order': 2,
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
@@ -325,6 +329,7 @@ class TestReviewViews(BaseTestCase):
                 'form-0-attachment': fh,
                 'form-0-attachment_type': 'image',
                 'form-0-description': 'Test Description',
+                'form-0-sort_order': 1,
             }
         )
         self.assertStatusCode(response, 302)
@@ -340,6 +345,7 @@ class TestReviewViews(BaseTestCase):
         attachment = obj.revision.attachments.get()
         self.assertEqual(attachment.attachment_type, 'image')
         self.assertEqual(attachment.description, 'Test Description')
+        self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(obj.reviewrevision_set.count(), 2)
         self.assertEqual(
             models.Message.objects.filter(title__contains='Update Review POST').count(),
