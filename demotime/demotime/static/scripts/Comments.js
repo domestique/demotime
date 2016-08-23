@@ -19,7 +19,7 @@ DemoTime.Comments = Backbone.View.extend({
         });
     },
 
-    post_new_comment: function(event) {
+    post_new_comment: function(event, also_approve) {
         var button = $(event.target),
             self = this,
             comment_parent = button.parents('.comment_parent'),
@@ -104,6 +104,10 @@ DemoTime.Comments = Backbone.View.extend({
             } else {
                 container.before(html);
             }
+
+            if (also_approve) {
+                $('a[data-type="approved"]').click();
+            }
         });
 
         req.error(function(data) {
@@ -132,7 +136,9 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     // Leave a comment and approve at the same time
-    reply_and_approve: function(event) {},
+    reply_and_approve: function(event) {
+        this.post_new_comment(event, true);
+    },
 
     // Expand collapse top level comments
     collapse_comment: function(event) {

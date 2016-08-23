@@ -1,4 +1,3 @@
-
 DemoTime.Review = Backbone.View.extend({
     el: 'body',
 
@@ -52,12 +51,14 @@ DemoTime.Review = Backbone.View.extend({
             }
         });
 
-        req.success(function(msg) {
+        req.always(function(msg) {
             if (msg.success) {
                 window.location.hash = 'state_change';
                 if (action == 'reload') {
                     window.location.reload();
                 }
+            } else {
+                window.location.reload();
             }
         });
     },
