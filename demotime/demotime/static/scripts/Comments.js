@@ -103,7 +103,7 @@ DemoTime.Comments = Backbone.View.extend({
                     $('a[data-type="approved"]').click();
                 } else {
                     $('html, body').animate({
-                        scrollTop: self.options.container.offset().top - 300
+                        scrollTop: comment_parent.find('.comments-reply').last().offset().top - 75
                     }, 500);
 
                     // Show 'new reply' link
