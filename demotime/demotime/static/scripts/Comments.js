@@ -11,7 +11,7 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     initialize: function(options) {
-        this.options = options;
+        this.options = options || [];
 
         Mousetrap.bind('command+enter', function(e) {
             $(e.target).parents('.comment_container').find('.new_comment_button').click();
@@ -30,7 +30,7 @@ DemoTime.Comments = Backbone.View.extend({
 
         // Saving container as an option for global use
         this.options.container = button.parents('.comment_container');
-        this.options.comment = comment_parent.find('.form-control').val(),
+        this.options.comment = comment_parent.find('.form-control').val();
 
         this.start_loading_state();
 
@@ -107,7 +107,9 @@ DemoTime.Comments = Backbone.View.extend({
                     }, 500);
 
                     // Show 'new reply' link
-                    self.options.trigger_link.show();
+                    if (self.options.trigger_link) {
+                        self.options.trigger_link.show();
+                    }
                 }
             }
         });
