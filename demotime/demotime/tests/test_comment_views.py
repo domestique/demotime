@@ -172,7 +172,7 @@ class TestCommentViews(BaseTestCase):
             'attachment_type': 'image',
         })
         self.assertStatusCode(response, 200)
-        self.assertFormError(response, 'form', 'attachment_type',
+        self.assertFormError(response, 'form', 'sort_order',
                              'Attachments require a sort_order')
 
     def test_delete_comment_attachment(self):

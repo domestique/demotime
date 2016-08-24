@@ -38,6 +38,7 @@ class AttachmentForm(forms.Form):
         )
     )
     attachment_type = forms.ChoiceField(
+        required=False,
         choices=models.Attachment.ATTACHMENT_TYPE_CHOICES,
         widget=forms.Select
     )
@@ -47,16 +48,9 @@ class AttachmentForm(forms.Form):
         max_length=2048
     )
     sort_order = forms.IntegerField(
+        required=False,
         widget=forms.HiddenInput,
     )
-
-
-class UpdateCommentForm(CommentForm, AttachmentForm):
-
-    def __init__(self, *args, **kwargs):
-        super(UpdateCommentForm, self).__init__(*args, **kwargs)
-        self.fields['attachment_type'].required = False
-        self.fields['sort_order'].required = False
 
     def clean_attachment_type(self):
         data = self.cleaned_data
@@ -71,3 +65,7 @@ class UpdateCommentForm(CommentForm, AttachmentForm):
             raise forms.ValidationError('Attachments require a sort_order')
 
         return data['sort_order']
+
+
+class UpdateCommentForm(CommentForm, AttachmentForm):
+    pass
