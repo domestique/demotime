@@ -19,6 +19,7 @@ class TestEventModels(BaseTestCase):
     def test_event_creation(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         event = models.Event.create_event(
+            review.project,
             models.EventType.DEMO_CREATED,
             review,
             review.creator

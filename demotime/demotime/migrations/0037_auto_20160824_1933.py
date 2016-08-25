@@ -45,6 +45,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='event',
+            name='project',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='demotime.Project'),
+        ),
+        migrations.AddField(
+            model_name='event',
             name='event_type',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='demotime.EventType'),
         ),

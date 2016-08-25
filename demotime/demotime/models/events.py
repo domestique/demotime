@@ -55,6 +55,7 @@ class Event(BaseModel):
         (REVISION, 'Revision')
     )
 
+    project = models.ForeignKey('Project')
     event_type = models.ForeignKey('EventType')
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
@@ -66,13 +67,14 @@ class Event(BaseModel):
         return 'Event {} on {}'.format(self.event_type.name, self.related_object)
 
     @classmethod
-    def create_event(cls, event_type_code, related_object, user):
+    def create_event(cls, project, event_type_code, related_object, user):
         event_type = EventType.objects.get(code=event_type_code)
         related_type = related_object._meta.model_name
         if related_type not in cls.RELATED_TYPES:
             raise RuntimeError('Invalid related object passed to Event creation')
 
         return cls.objects.create(
+            project=project,
             event_type=event_type,
             related_object=related_object,
             related_type=related_type,
