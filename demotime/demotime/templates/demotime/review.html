@@ -15,23 +15,23 @@
 {% block sub_nav_actions %}
 <ul class="subnav-item">
     {% if request.user == object.creator %}
-        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Add revision</a></li>
+        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Revise</a></li>
         {% if object.state == 'closed' %}
-            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Open demo</a></li>
+            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
         {% else %}
-            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close demo</a></li>
+            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close</a></li>
         {% endif %}
     {% else %}
         {% if reviewer and object.state != "closed" %}
             {% if reviewer.status == 'approved' %}
-                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove demo</a></li>
+                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove</a></li>
             {% else %}
-                <li><a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve demo</a></li>
+                <li><a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve</a></li>
             {% endif %}
             {% if reviewer.status == 'rejected' %}
-                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject demo</a></li>
+                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject</a></li>
             {% else %}
-                <li><a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject demo</a></li>
+                <li><a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject</a></li>
             {% endif %}
         {% endif %}
     {% endif %}
@@ -321,7 +321,7 @@
                                 {% endif %}
                             {% endfor %}
                             <div class="comments-reply_new collapseable">
-                                <a href="#" class="icon icon-comment expand_reply_link">Reply to this</a>
+                                <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
                                 <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
                                     {% use_macro comment 'Reply' %}
                                 </div>

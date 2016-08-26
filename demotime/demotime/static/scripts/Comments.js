@@ -221,6 +221,11 @@ DemoTime.Comments = Backbone.View.extend({
             container.find('input[type="file"]').val('');
             container.find('select[name="attachment_type"]').val('');
             container.find('input[name="attachment_description"]').val('');
+            if ($(window).width() > 720) {
+                $('html, body').animate({
+                    scrollTop: container.offset().top - 200
+                }, 500);
+            }
         });
         this.options.trigger_link.hide();
     }
