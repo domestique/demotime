@@ -2,15 +2,11 @@ DemoTime.Review = Backbone.View.extend({
     el: 'body',
 
     events: {
-        'click .collapser': 'collapse_comment',
-        'click .review-changer': 'change_review_state',
-        'click .leave_reply_link': 'leave_reply',
-        'click .reply_and_approve': 'reply_and_approve'
+        'click .review-changer': 'change_review_state'
     },
 
     initialize: function(options) {
         this.options = options;
-        this.setup_comment_hooks();
         this.render();
     },
 
@@ -55,25 +51,16 @@ DemoTime.Review = Backbone.View.extend({
             }
         });
 
-        req.success(function(msg) {
+        req.always(function(msg) {
             if (msg.success) {
                 window.location.hash = 'state_change';
                 if (action == 'reload') {
                     window.location.reload();
                 }
+            } else {
+                window.location.reload();
             }
         });
-    },
-
-    // Leave a comment and approve at the same time
-    reply_and_approve: function(event) {
-        var self = this,
-            button = $(event.target);
-        this.change_reviewer_state(button.data('type'));
-        setTimeout(function() {
-            button.parents('form').attr('action', '');
-            button.parents('form').submit();
-        }, 500);
     },
 
     // Changing demo state
@@ -129,49 +116,4 @@ DemoTime.Review = Backbone.View.extend({
             }
         });
     },
-
-    // Expand collapse top level comments
-    collapse_comment: function(event) {
-        var e = event,
-            collapser = $(event.target);
-
-        if (collapser.prop("tagName") != "A") {
-            collapser.parents('.collapser_parent').find('.collapseable').slideToggle(function() {
-                if (collapser.attr('class').match('squared')) {
-                    if ($(this).is(":visible")) {
-                        collapser.removeClass('icon-plus-squared-alt');
-                        collapser.addClass('icon-minus-squared-alt');
-                    } else {
-                        collapser.addClass('icon-plus-squared-alt');
-                        collapser.removeClass('icon-minus-squared-alt');
-                    }
-                }
-            });
-        }
-    },
-
-    setup_comment_hooks: function() {
-        // Attach comment pk's to form submits for
-        // smooth scroll to comment after sending it
-        $('[data-comment]').each(function() {
-            var comment = $(this),
-                form = comment.parents('.comment_parent').find('form');
-
-            if (comment.prop('id')) {
-                form.attr('action', '#' + comment.prop('id'));
-            } else {
-                form.attr('action', '#comments');
-            }
-        });
-    },
-
-    leave_reply: function(event) {
-        event.preventDefault();
-        var link = $(event.target);
-
-        link.next('.comment_container').slideDown(function() {
-            $(this).find('.wysiwyg-editor').focus();
-        });
-        link.remove();
-    }
 });

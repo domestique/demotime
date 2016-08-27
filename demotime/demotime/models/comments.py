@@ -44,12 +44,18 @@ class Comment(BaseModel):
         )
 
     def _to_json(self):
-        return {
+        comment_json = {
+            'id': self.pk,
             'name': self.commenter.userprofile.name,
             'comment': self.comment,
             'thread': self.thread.pk,
-            'attachment_count': self.attachments.count()
+            'attachment_count': self.attachments.count(),
+            'attachments': []
         }
+        for attachment in self.attachments.all():
+            comment_json['attachments'].append(attachment._to_json())
+
+        return comment_json
 
     @classmethod
     def create_comment(cls, commenter, comment, review,

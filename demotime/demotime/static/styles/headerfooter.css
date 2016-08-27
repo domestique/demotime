@@ -191,6 +191,7 @@ nav.subnav {
 @media screen and (max-width: 450px) {
     .subnav a.subnav-item {
         margin: 3px 0;
+        font-size: 14px;
     }
 }
 .subnav .cel {
@@ -245,6 +246,11 @@ nav.subnav {
 .breadcrumbs {
     background: #1F8470;
     padding: 10px 0;
+}
+@media screen and (max-width:375px) {
+    .breadcrumbs {
+        padding: 10px;
+    }
 }
 .breadcrumbs,
 .breadcrumbs a {

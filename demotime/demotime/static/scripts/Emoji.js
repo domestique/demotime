@@ -40,7 +40,8 @@ DemoTime.Emoji = Backbone.View.extend({
     },
 
     add_gif: function(event) {
-        var giphy_search_panel = $(event.target).parents('.wysiwyg-container').find('.giphy_input_panel');
+        this.options.wysiwyg = $(event.target).parents('.wysiwyg-container');
+        var giphy_search_panel = this.options.wysiwyg.find('.giphy_input_panel');
 
         giphy_search_panel.slideToggle(function() {
             if ($(this).is(':visible')) {
@@ -79,11 +80,11 @@ DemoTime.Emoji = Backbone.View.extend({
         req.success(function(data) {
             var giphy_model = new GiphyModel(data.data);
             // Grab the container template
-            var html = $('#giphy_results').html(),
+            var html = self.options.wysiwyg.find('#giphy_results').html(),
                 template = _.template(html);
             template = template ({ gif: giphy_model.attributes });
 
-            self.$el.find('.giphy_results').html(template).slideDown();
+            //self.options.wysiwyg.find('.giphy_results').html(template).slideDown();
         });
     },
 

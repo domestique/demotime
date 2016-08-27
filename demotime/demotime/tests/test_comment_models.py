@@ -246,3 +246,25 @@ class TestCommentModels(BaseTestCase):
             self.hook.pk,
             {'comment': comment._to_json()},
         )
+
+    def test_comment_to_json(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        models.Message.objects.all().delete()
+        self.assertEqual(models.Message.objects.count(), 0)
+        thread = models.CommentThread.create_comment_thread(review.revision)
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=review.revision,
+            comment="test comment",
+            thread=thread,
+            attachment=File(BytesIO(b'test_file_1'), name='test_file_1'),
+            attachment_type='image',
+        )
+        self.assertEqual(comment._to_json(), {
+            'id': comment.pk,
+            'thread': comment.thread.pk,
+            'name': comment.commenter.userprofile.name,
+            'comment': comment.comment,
+            'attachment_count': comment.attachments.count(),
+            'attachments': [comment.attachments.get()._to_json()]
+        })
