@@ -6,8 +6,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.contenttypes.models import ContentType
 
 from demotime import forms, models
-from demotime.views import CanViewMixin
-from . import CanViewJsonView, JsonView
+from demotime.views import CanViewMixin, CanViewJsonView, JsonView
 
 
 class ReviewDetail(CanViewMixin, DetailView):
@@ -87,8 +86,16 @@ class ReviewDetail(CanViewMixin, DetailView):
         ).update(read=True)
         context['project'] = self.project
         context['revision'] = self.revision
-        context['comment_form'] = self.comment_form if self.comment_form else forms.CommentForm(instance=self.comment)
-        context['attachment_form'] = self.attachment_form if self.attachment_form else forms.AttachmentForm()
+        if self.comment_form:
+            context['comment_form'] = self.comment_form
+        else:
+            context['comment_form'] = forms.CommentForm(instance=self.comment)
+        if self.attachment_form:
+            context['attachment_form'] = self.attachment_form
+        else:
+            context['attachment_form'] = forms.AttachmentForm(
+                initial={'sort_order': 1}
+            )
         return context
 
     def post(self, request, *args, **kwargs):
@@ -99,7 +106,9 @@ class ReviewDetail(CanViewMixin, DetailView):
             ):
                 thread = models.CommentThread.objects.get(pk=request.POST['thread'])
 
-        self.comment_form = forms.CommentForm(thread=thread, data=request.POST, instance=self.comment)
+        self.comment_form = forms.CommentForm(
+            thread=thread, data=request.POST, instance=self.comment
+        )
         self.attachment_form = forms.AttachmentForm(data=request.POST, files=request.FILES)
         data = {}
         if self.comment_form.is_valid():
