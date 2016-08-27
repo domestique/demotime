@@ -116,7 +116,11 @@ DemoTime.Comments = Backbone.View.extend({
 
         req.error(function(data) {
             // Write the error message html
-            self.show_errors(data.statusText);
+            if (data.statusText == 'error') {
+                self.show_errors('Sorry, the server is not responding at this time.');
+            } else {
+                self.show_errors(data.statusText);
+            }
         });
     },
 
