@@ -267,6 +267,7 @@ class TestCommentAPIViews(BaseTestCase):
             'attachment': fh,
             'attachment_type': 'image',
             'description': 'Test Description',
+            'sort_order': 1,
         })
         self.assertStatusCode(response, 200)
         comment = models.Comment.objects.latest('created')
@@ -297,6 +298,7 @@ class TestCommentAPIViews(BaseTestCase):
             'attachment': fh,
             'attachment_type': 'image',
             'description': 'Test Description',
+            'sort_order': 1,
             'thread': thread.pk
         })
         self.assertStatusCode(response, 200)
