@@ -257,7 +257,7 @@
                     {% endmacro %}
 
                     {% macro comment button_text %}
-                        <div>
+                        <form>
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
                             {{ comment_form.comment.errors }}
                             {{ comment_form.comment }}
@@ -274,7 +274,7 @@
                                     <input class="reply_and_approve" data-type="approved" type="button" value="Reply and Approve">
                                 {% endif %}
                             </div>
-                        </div>
+                        </form>
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
