@@ -123,7 +123,7 @@ DemoTime.Comments = Backbone.View.extend({
     get_success_html: function(data) {
         var html = '<div class="comments-reply">';
 
-        html += '<blockquote>' + this.options.comment;
+        html += '<blockquote><div class="blockquote-body">' + this.options.comment;
 
         if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
             html += '<br><br><div class="attachment-card image collapseable">\
@@ -142,7 +142,7 @@ DemoTime.Comments = Backbone.View.extend({
             html += '<p><em>Your attachment was uploaded successfully.</em></p>';
         }
 
-        html += '<br><br>(<a href="#" class="comment_edit">edit</a>)</blockquote>';
+        html += '<br><br>(<a href="#" class="comment_edit">edit</a>)</div></blockquote>';
 
         html += '</div>'
 
