@@ -1,4 +1,4 @@
-// Message counts, reviews with new comments, etc.
+/** Message counts, reviews with new comments, etc. */
 DemoTime.BackgroundTasks = Backbone.View.extend({
     el: 'body',
 
@@ -17,7 +17,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
             if (self.options.messages_url) {
                 self.fetch_new_messages();
             }
-            if (self.options.comments_url) {
+            if (self.options.json_url) {
                 self.fetch_new_comments();
                 self.check_activity_count();
             }
@@ -79,7 +79,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         var self = this;
 
         var req = $.ajax({
-            url: self.options.comments_url
+            url: self.options.json_url
         });
 
         req.success(function(data) {
@@ -103,11 +103,11 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                                 // Redirect the user to the comment
                                 if (update_obj.is_comment) {
                                     var url_hook = '#comments';
-                                    window.location.href = self.options.dt_url + '#comments';
+                                    window.location.href = self.options.site_url + '#comments';
                                     window.location.reload();
                                 // Or just reload the review
                                 } else {
-                                    window.location.href = self.options.dt_url;
+                                    window.location.href = self.options.site_url;
                                 }
                             }
                         }
