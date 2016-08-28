@@ -82,8 +82,12 @@ DemoTime.Comments = Backbone.View.extend({
                 // Write the error message html
                 self.show_errors(data.errors.comment);
             } else {
-                // Slide up the editor
-                self.options.container.slideUp();
+                // Slide up the editor if in a thread
+                if (thread) {
+                    self.options.container.slideUp();
+                } else {
+                    comment_parent.find('.wysiwyg-editor').html('').focus();
+                }
 
                 // Write the new comment HTML
                 var html = self.get_success_html(data);
@@ -220,12 +224,16 @@ DemoTime.Comments = Backbone.View.extend({
 
         this.options.trigger_link = $(event.target);
 
+        // Grab and clean-up new container
+        var container = this.options.trigger_link.next('.comment_container');
+        container.find('.wysiwyg-editor').html('');
+        container.find('input[type="file"]').val('');
+        container.find('select[name="attachment_type"]').val('');
+        container.find('input[name="attachment_description"]').val('');
+
+        // Show new comment container
         this.options.trigger_link.next('.comment_container').slideDown(function() {
-            var container = $(this);
-            container.find('.wysiwyg-editor').html('').focus();
-            container.find('input[type="file"]').val('');
-            container.find('select[name="attachment_type"]').val('');
-            container.find('input[name="attachment_description"]').val('');
+            container.find('.wysiwyg-editor').focus();
             if ($(window).width() > 720) {
                 $('html, body').animate({
                     scrollTop: container.offset().top - 200
