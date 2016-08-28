@@ -124,6 +124,10 @@ li.open.state-highlight {
 .comments-reply blockquote {
     padding: 3px;
 }
+.comments-reply .comment_edit {
+    display: block;
+    margin-top: 10px;
+}
 
 /* Special attachments display for comments */
 .attachment-card {

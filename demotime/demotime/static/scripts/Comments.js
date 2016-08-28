@@ -82,8 +82,12 @@ DemoTime.Comments = Backbone.View.extend({
                 // Write the error message html
                 self.show_errors(data.errors.comment);
             } else {
-                // Slide up the editor
-                self.options.container.slideUp();
+                // Slide up the editor if in a thread
+                if (thread) {
+                    self.options.container.slideUp();
+                } else {
+                    comment_parent.find('.wysiwyg-editor').html('').focus();
+                }
 
                 // Write the new comment HTML
                 var html = self.get_success_html(data);
@@ -147,7 +151,7 @@ DemoTime.Comments = Backbone.View.extend({
             html += '<p><em>Your attachment was uploaded successfully.</em></p>';
         }
 
-        html += '<br><br>(<a href="#" class="comment_edit">edit</a>)</div></blockquote>';
+        html += '<a href="#" class="comment_edit">(edit)</a></div></blockquote>';
 
         html += '</div>'
 
@@ -155,20 +159,28 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     comment_edit: function(event) {
-        var self = this;
+        var self = this,
+            reply = $(event.target).parents('.comments-reply'),
+            contents = reply.find('.blockquote-body .comment_edit').remove();
+
+        // Grab edit html
+        reply.find('.comment_edit').remove();
+        var edit_html = reply.find('.blockquote-body').html();
+
         event.preventDefault();
 
         // Remove old comment
-        $(event.target).parents('.comments-reply').slideUp().remove();
+        reply.slideUp().remove();
 
         // Disable attachment editing (for now)
-        this.options.container.find('.attachments, .summary').remove();
+        reply.find('.attachments, .summary').remove();
 
         // Enable 'editing' mode
         this.options.container.data('editing', true);
 
         // Re-show wysiwyg
         this.options.container.slideDown(function() {
+            self.options.container.find('.wysiwyg-editor').html(edit_html);
             self.options.container.find('.wysiwyg-editor').focus();
         });
     },
@@ -220,12 +232,16 @@ DemoTime.Comments = Backbone.View.extend({
 
         this.options.trigger_link = $(event.target);
 
+        // Grab and clean-up new container
+        var container = this.options.trigger_link.next('.comment_container');
+        container.find('.wysiwyg-editor').html('');
+        container.find('input[type="file"]').val('');
+        container.find('select[name="attachment_type"]').val('');
+        container.find('input[name="attachment_description"]').val('');
+
+        // Show new comment container
         this.options.trigger_link.next('.comment_container').slideDown(function() {
-            var container = $(this);
-            container.find('.wysiwyg-editor').html('').focus();
-            container.find('input[type="file"]').val('');
-            container.find('select[name="attachment_type"]').val('');
-            container.find('input[name="attachment_description"]').val('');
+            container.find('.wysiwyg-editor').focus();
             if ($(window).width() > 720) {
                 $('html, body').animate({
                     scrollTop: container.offset().top - 200
