@@ -67,6 +67,15 @@ blockquote .emoji,
 .modal.link-dialog .form-group {
     margin-top: 0;
 }
+.review .giphy_results {
+    text-align: center;
+}
+.review .giphy_results img.giphy_loading {
+    width: 15px;
+    height: 15px;
+    min-width: 0;
+    margin: 20px 0;
+}
 
 .giphy_branding {
     text-align: right;

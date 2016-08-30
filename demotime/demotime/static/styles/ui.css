@@ -16,12 +16,13 @@ a.button-link:hover {
     text-decoration: none;
 }
 .subnav a.subnav-item.alert {
-    background: #E03743;
+    background: #F14D51;
     color: #fff;
 }
+input[type="button"].reply_and_approve,
 .subnav a.subnav-item.confirm {
-    background: #115745;
-    color: #fff;
+    background-color: #FFD94B;
+    color: #555;
 }
 
 .review-attachments {

@@ -89,6 +89,19 @@ input[type="button"]:hover {
     background-color: #2bbbad;
 }
 
+button[disabled],
+input[type="button"][disabled] {
+    opacity: 0.3;
+    transition: all .5s ease;
+    cursor: default;
+    background-image: url(/static/images/loading.gif);
+    background-position: 85% 50%;
+    background-repeat: no-repeat;
+    background-color: #fff;
+    color: #2bbbad;
+    padding-right: 60px;
+}
+
 select[multiple="multiple"]{
     padding: 10px;
     min-width: 30%;
