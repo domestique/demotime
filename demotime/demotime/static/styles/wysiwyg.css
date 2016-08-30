@@ -28,6 +28,7 @@
     padding: 5px;
     background: #F5F5F5;
     overflow: hidden;
+    min-height: 35px;
 }
 .footer_panel .toggle_html {
     font-size: 11px;
