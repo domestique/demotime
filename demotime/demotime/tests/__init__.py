@@ -42,14 +42,16 @@ class BaseTestCase(TestCase):
             'project': self.project,
             'attachments': [
                 {
-                    'attachment': File(BytesIO(b'test_file_1')),
+                    'attachment': File(BytesIO(b'test_file_1'), name='test_file_1'),
                     'attachment_type': 'image',
                     'description': 'Testing',
+                    'sort_order': 1,
                 },
                 {
-                    'attachment': File(BytesIO(b'test_file_2')),
+                    'attachment': File(BytesIO(b'test_file_2'), name='test_file_2'),
                     'attachment_type': 'image',
                     'description': 'Testing',
+                    'sort_order': 2,
                 },
             ],
         }

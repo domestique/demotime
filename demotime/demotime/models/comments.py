@@ -44,17 +44,23 @@ class Comment(BaseModel):
         )
 
     def _to_json(self):
-        return {
+        comment_json = {
+            'id': self.pk,
             'name': self.commenter.userprofile.name,
             'comment': self.comment,
             'thread': self.thread.pk,
-            'attachment_count': self.attachments.count()
+            'attachment_count': self.attachments.count(),
+            'attachments': []
         }
+        for attachment in self.attachments.all():
+            comment_json['attachments'].append(attachment._to_json())
+
+        return comment_json
 
     @classmethod
     def create_comment(cls, commenter, comment, review,
                        thread=None, attachment=None, attachment_type=None,
-                       description=None):
+                       description=None, sort_order=1):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
 
@@ -85,6 +91,7 @@ class Comment(BaseModel):
                 attachment_type=attachment_type,
                 description=description,
                 content_object=obj,
+                sort_order=sort_order,
             )
 
         system_user = User.objects.get(username='demotime_sys')

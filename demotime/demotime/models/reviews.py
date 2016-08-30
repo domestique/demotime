@@ -162,6 +162,7 @@ class Review(BaseModel):
                 attachment_type=attachment['attachment_type'],
                 description=attachment['description'],
                 content_object=rev,
+                sort_order=attachment['sort_order'],
             )
         for reviewer in reviewers:
             Reviewer.create_reviewer(obj, reviewer)
@@ -215,6 +216,7 @@ class Review(BaseModel):
                 attachment_type=attachment['attachment_type'],
                 description=attachment['description'],
                 content_object=rev,
+                sort_order=attachment['sort_order'],
             )
 
         # No attachments, we'll copy them over
