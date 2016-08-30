@@ -115,6 +115,28 @@
             </ul>
         </section>
     </div>
+</div>
+<div class="dashboard split~680 by:1/2 with-gap:3">
+    <div class="cel">
+        <h3 class="icon icon-user">
+            Project Settings
+            <span class="help" title="Below are settings defined by the system
+                that you can modify to better suit your project's needs."</span>
+        </h3>
+        <section class="emph_low">
+            <ul>
+                {% if object.setting_set.exists %}
+                    {% for setting in object.setting_set.all %}
+                        <li>
+                            <a href="{% url 'project-settings-edit' object.slug setting.pk %}">{{ setting.title }} - {{ setting.value }}</a>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>This project has no settings</li>
+                {% endif %}
+            </ul>
+        </section>
+    </div>
     <div class="cel">
         <h3 class="icon icon-user">
             Web Hooks
@@ -138,28 +160,8 @@
                 {% if is_admin or request.user.is_superuser %}
                     <li>
                         <a class="icon icon-plus" href="{% url 'webhook-create' object.slug %}">Create Web Hook</a>
+                        <small>(<a href="{% url 'help' %}#webhooks">help</a>)</small>
                     </li>
-                {% endif %}
-                <a href='{% url 'help' %}#webhooks'>Web Hooks Help</a>
-            </ul>
-        </section>
-    </div>
-    <div class="cel">
-        <h3 class="icon icon-user">
-            Project Settings
-            <span class="help" title="Below are settings defined by the system 
-                that you can modify to better suit your project's needs."</span>
-        </h3>
-        <section class="emph_low">
-            <ul>
-                {% if object.setting_set.exists %}
-                    {% for setting in object.setting_set.all %}
-                        <li>
-                            <a href="{% url 'project-settings-edit' object.slug setting.pk %}">{{ setting.title }} - {{ setting.value }}</a>
-                        </li>
-                    {% endfor %}
-                {% else %}
-                    <li>This project has no settings</li>
                 {% endif %}
             </ul>
         </section>
