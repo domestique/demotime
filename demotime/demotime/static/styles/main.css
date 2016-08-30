@@ -65,8 +65,8 @@ article > *:first-child {
 
 section {
     background: #fafafa;
-    margin-top: .75em;
-    margin-bottom: 2em;
+    margin-top: .50em;
+    margin-bottom: 1em;
     padding: 20px;
     box-shadow: 4px 4px 0 #ccc;
     border: 1px solid #eaeaea;
@@ -83,7 +83,7 @@ section > *:first-child > *:first-child {
 }
 section blockquote {
     background: #fff;
-    box-shadow: 0 0 5px #ccc;
+    border: 1px solid #eee;
     margin: 0;
     padding: 15px;
 }
@@ -105,8 +105,9 @@ section blockquote p:first-child {
     font-size: 14px;
 }
 section section {
-    background: #fdfdfd;
-    box-shadow: 0 0 5px #ccc;
+    background: #f6f6f6;
+    box-shadow: none;
+    border-radius: 2px;
 }
 
 p, li {

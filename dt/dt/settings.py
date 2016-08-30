@@ -182,7 +182,7 @@ SERVER_URL = parser.get('demotime', 'server_url')
 SITE_ID = 1
 
 # DemoTime Specific Settings
-DT_PROD = parser.get('demotime', 'dt_prod')
+DT_PROD = parser.get('demotime', 'dt_prod').lower() == 'true'
 DEFAULT_REMINDER_DAYS = int(parser.get('demotime', 'default_reminder_days'))
 REGISTRATION_ENABLED = parser.get('demotime', 'registration').lower() == 'true'
 TRIALS_ENABLED = parser.get('demotime', 'trials').lower() == 'true'

@@ -30,6 +30,7 @@ class TestReviewModels(BaseTestCase):
         attachment = obj.revision.attachments.all()[0]
         attachment.attachment.name = 'test/test_file'
         self.assertEqual(attachment.pretty_name, 'test_file')
+        self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(obj.state, models.reviews.OPEN)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
