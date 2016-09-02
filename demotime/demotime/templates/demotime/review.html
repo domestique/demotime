@@ -262,7 +262,7 @@
                             {{ comment_form.comment.errors }}
                             {{ comment_form.comment }}
                             <div class="summary">
-                                <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
+                                <label class="icon icon-attach"><a href="#">Add optional {{ attachment_form.attachment.label }}</a></label>
                             </div>
                             <div class="toggled_text attachments">
                                 {% use_macro attachment %}
