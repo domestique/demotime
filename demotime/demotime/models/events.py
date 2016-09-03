@@ -34,6 +34,13 @@ class EventType(BaseModel):
             code=code
         )
 
+    def to_json(self):
+        return {
+            'id': self.pk,
+            'name': self.name,
+            'code': self.code,
+        }
+
 
 class Event(BaseModel):
 
@@ -69,7 +76,7 @@ class Event(BaseModel):
     @classmethod
     def create_event(cls, project, event_type_code, related_object, user):
         event_type = EventType.objects.get(code=event_type_code)
-        related_type = related_object._meta.model_name
+        related_type = related_object._meta.model_name  # pylint: disable=protected-access
         if related_type not in cls.RELATED_TYPES:
             raise RuntimeError('Invalid related object passed to Event creation')
 
@@ -80,6 +87,19 @@ class Event(BaseModel):
             related_type=related_type,
             user=user,
         )
+
+    def to_json(self):
+        return {
+            'project': {
+                'id': self.project.pk,
+                'slug': self.project.slug,
+                'name': self.project.name,
+            },
+            'event_type': self.event_type.to_json(),
+            'related_type': self.related_type,
+            'related_type_pretty': self.get_related_type_display(),
+            'related_object': self.related_object.to_json(),
+        }
 
     class Meta:
         index_together = [
