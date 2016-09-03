@@ -7,7 +7,7 @@ from django.template import loader
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 
-from .base import BaseModel
+from demotime.models.base import BaseModel
 
 
 class MessageBundle(BaseModel):

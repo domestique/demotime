@@ -3,9 +3,8 @@ import bdateutil
 from django.db import models
 from django.utils import timezone
 
-from .base import BaseModel
-from .messages import Message
-from .settings import Setting
+from demotime.models.base import BaseModel
+from demotime.models import Message, Setting
 
 
 def get_reminder_days(project):

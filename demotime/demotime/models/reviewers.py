@@ -6,8 +6,7 @@ from demotime.constants import (
     APPROVED,
     REJECTED
 )
-from .messages import Message
-from .reminders import Reminder
+from demotime.models import Message, Reminder
 
 
 class Reviewer(BaseModel):

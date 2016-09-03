@@ -1,7 +1,7 @@
 from django.db import models
 
-from .base import BaseModel
-from .messages import Message
+from demotime.models.base import BaseModel
+from demotime.models import Message
 
 
 class Follower(BaseModel):

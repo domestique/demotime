@@ -20,7 +20,7 @@ class TestProjectModels(BaseTestCase):
 
     def test_project_members(self):
         member_pks = list(
-            self.project.members.order_by('pk').values_list('pk', flat=True)
+            self.project.project_members.order_by('pk').values_list('pk', flat=True)
         )
         user_pks = list(
             User.objects.filter(

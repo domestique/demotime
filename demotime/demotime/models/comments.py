@@ -5,11 +5,12 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 
 from demotime.helpers import strip_tags
-from .attachments import Attachment
-from .base import BaseModel
-from .messages import Message
-from .users import UserReviewStatus
-
+from demotime.models import (
+    Attachment,
+    Message,
+    UserReviewStatus
+)
+from demotime.models.base import BaseModel
 from demotime import constants
 
 

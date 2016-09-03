@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-from .base import BaseModel
+from demotime.models.base import BaseModel
 
 
 def attachment_filename(instance, filename):

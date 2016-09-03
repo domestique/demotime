@@ -4,13 +4,17 @@ from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.auth.models import User
 
-from .attachments import Attachment
-from .base import BaseModel
-from .messages import Message
-from .users import UserReviewStatus
-from .reminders import Reminder
-from .followers import Follower
-from .reviewers import Reviewer
+from demotime.models.base import BaseModel
+from demotime.models import (
+    Attachment,
+    Event,
+    EventType,
+    Follower,
+    Message,
+    Reminder,
+    Reviewer,
+    UserReviewStatus,
+)
 
 from demotime import tasks
 from demotime.constants import (
@@ -188,6 +192,14 @@ class Review(BaseModel):
         # Reminders
         Reminder.create_reminders_for_review(obj)
 
+        # Events
+        Event.create_event(
+            project,
+            EventType.DEMO_CREATED,
+            obj,
+            creator
+        )
+
         obj.trigger_webhooks(CREATED)
         return obj
 
@@ -196,7 +208,7 @@ class Review(BaseModel):
             cls, review, creator, title, description,
             case_link, reviewers, project,
             followers=None, attachments=None
-            ):
+        ):
         ''' Standard update review method '''
         obj = cls.objects.get(pk=review)
         obj.title = title
@@ -291,9 +303,7 @@ class Review(BaseModel):
                 revision=self.revision,
             )
         else:
-            # Uhh, how'd we get here, eh?
-            1/0
-            pass
+            raise RuntimeError('Invalid Demo State')
 
     def update_reviewer_state(self):
         statuses = self.reviewer_set.values_list('status', flat=True)
@@ -372,7 +382,7 @@ class Review(BaseModel):
 
         return True
 
-    def _common_state_change(self, state):
+    def _common_state_change(self):
         ''' General purpose state change things '''
         UserReviewStatus.objects.filter(
             review=self
@@ -396,7 +406,7 @@ class Review(BaseModel):
             self.trigger_webhooks(REOPENED)
 
         if state_changed:
-            self._common_state_change(new_state)
+            self._common_state_change()
 
         return state_changed
 

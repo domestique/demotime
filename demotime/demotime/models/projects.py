@@ -42,7 +42,7 @@ class Project(BaseModel):
         return reverse('project-detail', args=[self.slug])
 
     @property
-    def members(self):
+    def project_members(self):
         return User.objects.filter(
             models.Q(projectmember__project=self) |
             models.Q(group__projectgroup__project=self)
