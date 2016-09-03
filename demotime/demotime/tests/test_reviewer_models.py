@@ -22,6 +22,14 @@ class TestReviewerModels(BaseTestCase):
         reminder = models.Reminder.objects.get(review=obj, user=reviewer.reviewer)
         models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
         reviewer.set_status(models.reviews.APPROVED)
+        event = reviewer.events.get(
+            event_type__code=models.EventType.REVIEWER_APPROVED
+            )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_APPROVED
+        )
+        self.assertEqual(event.user, reviewer.reviewer)
+        self.assertEqual(event.related_object, reviewer)
         self.assertEqual(
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             models.reviews.APPROVED
@@ -40,6 +48,14 @@ class TestReviewerModels(BaseTestCase):
         models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
 
         reviewer.set_status(models.reviews.REJECTED)
+        event = reviewer.events.get(
+            event_type__code=models.EventType.REVIEWER_REJECTED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_REJECTED
+        )
+        self.assertEqual(event.user, reviewer.reviewer)
+        self.assertEqual(event.related_object, reviewer)
         self.assertEqual(
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             models.reviews.REJECTED
@@ -54,6 +70,14 @@ class TestReviewerModels(BaseTestCase):
         models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
 
         reviewer.set_status(models.reviews.REVIEWING)
+        event = reviewer.events.get(
+            event_type__code=models.EventType.REVIEWER_RESET
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_RESET
+        )
+        self.assertEqual(event.user, reviewer.reviewer)
+        self.assertEqual(event.related_object, reviewer)
         self.assertEqual(
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             models.reviews.REVIEWING
@@ -72,7 +96,17 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(review.reviewer_set.count(), 0)
         mail.outbox = []
         new_reviewer = User.objects.get(username='test_user_0')
-        reviewer_obj = models.Reviewer.create_reviewer(review, new_reviewer, True)
+        reviewer_obj = models.Reviewer.create_reviewer(
+            review, new_reviewer, True
+        )
+        event = reviewer_obj.events.get(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(event.user, reviewer_obj.reviewer)
+        self.assertEqual(event.related_object, reviewer_obj)
 
         # We email on non-revision
         self.assertEqual(len(mail.outbox), 1)
@@ -103,7 +137,17 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(review.reviewer_set.count(), 0)
         mail.outbox = []
         new_reviewer = User.objects.get(username='test_user_0')
-        reviewer_obj = models.Reviewer.create_reviewer(review, new_reviewer, False, True)
+        reviewer_obj = models.Reviewer.create_reviewer(
+            review, new_reviewer, False, True
+        )
+        event = reviewer_obj.events.get(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(event.user, reviewer_obj.reviewer)
+        self.assertEqual(event.related_object, reviewer_obj)
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(review.reviewer_set.count(), 1)

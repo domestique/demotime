@@ -68,6 +68,7 @@ class Review(BaseModel):
     )
     is_public = models.BooleanField(default=False)
     project = models.ForeignKey('Project')
+    events = GenericRelation('Event')
 
     def __str__(self):
         return 'Review: {} by {}'.format(
@@ -140,6 +141,7 @@ class Review(BaseModel):
                 revision=self.revision,
             )
 
+    # pylint: disable=too-many-arguments
     @classmethod
     def create_review(
             cls, creator, title, description,
@@ -187,7 +189,7 @@ class Review(BaseModel):
         )
 
         # Messages
-        obj._send_revision_messages()
+        obj._send_revision_messages()  # pylint: disable=protected-access
 
         # Reminders
         Reminder.create_reminders_for_review(obj)
@@ -203,6 +205,8 @@ class Review(BaseModel):
         obj.trigger_webhooks(CREATED)
         return obj
 
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-locals
     @classmethod
     def update_review(
             cls, review, creator, title, description,
@@ -263,10 +267,18 @@ class Review(BaseModel):
         obj.follower_set.exclude(review=obj, user__in=followers).delete()
 
         # Messages
-        obj._send_revision_messages(update=True)
+        obj._send_revision_messages(update=True)  # pylint: disable=protected-access
 
         # Reminders
         Reminder.update_reminders_for_review(obj)
+
+        # Events
+        Event.create_event(
+            project,
+            EventType.DEMO_UPDATED,
+            obj,
+            creator
+        )
 
         obj.trigger_webhooks(UPDATED)
         return obj
@@ -286,6 +298,12 @@ class Review(BaseModel):
                 self.creator,
                 revision=self.revision,
             )
+            Event.create_event(
+                self.project,
+                EventType.DEMO_APPROVED,
+                self,
+                self.creator
+            )
         elif state == REJECTED:
             Message.send_system_message(
                 '"{}" has been Rejected'.format(self.title),
@@ -294,6 +312,12 @@ class Review(BaseModel):
                 self.creator,
                 revision=self.revision,
             )
+            Event.create_event(
+                self.project,
+                EventType.DEMO_REJECTED,
+                self,
+                self.creator
+            )
         elif state == REVIEWING:
             Message.send_system_message(
                 '"{}" is back Under Review'.format(self.title),
@@ -301,6 +325,12 @@ class Review(BaseModel):
                 {'review': self, 'previous_state': previous_state},
                 self.creator,
                 revision=self.revision,
+            )
+            Event.create_event(
+                self.project,
+                EventType.DEMO_REVIEWING,
+                self,
+                self.creator
             )
         else:
             raise RuntimeError('Invalid Demo State')
@@ -330,6 +360,12 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state'])
+        Event.create_event(
+            self.project,
+            EventType.DEMO_OPENED,
+            self,
+            self.creator
+        )
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
         ).distinct()
@@ -359,6 +395,16 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state', 'modified'])
+        if state == ABORTED:
+            event_type = EventType.DEMO_ABORTED
+        else:
+            event_type = EventType.DEMO_CLOSED
+        Event.create_event(
+            self.project,
+            event_type,
+            self,
+            self.creator
+        )
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
         ).distinct()

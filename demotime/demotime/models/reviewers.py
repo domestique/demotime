@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericRelation
 
 from demotime.models.base import BaseModel
 from demotime.constants import (
@@ -6,7 +7,7 @@ from demotime.constants import (
     APPROVED,
     REJECTED
 )
-from demotime.models import Message, Reminder
+from demotime.models import Event, EventType, Message, Reminder
 
 
 class Reviewer(BaseModel):
@@ -23,6 +24,7 @@ class Reviewer(BaseModel):
         max_length=128, choices=STATUS_CHOICES,
         default='reviewing', db_index=True
     )
+    events = GenericRelation('Event')
 
     def __str__(self):
         return '{} Follower on {}'.format(
@@ -50,12 +52,24 @@ class Reviewer(BaseModel):
             reviewer=reviewer,
             status=REVIEWING
         )
+        Event.create_event(
+            project=review.project,
+            event_type_code=EventType.REVIEWER_ADDED,
+            related_object=obj,
+            user=obj.reviewer
+        )
 
         if notify_reviewer:
-            obj._send_reviewer_message(notify_reviewer=True, notify_creator=False)
+            # pylint: disable=protected-access
+            obj._send_reviewer_message(
+                notify_reviewer=True, notify_creator=False
+            )
 
         if notify_creator:
-            obj._send_reviewer_message(notify_reviewer=False, notify_creator=True)
+            # pylint: disable=protected-access
+            obj._send_reviewer_message(
+                notify_reviewer=False, notify_creator=True
+            )
 
         return obj
 
@@ -100,6 +114,19 @@ class Reviewer(BaseModel):
 
         reminder_active = status == REVIEWING
         Reminder.set_activity(self.review, self.reviewer, reminder_active)
+
+        if status == APPROVED:
+            event_code = EventType.REVIEWER_APPROVED
+        elif status == REJECTED:
+            event_code = EventType.REVIEWER_REJECTED
+        else:
+            event_code = EventType.REVIEWER_RESET
+        Event.create_event(
+            project=self.review.project,
+            event_type_code=event_code,
+            related_object=self,
+            user=self.reviewer
+        )
 
         # Send a message if this isn't the last person to approve/reject
         all_statuses = self.review.reviewer_set.values_list('status', flat=True)

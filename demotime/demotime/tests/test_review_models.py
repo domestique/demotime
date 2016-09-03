@@ -21,7 +21,7 @@ class TestReviewModels(BaseTestCase):
         assert obj.revision
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, 'Test Title')
-        self.assertEqual(obj.description, 'Test Description'),
+        self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://example.org/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.reviewer_set.count(), 3)
@@ -46,6 +46,10 @@ class TestReviewModels(BaseTestCase):
         self.hook_patch_run.assert_called_once_with(
             constants.CREATED
         )
+        event = obj.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
 
     def test_create_review_duped_reviewer_follower(self):
         ''' Test creating a review with a user in both the Reviwers and the
@@ -60,7 +64,7 @@ class TestReviewModels(BaseTestCase):
         assert obj.revision
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, 'Test Title')
-        self.assertEqual(obj.description, 'Test Description'),
+        self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://example.org/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.reviewer_set.count(), 3)
@@ -111,6 +115,12 @@ class TestReviewModels(BaseTestCase):
             'reviewers': self.test_users.exclude(username='test_user_0'),
         })
         new_obj = models.Review.update_review(**review_kwargs)
+        event = new_obj.events.get(
+            event_type__code=models.EventType.DEMO_UPDATED
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_UPDATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         second_rev = new_obj.revision
         self.assertEqual(obj.pk, new_obj.pk)
         self.assertEqual(new_obj.title, 'New Title')
@@ -233,6 +243,10 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.APPROVED)
+        event = obj.events.get(event_type__code=models.EventType.DEMO_APPROVED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_APPROVED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         self.assertTrue(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -261,6 +275,10 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
+        event = obj.events.get(event_type__code=models.EventType.DEMO_REJECTED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_REJECTED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msg = models.Message.objects.get(
             review=obj.reviewrevision_set.latest(),
             receipient=obj.creator
@@ -305,6 +323,10 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REVIEWING)
+        event = obj.events.get(event_type__code=models.EventType.DEMO_REVIEWING)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_REVIEWING)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         self.assertTrue(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -336,6 +358,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.CLOSED)
+        event = obj.events.get(event_type__code=models.EventType.DEMO_CLOSED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CLOSED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
             title='"{}" has been {}'.format(
@@ -375,6 +401,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.ABORTED)
+        event = obj.events.get(event_type__code=models.EventType.DEMO_ABORTED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_ABORTED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -418,6 +448,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
+        event = obj.events.get(event_type__code=models.EventType.DEMO_OPENED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -459,6 +493,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
+        event = obj.events.get(event_type__code=models.EventType.DEMO_OPENED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),

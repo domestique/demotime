@@ -7,6 +7,8 @@ from django.contrib.contenttypes.fields import GenericRelation
 from demotime.helpers import strip_tags
 from demotime.models import (
     Attachment,
+    Event,
+    EventType,
     Message,
     UserReviewStatus
 )
@@ -38,6 +40,7 @@ class Comment(BaseModel):
     comment = models.TextField()
     thread = models.ForeignKey('CommentThread')
     attachments = GenericRelation('Attachment')
+    events = GenericRelation('Event')
 
     def __str__(self):
         return 'Comment by {} on Review: {}'.format(
@@ -137,6 +140,12 @@ class Comment(BaseModel):
                 thread=thread,
             )
 
+        Event.create_event(
+            project=review.review.project,
+            event_type_code=EventType.COMMENT_ADDED,
+            related_object=obj,
+            user=commenter,
+        )
         review.review.trigger_webhooks(
             constants.COMMENT,
             {'comment': obj.to_json()}
