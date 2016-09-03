@@ -70,7 +70,7 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             self.review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
 
     def test_create_comment_with_thread(self):
@@ -133,7 +133,7 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
 
     def test_create_comment_with_mention_in_middle_non_reviewer(self):
@@ -167,7 +167,7 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
 
     def test_create_comment_mention_missing_user(self):
@@ -189,7 +189,7 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
 
     def test_create_comment_case_insensitive_mentions(self):
@@ -218,7 +218,7 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
 
     def test_create_comment_mention_ignores_misses(self):
@@ -244,7 +244,7 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
 
     def test_comment_to_json(self):
@@ -260,11 +260,11 @@ class TestCommentModels(BaseTestCase):
             attachment=File(BytesIO(b'test_file_1'), name='test_file_1'),
             attachment_type='image',
         )
-        self.assertEqual(comment._to_json(), {
+        self.assertEqual(comment.to_json(), {
             'id': comment.pk,
             'thread': comment.thread.pk,
             'name': comment.commenter.userprofile.name,
             'comment': comment.comment,
             'attachment_count': comment.attachments.count(),
-            'attachments': [comment.attachments.get()._to_json()]
+            'attachments': [comment.attachments.get().to_json()]
         })

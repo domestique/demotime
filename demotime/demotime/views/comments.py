@@ -43,7 +43,7 @@ class CommentJsonView(CanViewJsonView):
                 return {
                     'errors': '',
                     'status': 'success',
-                    'comment': comment._to_json(),
+                    'comment': comment.to_json(),
                 }
 
         json_data = {
@@ -54,7 +54,7 @@ class CommentJsonView(CanViewJsonView):
         for thread in self.revision.commentthread_set.all():
             comment_data = []
             for comment in thread.comment_set.all():
-                comment_data.append(comment._to_json())
+                comment_data.append(comment.to_json())
 
             json_data['threads'][thread.pk] = comment_data
 
@@ -90,7 +90,7 @@ class CommentJsonView(CanViewJsonView):
             return {
                 'errors': '',
                 'status': 'success',
-                'comment': comment._to_json(),
+                'comment': comment.to_json(),
             }
 
         return {
@@ -148,7 +148,7 @@ class CommentJsonView(CanViewJsonView):
             return {
                 'status': 'success',
                 'errors': '',
-                'comment': comment._to_json()
+                'comment': comment.to_json()
             }
 
         return {

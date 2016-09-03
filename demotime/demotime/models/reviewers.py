@@ -30,7 +30,7 @@ class Reviewer(BaseModel):
             self.review.title,
         )
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'name': self.reviewer.userprofile.name,
             'user_pk': self.reviewer.pk,

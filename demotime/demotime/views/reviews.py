@@ -335,14 +335,14 @@ class ReviewJsonView(CanViewJsonView):
         return super(ReviewJsonView, self).dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        return self.review._to_json()
+        return self.review.to_json()
 
     def post(self, request, *args, **kwargs):
         if self.review.creator != request.user:
             self.status = 403
             return {
                 'errors': ['Only the creator of a Demo can edit it'],
-                'review': self.review._to_json()
+                'review': self.review.to_json()
             }
 
         form = forms.ReviewQuickEditForm(request.POST)
@@ -359,7 +359,7 @@ class ReviewJsonView(CanViewJsonView):
         else:
             json_dict['errors'] = form.errors
 
-        json_dict['review'] = self.review._to_json()
+        json_dict['review'] = self.review.to_json()
         return json_dict
 
 
@@ -391,7 +391,7 @@ class ReviewSearchJsonView(JsonView):
                 'reviews': [],
             }
             for review in reviews:
-                review_json_dict['reviews'].append(review._to_json())
+                review_json_dict['reviews'].append(review.to_json())
 
             return review_json_dict
 

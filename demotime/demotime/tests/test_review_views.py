@@ -880,7 +880,7 @@ class TestReviewViews(BaseTestCase):
         )
         self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data, self.review._to_json())
+        self.assertEqual(data, self.review.to_json())
 
     def test_review_detail_quick_edit(self):
         url = reverse(

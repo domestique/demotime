@@ -11,7 +11,7 @@ class GroupType(BaseModel):
     def __str__(self):
         return '{}'.format(self.slug)
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'name': self.name,
             'slug': self.slug,
@@ -39,16 +39,16 @@ class Group(BaseModel):
     def __str__(self):
         return 'Group: {}'.format(self.slug)
 
-    def _to_json(self):
+    def to_json(self):
         members = []
         for member in GroupMember.objects.filter(group=self):
-            members.append(member._to_json())
+            members.append(member.to_json())
 
         return {
             'name': self.name,
             'slug': self.slug,
             'description': self.description,
-            'group_type': self.group_type._to_json(),
+            'group_type': self.group_type.to_json(),
             'members': members,
             'pk': self.pk,
         }
@@ -86,7 +86,7 @@ class GroupMember(BaseModel):
             self.user.userprofile.name
         )
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'user_pk': self.user.pk,
             'username': self.user.username,

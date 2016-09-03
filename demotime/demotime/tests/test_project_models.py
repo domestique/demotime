@@ -30,7 +30,7 @@ class TestProjectModels(BaseTestCase):
         self.assertEqual(member_pks, user_pks)
 
     def test_project_to_json(self):
-        proj_json = self.project._to_json()
+        proj_json = self.project.to_json()
         models.ProjectMember.objects.create(
             user=self.user,
             project=self.project
@@ -45,17 +45,17 @@ class TestProjectModels(BaseTestCase):
         members = []
         groups = []
         for member in models.ProjectMember.objects.filter(project=self.project):
-            members.append(member._to_json())
+            members.append(member.to_json())
 
         for group in models.ProjectGroup.objects.filter(project=self.project):
-            groups.append(group._to_json())
+            groups.append(group.to_json())
 
     def test_project_member_to_json(self):
         member = models.ProjectMember.objects.create(
             user=self.user,
             project=self.project
         )
-        mem_json = member._to_json()
+        mem_json = member.to_json()
         self.assertEqual(mem_json['project_pk'], self.project.pk)
         self.assertEqual(mem_json['user_pk'], self.user.pk)
         self.assertEqual(mem_json['username'], self.user.username)

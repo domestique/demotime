@@ -11,7 +11,7 @@ class TestAttachmentModel(BaseTestCase):
         self.attachment = models.Attachment.objects.first()
 
     def test_attachment_to_json(self):
-        self.assertEqual(self.attachment._to_json(), {
+        self.assertEqual(self.attachment.to_json(), {
             'static_url': '/file/1',
             'attachment_type': models.Attachment.IMAGE,
             'description': 'Testing'

@@ -44,7 +44,7 @@ class Comment(BaseModel):
             self.commenter.username, self.thread.review_revision.review.title
         )
 
-    def _to_json(self):
+    def to_json(self):
         comment_json = {
             'id': self.pk,
             'name': self.commenter.userprofile.name,
@@ -54,7 +54,7 @@ class Comment(BaseModel):
             'attachments': []
         }
         for attachment in self.attachments.all():
-            comment_json['attachments'].append(attachment._to_json())
+            comment_json['attachments'].append(attachment.to_json())
 
         return comment_json
 
@@ -139,7 +139,7 @@ class Comment(BaseModel):
 
         review.review.trigger_webhooks(
             constants.COMMENT,
-            {'comment': obj._to_json()}
+            {'comment': obj.to_json()}
         )
         return obj
 

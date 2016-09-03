@@ -74,14 +74,14 @@ class Review(BaseModel):
             self.title, self.creator.username
         )
 
-    def _to_json(self):
+    def to_json(self):
         reviewers = []
         followers = []
         for reviewer in self.reviewer_set.all():
-            reviewers.append(reviewer._to_json())
+            reviewers.append(reviewer.to_json())
 
         for follower in self.follower_set.all():
-            followers.append(follower._to_json())
+            followers.append(follower.to_json())
 
         return {
             'creator': self.creator.userprofile.name,
@@ -93,7 +93,7 @@ class Review(BaseModel):
             'state': self.state,
             'reviewer_state': self.reviewer_state,
             'is_public': self.is_public,
-            'project': self.project._to_json(),
+            'project': self.project.to_json(),
             'reviewing_count': self.reviewing_count,
             'approved_count': self.approved_count,
             'rejected_count': self.rejected_count,

@@ -91,7 +91,7 @@ class Message(BaseModel):
         return 0
 
     @classmethod
-    def _render_message_text(self, context_dict, template_name, email=False):
+    def _render_message_text(cls, context_dict, template_name, email=False):
         context_dict['is_email'] = email
         return loader.get_template(template_name).render(context_dict)
 

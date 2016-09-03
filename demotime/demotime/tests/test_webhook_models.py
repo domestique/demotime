@@ -20,7 +20,7 @@ class TestWebHookModels(BaseTestCase):
             'http://www.example.org/',
             constants.CREATED
         )
-        self.assertEqual(hook._to_json(), {
+        self.assertEqual(hook.to_json(), {
             'project_pk': hook.project.pk,
             'pk': hook.pk,
             'target': hook.target,

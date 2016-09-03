@@ -237,7 +237,7 @@ class TestCommentAPIViews(BaseTestCase):
             'status': 'success',
             'errors': '',
             'threads': {
-                str(self.comment.thread.pk): [self.comment._to_json()]
+                str(self.comment.thread.pk): [self.comment.to_json()]
             }
         })
 
@@ -247,7 +247,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
-            'comment': self.comment._to_json()
+            'comment': self.comment.to_json()
         })
 
     def test_comment_json_missing_comment(self):
@@ -274,7 +274,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
-            'comment': comment._to_json()
+            'comment': comment.to_json()
         })
         comment = self.review.revision.commentthread_set.latest().comment_set.get()
         self.assertEqual(comment.comment, 'test_comment_json_create_comment_thread')
@@ -306,7 +306,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
-            'comment': comment._to_json()
+            'comment': comment.to_json()
         })
         self.assertEqual(comment.comment, 'test_comment_json_reply_comment')
         self.assertEqual(comment.thread, thread)
@@ -354,7 +354,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
-            'comment': self.comment._to_json()
+            'comment': self.comment.to_json()
         })
 
     def test_update_comment_without_delete(self):
@@ -369,7 +369,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
-            'comment': self.comment._to_json()
+            'comment': self.comment.to_json()
         })
 
     def test_update_comment_non_json(self):

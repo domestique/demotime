@@ -23,7 +23,7 @@ class WebHook(BaseModel):
         max_length=64, choices=HOOK_TRIGGERS, db_index=True
     )
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'project_pk': self.project.pk,
             'pk': self.pk,

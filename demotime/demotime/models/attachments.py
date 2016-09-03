@@ -47,7 +47,7 @@ class Attachment(BaseModel):
     description = models.CharField(max_length=2048, blank=True, null=True)
     sort_order = models.IntegerField(default=1)
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'static_url': reverse('user-media', args=[self.pk]),
             'attachment_type': self.attachment_type,

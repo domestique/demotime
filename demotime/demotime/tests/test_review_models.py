@@ -504,16 +504,16 @@ class TestReviewModels(BaseTestCase):
 
     def test_review_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
-        review_json = review._to_json()
+        review_json = review.to_json()
         self.assertEqual(review_json['title'], review.title)
         self.assertEqual(review_json['creator'], review.creator.userprofile.name)
         reviewers = []
         for reviewer in review.reviewer_set.all():
-            reviewers.append(reviewer._to_json())
+            reviewers.append(reviewer.to_json())
 
         followers = []
         for follower in review.follower_set.all():
-            followers.append(follower._to_json())
+            followers.append(follower.to_json())
 
         self.assertEqual(review_json['reviewers'], reviewers)
         self.assertEqual(review_json['followers'], followers)
@@ -522,12 +522,12 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['state'], review.state)
         self.assertEqual(review_json['reviewer_state'], review.reviewer_state)
         self.assertEqual(review_json['is_public'], review.is_public)
-        self.assertEqual(review_json['project'], review.project._to_json())
+        self.assertEqual(review_json['project'], review.project.to_json())
         self.assertEqual(review_json['url'], review.get_absolute_url())
         self.assertEqual(review_json['reviewing_count'], review.reviewing_count)
         self.assertEqual(review_json['approved_count'], review.approved_count)
         self.assertEqual(review_json['rejected_count'], review.rejected_count)
-        self.assertEqual(review_json['project'], review.project._to_json())
+        self.assertEqual(review_json['project'], review.project.to_json())
 
     @patch('demotime.tasks.fire_webhook')
     def test_trigger_webhooks_fires(self, task_patch):

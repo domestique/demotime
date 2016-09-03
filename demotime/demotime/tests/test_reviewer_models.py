@@ -130,7 +130,7 @@ class TestReviewerModels(BaseTestCase):
     def test_reviewer_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         reviewer = review.reviewer_set.all()[0]
-        reviewer_json = reviewer._to_json()
+        reviewer_json = reviewer.to_json()
         self.assertEqual(reviewer_json['name'], reviewer.reviewer.userprofile.name)
         self.assertEqual(reviewer_json['user_pk'], reviewer.reviewer.pk)
         self.assertEqual(reviewer_json['reviewer_pk'], reviewer.pk)

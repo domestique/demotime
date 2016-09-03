@@ -319,7 +319,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [self.project._to_json()],
+            'projects': [self.project.to_json()],
         })
 
     def test_project_json_view_search_by_name_get(self):
@@ -330,7 +330,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [self.project._to_json()],
+            'projects': [self.project.to_json()],
         })
 
     def test_project_json_view_search_without_name_get(self):
@@ -339,7 +339,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [self.project._to_json()]
+            'projects': [self.project.to_json()]
         })
 
     def test_project_json_view_search_without_name_post(self):
@@ -348,7 +348,7 @@ class TestProjectViews(BaseTestCase):
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data, {
             'count': 1,
-            'projects': [self.project._to_json()],
+            'projects': [self.project.to_json()],
         })
 
     def test_project_json_view_hides_unauthed_get(self):

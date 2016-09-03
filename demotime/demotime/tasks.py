@@ -13,8 +13,8 @@ def fire_webhook(self, review_pk, webhook_pk, additional_json=None):
     review = models.Review.objects.get(pk=review_pk)
     json_data = {
         'token': review.project.token,
-        'webhook': webhook._to_json(),
-        'review': review._to_json(),
+        'webhook': webhook.to_json(),
+        'review': review.to_json(),
     }
     if additional_json:
         json_data.update(additional_json)
