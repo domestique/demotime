@@ -27,7 +27,7 @@ class Reviewer(BaseModel):
     events = GenericRelation('Event')
 
     def __str__(self):
-        return '{} Follower on {}'.format(
+        return '{} Reviewer on {}'.format(
             self.reviewer_display_name,
             self.review.title,
         )

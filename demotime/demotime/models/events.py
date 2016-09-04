@@ -66,6 +66,7 @@ class Event(BaseModel):
     )
 
     project = models.ForeignKey('Project')
+    review = models.ForeignKey('Review')
     event_type = models.ForeignKey('EventType')
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
@@ -75,6 +76,21 @@ class Event(BaseModel):
 
     def __str__(self):
         return 'Event {} on {}'.format(self.event_type.name, self.related_object)
+
+    @classmethod
+    def _get_review(cls, related_object, related_type):
+        if related_type == cls.REVIEW:
+            return related_object
+        elif related_type == cls.COMMENT:
+            return related_object.thread.review_revision.review
+        elif related_type == cls.FOLLOWER:
+            return related_object.review
+        elif related_type == cls.REVIEWER:
+            return related_object.review
+        elif related_type == cls.REVISION:
+            return related_object.review
+        else:
+            raise RuntimeError('Invalid related_type')
 
     @classmethod
     def create_event(cls, project, event_type_code, related_object, user):
@@ -89,6 +105,7 @@ class Event(BaseModel):
             related_object=related_object,
             related_type=related_type,
             user=user,
+            review=cls._get_review(related_object, related_type)
         )
 
     def to_json(self):

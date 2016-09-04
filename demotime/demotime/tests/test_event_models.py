@@ -1,3 +1,5 @@
+from mock import Mock
+
 from demotime import models
 from demotime.tests import BaseTestCase
 
@@ -42,6 +44,43 @@ class TestEventModels(BaseTestCase):
         self.assertEqual(event.__str__(), 'Event {} on {}'.format(
             event.event_type.name, event.related_object
         ))
+        self.assertEqual(event.review, review)
+
+    def test_get_review_review(self):
+        obj = Mock()
+        # pylint: disable=protected-access
+        res = models.Event._get_review(obj, models.Event.REVIEW)
+        self.assertEqual(res, obj)
+
+    def test_get_review_comment(self):
+        obj = Mock()
+        # pylint: disable=protected-access
+        res = models.Event._get_review(obj, models.Event.COMMENT)
+        self.assertEqual(res, obj.thread.review_revision.review)
+
+    def test_get_review_follower(self):
+        obj = Mock()
+        # pylint: disable=protected-access
+        res = models.Event._get_review(obj, models.Event.FOLLOWER)
+        self.assertEqual(res, obj.review)
+
+    def test_get_review_reviewer(self):
+        obj = Mock()
+        # pylint: disable=protected-access
+        res = models.Event._get_review(obj, models.Event.REVIEWER)
+        self.assertEqual(res, obj.review)
+
+    def test_get_review_revision(self):
+        obj = Mock()
+        # pylint: disable=protected-access
+        res = models.Event._get_review(obj, models.Event.REVISION)
+        self.assertEqual(res, obj.review)
+
+    def test_get_review_runtimeerror(self):
+        obj = Mock()
+        with self.assertRaises(RuntimeError):
+            # pylint: disable=protected-access
+            models.Event._get_review(obj, 'not real')
 
     def test_event_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)

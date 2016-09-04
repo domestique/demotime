@@ -68,7 +68,6 @@ class Review(BaseModel):
     )
     is_public = models.BooleanField(default=False)
     project = models.ForeignKey('Project')
-    events = GenericRelation('Event')
 
     def __str__(self):
         return 'Review: {} by {}'.format(
@@ -170,6 +169,15 @@ class Review(BaseModel):
                 content_object=rev,
                 sort_order=attachment['sort_order'],
             )
+
+        # Events
+        Event.create_event(
+            project,
+            EventType.DEMO_CREATED,
+            obj,
+            creator
+        )
+
         for reviewer in reviewers:
             Reviewer.create_reviewer(obj, reviewer, creator, True)
             UserReviewStatus.create_user_review_status(
@@ -193,14 +201,6 @@ class Review(BaseModel):
 
         # Reminders
         Reminder.create_reminders_for_review(obj)
-
-        # Events
-        Event.create_event(
-            project,
-            EventType.DEMO_CREATED,
-            obj,
-            creator
-        )
 
         obj.trigger_webhooks(CREATED)
         return obj
@@ -242,6 +242,14 @@ class Review(BaseModel):
                 attachment.pk = None
                 attachment.save()
 
+        # Events
+        Event.create_event(
+            project,
+            EventType.DEMO_UPDATED,
+            obj,
+            creator
+        )
+
         for reviewer in reviewers:
             try:
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
@@ -278,14 +286,6 @@ class Review(BaseModel):
 
         # Reminders
         Reminder.update_reminders_for_review(obj)
-
-        # Events
-        Event.create_event(
-            project,
-            EventType.DEMO_UPDATED,
-            obj,
-            creator
-        )
 
         obj.trigger_webhooks(UPDATED)
         return obj
