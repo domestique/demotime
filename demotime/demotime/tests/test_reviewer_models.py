@@ -11,10 +11,36 @@ class TestReviewerModels(BaseTestCase):
         obj = models.Review.create_review(**self.default_review_kwargs)
         obj.reviewer_set.all().delete()
         user = User.objects.get(username='test_user_0')
-        reviewer = models.Reviewer.create_reviewer(obj, user)
+        reviewer = models.Reviewer.create_reviewer(obj, user, self.user, True)
         self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         self.assertEqual(reviewer.review.pk, obj.pk)
         self.assertEqual(reviewer.reviewer.pk, user.pk)
+        event = reviewer.events.get(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(event.related_object, reviewer)
+
+    def test_drop_reviewer(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        models.MessageBundle.objects.all().delete()
+        reviewer = obj.reviewer_set.last()
+        reviewer.drop_reviewer(obj.creator)
+        self.assertEqual(models.MessageBundle.objects.count(), 1)
+        self.assertEqual(
+            models.Event.objects.filter(
+                event_type__code=models.EventType.REVIEWER_REMOVED
+            ).count(),
+            1
+        )
+        event = models.Event.objects.get(
+            event_type__code=models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(event.user, reviewer.reviewer)
+        self.assertEqual(event.related_object, obj)
 
     def test_reviewer_set_status(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -24,7 +50,7 @@ class TestReviewerModels(BaseTestCase):
         reviewer.set_status(models.reviews.APPROVED)
         event = reviewer.events.get(
             event_type__code=models.EventType.REVIEWER_APPROVED
-            )
+        )
         self.assertEqual(
             event.event_type.code, models.EventType.REVIEWER_APPROVED
         )
@@ -97,7 +123,7 @@ class TestReviewerModels(BaseTestCase):
         mail.outbox = []
         new_reviewer = User.objects.get(username='test_user_0')
         reviewer_obj = models.Reviewer.create_reviewer(
-            review, new_reviewer, True
+            review, new_reviewer, self.user
         )
         event = reviewer_obj.events.get(
             event_type__code=models.EventType.REVIEWER_ADDED
@@ -105,7 +131,7 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(
             event.event_type.code, models.EventType.REVIEWER_ADDED
         )
-        self.assertEqual(event.user, reviewer_obj.reviewer)
+        self.assertEqual(event.user, self.user)
         self.assertEqual(event.related_object, reviewer_obj)
 
         # We email on non-revision
@@ -138,7 +164,7 @@ class TestReviewerModels(BaseTestCase):
         mail.outbox = []
         new_reviewer = User.objects.get(username='test_user_0')
         reviewer_obj = models.Reviewer.create_reviewer(
-            review, new_reviewer, False, True
+            review, new_reviewer, new_reviewer
         )
         event = reviewer_obj.events.get(
             event_type__code=models.EventType.REVIEWER_ADDED

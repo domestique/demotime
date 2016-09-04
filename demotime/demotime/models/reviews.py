@@ -171,13 +171,13 @@ class Review(BaseModel):
                 sort_order=attachment['sort_order'],
             )
         for reviewer in reviewers:
-            Reviewer.create_reviewer(obj, reviewer)
+            Reviewer.create_reviewer(obj, reviewer, creator, True)
             UserReviewStatus.create_user_review_status(
                 obj, reviewer
             )
 
         for follower in followers:
-            Follower.create_follower(obj, follower)
+            Follower.create_follower(obj, follower, creator, True)
             UserReviewStatus.create_user_review_status(
                 obj, follower
             )
@@ -246,7 +246,7 @@ class Review(BaseModel):
             try:
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
-                reviewer = Reviewer.create_reviewer(obj, reviewer)
+                reviewer = Reviewer.create_reviewer(obj, reviewer, creator, True)
             else:
                 reviewer.status = REVIEWING
                 reviewer.save()
@@ -255,7 +255,10 @@ class Review(BaseModel):
             try:
                 Follower.objects.get(review=obj, user=follower)
             except Follower.DoesNotExist:
-                Follower.create_follower(review=obj, user=follower)
+                Follower.create_follower(
+                    review=obj, user=follower,
+                    creator=creator, skip_notifications=True
+                )
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
@@ -263,8 +266,12 @@ class Review(BaseModel):
         ).update(read=False)
 
         # Drop Reviewers no longer assigned
-        obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers).delete()
-        obj.follower_set.exclude(review=obj, user__in=followers).delete()
+        reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
+        for reviewer in reviewers:
+            reviewer.drop_reviewer(obj.creator)
+        followers = obj.follower_set.exclude(review=obj, user__in=followers)
+        for follower in followers:
+            follower.drop_follower(obj.creator)
 
         # Messages
         obj._send_revision_messages(update=True)  # pylint: disable=protected-access

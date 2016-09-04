@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from demotime import models
-from . import JsonView
+from demotime.views import JsonView
 
 
 class UserAPI(JsonView):
@@ -95,13 +95,10 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User already on review'}
             }
         else:
-            notify_follower = self.request.user != user
-            notify_creator = self.request.user != self.review.creator
             follower = models.Follower.create_follower(
                 review=self.review,
                 user=user,
-                notify_follower=notify_follower,
-                notify_creator=notify_creator
+                creator=self.request.user
             )
             return {
                 'follower_name': follower.user.userprofile.name,
@@ -172,7 +169,7 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User not currently on review'}
             }
         else:
-            follower.delete()
+            follower.drop_follower(self.request.user)
             return {
                 'success': True,
                 'errors': {},
@@ -219,13 +216,10 @@ class UserAPI(JsonView):
                 review=self.review,
                 user=user,
             ).delete()
-            notify_reviewer = self.request.user != user
-            notify_creator = self.request.user != self.review.creator
             reviewer = models.Reviewer.create_reviewer(
                 review=self.review,
                 reviewer=user,
-                notify_reviewer=notify_reviewer,
-                notify_creator=notify_creator
+                creator=self.request.user,
             )
             return {
                 'reviewer_name': reviewer.reviewer.userprofile.name,
@@ -296,7 +290,7 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User not currently on review'}
             }
         else:
-            reviewer.drop_reviewer()
+            reviewer.drop_reviewer(self.request.user)
             return {
                 'success': True,
                 'errors': {},

@@ -17,7 +17,9 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(self.review.reviewer_set.count(), 3)
         mail.outbox = []
         follower = self.followers[0]
-        follower_obj = models.Follower.create_follower(self.review, follower)
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.user, True
+        )
 
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(self.review.follower_set.count(), 1)
@@ -27,13 +29,23 @@ class TestFollowerModels(BaseTestCase):
             follower_obj.__str__(),
             '{} Follower on {}'.format(follower_obj.display_name, self.review.title)
         )
+        event = follower_obj.events.get(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(event.related_object, follower_obj)
 
     def test_create_follower_notify_follower(self):
         self.assertEqual(self.review.follower_set.count(), 0)
         self.assertEqual(self.review.reviewer_set.count(), 3)
         mail.outbox = []
         follower = self.followers[0]
-        follower_obj = models.Follower.create_follower(self.review, follower, True)
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.user
+        )
 
         # We email on non-revision
         self.assertEqual(len(mail.outbox), 1)
@@ -57,13 +69,23 @@ class TestFollowerModels(BaseTestCase):
                 read=False,
             ).exists()
         )
+        event = follower_obj.events.get(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(event.related_object, follower_obj)
 
     def test_create_follower_notify_creator(self):
         self.assertEqual(self.review.follower_set.count(), 0)
         self.assertEqual(self.review.reviewer_set.count(), 3)
         mail.outbox = []
         follower = self.followers[0]
-        follower_obj = models.Follower.create_follower(self.review, follower, False, True)
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, follower
+        )
 
         # We email on non-revision
         self.assertEqual(len(mail.outbox), 1)
@@ -87,6 +109,14 @@ class TestFollowerModels(BaseTestCase):
                 read=False,
             ).exists()
         )
+        event = follower_obj.events.get(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(event.user, follower_obj.user)
+        self.assertEqual(event.related_object, follower_obj)
 
     def test_create_follower_with_reviewer(self):
         self.assertEqual(self.review.follower_set.count(), 0)
@@ -107,3 +137,21 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(follower_json['user_pk'], follower.user.pk)
         self.assertEqual(follower_json['follower_pk'], follower.pk)
         self.assertEqual(follower_json['review_pk'], follower.review.pk)
+
+    def test_drop_follower(self):
+        follower = self.followers[0]
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.user, True
+        )
+        follower_obj.drop_follower(self.review.creator)
+        self.assertEqual(
+            models.Event.objects.filter(
+                event_type__code=models.EventType.FOLLOWER_REMOVED
+            ).count(),
+            1
+        )
+        event = models.Event.objects.get(
+            event_type__code=models.EventType.FOLLOWER_REMOVED
+        )
+        self.assertEqual(event.user, follower)
+        self.assertEqual(event.related_object, self.review)

@@ -31,6 +31,11 @@ def add_event_types(apps, schema_editor):
         EventType.objects.create(name=name, code=code)
 
 
+def remove_event_types(apps, schema_editor):
+    EventType = apps.get_model('demotime', 'EventType')
+    EventType.objects.all().delete()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -38,5 +43,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_event_types)
+        migrations.RunPython(add_event_types, remove_event_types)
     ]

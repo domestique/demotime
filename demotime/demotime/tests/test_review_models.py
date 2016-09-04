@@ -143,7 +143,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 5)
-        self.assertEqual(len(mail.outbox), 4)
+        self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             3
@@ -213,7 +213,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 5)
-        self.assertEqual(len(mail.outbox), 4)
+        self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             3

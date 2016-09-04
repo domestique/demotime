@@ -66,6 +66,10 @@ class TestCommentViews(BaseTestCase):
             models.Message.objects.filter(receipient=self.user).exists()
         )
         self.assertEqual(len(mail.outbox), 5)
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
 
     def test_reply_to_comment(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -89,6 +93,12 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(thread.comment_set.count(), 2)
         self.assertTrue(thread.comment_set.filter(comment='Reply!').exists())
         self.assertEqual(len(mail.outbox), 10)
+        self.assertEqual(
+            models.Event.objects.filter(
+                event_type__code=models.EventType.COMMENT_ADDED
+            ).count(),
+            3
+        )
 
     def test_create_second_thread(self):
         response = self.client.post(
@@ -114,6 +124,12 @@ class TestCommentViews(BaseTestCase):
         new_thread = rev.commentthread_set.latest()
         self.assertTrue(
             new_thread.comment_set.filter(comment='New Comment!').exists()
+        )
+        self.assertEqual(
+            models.Event.objects.filter(
+                event_type__code=models.EventType.COMMENT_ADDED
+            ).count(),
+            3
         )
 
     def test_get_update_comment_view(self):
@@ -226,7 +242,6 @@ class TestCommentAPIViews(BaseTestCase):
             'proj_slug': self.review.project.slug,
             'rev_num': self.review.revision.number,
         })
-        self.maxDiff = None
         # Reset out mail queue
         mail.outbox = []
 
@@ -271,12 +286,18 @@ class TestCommentAPIViews(BaseTestCase):
         })
         self.assertStatusCode(response, 200)
         comment = models.Comment.objects.latest('created')
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
             'comment': comment.to_json()
         })
         comment = self.review.revision.commentthread_set.latest().comment_set.get()
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
         self.assertEqual(comment.comment, 'test_comment_json_create_comment_thread')
         self.assertEqual(comment.attachments.count(), 1)
 
@@ -303,6 +324,9 @@ class TestCommentAPIViews(BaseTestCase):
         })
         self.assertStatusCode(response, 200)
         comment = models.Comment.objects.latest('created')
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
