@@ -258,13 +258,12 @@
                     project_url: '{% url 'project-json' %}'
                 });
 
-                if(typeof(Storage) !== "undefined") {
-                    var blog_entry = 'blog20160830'
+                // Update this date to trigger new blog post notifications
+                var blog_update = '20160905';
 
-                    if (!localStorage.getItem(blog_entry)) {
-                        localStorage.setItem(blog_entry, true);
-                        $('.footer-blog').addClass('highlight');
-                    }
+                if (!Cookies.get('blog_entry') || Cookies.get('blog_entry') != blog_update) {
+                    Cookies.set('blog_entry', blog_update);
+                    $('.footer-blog').addClass('highlight');
                 }
             </script>
 
