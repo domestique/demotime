@@ -275,7 +275,7 @@ class TestUserApiReviewers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(self.review.reviewers.count(), 1)
-        event = self.review.events.get(
+        event = self.review.event_set.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
         self.assertEqual(
@@ -304,7 +304,7 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertEqual(self.review.reviewers.count(), 1)
         self.assertEqual(self.review.reviewer_state, constants.APPROVED)
-        event = self.review.events.get(
+        event = self.review.event_set.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
         self.assertEqual(
@@ -625,7 +625,7 @@ class TestUserApiFollowers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(self.review.follower_set.count(), 1)
-        event = self.review.events.get(
+        event = self.review.event_set.get(
             event_type__code=models.EventType.FOLLOWER_REMOVED
         )
         self.assertEqual(

@@ -46,7 +46,9 @@ class TestReviewModels(BaseTestCase):
         self.hook_patch_run.assert_called_once_with(
             constants.CREATED
         )
-        event = obj.events.get()
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
@@ -115,7 +117,7 @@ class TestReviewModels(BaseTestCase):
             'reviewers': self.test_users.exclude(username='test_user_0'),
         })
         new_obj = models.Review.update_review(**review_kwargs)
-        event = new_obj.events.get(
+        event = new_obj.event_set.get(
             event_type__code=models.EventType.DEMO_UPDATED
         )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_UPDATED)
@@ -243,7 +245,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.APPROVED)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_APPROVED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_APPROVED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_APPROVED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
@@ -275,7 +277,7 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_REJECTED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_REJECTED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_REJECTED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
@@ -323,7 +325,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REVIEWING)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_REVIEWING)
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_REVIEWING
+        )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_REVIEWING)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
@@ -358,7 +362,7 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.CLOSED)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_CLOSED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_CLOSED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CLOSED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
@@ -401,7 +405,7 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.ABORTED)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_ABORTED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_ABORTED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_ABORTED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
@@ -448,7 +452,7 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_OPENED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
@@ -493,7 +497,7 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_OPENED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)

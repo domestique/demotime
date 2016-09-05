@@ -250,7 +250,9 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
-        event = obj.events.get()
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, title)
@@ -311,7 +313,9 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
-        event = obj.events.get()
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
         self.assertEqual(obj.revision.attachments.count(), 1)
 
@@ -342,7 +346,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         )
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
-        event = obj.events.get(event_type__code=models.EventType.DEMO_UPDATED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_UPDATED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, title)
@@ -512,7 +516,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             5
         )
         self.assertEqual(len(mail.outbox), 5)
-        event = self.review.events.get(
+        event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_CLOSED
         )
         self.assertEqual(event.related_object, self.review)
@@ -535,7 +539,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             models.Message.objects.filter(title=title).count(),
             5
         )
-        event = self.review.events.get(
+        event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_ABORTED
         )
         self.assertEqual(event.related_object, self.review)
@@ -560,7 +564,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             models.Message.objects.filter(title=title).count(),
             5
         )
-        event = self.review.events.get(
+        event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_OPENED
         )
         self.assertEqual(event.related_object, self.review)
