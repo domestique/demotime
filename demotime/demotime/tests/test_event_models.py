@@ -96,6 +96,7 @@ class TestEventModels(BaseTestCase):
                 'name': review.project.name,
                 'slug': review.project.slug,
             },
+            'review': review.to_json(),
             'event_type': event.event_type.to_json(),
             'related_type': event.REVIEW,
             'related_type_pretty': 'Review',

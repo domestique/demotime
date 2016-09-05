@@ -115,6 +115,7 @@ class Event(BaseModel):
                 'slug': self.project.slug,
                 'name': self.project.name,
             },
+            'review': self.review.to_json(),
             'event_type': self.event_type.to_json(),
             'related_type': self.related_type,
             'related_type_pretty': self.get_related_type_display(),

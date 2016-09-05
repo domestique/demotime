@@ -211,14 +211,15 @@
             </div>
         </div>
 
-        <article class="review-overview events">
+        <article class="review-overview events" style="display: none">
             <h3>Events</h3>
+            <p>Debug section, move along please</p>
             <section>
                 {% for event in object.event_set.all %}
-                    <p>Event: {{ event.event_type.name }}</p>
+                    <p>Event: {{ event.event_type.name }} - {{ event.event_type.code }}</p>
                     <ul>
-                        <li>Project: {{ event.project }}</li>
-                        <li>Review: {{ event.review }}</li>
+                        <li>Project: {{ event.project }} - {{ event.project.slug }}</li>
+                        <li>Review: {{ event.review }} - {{ event.review.pk }}</li>
                         <li>User: {{ event.user }}</li>
                         <li>Created: {{ event.created }}</li>
                         <li>Related Object: {{ event.related_object }}</li>
