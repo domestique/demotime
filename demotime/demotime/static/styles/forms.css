@@ -101,6 +101,13 @@ input[type="button"][disabled] {
     color: #2bbbad;
     padding-right: 60px;
 }
+input[type="submit"].button-clear,
+input[type="button"].button-clear,
+button.button-clear {
+    background: none;
+    color: #333;
+    box-shadow: none;
+}
 
 select[multiple="multiple"]{
     padding: 10px;

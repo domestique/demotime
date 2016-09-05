@@ -4,6 +4,12 @@
 {% block button_text %}Update demo{% endblock %}
 {% block description_leader %}Revision {% endblock %}
 {% block description_follower %}<small>Give your revision some context</small>{% endblock %}
+{% block form_warning %}
+<section class="warning">
+    <strong>Heads up!</strong>: Adding a revision to your demo will
+    reset everyone's approval status back to 'Reviewing'
+</section>
+{% endblock %}
 {% block crumbs_contents %}
     <a href="{{ review_inst.get_absolute_url }}">DT-{{ review_inst.pk }}: {{ review_inst.title }}</a> &gt;
     New revision

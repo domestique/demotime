@@ -104,9 +104,10 @@ h1 em {
                         </div>
                     </div>
                 </div>
+                {% block form_warning %}{% endblock %}
                 <div class="form-group">
                     <input type="submit" value="{% block button_text %}{% endblock %}">
-                    <input type="button" value="Cancel" onclick="javascript: history.go(-1)">
+                    <input type="button" class="button-clear" value="Cancel" onclick="javascript: history.go(-1)">
                 </div>
             </form>
         </div>
