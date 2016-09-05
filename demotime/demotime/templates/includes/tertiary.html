@@ -1,7 +1,7 @@
 <ul>
     <li class="your_dashboard active"><a href="{% url 'index' %}">Your dashboard</a></li>
     {% for project in available_projects %}
-        <li class="{{ project.name|lower|cut:' ' }} new">
+        <li class="{{ project.name|lower|cut:' ' }}">
             <a href="{% url 'project-dashboard' project.slug %}">{{ project.name }} Dashboard</a>
         </li>
     {% endfor %}
