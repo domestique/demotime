@@ -519,11 +519,3 @@ h3 small {
     font-weight: 700;
     font-size: 9px;
 }
-
-.warning {
-    padding-left: 50px;
-    background-image: url(/static/images/emoji/warning.png);
-    background-position: 15px 15px;
-    background-repeat: no-repeat;
-    background-size: 25px;
-}
