@@ -25,7 +25,7 @@ class TestDTTasks(BaseTestCase):
             webhook.target,
             data=json.dumps({
                 'token': review.project.token,
-                'webhook': webhook._to_json(),
-                'review': review._to_json(),
+                'webhook': webhook.to_json(),
+                'review': review.to_json(),
             })
         )

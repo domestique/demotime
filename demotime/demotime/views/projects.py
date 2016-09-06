@@ -229,7 +229,7 @@ class ProjectJsonView(JsonView):
             'projects': []
         }
         for project in projects:
-            json_resp['projects'].append(project._to_json())
+            json_resp['projects'].append(project.to_json())
 
         return json_resp
 

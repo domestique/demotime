@@ -9,7 +9,7 @@ from demotime import constants, models
 from demotime.tests import BaseTestCase
 
 
-class TestReviewViews(BaseTestCase):
+class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
     def setUp(self):
         super(TestReviewViews, self).setUp()
@@ -46,7 +46,11 @@ class TestReviewViews(BaseTestCase):
         self.assertIn(reviewer_review, response.context['open_reviews'])
         self.assertEqual(
             list(response.context['updated_demos'].values_list('pk', flat=True)),
-            list(models.UserReviewStatus.objects.filter(user=self.user).values_list('pk', flat=True))
+            list(
+                models.UserReviewStatus.objects.filter(
+                    user=self.user
+                ).values_list('pk', flat=True)
+            )
         )
         self.assertEqual(models.Review.objects.count(), 3)
         self.assertEqual(len(response.context['message_bundles']), 2)
@@ -246,9 +250,13 @@ class TestReviewViews(BaseTestCase):
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, title)
-        self.assertEqual(obj.description, 'Test Description'),
+        self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://www.example.org')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.followers.count(), 2)
@@ -305,6 +313,10 @@ class TestReviewViews(BaseTestCase):
         })
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
         self.assertEqual(obj.revision.attachments.count(), 1)
 
     def test_post_update_review(self):
@@ -334,10 +346,12 @@ class TestReviewViews(BaseTestCase):
         )
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_UPDATED)
+        self.assertEqual(event.related_object, obj)
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, title)
-        self.assertEqual(obj.description, 'Test Description'),
-        self.assertEqual(obj.revision.description, 'Updated Description'),
+        self.assertEqual(obj.description, 'Test Description')
+        self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.followers.count(), 0)
@@ -397,6 +411,10 @@ class TestReviewViews(BaseTestCase):
             'success': True,
             'errors': {},
         })
+        event = reviewer.events.get(
+            event_type__code=models.EventType.REVIEWER_APPROVED
+        )
+        self.assertEqual(event.related_object, reviewer)
 
     def test_update_reviewer_status_failure(self):
         user = User.objects.get(username='test_user_0')
@@ -498,6 +516,10 @@ class TestReviewViews(BaseTestCase):
             5
         )
         self.assertEqual(len(mail.outbox), 5)
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.DEMO_CLOSED
+        )
+        self.assertEqual(event.related_object, self.review)
 
     def test_update_review_state_aborted(self):
         url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
@@ -517,6 +539,10 @@ class TestReviewViews(BaseTestCase):
             models.Message.objects.filter(title=title).count(),
             5
         )
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.DEMO_ABORTED
+        )
+        self.assertEqual(event.related_object, self.review)
 
     def test_update_review_state_reopened(self):
         self.review.state = models.reviews.CLOSED
@@ -538,6 +564,10 @@ class TestReviewViews(BaseTestCase):
             models.Message.objects.filter(title=title).count(),
             5
         )
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.DEMO_OPENED
+        )
+        self.assertEqual(event.related_object, self.review)
 
     def test_update_review_state_invalid(self):
         self.client.logout()
@@ -553,7 +583,8 @@ class TestReviewViews(BaseTestCase):
             'state_changed': False,
             'success': False,
             'errors': {
-                'review': ['Select a valid choice. That choice is not one of the available choices.']
+                'review': ['Select a valid choice. '
+                           'That choice is not one of the available choices.']
             },
         })
 
@@ -880,7 +911,7 @@ class TestReviewViews(BaseTestCase):
         )
         self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data, self.review._to_json())
+        self.assertEqual(data, self.review.to_json())
 
     def test_review_detail_quick_edit(self):
         url = reverse(
@@ -922,7 +953,8 @@ class TestReviewViews(BaseTestCase):
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(
             data['errors'],
-            {'state': ['Select a valid choice. Not a real state is not one of the available choices.']}
+            {'state': ['Select a valid choice. '
+                       'Not a real state is not one of the available choices.']}
         )
 
     def test_review_detail_quick_edit_forbidden(self):

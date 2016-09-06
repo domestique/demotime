@@ -4,9 +4,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from .base import BaseModel
-from .groups import Group
-from .projects import Project
+from demotime.models.base import BaseModel
+from demotime.models import Group, Project
 
 
 def avatar_field(instance, filename):

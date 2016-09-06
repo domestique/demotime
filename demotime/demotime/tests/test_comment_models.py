@@ -70,8 +70,12 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             self.review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
 
     def test_create_comment_with_thread(self):
         self.assertEqual(models.Message.objects.count(), 0)
@@ -95,6 +99,10 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(attachment.attachment_type, 'image')
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
             5
@@ -133,8 +141,12 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
 
     def test_create_comment_with_mention_in_middle_non_reviewer(self):
         ''' Everyone still gets mentioned, but this is a great way to include
@@ -167,8 +179,12 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
 
     def test_create_comment_mention_missing_user(self):
         ''' If a comment starts with a missing user, we should ignore the
@@ -189,8 +205,12 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
 
     def test_create_comment_case_insensitive_mentions(self):
         review = models.Review.create_review(**self.default_review_kwargs)
@@ -218,8 +238,12 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
 
     def test_create_comment_mention_ignores_misses(self):
         ''' If a username is bad within a comment with a mention, we still hit
@@ -244,8 +268,12 @@ class TestCommentModels(BaseTestCase):
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
-            {'comment': comment._to_json()},
+            {'comment': comment.to_json()},
         )
+        event = comment.events.get()
+        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
+        self.assertEqual(event.related_object, comment)
+        self.assertEqual(event.user, comment.commenter)
 
     def test_comment_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
@@ -260,11 +288,11 @@ class TestCommentModels(BaseTestCase):
             attachment=File(BytesIO(b'test_file_1'), name='test_file_1'),
             attachment_type='image',
         )
-        self.assertEqual(comment._to_json(), {
+        self.assertEqual(comment.to_json(), {
             'id': comment.pk,
             'thread': comment.thread.pk,
             'name': comment.commenter.userprofile.name,
             'comment': comment.comment,
             'attachment_count': comment.attachments.count(),
-            'attachments': [comment.attachments.get()._to_json()]
+            'attachments': [comment.attachments.get().to_json()]
         })

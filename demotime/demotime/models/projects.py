@@ -18,14 +18,14 @@ class Project(BaseModel):
     def __str__(self):
         return 'Project {}'.format(self.name)
 
-    def _to_json(self):
+    def to_json(self):
         groups = []
         for group in ProjectGroup.objects.filter(project=self):
-            groups.append(group._to_json())
+            groups.append(group.to_json())
 
         members = []
         for member in ProjectMember.objects.filter(project=self):
-            members.append(member._to_json())
+            members.append(member.to_json())
 
         return {
             'name': self.name,
@@ -42,7 +42,7 @@ class Project(BaseModel):
         return reverse('project-detail', args=[self.slug])
 
     @property
-    def members(self):
+    def project_members(self):
         return User.objects.filter(
             models.Q(projectmember__project=self) |
             models.Q(group__projectgroup__project=self)
@@ -61,10 +61,10 @@ class ProjectGroup(BaseModel):
             self.group.slug
         )
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'project_pk': self.project.pk,
-            'group': self.group._to_json(),
+            'group': self.group.to_json(),
             'is_admin': self.is_admin,
         }
 
@@ -81,7 +81,7 @@ class ProjectMember(BaseModel):
             self.user.userprofile.name,
         )
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'project_pk': self.project.pk,
             'user_pk': self.user.pk,

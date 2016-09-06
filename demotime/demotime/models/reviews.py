@@ -4,13 +4,17 @@ from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.auth.models import User
 
-from .attachments import Attachment
-from .base import BaseModel
-from .messages import Message
-from .users import UserReviewStatus
-from .reminders import Reminder
-from .followers import Follower
-from .reviewers import Reviewer
+from demotime.models.base import BaseModel
+from demotime.models import (
+    Attachment,
+    Event,
+    EventType,
+    Follower,
+    Message,
+    Reminder,
+    Reviewer,
+    UserReviewStatus,
+)
 
 from demotime import tasks
 from demotime.constants import (
@@ -70,14 +74,14 @@ class Review(BaseModel):
             self.title, self.creator.username
         )
 
-    def _to_json(self):
+    def to_json(self):
         reviewers = []
         followers = []
         for reviewer in self.reviewer_set.all():
-            reviewers.append(reviewer._to_json())
+            reviewers.append(reviewer.to_json())
 
         for follower in self.follower_set.all():
-            followers.append(follower._to_json())
+            followers.append(follower.to_json())
 
         return {
             'creator': self.creator.userprofile.name,
@@ -89,7 +93,7 @@ class Review(BaseModel):
             'state': self.state,
             'reviewer_state': self.reviewer_state,
             'is_public': self.is_public,
-            'project': self.project._to_json(),
+            'project': self.project.to_json(),
             'reviewing_count': self.reviewing_count,
             'approved_count': self.approved_count,
             'rejected_count': self.rejected_count,
@@ -136,6 +140,7 @@ class Review(BaseModel):
                 revision=self.revision,
             )
 
+    # pylint: disable=too-many-arguments
     @classmethod
     def create_review(
             cls, creator, title, description,
@@ -164,14 +169,23 @@ class Review(BaseModel):
                 content_object=rev,
                 sort_order=attachment['sort_order'],
             )
+
+        # Events
+        Event.create_event(
+            project,
+            EventType.DEMO_CREATED,
+            obj,
+            creator
+        )
+
         for reviewer in reviewers:
-            Reviewer.create_reviewer(obj, reviewer)
+            Reviewer.create_reviewer(obj, reviewer, creator, True)
             UserReviewStatus.create_user_review_status(
                 obj, reviewer
             )
 
         for follower in followers:
-            Follower.create_follower(obj, follower)
+            Follower.create_follower(obj, follower, creator, True)
             UserReviewStatus.create_user_review_status(
                 obj, follower
             )
@@ -183,7 +197,7 @@ class Review(BaseModel):
         )
 
         # Messages
-        obj._send_revision_messages()
+        obj._send_revision_messages()  # pylint: disable=protected-access
 
         # Reminders
         Reminder.create_reminders_for_review(obj)
@@ -191,12 +205,14 @@ class Review(BaseModel):
         obj.trigger_webhooks(CREATED)
         return obj
 
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-locals
     @classmethod
     def update_review(
             cls, review, creator, title, description,
             case_link, reviewers, project,
             followers=None, attachments=None
-            ):
+        ):
         ''' Standard update review method '''
         obj = cls.objects.get(pk=review)
         obj.title = title
@@ -226,11 +242,19 @@ class Review(BaseModel):
                 attachment.pk = None
                 attachment.save()
 
+        # Events
+        Event.create_event(
+            project,
+            EventType.DEMO_UPDATED,
+            obj,
+            creator
+        )
+
         for reviewer in reviewers:
             try:
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
-                reviewer = Reviewer.create_reviewer(obj, reviewer)
+                reviewer = Reviewer.create_reviewer(obj, reviewer, creator, True)
             else:
                 reviewer.status = REVIEWING
                 reviewer.save()
@@ -239,7 +263,10 @@ class Review(BaseModel):
             try:
                 Follower.objects.get(review=obj, user=follower)
             except Follower.DoesNotExist:
-                Follower.create_follower(review=obj, user=follower)
+                Follower.create_follower(
+                    review=obj, user=follower,
+                    creator=creator, skip_notifications=True
+                )
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
@@ -247,11 +274,15 @@ class Review(BaseModel):
         ).update(read=False)
 
         # Drop Reviewers no longer assigned
-        obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers).delete()
-        obj.follower_set.exclude(review=obj, user__in=followers).delete()
+        reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
+        for reviewer in reviewers:
+            reviewer.drop_reviewer(obj.creator)
+        followers = obj.follower_set.exclude(review=obj, user__in=followers)
+        for follower in followers:
+            follower.drop_follower(obj.creator)
 
         # Messages
-        obj._send_revision_messages(update=True)
+        obj._send_revision_messages(update=True)  # pylint: disable=protected-access
 
         # Reminders
         Reminder.update_reminders_for_review(obj)
@@ -274,6 +305,12 @@ class Review(BaseModel):
                 self.creator,
                 revision=self.revision,
             )
+            Event.create_event(
+                self.project,
+                EventType.DEMO_APPROVED,
+                self,
+                self.creator
+            )
         elif state == REJECTED:
             Message.send_system_message(
                 '"{}" has been Rejected'.format(self.title),
@@ -281,6 +318,12 @@ class Review(BaseModel):
                 {'review': self},
                 self.creator,
                 revision=self.revision,
+            )
+            Event.create_event(
+                self.project,
+                EventType.DEMO_REJECTED,
+                self,
+                self.creator
             )
         elif state == REVIEWING:
             Message.send_system_message(
@@ -290,10 +333,14 @@ class Review(BaseModel):
                 self.creator,
                 revision=self.revision,
             )
+            Event.create_event(
+                self.project,
+                EventType.DEMO_REVIEWING,
+                self,
+                self.creator
+            )
         else:
-            # Uhh, how'd we get here, eh?
-            1/0
-            pass
+            raise RuntimeError('Invalid Demo State')
 
     def update_reviewer_state(self):
         statuses = self.reviewer_set.values_list('status', flat=True)
@@ -320,6 +367,12 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state'])
+        Event.create_event(
+            self.project,
+            EventType.DEMO_OPENED,
+            self,
+            self.creator
+        )
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
         ).distinct()
@@ -349,6 +402,16 @@ class Review(BaseModel):
         prev_state = self.get_state_display()
         self.state = state
         self.save(update_fields=['state', 'modified'])
+        if state == ABORTED:
+            event_type = EventType.DEMO_ABORTED
+        else:
+            event_type = EventType.DEMO_CLOSED
+        Event.create_event(
+            self.project,
+            event_type,
+            self,
+            self.creator
+        )
         users = User.objects.filter(
             models.Q(reviewer__review=self) | models.Q(follower__review=self),
         ).distinct()
@@ -372,7 +435,7 @@ class Review(BaseModel):
 
         return True
 
-    def _common_state_change(self, state):
+    def _common_state_change(self):
         ''' General purpose state change things '''
         UserReviewStatus.objects.filter(
             review=self
@@ -396,7 +459,7 @@ class Review(BaseModel):
             self.trigger_webhooks(REOPENED)
 
         if state_changed:
-            self._common_state_change(new_state)
+            self._common_state_change()
 
         return state_changed
 

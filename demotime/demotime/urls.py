@@ -12,6 +12,7 @@ from django.contrib.auth.views import (
 
 from demotime.views import (
     comments,
+    events,
     files,
     groups,
     index_view,
@@ -163,6 +164,11 @@ urlpatterns += [
 # Projects
 urlpatterns += [
     url(r'projects/$', projects.project_json, name='project-json'),
+    url(
+        r'projects/(?P<proj_slug>[-\w]+)/events/$',
+        events.EventView.as_view(),
+        name='events'
+    ),
     url(
         r'projects/(?P<proj_slug>[-\w]+)/admin/hooks/create/$',
         webhooks.manage_hooks,
