@@ -137,7 +137,15 @@ class MessagesJsonView(JsonView):
     def _format_json(self, bundles):
         json_data = {'message_count': bundles.count(), 'bundles': []}
         for bundle in bundles:
-            msgs = bundle.message_set.filter(created__gte=bundle.modified)
+            msgs = bundle.message_set.filter(
+                created__gte=bundle.modified
+            ).select_related(
+                'review',
+                'thread',
+            ).prefetch_related(
+                'review__review',
+                'review__review__project',
+            )
             bundle_dict = {
                 'bundle_pk': bundle.pk,
                 'messages': [],
