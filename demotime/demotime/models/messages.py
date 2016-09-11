@@ -73,6 +73,7 @@ class Message(BaseModel):
             self.receipient.username, self.sender.username
         )
 
+    # pylint: disable=no-self-use
     def _send_email(self, recipient, title, msg_text):
         if recipient.email:
             try:
@@ -95,6 +96,7 @@ class Message(BaseModel):
         context_dict['is_email'] = email
         return loader.get_template(template_name).render(context_dict)
 
+    # pylint: disable=too-many-arguments
     @classmethod
     def send_system_message(
             cls, title, template_name, context_dict, receipient,
@@ -104,9 +106,9 @@ class Message(BaseModel):
         context_dict.update({
             'sender': system_user,
             'dt_url': settings.SERVER_URL,
+            'dt_prod': settings.DT_PROD,
         })
         msg_text = cls._render_message_text(context_dict, template_name)
-        email_text = cls._render_message_text(context_dict, template_name, True)
         obj = cls.create_message(
             receipient=receipient,
             sender=system_user,
@@ -114,16 +116,26 @@ class Message(BaseModel):
             review_revision=revision,
             message=msg_text,
             thread=thread,
-            email=email,
-            email_text=email_text,
         )
+        if email:
+            context_dict['bundle'] = obj.bundle
+            email_text = cls._render_message_text(
+                context_dict, template_name, True
+            )
+            subject = title
+            if revision:
+                subject = '[DT-{}] - {}'.format(
+                    revision.review.pk,
+                    revision.review.title
+                )
+            # pylint: disable=protected-access
+            obj._send_email(receipient, subject, email_text)
         return obj
 
     @classmethod
     def create_message(
             cls, receipient, sender, title,
-            review_revision, thread, message, email=True,
-            email_text='',
+            review_revision, thread, message
     ):
         bundle = MessageBundle.create_message_bundle(
             review=review_revision.review if review_revision else None,
@@ -138,14 +150,6 @@ class Message(BaseModel):
             message=message,
             bundle=bundle,
         )
-        if email:
-            subject = title
-            if review_revision:
-                subject = '[DT-{}] - {}'.format(
-                    review_revision.review.pk,
-                    review_revision.review.title
-                )
-            obj._send_email(receipient, subject, email_text)
         return obj
 
     class Meta:

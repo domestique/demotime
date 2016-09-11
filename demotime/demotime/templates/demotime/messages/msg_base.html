@@ -5,6 +5,9 @@ leave it unwrapped so it looks better in the Inbox.
 {% if is_email %}
     <!DOCTYPE html>
     <html lang="en">
+        <head>
+            <script>(new Image()).src = "{% if DT_PROD %}https{% else %}http{% endif %}://{{ dt_url }}/messages/pixel/{{ bundle.pk }}.png"</script>
+        </head>
         <body>
             <div style="color: #fff; background: #303030; padding: 10px; margin-bottom: 0">
                 <span style="font-family: Arial; letter-spacing: 1px;line-height: 35px;vertical-align: middle;text-transform: uppercase;font-size: .8em;display: inline-block;">
