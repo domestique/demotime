@@ -20,21 +20,25 @@ class TestProfileViews(BaseTestCase):
         )
         # Sample review
         self.review = models.Review.create_review(**self.default_review_kwargs)
-        self.profile_url = reverse('profile', args=[self.user.userprofile.pk])
-        self.edit_url = reverse('edit-profile', args=[self.user.userprofile.pk])
+        self.profile_url = reverse('profile', args=[self.user.username])
+        self.edit_url = reverse('edit-profile', args=[self.user.username])
         self.image_path = os.path.join(TEST_ROOT, 'test_data', 'activate_swag.gif')
 
     def test_get_profile_as_self(self):
         response = self.client.get(self.profile_url)
         self.assertStatusCode(response, 200)
         self.assertIn('open_demos', response.context)
+        self.assertIn('open_demos', response.context)
+        self.assertIn('followed_demos', response.context)
         self.assertTrue(response.context['owner_viewing'])
 
     def test_get_profile_as_other(self):
         other_user = User.objects.get(username='test_user_2')
-        response = self.client.get(reverse('profile', args=[other_user.userprofile.pk]))
+        response = self.client.get(reverse('profile', args=[other_user.username]))
         self.assertStatusCode(response, 200)
         self.assertIn('open_reviews', response.context)
+        self.assertIn('open_demos', response.context)
+        self.assertIn('followed_demos', response.context)
         self.assertFalse(response.context['owner_viewing'])
 
     def test_get_edit_profile(self):
@@ -45,7 +49,7 @@ class TestProfileViews(BaseTestCase):
     def test_get_other_edit_profile(self):
         other_user = User.objects.get(username='test_user_2')
         response = self.client.get(
-            reverse('edit-profile', args=[other_user.userprofile.pk])
+            reverse('edit-profile', args=[other_user.username])
         )
         self.assertStatusCode(response, 404)
 

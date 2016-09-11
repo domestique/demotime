@@ -145,6 +145,14 @@ class TestUserApiReviewers(BaseTestCase):
                 review=reviewer.review.revision,
             ).exists()
         )
+        event = reviewer.events.get(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(event.related_object, reviewer)
 
     def test_add_follower_as_reviewer(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -185,6 +193,14 @@ class TestUserApiReviewers(BaseTestCase):
                 user=follower, review=self.review
             ).exists()
         )
+        event = reviewer.events.get(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(event.related_object, reviewer)
 
     def test_add_reviewer_missing_user_pk(self):
         response = self.client.post(reverse('user-api'), {
@@ -193,13 +209,12 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'reviewer_name': '',
-                'reviewer_user_pk': '',
-                'reviewer_status': '',
-                'success': False,
-                'errors': {'user_pk': 'User identifier missing'}
-            }
-        )
+            'reviewer_name': '',
+            'reviewer_user_pk': '',
+            'reviewer_status': '',
+            'success': False,
+            'errors': {'user_pk': 'User identifier missing'}
+        })
 
     def test_add_reviewer_already_on_review(self):
         response = self.client.post(reverse('user-api'), {
@@ -209,13 +224,12 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'reviewer_name': '',
-                'reviewer_user_pk': '',
-                'reviewer_status': '',
-                'success': False,
-                'errors': {'user_pk': 'User already on review'}
-            }
-        )
+            'reviewer_name': '',
+            'reviewer_user_pk': '',
+            'reviewer_status': '',
+            'success': False,
+            'errors': {'user_pk': 'User already on review'}
+        })
 
     def test_add_reviewer_not_found(self):
         response = self.client.post(reverse('user-api'), {
@@ -225,13 +239,12 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'reviewer_name': '',
-                'reviewer_user_pk': '',
-                'reviewer_status': '',
-                'success': False,
-                'errors': {'user_pk': 'User not found'}
-            }
-        )
+            'reviewer_name': '',
+            'reviewer_user_pk': '',
+            'reviewer_status': '',
+            'success': False,
+            'errors': {'user_pk': 'User not found'}
+        })
 
     def test_add_creator_as_reviewer(self):
         response = self.client.post(reverse('user-api'), {
@@ -241,13 +254,12 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'reviewer_name': '',
-                'reviewer_user_pk': '',
-                'reviewer_status': '',
-                'success': False,
-                'errors': {'user_pk': 'User already on review'}
-            }
-        )
+            'reviewer_name': '',
+            'reviewer_user_pk': '',
+            'reviewer_status': '',
+            'success': False,
+            'errors': {'user_pk': 'User already on review'}
+        })
 
     def test_delete_reviewer(self):
         test_user_1 = User.objects.get(username='test_user_1')
@@ -263,6 +275,14 @@ class TestUserApiReviewers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(self.review.reviewers.count(), 1)
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(event.user, test_user_1)
+        self.assertEqual(event.related_object, self.review)
 
     def test_delete_reviewer_updates_review_state(self):
         test_user_1 = User.objects.get(username='test_user_1')
@@ -284,6 +304,14 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertEqual(self.review.reviewers.count(), 1)
         self.assertEqual(self.review.reviewer_state, constants.APPROVED)
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(event.user, test_user_1)
+        self.assertEqual(event.related_object, self.review)
 
     def test_delete_reviewer_missing_reviewer(self):
         response = self.client.post(reverse('user-api'), {
@@ -410,11 +438,10 @@ class TestUserApiFollowers(BaseTestCase):
                 'username': user.username,
             })
         self.assertEqual(data, {
-                'users': user_list,
-                'success': True,
-                'errors': {}
-            }
-        )
+            'users': user_list,
+            'success': True,
+            'errors': {}
+        })
 
     def test_find_follower_not_in_project(self):
         # Drop all members/groups from the project
@@ -462,6 +489,14 @@ class TestUserApiFollowers(BaseTestCase):
                 review=follower.review.revision,
             ).exists()
         )
+        event = follower.events.get(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(event.related_object, follower)
 
     def test_add_follower_notify_follower_and_creator(self):
         extra_follower = User.objects.create(username='extra')
@@ -512,6 +547,14 @@ class TestUserApiFollowers(BaseTestCase):
                 review=follower.review.revision,
             ).exists()
         )
+        event = follower.events.get(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(event.user, extra_follower)
+        self.assertEqual(event.related_object, follower)
 
     def test_add_follower_missing_user_pk(self):
         response = self.client.post(reverse('user-api'), {
@@ -520,12 +563,11 @@ class TestUserApiFollowers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'follower_name': '',
-                'follower_user_pk': '',
-                'success': False,
-                'errors': {'user_pk': 'User identifier missing'}
-            }
-        )
+            'follower_name': '',
+            'follower_user_pk': '',
+            'success': False,
+            'errors': {'user_pk': 'User identifier missing'}
+        })
 
     def test_add_follower_already_on_review(self):
         response = self.client.post(reverse('user-api'), {
@@ -535,12 +577,11 @@ class TestUserApiFollowers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'follower_name': '',
-                'follower_user_pk': '',
-                'success': False,
-                'errors': {'user_pk': 'User already on review'}
-            }
-        )
+            'follower_name': '',
+            'follower_user_pk': '',
+            'success': False,
+            'errors': {'user_pk': 'User already on review'}
+        })
 
     def test_add_follower_not_found(self):
         response = self.client.post(reverse('user-api'), {
@@ -550,12 +591,11 @@ class TestUserApiFollowers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'follower_name': '',
-                'follower_user_pk': '',
-                'success': False,
-                'errors': {'user_pk': 'User not found'}
-            }
-        )
+            'follower_name': '',
+            'follower_user_pk': '',
+            'success': False,
+            'errors': {'user_pk': 'User not found'}
+        })
 
     def test_add_creator_as_follower(self):
         response = self.client.post(reverse('user-api'), {
@@ -565,12 +605,11 @@ class TestUserApiFollowers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-                'follower_name': '',
-                'follower_user_pk': '',
-                'success': False,
-                'errors': {'user_pk': 'User already on review'}
-            }
-        )
+            'follower_name': '',
+            'follower_user_pk': '',
+            'success': False,
+            'errors': {'user_pk': 'User already on review'}
+        })
 
     def test_delete_follower(self):
         follower_0 = User.objects.get(username='follower_0')
@@ -586,6 +625,14 @@ class TestUserApiFollowers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(self.review.follower_set.count(), 1)
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.FOLLOWER_REMOVED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_REMOVED
+        )
+        self.assertEqual(event.user, follower_0)
+        self.assertEqual(event.related_object, self.review)
 
     def test_delete_follower_missing_follower(self):
         response = self.client.post(reverse('user-api'), {

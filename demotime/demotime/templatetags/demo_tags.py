@@ -18,3 +18,8 @@ def reviewer_status(review, user):
         status = ''
 
     return status
+
+
+@register.assignment_tag
+def setting_value(project, setting_key):
+    return models.Setting.objects.get_value(project, setting_key)

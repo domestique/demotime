@@ -15,23 +15,23 @@
 {% block sub_nav_actions %}
 <ul class="subnav-item">
     {% if request.user == object.creator %}
-        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Add revision</a></li>
+        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Revise</a></li>
         {% if object.state == 'closed' %}
-            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Open demo</a></li>
+            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
         {% else %}
-            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close demo</a></li>
+            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close</a></li>
         {% endif %}
     {% else %}
         {% if reviewer and object.state != "closed" %}
             {% if reviewer.status == 'approved' %}
-                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove demo</a></li>
+                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove</a></li>
             {% else %}
-                <li><a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve demo</a></li>
+                <li><a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve</a></li>
             {% endif %}
             {% if reviewer.status == 'rejected' %}
-                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject demo</a></li>
+                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject</a></li>
             {% else %}
-                <li><a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject demo</a></li>
+                <li><a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject</a></li>
             {% endif %}
         {% endif %}
     {% endif %}
@@ -85,7 +85,7 @@
                     <div class="your-status">
                         You are following this demo
                         <small class="person_deleter">
-                            [<a href="#" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
+                            [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
                         </small>
                         <span class="help" title="When you are assigned as a 'reviewer' you
                         will need to either approve or reject a demo. A follower can simply follow
@@ -154,7 +154,7 @@
                             </small>
                             {% if review.creator == request.user %}
                                 <small class="person_deleter" style="display:none">
-                                    [<a href="#" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+                                    [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
@@ -170,7 +170,7 @@
                             </small>
                             {% if review.creator == request.user or follower.user == request.user %}
                                 <small class="person_deleter" style="display:none">
-                                    [<a href="#" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                    [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
@@ -211,6 +211,24 @@
             </div>
         </div>
 
+        <article class="review-overview events" style="display: none">
+            <h3>Events</h3>
+            <p>Debug section, move along please</p>
+            <section>
+                {% for event in object.event_set.all %}
+                    <p>Event: {{ event.event_type.name }} - {{ event.event_type.code }}</p>
+                    <ul>
+                        <li>Project: {{ event.project }} - {{ event.project.slug }}</li>
+                        <li>Review: {{ event.review }} - {{ event.review.pk }}</li>
+                        <li>User: {{ event.user }}</li>
+                        <li>Created: {{ event.created }}</li>
+                        <li>Related Object: {{ event.related_object }}</li>
+                        <li>Related Type: {{ event.related_type }}</li>
+                    </ul>
+                {% endfor %}
+            </section>
+        </article>
+
         <article class="review-overview collapser_parent">
             <h3 class="icon icon-lightbulb collapser">Review Overview</h3>
             <section class="collapseable">
@@ -240,7 +258,7 @@
         {% endif %}
 
         {% if revision.commentthread_set.all %}
-            <article id="comments">
+            <article class="comment_wrapper" id="comments">
                 <h3 class="icon icon-comment collapser">Feedback</h3>
                 <section class="comments">
                     {% macro attachments %}
@@ -256,21 +274,20 @@
                         </section>
                     {% endmacro %}
 
-                    {% macro form button_text %}
-                        <form action="#comments" method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
+                    {% macro comment button_text %}
+                        <form>
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
                             {{ comment_form.comment.errors }}
                             {{ comment_form.comment }}
                             <div class="summary">
-                                <label class="icon icon-attach">{{ attachment_form.attachment.label }} (<em>Optional</em>) - <a href="#">(add attachment)</a></label>
+                                <label class="icon icon-attach"><a href="#">Add optional {{ attachment_form.attachment.label }}</a></label>
                             </div>
                             <div class="toggled_text attachments">
                                 {% use_macro attachment %}
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <div class="form-group">
-                                <input type="submit" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
+                                <input type="button" class="new_comment_button" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
                                 {% if reviewer and request.user != object.creator and reviewer.status != 'approved' %}
                                     <input class="reply_and_approve" data-type="approved" type="button" value="Reply and Approve">
                                 {% endif %}
@@ -279,10 +296,10 @@
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section class="comment_parent collapser_parent">
+                        <section data-thread="{{ thread.pk }}" class="comment_parent collapser_parent">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
-                                    <label data-comment id="{{ comment.pk }}" class="icon collapser icon-minus-squared-alt">
+                                    <label class="icon collapser icon-minus-squared-alt">
                                         New comment by
                                         <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
                                             {{ comment.commenter.userprofile }}
@@ -300,7 +317,7 @@
                                     {% use_macro attachments %}
                                 {% else %}
                                     <div class="comments-reply collapseable">
-                                        <blockquote id="{{ comment.pk }}">
+                                        <blockquote>
                                             <div class="blockquote-header">
                                                 Reply by
                                                 <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
@@ -322,9 +339,9 @@
                                 {% endif %}
                             {% endfor %}
                             <div class="comments-reply_new collapseable">
-                                <a href="#" class="icon icon-comment leave_reply_link">Reply to this</a>
+                                <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
                                 <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
-                                    {% use_macro form 'Reply' %}
+                                    {% use_macro comment 'Reply' %}
                                 </div>
                             </div>
                         </section>
@@ -333,10 +350,12 @@
             </article>
         {% endif %}
 
-        <article>
+        <article class="comment_wrapper">
             <h3 class="heading">Post a New Comment</h3>
-            <section class="new_comment">
-                {% use_macro form 'Reply' %}
+            <section class="comment_parent new_comment">
+                <div class="comment_container">
+                    {% use_macro comment 'Reply' %}
+                </div>
             </section>
         </article>
     </div>
@@ -373,8 +392,19 @@ var mentions = new DemoTime.Mention({
 </script>
 <script src="/static/scripts/Review.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Reviewers.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/Comments.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/library/autolinker.min.js"></script>
 <script>
+// Scope regions where auto-linking is enabled
+$('.review-overview, .comment_parent, .attachment-description').each(function() {
+    var $area = $(this),
+        $html = $area.html(),
+        linkedText = Autolinker.link($html, { twitter: false });
+
+    $area.html(linkedText);
+});
+
 var review = new DemoTime.Review({
     {% if reviewer %}
         is_reviewer: true
@@ -394,16 +424,19 @@ var review = new DemoTime.Review({
     , creator_pk: {{ object.creator.pk }}
 });
 
-var ModifyReviewers = new DemoTime.Reviewers({
+var modify_reviewers = new DemoTime.Reviewers({
     url: '{% url 'user-api' %}',
     review_pk: '{{ review.pk }}'
 });
 
 // set up background tasks (new messages, comments etc)
-var NewComments = new DemoTime.BackgroundTasks({
-    comments_url: '{% url "messages-json" review.pk %}',
-    dt_url: '{{ review.get_absolute_url }}'
+var background_tasks = new DemoTime.BackgroundTasks({
+    json_url: '{% url "messages-json" review.pk %}'
+    , site_url: '{{ review.get_absolute_url }}'
 });
 
+var comments = new DemoTime.Comments({
+    comments_url: "{% url 'comments-api' proj_slug=revision.review.project.slug review_pk=revision.review.pk rev_num=revision.number %}"
+});
 </script>
 {% endblock %}

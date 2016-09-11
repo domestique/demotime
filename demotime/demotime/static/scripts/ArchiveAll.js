@@ -28,7 +28,6 @@ DemoTime.ArchiveAll = Backbone.View.extend({
         });
 
         req.done(function(msg) {
-            console.log(msg);
             messages.slideUp(function() {
                 messages.html('No unread messages.').slideDown();
                 $('.msg_notifier').removeClass('unread_notification').addClass('read_notification').find('a').html(msg.message_count);

@@ -6,7 +6,7 @@ DemoTime.Reviewers = Backbone.View.extend({
     events: {
         'keyup .find_person': 'typing',
         'click .add_person_click': 'add',
-        'click .person_deleter': 'delete',
+        'click .person_deleter_link': 'delete',
         'click .cancel': 'cancel'
     },
 
@@ -123,16 +123,16 @@ DemoTime.Reviewers = Backbone.View.extend({
 
     delete: function(event) {
         event.preventDefault();
-        var $el = $(event.target),
-            $li = $el.parents('li'),
-            pk = $el.data('person'),
+        var $link = $(event.target),
+            pk = $link.data('person'),
+            $li = $link.parents('li'),
             self = this;
 
         var req = $.ajax({
             url: self.options.url,
             method: 'POST',
             data: {
-                action: $el.data('action'),
+                action: $link.data('action'),
                 review_pk: self.options.review_pk,
                 user_pk: pk
             }

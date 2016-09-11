@@ -5,11 +5,14 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 
 from demotime.helpers import strip_tags
-from .attachments import Attachment
-from .base import BaseModel
-from .messages import Message
-from .users import UserReviewStatus
-
+from demotime.models import (
+    Attachment,
+    Event,
+    EventType,
+    Message,
+    UserReviewStatus
+)
+from demotime.models.base import BaseModel
 from demotime import constants
 
 
@@ -37,24 +40,31 @@ class Comment(BaseModel):
     comment = models.TextField()
     thread = models.ForeignKey('CommentThread')
     attachments = GenericRelation('Attachment')
+    events = GenericRelation('Event')
 
     def __str__(self):
         return 'Comment by {} on Review: {}'.format(
             self.commenter.username, self.thread.review_revision.review.title
         )
 
-    def _to_json(self):
-        return {
+    def to_json(self):
+        comment_json = {
+            'id': self.pk,
             'name': self.commenter.userprofile.name,
             'comment': self.comment,
             'thread': self.thread.pk,
-            'attachment_count': self.attachments.count()
+            'attachment_count': self.attachments.count(),
+            'attachments': []
         }
+        for attachment in self.attachments.all():
+            comment_json['attachments'].append(attachment.to_json())
+
+        return comment_json
 
     @classmethod
     def create_comment(cls, commenter, comment, review,
                        thread=None, attachment=None, attachment_type=None,
-                       description=None):
+                       description=None, sort_order=1):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
 
@@ -85,6 +95,7 @@ class Comment(BaseModel):
                 attachment_type=attachment_type,
                 description=description,
                 content_object=obj,
+                sort_order=sort_order,
             )
 
         system_user = User.objects.get(username='demotime_sys')
@@ -129,9 +140,15 @@ class Comment(BaseModel):
                 thread=thread,
             )
 
+        Event.create_event(
+            project=review.review.project,
+            event_type_code=EventType.COMMENT_ADDED,
+            related_object=obj,
+            user=commenter,
+        )
         review.review.trigger_webhooks(
             constants.COMMENT,
-            {'comment': obj._to_json()}
+            {'comment': obj.to_json()}
         )
         return obj
 

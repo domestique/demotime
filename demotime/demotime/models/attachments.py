@@ -1,10 +1,11 @@
 import os
 
 from django.db import models
+from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-from .base import BaseModel
+from demotime.models.base import BaseModel
 
 
 def attachment_filename(instance, filename):
@@ -44,11 +45,19 @@ class Attachment(BaseModel):
         db_index=True,
     )
     description = models.CharField(max_length=2048, blank=True, null=True)
+    sort_order = models.IntegerField(default=1)
+
+    def to_json(self):
+        return {
+            'static_url': reverse('user-media', args=[self.pk]),
+            'attachment_type': self.attachment_type,
+            'description': self.description,
+        }
 
     @property
     def pretty_name(self):
         ''' Just cleaning up the filename display a bit '''
-        return ''.join(self.attachment.name.split('/')[1:])
+        return ''.join(self.attachment.name.split('/')[-1])
 
     @property
     def review(self):
@@ -72,3 +81,4 @@ class Attachment(BaseModel):
         ]
         app_label = 'demotime'
         get_latest_by = 'created'
+        ordering = ('sort_order',)

@@ -11,7 +11,7 @@ DemoTime.Mention = Backbone.View.extend({
 
     initialize: function(options) {
         this.options = options;
-        this.options.interval = 400;
+        this.options.interval = 250;
 
         // Catch arrows for nav
         var self = this;
@@ -35,10 +35,12 @@ DemoTime.Mention = Backbone.View.extend({
         user_req.success(function(data) {
             self.users = new MentionModel(data);
 
-            // Grab the mentioner container template (popup)
-            var html = $('#mentioner').html();
-            self.options.template = _.template(html);
-            self.options.template = self.options.template ({ user: self.users.get('users') });
+            if ($('#mentioner').length) {
+                // Grab the mentioner container template (popup)
+                var html = $('#mentioner').html();
+                self.options.template = _.template(html);
+                self.options.template = self.options.template ({ user: self.users.get('users') });
+            }
         });
     },
 
@@ -85,26 +87,31 @@ DemoTime.Mention = Backbone.View.extend({
     // Clear countdown on keyup, trigger mention
     mention_checker: function(event) {
         var self = this,
-            code = event.keyCode,
-            mentioner = self.options.form.find('.mentioner');
+            code = event.keyCode;
 
-        clearTimeout(self.options.timer);
-
-        // If the user isn't pressing an arrow key (navigating mentions)
-        // then remove the mentioner (to avoid previous mention popups
-        // while typing.
-        if (!self.using_arrows(code)) {
-            mentioner.remove();
+        if (self.options.form) {
+            var mentioner = self.options.form.find('.mentioner');
         }
 
-        // Execute after the interval is done
-        function finished() {
-            // If the mentioner isn't already visible...
-            if (!mentioner.is(':visible')) {
-                self.get_last_word(event);
+        if (mentioner) {
+            clearTimeout(self.options.timer);
+
+            // If the user isn't pressing an arrow key (navigating mentions)
+            // then remove the mentioner (to avoid previous mention popups
+            // while typing.
+            if (!self.using_arrows(code)) {
+                mentioner.remove();
             }
+
+            // Execute after the interval is done
+            function finished() {
+                // If the mentioner isn't already visible...
+                if (!mentioner.is(':visible')) {
+                    self.get_last_word(event);
+                }
+            }
+            self.options.timer = setTimeout(finished, self.options.interval);
         }
-        self.options.timer = setTimeout(finished, self.options.interval);
     },
 
     // Return true if the user is navigating with arrows

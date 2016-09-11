@@ -14,6 +14,7 @@ class EditProfileView(DetailView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.profile_form = None
+        self.lookup_kwargs = kwargs
         return super(EditProfileView, self).dispatch(request, *args, **kwargs)
 
     def init_profile_form(self, data=None, files=None):
@@ -33,10 +34,15 @@ class EditProfileView(DetailView):
         return forms.UserProfileForm(**kwargs)
 
     def get_object(self, *args, **kwargs):
+        lookup_dict = {'user': self.request.user}
+        if self.lookup_kwargs.get('pk'):
+            lookup_dict['pk'] = self.lookup_kwargs['pk']
+        if self.lookup_kwargs.get('username'):
+            lookup_dict['user__username'] = self.lookup_kwargs['username']
+
         return get_object_or_404(
             models.UserProfile,
-            pk=self.kwargs['pk'],
-            user=self.request.user
+            **lookup_dict
         )
 
     def get_context_data(self, *args, **kwargs):
@@ -78,7 +84,20 @@ class ProfileView(DetailView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.profile_form = None
+        self.lookup_args = kwargs
         return super(ProfileView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self, *args, **kwargs):
+        lookup_dict = {}
+        if self.lookup_args.get('pk'):
+            lookup_dict['pk'] = self.lookup_args['pk']
+        if self.lookup_args.get('username'):
+            lookup_dict['user__username'] = self.lookup_args['username']
+
+        return get_object_or_404(
+            models.UserProfile,
+            **lookup_dict
+        )
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
@@ -87,13 +106,13 @@ class ProfileView(DetailView):
             creator=obj.user,
             state=models.reviews.OPEN,
         )
-        context['closed_demos'] = models.Review.objects.filter(
-            creator=obj.user,
-            state__in=(models.reviews.CLOSED, models.reviews.ABORTED),
-        )
         context['open_reviews'] = models.Review.objects.filter(
             reviewers=obj.user,
             state=models.reviews.OPEN
+        )
+        context['followed_demos'] = models.Review.objects.filter(
+            followers=obj.user,
+            state=models.reviews.OPEN,
         )
         owner_viewing = self.request.user == obj.user
         context['owner_viewing'] = owner_viewing

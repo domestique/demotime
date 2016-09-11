@@ -1,11 +1,20 @@
 // Slide toggle summary boxes
-$('.summary a').click(function(event) {
+$('body').on('click', '.summary a', function(event) {
     event.preventDefault();
     $(this).parents('.summary').next().slideToggle();
 });
 
+$(document).ready(function() {
+    if ($(window).width() > 375) {
+        $('.subnav').stick_in_parent({
+            'parent': 'body',
+            'recalc_every': 100,
+        });
+    }
+});
+
 // Dynamically add attachment type
-$('.attachment-file').click(function() {
+$('body').on('click', '.attachment-file', function() {
     var file = $(this).find('input');
 
     file.change(function() {

@@ -1,16 +1,51 @@
+{% load demo_tags %}
+{% if project %}
 <script type="text/x-pattern" id="wysiwyg_footer">
     <div class="footer_panel">
         <a href="#" class="toggle_html">&lt;html /&gt;</a>
-        <div class="emoji_panel" title="Click to insert a reaction">
-            <img src="/static/images/emoji/smiley.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/grin.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/frowning2.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/astonished.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/confounded.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/cry.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/heart.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/thumbsup.png" class="add_emoji emoji">
-            <img src="/static/images/emoji/beers.png" class="add_emoji emoji">
-        </div>
+        {% setting_value project 'emojis_enabled' as emojis_enabled %}
+        {% setting_value project 'gifs_enabled' as gifs_enabled %}
+        {% if emojis_enabled or gifs_enabled %}
+            <div class="emoji_panel" title="Click to insert a reaction">
+                {% if gifs_enabled %}
+                    <img src="/static/images/emoji/gif.png" class="add_gif emoji" title="<img src='/static/images/giphy.png'>">
+                {% endif %}
+                {% if emojis_enabled %}
+                    <img src="/static/images/emoji/smiley.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/grin.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/frowning2.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/astonished.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/confounded.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/cry.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/heart.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/thumbsup.png" class="add_emoji emoji">
+                    <img src="/static/images/emoji/beers.png" class="add_emoji emoji">
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
+    {% if gifs_enabled %}
+        <div class="giphy_input_panel" style="display: none">
+            <input type="text" placeholder="GIF Keyword" class="giphy_input">
+            <button type="button" class="giphy_button">search</button>
+        </div>
+        <div class="giphy_results"></div>
+        <div class="giphy_branding">
+            <img src="/static/images/giphy.png" class="giphy_logo">
+        </div>
+    {% endif %}
 </script>
+<script type="text/x-pattern" id="giphy_results">
+<div>
+    <ul>
+        <% _.each(gif, function(gif) { %>
+            <li>
+                <% if (gif) { %>
+                    <img data-full="<%= gif.images.downsized_large.url %>" src='<%= gif.images.fixed_height_small.url %>' class="giphy_result_image">
+                <% } %>
+            </li>
+        <% }); %>
+    </ul>
+</div>
+</script>
+{% endif %}

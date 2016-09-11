@@ -1,13 +1,15 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericRelation
 
-from .base import BaseModel
-from .messages import Message
+from demotime.models.base import BaseModel
+from demotime.models import Event, EventType, Message
 
 
 class Follower(BaseModel):
 
     review = models.ForeignKey('Review')
     user = models.ForeignKey('auth.User')
+    events = GenericRelation('Event')
 
     @property
     def display_name(self):
@@ -19,7 +21,7 @@ class Follower(BaseModel):
             self.review.title,
         )
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'name': self.user.userprofile.name,
             'user_pk': self.user.pk,
@@ -28,7 +30,7 @@ class Follower(BaseModel):
         }
 
     @classmethod
-    def create_follower(cls, review, user, notify_follower=False, notify_creator=False):
+    def create_follower(cls, review, user, creator, skip_notifications=False):
         existing_reviewer = review.reviewer_set.filter(reviewer=user)
         if existing_reviewer.exists():
             return existing_reviewer.get()
@@ -37,13 +39,35 @@ class Follower(BaseModel):
             review=review,
             user=user
         )
+        Event.create_event(
+            project=review.project,
+            event_type_code=EventType.FOLLOWER_ADDED,
+            related_object=obj,
+            user=creator
+        )
+        if skip_notifications:
+            notify_follower = notify_creator = False
+        else:
+            notify_follower = creator != user
+            notify_creator = creator != review.creator
         if notify_follower:
+            # pylint: disable=protected-access
             obj._send_follower_message(notify_follower=True)
 
         if notify_creator:
+            # pylint: disable=protected-access
             obj._send_follower_message(notify_creator=True)
 
         return obj
+
+    def drop_follower(self, dropper):  # pylint: disable=unused-argument
+        Event.create_event(
+            project=self.review.project,
+            event_type_code=EventType.FOLLOWER_REMOVED,
+            related_object=self.review,
+            user=self.user
+        )
+        self.delete()
 
     def _send_follower_message(self, notify_follower=False, notify_creator=False):
         if not notify_follower and not notify_creator:

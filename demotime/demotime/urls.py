@@ -11,6 +11,8 @@ from django.contrib.auth.views import (
 )
 
 from demotime.views import (
+    comments,
+    events,
     files,
     groups,
     index_view,
@@ -20,6 +22,7 @@ from demotime.views import (
     reviews,
     users,
     webhooks,
+    gif_search,
 )
 
 
@@ -29,7 +32,8 @@ urlpatterns = [
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^terms-of-use/$', TemplateView.as_view(template_name='terms_of_use.html'), name='terms-of-use'),
     url(r'^privacy-policy/$', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy-policy'),
-    url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help')
+    url(r'^help/$', TemplateView.as_view(template_name='demotime/help.html'), name='help'),
+    url(r'^gifs/$', gif_search.GIFSearch.as_view(), name='gif-search'),
 ]
 
 # Admin urls
@@ -41,6 +45,21 @@ urlpatterns += [
     url(r'^admin/group-types/create/$', groups.manage_group_type, name='group-type-manage'),
     url(r'^admin/group-types/edit/(?P<slug>[\w-]+)/$', groups.manage_group_type, name='group-type-manage'),
     url(r'^admin/projects/create/$', projects.project_admin, name='project-create'),
+]
+
+# Comments
+urlpatterns += [
+    url(
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/rev/(?P<rev_num>[\d]+)/comments/$',
+        comments.comments_json_view,
+        name='comments-api',
+    ),
+    url(r'^comment/update/(?P<pk>[\d]+)/$', comments.update_comment_view, name='update-comment'),
+    url(
+        r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
+        comments.delete_comment_attachment_view,
+        name='update-comment-attachment'
+    ),
 ]
 
 # Reviews
@@ -86,16 +105,6 @@ urlpatterns += [
     url(r'^reviews/(?P<proj_slug>[\w-]+)/search/$', reviews.review_search_json_view, name='reviews-search-json'),
 ]
 
-# Comments
-urlpatterns += [
-    url(r'^comment/update/(?P<pk>[\d]+)/$', reviews.update_comment_view, name='update-comment'),
-    url(
-        r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
-        reviews.delete_comment_attachment_view,
-        name='update-comment-attachment'
-    ),
-]
-
 # Messages
 urlpatterns += [
     url(r'^inbox/$', messages.inbox_view, name='inbox'),
@@ -120,6 +129,8 @@ urlpatterns += [
     url(r'^accounts/logout/$', logout_then_login, name='logout'),
     url(r'^accounts/profile/(?P<pk>[\d]+)/$', profile.profile_view, name='profile'),
     url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', profile.edit_profile_view, name='edit-profile'),
+    url(r'^accounts/profile/(?P<username>[\w.-_@]+)/edit/$', profile.edit_profile_view, name='edit-profile'),
+    url(r'^accounts/profile/(?P<username>[\w.-_@]+)/$', profile.profile_view, name='profile'),
     url(
         r'^accounts/password/reset/$',
         password_reset,
@@ -154,6 +165,11 @@ urlpatterns += [
 urlpatterns += [
     url(r'projects/$', projects.project_json, name='project-json'),
     url(
+        r'projects/(?P<proj_slug>[-\w]+)/events/$',
+        events.EventView.as_view(),
+        name='events'
+    ),
+    url(
         r'projects/(?P<proj_slug>[-\w]+)/admin/hooks/create/$',
         webhooks.manage_hooks,
         name='webhook-create'
@@ -162,6 +178,11 @@ urlpatterns += [
         r'projects/(?P<proj_slug>[-\w]+)/admin/hooks/edit/(?P<hook_pk>[\d]+)/$',
         webhooks.manage_hooks,
         name='webhook-edit'
+    ),
+    url(
+        r'projects/(?P<proj_slug>[-\w]+)/admin/settings/(?P<setting_pk>[\d]+)/$',
+        projects.project_settings,
+        name='project-settings-edit'
     ),
     url(r'projects/(?P<proj_slug>[-\w]+)/admin/edit/$', projects.project_admin, name='project-admin'),
     url(r'projects/(?P<proj_slug>[-\w]+)/admin/$', projects.project_detail, name='project-detail'),

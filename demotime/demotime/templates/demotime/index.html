@@ -16,6 +16,7 @@
 {% endblock %}
 
 {% block content %}
+<canvas id="fireworks" style="display: none"></canvas>
 <h1 class="heading">
     <strong>Your</strong> Dashboard
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
@@ -94,7 +95,7 @@
         {% endif %}
         {% if open_demos %}
             <h3 class="icon icon-calendar">
-                Open demos you've created
+                Open demos you've <strong>created</strong>
                 <small>
                     <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
                 </small>
@@ -144,6 +145,7 @@
 
 {% block scripts %}
 <script src="/static/scripts/ArchiveAll.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/DemoState.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
 $('.icon-mail.iframe').click(function() {
@@ -153,6 +155,8 @@ $('.icon-mail.iframe').click(function() {
 var archive_all = new DemoTime.ArchiveAll({
     url: '{% url "messages-json" %}'
 });
+
+var demo_state = new DemoTime.DemoState();
 
 {# Tour for project dash #}
 if (!Cookies.get('seen_dash_updates')) {

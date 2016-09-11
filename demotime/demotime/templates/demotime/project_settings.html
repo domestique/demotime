@@ -1,0 +1,64 @@
+{% extends 'layout-user.html' %}
+{% block title %}Project {{ object.name }} Administration{% endblock %}
+
+{% block sub_nav_contents %}
+    <a href="javascript:history.back()" class="subnav-item">Cancel</a></li>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <div class="container">
+        <a href="{% url 'index' %}">Your dashboard</a> &gt;
+            Edit Setting - {{ setting.title }}
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+a.error {
+    transition:5s;
+}
+.project h3 {
+    font-size:1.1em;
+    font-weight:400;
+}
+.project {
+    font-size: 12px;
+}
+.form-group.first {
+    margin-top: 0;
+}
+.project label {
+    font-size: 1.7em;
+    color: #555;
+    font-weight: 400;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Edit Setting - {{ setting.title }}
+
+<article class="project">
+    <section>
+        <form action="{% url 'project-settings-edit' project.slug setting.pk %}" method='post'>
+            {% csrf_token %}
+            <h3 class="icon icon-pencil">
+                Setting Information:
+            </h3>
+            <ul>
+                <li>Description: {{ setting.description }}</li>
+                <li>Setting Type: {{ setting.get_setting_type_display }}</li>
+            </ul>
+            <section>
+                {{ form.as_p }}
+            </section>
+            <input type="button" value="Cancel" onclick="javascript: history.go(-1)">
+            <input type="submit" value="Submit" />
+        </form>
+    </section>
+</article>
+{% endblock %}

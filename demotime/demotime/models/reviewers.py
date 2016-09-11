@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericRelation
 
 from demotime.models.base import BaseModel
 from demotime.constants import (
@@ -6,8 +7,7 @@ from demotime.constants import (
     APPROVED,
     REJECTED
 )
-from .messages import Message
-from .reminders import Reminder
+from demotime.models import Event, EventType, Message, Reminder
 
 
 class Reviewer(BaseModel):
@@ -24,14 +24,15 @@ class Reviewer(BaseModel):
         max_length=128, choices=STATUS_CHOICES,
         default='reviewing', db_index=True
     )
+    events = GenericRelation('Event')
 
     def __str__(self):
-        return '{} Follower on {}'.format(
+        return '{} Reviewer on {}'.format(
             self.reviewer_display_name,
             self.review.title,
         )
 
-    def _to_json(self):
+    def to_json(self):
         return {
             'name': self.reviewer.userprofile.name,
             'user_pk': self.reviewer.pk,
@@ -45,18 +46,34 @@ class Reviewer(BaseModel):
         return self.reviewer.userprofile.display_name or self.reviewer.username
 
     @classmethod
-    def create_reviewer(cls, review, reviewer, notify_reviewer=False, notify_creator=False):
+    def create_reviewer(cls, review, reviewer, creator, skip_notifications=False):
         obj = cls.objects.create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
         )
-
+        Event.create_event(
+            project=review.project,
+            event_type_code=EventType.REVIEWER_ADDED,
+            related_object=obj,
+            user=creator
+        )
+        if skip_notifications:
+            notify_reviewer = notify_creator = False
+        else:
+            notify_reviewer = creator != reviewer
+            notify_creator = creator != review.creator
         if notify_reviewer:
-            obj._send_reviewer_message(notify_reviewer=True, notify_creator=False)
+            # pylint: disable=protected-access
+            obj._send_reviewer_message(
+                notify_reviewer=True, notify_creator=False
+            )
 
         if notify_creator:
-            obj._send_reviewer_message(notify_reviewer=False, notify_creator=True)
+            # pylint: disable=protected-access
+            obj._send_reviewer_message(
+                notify_reviewer=False, notify_creator=True
+            )
 
         return obj
 
@@ -102,6 +119,19 @@ class Reviewer(BaseModel):
         reminder_active = status == REVIEWING
         Reminder.set_activity(self.review, self.reviewer, reminder_active)
 
+        if status == APPROVED:
+            event_code = EventType.REVIEWER_APPROVED
+        elif status == REJECTED:
+            event_code = EventType.REVIEWER_REJECTED
+        else:
+            event_code = EventType.REVIEWER_RESET
+        Event.create_event(
+            project=self.review.project,
+            event_type_code=event_code,
+            related_object=self,
+            user=self.reviewer
+        )
+
         # Send a message if this isn't the last person to approve/reject
         all_statuses = self.review.reviewer_set.values_list('status', flat=True)
         consensus = all(x == APPROVED for x in all_statuses) or all(
@@ -131,8 +161,14 @@ class Reviewer(BaseModel):
             )
         return self.review.update_reviewer_state()
 
-    def drop_reviewer(self):
+    def drop_reviewer(self, dropper):  # pylint: disable=unused-argument
         self._send_reviewer_message(deleted=True)
+        Event.create_event(
+            project=self.review.project,
+            event_type_code=EventType.REVIEWER_REMOVED,
+            related_object=self.review,
+            user=self.reviewer
+        )
         review = self.review
         self.delete()
         review.update_reviewer_state()

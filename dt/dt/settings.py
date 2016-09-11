@@ -25,6 +25,8 @@ if not parser.has_section('demotime'):
     parser.set('demotime', 'dt_prod', 'false')
     parser.set('demotime', 'registration', 'false')
     parser.set('demotime', 'trials', 'false')
+    parser.set('demotime', 'debug', 'true')
+    parser.set('demotime', 'allowed_hosts', '')
     if os.environ.get('TRAVIS', '').lower() == 'true':
         parser.set('demotime', 'static_root', os.path.join(BASE_DIR, 'static'))
         parser.set('demotime', 'media_root', os.path.join(BASE_DIR, 'uploads'))
@@ -46,10 +48,16 @@ if not parser.has_section('celery'):
 SECRET_KEY = 'zf3o4tx%22pzoauflj+z2=$l2@g&$656!7d5ir)hdj4g!mv8$%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = parser.get('demotime', 'debug').lower() == 'true'
 
-ALLOWED_HOSTS = []
+if parser.get('demotime', 'allowed_hosts'):
+    ALLOWED_HOSTS = parser.get('demotime', 'allowed_hosts').split(',')
+else:
+    ALLOWED_HOSTS = []
 
+ADMINS = (
+    ('Domestique Support', 'support@domestiquestudios.com'),
+)
 
 # Application definition
 
@@ -174,11 +182,13 @@ SERVER_URL = parser.get('demotime', 'server_url')
 SITE_ID = 1
 
 # DemoTime Specific Settings
-DT_PROD = parser.get('demotime', 'dt_prod')
+DT_PROD = parser.get('demotime', 'dt_prod').lower() == 'true'
 DEFAULT_REMINDER_DAYS = int(parser.get('demotime', 'default_reminder_days'))
 REGISTRATION_ENABLED = parser.get('demotime', 'registration').lower() == 'true'
 TRIALS_ENABLED = parser.get('demotime', 'trials').lower() == 'true'
 CACHE_BUSTER = os.environ.get('HOSTNAME')
+GIF_PROVIDER_URL = 'https://api.giphy.com/v1/gifs/search'
+GIF_PROVIDER_API_KEY = '3o85g3XtoNNLeNPWO4'
 
 # SENDFILE SETINGS
 SENDFILE_BACKEND = 'sendfile.backends.nginx'

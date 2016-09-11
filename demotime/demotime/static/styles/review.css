@@ -17,6 +17,12 @@
         line-height: 24px;
     }
 }
+
+/* For sticky header */
+.subnav {
+    z-index: 314;
+}
+
 h1 .alert {
     font-size: 10px;
     color: #aaa;
@@ -69,19 +75,24 @@ h1 .alert {
     font-size: 17px;
 }
 .review-meta ol {
-    margin:0;
-    padding-left:20px;
+    margin: 0;
+    padding-left: 20px;
 }
 .review-meta ul {
-    list-style:none;
-    margin:0;
-    padding:0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 .review-meta h4 {
-    margin:0;
+    margin: 0;
 }
 .review h3 {
-    margin:0 0 10px;
+    margin: 0 0 10px;
+}
+@media screen and (max-width:375px) {
+    .review h3 {
+        font-size: 18px;
+    }
 }
 .review h3.collapser {
     cursor: pointer;
@@ -110,79 +121,70 @@ li.open.state-highlight {
 .comments-reply {
     font-size:0.8em;
 }
+.comments-reply blockquote {
+    padding: 3px;
+}
+.comments-reply .comment_edit {
+    display: block;
+    margin-top: 10px;
+}
 
 /* Special attachments display for comments */
-.comments .attachment-card {
-    margin:-13px 0;
+.attachment-card {
+    margin: 0;
+    position: relative;
+    top: -3px;
 }
-.comments .attachment-card section {
+.attachment-card section {
     overflow: hidden;
-    background: #555;
-    color: #fff;
+    background: #fff;
     min-height: 0;
+    border-top: 0;
 }
-.comments .attachment-card h3 {
+.attachment-card h3 {
     font-size: 16px;
-    color: #fff;
 }
-.comments .attachment-card.image {
+.attachment-card.image {
     overflow: hidden;
 }
-.comments .attachment-card.other,
-.comments .attachment-card.document {
+.attachment-card.other,
+.attachment-card.document {
     overflow: hidden;
 }
-.comments .attachment-card.audio {
+.attachment-card.audio {
     overflow: hidden;
 }
-.comments .attachment-card section img {
+.attachment-card section img {
     max-height: 100px;
 }
-.comments .attachment-card .attachment-image {
+.attachment-card .attachment-image {
     text-align: left;
 }
 
 .attachment-card h3 {
-    font-size:1.6em;
+    font-size: 16px;
 }
 .comments-reply {
-    margin:1em 0 0 3em;
+    margin: 1em 0 0 3em;
 }
 .comments-reply_new {
-    margin:2em 0 0 1em;
-}
-@media screen and (max-width:680px) {
-    .comments-reply,
-    .comments-reply_new {
-        margin:.5em 0 .5em .5em;
-    }
+    margin: 1em 0 0 1em;
 }
 .comments-reply_new {
-    overflow:hidden;
+    overflow: hidden;
 }
-.comments-reply_new textarea {
-    height:80px;
-}
-.comments-reply_new input[type="submit"] {
-    float:right;
-    margin-top:-10px;
-}
-@media screen and (max-width:680px) {
-    .comments-reply_new input[type="submit"] {
-        float:none;
-    }
-}
+
 .comments .collapser {
-    margin:1em 0 1em;
-    cursor:pointer;
+    margin: 0 0 10px;
+    cursor: pointer;
 }
 @media screen and (max-width:680px) {
     .comments .collapser {
-        font-size:0.9em;
+        font-size: 10px;
     }
 }
 section section {
-    padding:1em;
+    padding: 1em;
 }
 
 article > section {
@@ -199,6 +201,9 @@ article {
 /* No need showing 'reply' label for new comments */
 .new_comment label.icon-comment {
     display: none;
+}
+.new_comment .comments-reply {
+    margin: 0;
 }
 
 .revision a {
@@ -267,7 +272,7 @@ input.find_person {
 }
 .your-status span {
     color: #333;
-    font-weight: 900;
+    font-weight: 700;
 }
 
 #confetti {

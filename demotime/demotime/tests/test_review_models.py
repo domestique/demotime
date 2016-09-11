@@ -21,7 +21,7 @@ class TestReviewModels(BaseTestCase):
         assert obj.revision
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, 'Test Title')
-        self.assertEqual(obj.description, 'Test Description'),
+        self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://example.org/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.reviewer_set.count(), 3)
@@ -30,6 +30,7 @@ class TestReviewModels(BaseTestCase):
         attachment = obj.revision.attachments.all()[0]
         attachment.attachment.name = 'test/test_file'
         self.assertEqual(attachment.pretty_name, 'test_file')
+        self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(obj.state, models.reviews.OPEN)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
@@ -45,6 +46,12 @@ class TestReviewModels(BaseTestCase):
         self.hook_patch_run.assert_called_once_with(
             constants.CREATED
         )
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
 
     def test_create_review_duped_reviewer_follower(self):
         ''' Test creating a review with a user in both the Reviwers and the
@@ -59,7 +66,7 @@ class TestReviewModels(BaseTestCase):
         assert obj.revision
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, 'Test Title')
-        self.assertEqual(obj.description, 'Test Description'),
+        self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://example.org/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.reviewer_set.count(), 3)
@@ -110,6 +117,12 @@ class TestReviewModels(BaseTestCase):
             'reviewers': self.test_users.exclude(username='test_user_0'),
         })
         new_obj = models.Review.update_review(**review_kwargs)
+        event = new_obj.event_set.get(
+            event_type__code=models.EventType.DEMO_UPDATED
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_UPDATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         second_rev = new_obj.revision
         self.assertEqual(obj.pk, new_obj.pk)
         self.assertEqual(new_obj.title, 'New Title')
@@ -132,7 +145,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 5)
-        self.assertEqual(len(mail.outbox), 4)
+        self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             3
@@ -202,7 +215,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 5)
-        self.assertEqual(len(mail.outbox), 4)
+        self.assertEqual(len(mail.outbox), 5)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             3
@@ -232,6 +245,10 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.APPROVED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_APPROVED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_APPROVED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         self.assertTrue(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -260,6 +277,10 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REJECTED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_REJECTED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_REJECTED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msg = models.Message.objects.get(
             review=obj.reviewrevision_set.latest(),
             receipient=obj.creator
@@ -304,6 +325,12 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REVIEWING)
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_REVIEWING
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_REVIEWING)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         self.assertTrue(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -335,6 +362,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.CLOSED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_CLOSED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CLOSED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
             title='"{}" has been {}'.format(
@@ -374,6 +405,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.ABORTED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_ABORTED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_ABORTED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -417,6 +452,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -458,6 +497,10 @@ class TestReviewModels(BaseTestCase):
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.state, models.reviews.OPEN)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -503,16 +546,16 @@ class TestReviewModels(BaseTestCase):
 
     def test_review_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
-        review_json = review._to_json()
+        review_json = review.to_json()
         self.assertEqual(review_json['title'], review.title)
         self.assertEqual(review_json['creator'], review.creator.userprofile.name)
         reviewers = []
         for reviewer in review.reviewer_set.all():
-            reviewers.append(reviewer._to_json())
+            reviewers.append(reviewer.to_json())
 
         followers = []
         for follower in review.follower_set.all():
-            followers.append(follower._to_json())
+            followers.append(follower.to_json())
 
         self.assertEqual(review_json['reviewers'], reviewers)
         self.assertEqual(review_json['followers'], followers)
@@ -521,12 +564,12 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['state'], review.state)
         self.assertEqual(review_json['reviewer_state'], review.reviewer_state)
         self.assertEqual(review_json['is_public'], review.is_public)
-        self.assertEqual(review_json['project'], review.project._to_json())
+        self.assertEqual(review_json['project'], review.project.to_json())
         self.assertEqual(review_json['url'], review.get_absolute_url())
         self.assertEqual(review_json['reviewing_count'], review.reviewing_count)
         self.assertEqual(review_json['approved_count'], review.approved_count)
         self.assertEqual(review_json['rejected_count'], review.rejected_count)
-        self.assertEqual(review_json['project'], review.project._to_json())
+        self.assertEqual(review_json['project'], review.project.to_json())
 
     @patch('demotime.tasks.fire_webhook')
     def test_trigger_webhooks_fires(self, task_patch):

@@ -1,16 +1,19 @@
 import bdateutil
 
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
 
-from .base import BaseModel
-from .messages import Message
+from demotime.models.base import BaseModel
+from demotime.models import Message, Setting
 
 
-def get_reminder_days():
+def get_reminder_days(project):
+    days = Setting.objects.get_value(
+        project=project,
+        key=Setting.REMINDER_DAYS
+    )
     return timezone.now() + bdateutil.relativedelta(
-        bdays=settings.DEFAULT_REMINDER_DAYS
+        bdays=days,
     )
 
 
@@ -44,7 +47,7 @@ class Reminder(BaseModel):
     @classmethod
     def create_reminder(cls, review, user, reminder_type, remind_at=None):
         if not remind_at:
-            remind_at = get_reminder_days()
+            remind_at = get_reminder_days(review.project)
         return cls.objects.create(
             review=review,
             user=user,
@@ -68,7 +71,7 @@ class Reminder(BaseModel):
 
     @classmethod
     def update_reminders_for_review(cls, review):
-        remind_at = get_reminder_days()
+        remind_at = get_reminder_days(review.project)
 
         # Creator Reminder
         try:
@@ -93,7 +96,7 @@ class Reminder(BaseModel):
         if active:
             cls.objects.filter(review=review).update(
                 active=active,
-                remind_at=get_reminder_days(),
+                remind_at=get_reminder_days(review.project),
             )
         else:
             cls.objects.filter(review=review).update(active=active)
@@ -103,7 +106,7 @@ class Reminder(BaseModel):
         if active:
             cls.objects.filter(review=review, user=user).update(
                 active=active,
-                remind_at=get_reminder_days(),
+                remind_at=get_reminder_days(review.project),
             )
         else:
             cls.objects.filter(review=review, user=user).update(active=active)
@@ -121,7 +124,7 @@ class Reminder(BaseModel):
             self.user,
             revision=self.review.revision,
         )
-        self.remind_at = get_reminder_days()
+        self.remind_at = get_reminder_days(self.review.project)
         self.save(update_fields=['remind_at'])
 
     class Meta:

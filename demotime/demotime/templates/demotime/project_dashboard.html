@@ -17,7 +17,7 @@
 {% block content %}
 <h1 class="heading">
     <strong>{{ object.name }}</strong> Dashboard
-    {% if is_admin %}
+    {% if is_admin or request.user.is_superuser %}
         <small>
             <a class="icon icon-right-dir" href="{% url 'project-detail' object.slug %}">Go to Project Administration</a>
         </small>

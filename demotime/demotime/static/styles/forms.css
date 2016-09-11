@@ -89,6 +89,26 @@ input[type="button"]:hover {
     background-color: #2bbbad;
 }
 
+button[disabled],
+input[type="button"][disabled] {
+    opacity: 0.3;
+    transition: all .5s ease;
+    cursor: default;
+    background-image: url(/static/images/loading.gif);
+    background-position: 85% 50%;
+    background-repeat: no-repeat;
+    background-color: #fff;
+    color: #2bbbad;
+    padding-right: 60px;
+}
+input[type="submit"].button-clear,
+input[type="button"].button-clear,
+button.button-clear {
+    background: none;
+    color: #333;
+    box-shadow: none;
+}
+
 select[multiple="multiple"]{
     padding: 10px;
     min-width: 30%;
@@ -130,74 +150,6 @@ select[multiple="multiple"]:focus {
     box-sizing: border-box;
 }
 
-.wysiwyg-editor {
-    font-size: 16px;
-    padding: 15px 15px 50px;
-}
-.wysiwyg-editor,
-.wysiwyg-container textarea {
-    min-height: 150px;
-}
-.comments pre {
-    font-family: Courier;
-    padding: 10px;
-    background: #fafafa;
-    border: 2px dashed #eee;
-    font-size: 13px;
-}
-.wysiwyg-popup {
-    min-width: 350px;
-}
-.wysiwyg-popup .wysiwyg-toolbar-icon {
-    display: none;
-}
-.wysiwyg-container {
-    position: relative;
-}
-
-.footer_panel {
-    padding: 5px;
-    background: #F5F5F5;
-    overflow: hidden;
-}
-.footer_panel .toggle_html {
-    font-size: 11px;
-    margin: 10px 0 0 10px;
-    display: inline-block;
-}
-@media screen and (max-width:375px) {
-    .footer_panel .toggle_html,
-    .wysiwyg-toolbar {
-        display: none;
-    }
-}
-.emoji_panel {
-    float: right;
-}
-.emoji_panel .emoji {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-}
-@media screen and (max-width:375px) {
-    .emoji_panel .emoji {
-        width: 20px;
-        height: 20px;
-    }
-}
-p img.emoji,
-blockquote .emoji,
-.note-editor img.emoji {
-    max-width: 30px !important;
-    max-height: 30px !important;
-}
-.note-group-select-from-files {
-    display: none !important;
-}
-.modal.link-dialog .form-group {
-    margin-top: 0;
-}
-
 .dd-container,
 .dd-select {
     max-width: 195px;
@@ -234,32 +186,4 @@ blockquote .emoji,
 }
 .dd-option {
     border-bottom: 0 !important;
-}
-
-/* Mentions */
-.mentioner {
-    position: absolute;
-    bottom: 45px;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background: #f6f6f6;
-    padding: 8px 12px;
-}
-.mentioner-user {
-    padding: 3px 6px;
-    font-size: 12px;
-}
-.mentioner-active,
-.mentioner-user:hover {
-    background: #18735D;
-    color: #fff !important;
-    text-decoration: none !important;
-}
-.mentioned {
-    color: #32CCAE;
-    font-weight: 700;
-}
-.mentioned:before {
-    content: '@';
 }
