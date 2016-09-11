@@ -1,13 +1,14 @@
-from socket import error as socket_error
+
 
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.template import loader
 from django.core.urlresolvers import reverse
-from django.core.mail import send_mail
+
 
 from demotime.models.base import BaseModel
+from demotime.tasks import dt_send_mail
 
 
 class MessageBundle(BaseModel):
@@ -74,21 +75,9 @@ class Message(BaseModel):
         )
 
     def _send_email(self, recipient, title, msg_text):
-        if recipient.email:
-            try:
-                return send_mail(
-                    subject=title,
-                    message=msg_text,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[recipient.email],
-                    html_message=msg_text,
-                    fail_silently=True,
-                )
-            except socket_error:
-                if settings.DT_PROD:
-                    raise
-
-        return 0
+        dt_send_mail.delay(
+            recipient, title, msg_text
+        )
 
     @classmethod
     def _render_message_text(cls, context_dict, template_name, email=False):
