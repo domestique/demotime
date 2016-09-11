@@ -103,50 +103,52 @@
             {{ object.bio|safe }}
         {% endif %}
     </section>
-    {% if open_reviews %}
-        <h3 class="icon icon-inbox">
-            Open demos {% if owner_viewing %}you're{% else %}{{ object }} is{% endif %} <strong>reviewing</strong>
-        </h3>
-        <section class="emph_med aggregated_dashboard-reviewing">
-            <div>
-                <ul>
-                    {% for demo in open_reviews %}
-                        {% include "includes/reviews_li.html" %}
-                    {% endfor %}
-                </ul>
-            </div>
-        </section>
-    {% endif %}
-    {% if followed_demos %}
-        <h3 class="icon icon-inbox">
-            Open demos {% if owner_viewing %}you're{% else %}{{ object }} is{% endif %} <strong>following</strong>
-        </h3>
-        <section class="emph_med aggregated_dashboard-following">
-            <div>
-                <ul>
-                    {% for demo in followed_demos %}
-                        {% include "includes/reviews_li.html" %}
-                    {% endfor %}
-                </ul>
-            </div>
-        </section>
-    {% endif %}
-    {% if open_demos %}
-        <h3 class="icon icon-calendar">
-            Open demos {% if owner_viewing %}you've{% else %}{{ object }} has{% endif %} <strong>created</strong>
-            <small>
-                <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
-            </small>
-        </h3>
-        <section class="emph_med aggregated_dashboard-created">
-            <div>
-                <ul>
-                    {% for demo in open_demos %}
-                        {% include "includes/reviews_li.html" %}
-                    {% endfor %}
-                </ul>
-            </div>
-        </section>
-    {% endif %}
+    <article>
+        {% if open_reviews %}
+            <h3 class="icon icon-inbox">
+                Open demos {% if owner_viewing %}you're{% else %}{{ object }} is{% endif %} <strong>reviewing</strong>
+            </h3>
+            <section class="emph_med aggregated_dashboard-reviewing">
+                <div>
+                    <ul>
+                        {% for demo in open_reviews %}
+                            {% include "includes/reviews_li.html" %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        {% endif %}
+        {% if followed_demos %}
+            <h3 class="icon icon-inbox">
+                Open demos {% if owner_viewing %}you're{% else %}{{ object }} is{% endif %} <strong>following</strong>
+            </h3>
+            <section class="emph_med aggregated_dashboard-following">
+                <div>
+                    <ul>
+                        {% for demo in followed_demos %}
+                            {% include "includes/reviews_li.html" %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        {% endif %}
+        {% if open_demos %}
+            <h3 class="icon icon-calendar">
+                Open demos {% if owner_viewing %}you've{% else %}{{ object }} has{% endif %} <strong>created</strong>
+                <small>
+                    <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
+                </small>
+            </h3>
+            <section class="emph_med aggregated_dashboard-created">
+                <div>
+                    <ul>
+                        {% for demo in open_demos %}
+                            {% include "includes/reviews_li.html" %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        {% endif %}
+    </article>
 </div>
 {% endblock %}
