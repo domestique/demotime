@@ -194,6 +194,15 @@
 
         {# Logged-in user scripts #}
         {% if request.user %}
+            {# Syntax Highlighting #}
+            <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+            <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+            <script>
+            $('pre').each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
+            </script>
+
             {# DT-XX Info boxes #}
             <script src="/static/scripts/Info.js?{{ site_settings.CACHE_BUSTER }}"></script>
             <script>
