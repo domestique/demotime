@@ -106,13 +106,13 @@ class ProfileView(DetailView):
             creator=obj.user,
             state=models.reviews.OPEN,
         )
-        context['closed_demos'] = models.Review.objects.filter(
-            creator=obj.user,
-            state__in=(models.reviews.CLOSED, models.reviews.ABORTED),
-        )
         context['open_reviews'] = models.Review.objects.filter(
             reviewers=obj.user,
             state=models.reviews.OPEN
+        )
+        context['followed_demos'] = models.Review.objects.filter(
+            followers=obj.user,
+            state=models.reviews.OPEN,
         )
         owner_viewing = self.request.user == obj.user
         context['owner_viewing'] = owner_viewing

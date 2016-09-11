@@ -28,6 +28,8 @@ class TestProfileViews(BaseTestCase):
         response = self.client.get(self.profile_url)
         self.assertStatusCode(response, 200)
         self.assertIn('open_demos', response.context)
+        self.assertIn('open_demos', response.context)
+        self.assertIn('followed_demos', response.context)
         self.assertTrue(response.context['owner_viewing'])
 
     def test_get_profile_as_other(self):
@@ -35,6 +37,8 @@ class TestProfileViews(BaseTestCase):
         response = self.client.get(reverse('profile', args=[other_user.username]))
         self.assertStatusCode(response, 200)
         self.assertIn('open_reviews', response.context)
+        self.assertIn('open_demos', response.context)
+        self.assertIn('followed_demos', response.context)
         self.assertFalse(response.context['owner_viewing'])
 
     def test_get_edit_profile(self):
