@@ -303,3 +303,10 @@ a[data-type="rejected"] {
     color: #fff;
     border: 1px solid #fafafa;
 }
+
+/* Syntax Highlighting */
+pre {
+    background: #F2EFEC;
+    max-height: 400px;
+    overflow: auto;
+}
