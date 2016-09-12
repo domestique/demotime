@@ -5,13 +5,10 @@ leave it unwrapped so it looks better in the Inbox.
 {% if is_email %}
     <!DOCTYPE html>
     <html lang="en">
-        <head>
-            <script>(new Image()).src = "{% if DT_PROD %}https{% else %}http{% endif %}://{{ dt_url }}/messages/pixel/{{ bundle.pk }}.png"</script>
-        </head>
         <body>
             <div style="color: #fff; background: #303030; padding: 10px; margin-bottom: 0">
                 <span style="font-family: Arial; letter-spacing: 1px;line-height: 35px;vertical-align: middle;text-transform: uppercase;font-size: .8em;display: inline-block;">
-                    <a href="{% if DT_PROD %}https{% else %}http{% endif %}://{{ dt_url }}" style="color: #fff; text-decoration: none;"><strong>Demo</strong>time</a>
+                    <a href="{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}" style="color: #fff; text-decoration: none;"><strong>Demo</strong>time</a>
                 </span>
             </div>
             <div style="padding: 10px; font-family: Helvetica; font-weight: 400;">
@@ -22,6 +19,7 @@ leave it unwrapped so it looks better in the Inbox.
 
 {% if is_email %}
             <p style="margin-top: 40px; color: #777; font-size: 13px; font-style: italic;">Thank you for using DemoTime!</p>
+            <script>(new Image()).src = "{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}/messages/pixel/{{ bundle.pk }}.png"</script>
             </div>
         </body>
     </html>
