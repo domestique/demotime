@@ -276,9 +276,9 @@ input.find_person {
 }
 
 #confetti {
-    position: absolute;
+    position: fixed;
+    top: 0;
     left: 0;
-    top: 90px;
     height: 100%;
     width: 100%;
     min-width: 1400px;
