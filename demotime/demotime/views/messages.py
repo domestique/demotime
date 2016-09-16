@@ -1,10 +1,11 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, View
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from demotime import forms, models
-from . import JsonView
+from demotime.views import JsonView
 
 
 class InboxView(ListView):
@@ -61,6 +62,11 @@ class InboxView(ListView):
 class MessageDetailView(DetailView):
     template_name = 'demotime/message.html'
 
+    def __init__(self, *args, **kwargs):
+        super(MessageDetailView, self).__init__(*args, **kwargs)
+        self.redirect = False
+        self.message = None
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(MessageDetailView, self).dispatch(*args, **kwargs)
@@ -68,7 +74,6 @@ class MessageDetailView(DetailView):
     def get_object(self, queryset=None):
         read = True
         delete = False
-        self.redirect = False
         action = self.request.GET.get('action')
         if action == 'mark-unread':
             read = False
@@ -123,9 +128,13 @@ class MessagesJsonView(JsonView):
 
     status = 200
 
+    def __init__(self, *args, **kwargs):
+        super(MessagesJsonView, self).__init__(*args, **kwargs)
+        self.review = None
+        self.project = None
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        self.review = None
         if 'review_pk' in kwargs:
             self.review = get_object_or_404(
                 models.Review,
@@ -134,6 +143,7 @@ class MessagesJsonView(JsonView):
             self.project = self.review.project
         return super(MessagesJsonView, self).dispatch(*args, **kwargs)
 
+    # pylint: disable=no-self-use
     def _format_json(self, bundles):
         json_data = {'message_count': bundles.count(), 'bundles': []}
         for bundle in bundles:
@@ -197,12 +207,14 @@ class MessagesJsonView(JsonView):
         )
         return self._format_json(bundles)
 
+    # pylint: disable=unused-argument
     def get(self, *args, **kwargs):
         if self.review:
             return self._get_review_messages()
 
         return self._get_messages()
 
+    # pylint: disable=unused-argument
     def post(self, *args, **kwargs):
         form = forms.BulkMessageUpdateForm(
             user=self.request.user,
@@ -228,6 +240,16 @@ class MessagesJsonView(JsonView):
 
         return self._get_messages()
 
-inbox_view = InboxView.as_view()
-msg_detail_view = MessageDetailView.as_view()
-messages_json_view = MessagesJsonView.as_view()
+
+class MessagePixelView(View):
+
+    # pylint: disable=unused-argument,no-self-use
+    def get(self, request, bundle_pk, *args, **kwargs):
+        bundle = get_object_or_404(
+            models.MessageBundle,
+            pk=bundle_pk,
+            owner=request.user,
+        )
+        bundle.read = True
+        bundle.save()
+        return HttpResponse(status=204)

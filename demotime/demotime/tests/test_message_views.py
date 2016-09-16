@@ -202,6 +202,28 @@ class TestMessageViews(BaseTestCase):
             models.MessageBundle.objects.filter(owner=self.user).count(),
         )
 
+    def test_message_pixel(self):
+        bundle = models.MessageBundle.objects.filter(owner=self.user).last()
+        bundle.read = False
+        bundle.save(update_fields=['read'])
+        response = self.client.get(
+            reverse('message-pixel', kwargs={'bundle_pk': bundle.pk})
+        )
+        bundle.refresh_from_db()
+        self.assertStatusCode(response, 204)
+        self.assertTrue(bundle.read)
+
+    def test_message_pixel_unauthorized(self):
+        bundle = models.MessageBundle.objects.exclude(owner=self.user).last()
+        bundle.read = False
+        bundle.save(update_fields=['read'])
+        response = self.client.get(
+            reverse('message-pixel', kwargs={'bundle_pk': bundle.pk})
+        )
+        bundle.refresh_from_db()
+        self.assertStatusCode(response, 404)
+        self.assertFalse(bundle.read)
+
 
 class TestMessagesAPI(BaseTestCase):
 

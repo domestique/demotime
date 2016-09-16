@@ -107,13 +107,18 @@ urlpatterns += [
 
 # Messages
 urlpatterns += [
-    url(r'^inbox/$', messages.inbox_view, name='inbox'),
-    url(r'^message/(?P<pk>[\d]+)/$', messages.msg_detail_view, name='message-detail'),
-    url(r'^messages/$', messages.messages_json_view, name='messages-json'),
+    url(r'^inbox/$', messages.InboxView.as_view(), name='inbox'),
+    url(r'^message/(?P<pk>[\d]+)/$', messages.MessageDetailView.as_view(), name='message-detail'),
+    url(r'^messages/$', messages.MessagesJsonView.as_view(), name='messages-json'),
     url(
         r'^messages/(?P<review_pk>[\d]+)/$',
-        messages.messages_json_view,
+        messages.MessagesJsonView.as_view(),
         name='messages-json'
+    ),
+    url(
+        r'messages/pixel/(?P<bundle_pk>[\d]+).png',
+        messages.MessagePixelView.as_view(),
+        name='message-pixel',
     ),
 ]
 
