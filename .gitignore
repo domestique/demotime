@@ -60,3 +60,4 @@ dt/uploads
 *.swo
 demotime/demotime/static/admin
 .DS_Store
+demotime/demotime/static/silk/
