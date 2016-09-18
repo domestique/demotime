@@ -14,7 +14,9 @@ class TestAttachmentModel(BaseTestCase):
         self.assertEqual(self.attachment.to_json(), {
             'static_url': '/file/1',
             'attachment_type': models.Attachment.IMAGE,
-            'description': 'Testing'
+            'description': 'Testing',
+            'created': self.attachment.created.isoformat(),
+            'modified': self.attachment.modified.isoformat(),
         })
 
     def test_pretty_name(self):

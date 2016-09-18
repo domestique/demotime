@@ -54,7 +54,9 @@ class Comment(BaseModel):
             'comment': self.comment,
             'thread': self.thread.pk,
             'attachment_count': self.attachments.count(),
-            'attachments': []
+            'attachments': [],
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
         for attachment in self.attachments.all():
             comment_json['attachments'].append(attachment.to_json())

@@ -39,6 +39,8 @@ class Reviewer(BaseModel):
             'reviewer_pk': self.pk,
             'reviewer_status': self.status,
             'review_pk': self.review.pk,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
 
     @property

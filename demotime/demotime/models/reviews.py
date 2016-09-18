@@ -99,6 +99,8 @@ class Review(BaseModel):
             'rejected_count': self.rejected_count,
             'url': self.get_absolute_url(),
             'pk': self.pk,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
 
     def get_absolute_url(self):
