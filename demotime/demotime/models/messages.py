@@ -96,6 +96,7 @@ class Message(BaseModel):
             'sender': system_user,
             'dt_url': settings.SERVER_URL,
             'dt_prod': settings.DT_PROD,
+            'site_settings': settings,
         })
         msg_text = cls._render_message_text(context_dict, template_name)
         obj = cls.create_message(
