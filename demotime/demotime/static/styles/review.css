@@ -303,3 +303,20 @@ a[data-type="rejected"] {
     color: #fff;
     border: 1px solid #fafafa;
 }
+
+.review_toggles {
+    text-align: right;
+    padding: 5px 0;
+}
+.review_toggles a {
+    background: #f2f2f2;
+    display: inline-block;
+    padding: 8px 20px;
+    color: #666;
+    cursor: pointer;
+}
+.review_toggles .enabled {
+    z-index: 31415;
+    background: #1f8470;
+    color: #fff;
+}

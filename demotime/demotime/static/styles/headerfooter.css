@@ -6,14 +6,14 @@ body.bookmarklet h1 {
     margin-top: .5em;
 }
 .navbar {
-    color: #fff;
+    color: #ffffff;
     background: #303030;
-    box-shadow: 0 2px 5px #ccc;
+    box-shadow: 0 2px 5px #cccccc;
     padding: 5px 0 0;
     margin-bottom: 20px;
 }
 .navbar a {
-    color: #fff;
+    color: #ffffff;
     text-decoration: none;
 }
 .navbar .navbar-logo {
@@ -43,7 +43,7 @@ body.bookmarklet h1 {
     }
 }
 .navbar-nav small a {
-    color: #25C59E;
+    color: #25c59e;
 }
 .navbar ul {
     list-style: none;
@@ -60,13 +60,13 @@ body.bookmarklet h1 {
     display: inline-block;
 }
 .navbar .read_notification a {
-    background: #777;
+    background: #777777;
     color: white;
     font-weight: 400;
     padding: 5px 10px;
 }
 .navbar .unread_notification a {
-    background: #E03743;
+    background: #e03743;
     border-radius: 2px;
     color: white;
     font-weight: 700;
@@ -80,31 +80,31 @@ body.bookmarklet h1 {
 
 .navbar .manage_user {
     position: relative;
-    border: 1px solid #777;
+    border: 1px solid #777777;
     border-radius: 2px;
     padding: 2px 3px;
-    position: relative;
     top: -1px;
 }
 .navbar .manage_user:after {
-    font-family: Verdana;
-    content: '↴';
+    font-family: Arial;
+    content: 'v';
     font-size: 12px;
-    font-weight: 800;
-    margin-left: 1px;
+    font-weight: 400;
+    margin-left: 3px;
+    margin-right: 3px;
     position: relative;
     top: -1px;
-    color: #777;
+    color: #777777;
 }
 a.footer-blog.highlight {
     font-weight: 700;
-    color: #000;
+    color: #000000;
     text-decoration: none;
 }
 
 a.footer-blog.highlight:after,
 .navbar .manage_user.highlight:after {
-    font-family: "fontello";
+    font-family: 'fontello';
     content: '\e828';
     color: red;
 }
@@ -117,7 +117,7 @@ a.footer-blog.highlight:after {
     top: 30px;
     right: 0;
     padding: 10px;
-    background: rgba(70, 70, 70, 0.95);
+    background: rgba(70, 70, 70, .95);
     width: 111px;
     z-index: 2;
 }
@@ -129,13 +129,13 @@ a.footer-blog.highlight:after {
 .navbar .manage_user li a {
     font-weight: bold;
     display: block;
-    color: #32CCAE;
+    color: #32ccae;
     padding: 3px 10px;
     font-size: 12px;
 }
 .navbar .manage_user li a:hover {
     background: rgba(48, 48, 48, 1);
-    color: #fff;
+    color: #ffffff;
 }
 
 footer {
@@ -143,10 +143,10 @@ footer {
     margin-bottom: 3em;
     font-size: .9em;
     text-align: center;
-    color: #ccc;
+    color: #cccccc;
 }
 footer a {
-    color: #aaa;
+    color: #aaaaaa;
     text-decoration: none;
 }
 
@@ -164,8 +164,8 @@ footer a {
 }
 
 nav.subnav {
-    background: #32CCAE;
-    margin-top: 0px;
+    background: #32ccae;
+    margin-top: 0;
     padding: 8px 0;
 }
 @media screen and (max-width: 940px) {
@@ -175,8 +175,8 @@ nav.subnav {
     }
 }
 .subnav a.subnav-item {
-    background: #fff;
-    color: #555;
+    background: #ffffff;
+    color: #555555;
     font-weight: 400;
     display: inline-block;
     padding: 3px 10px;
@@ -207,7 +207,7 @@ nav.subnav {
     padding-top: 3px;
 }
 @media screen and (max-width: 680px) {
-    .subnav input[type="text"] {
+    .subnav input[type='text'] {
         font-size: 12px;
     }
     .subnav .global_actions {
@@ -244,7 +244,7 @@ nav.subnav {
     display: none;
 }
 .breadcrumbs {
-    background: #1F8470;
+    background: #1f8470;
     padding: 10px 0;
 }
 @media screen and (max-width:375px) {
@@ -254,7 +254,7 @@ nav.subnav {
 }
 .breadcrumbs,
 .breadcrumbs a {
-    color: #fff;
+    color: #ffffff;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
