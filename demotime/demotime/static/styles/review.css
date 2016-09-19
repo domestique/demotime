@@ -283,6 +283,7 @@ input.find_person {
     width: 100%;
     min-width: 1400px;
     display: block;
+    z-index: 314159;
 }
 
 h1.heading {

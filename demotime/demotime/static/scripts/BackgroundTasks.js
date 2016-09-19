@@ -5,7 +5,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
     initialize: function(options) {
         this.options = options;
         this.options.counter = 0;
-        this.options.check_every = 60000; // check for msgs every minute (60,000ms)
+        this.options.check_every = 15000; // check for msgs every 15 seconds (15,000ms)
         this.options.max_attempts = 120; // after 120 mins of inactivity, ajax stops
         this.render();
     },
@@ -28,7 +28,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
     check_activity_count: function() {
         var self = this;
 
-        // Cancelling background task after an hour of no activity
+        // Cancelling background task after a period of no activity
         if ((self.options.counter > self.options.max_attempts) && self.options.interval) {
             clearInterval(self.options.interval);
             self.options.noty = noty({
@@ -100,14 +100,13 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                         },
                         callback: {
                             onCloseClick: function() {
-                                // Redirect the user to the comment
-                                if (update_obj.is_comment) {
-                                    var url_hook = '#comments';
-                                    window.location.href = self.options.site_url + '#comments';
-                                    window.location.reload();
-                                // Or just reload the review
+                                self.options.noty = null;
+                                // See site activity
+                                ScrollToLink.jump_to_link('review');
+                                if ($('#events').is(':visible')) {
+                                    $('#refresh_events').click();
                                 } else {
-                                    window.location.href = self.options.site_url;
+                                    $('#activity_toggler').click();
                                 }
                             }
                         }

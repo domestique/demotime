@@ -372,22 +372,31 @@
 <li><a href="/accounts/profile/<%= person.attributes.follower_user_pk %>"><%= person.attributes.follower_name %></a> <small>following</small></li>
 </script>
 <script type="text/x-pattern" id="events_pattern">
+<a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
 <% _.each(moments, function(moment) { %>
-    <% console.log(moment); %>
+    <% console.log(moment) %>
     <section>
-        <strong><%= moment.created %></strong>
-        <% if (moment.related_type == 'reviewer' || moment.related_type == 'follower') { %>
-            <%= moment.related_object.name %> was added as a <%= moment.related_type %>
-        <% } else { %>
-            <%= moment.related_type %>
-        <% } %>
-        by <%= moment.user %>
-        <% if (moment.related_type == 'comment') { %>
-            <small><a href="#<%= moment.related_object.thread %>">jump to this</a></small>
-            <blockquote>
-                <%= moment.related_object.comment %>
-            </blockquote>
-        <% } %>
+        <strong><%= new Date(moment.created) %></strong> <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a> made an update
+        <div style="margin:10px 0 0">
+            <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
+                <a href="/accounts/profile/<%= moment.related_object.user_pk %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
+            <% } else if (moment.event_type.code == 'demo-created') { %>
+                This demo was created
+            <% } else if (moment.event_type.code == 'reviewer-approved') { %>
+                <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
+            <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
+                <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects.
+            <% } else if (moment.event_type.code == 'reviewer-reset') { %>
+                <%= moment.user.name %> resets an approval status.
+            <% } else if (moment.event_type.code == 'comment-added') { %>
+                <blockquote style="margin:0 0 10px">
+                    <%= moment.related_object.comment %>
+                </blockquote>
+                <a data-thread="<%= moment.related_object.thread %>" href="#" class="icon icon-comment reply_to_thread">Reply</a>
+            <% } else { %>
+                <%= moment.event_type.name %>
+            <% } %>
+        </div>
     </section>
 <% }); %>
 </script>
@@ -449,7 +458,6 @@ var modify_reviewers = new DemoTime.Reviewers({
 // set up background tasks (new messages, comments etc)
 var background_tasks = new DemoTime.BackgroundTasks({
     json_url: '{% url "messages-json" review.pk %}'
-    , site_url: '{{ review.get_absolute_url }}'
 });
 
 var comments = new DemoTime.Comments({

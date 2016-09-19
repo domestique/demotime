@@ -2,7 +2,9 @@ DemoTime.ReviewActivity = Backbone.View.extend({
     el: '.review',
 
     events: {
-        'click #activity_toggler': 'toggle_activity_pane'
+        'click #activity_toggler': 'toggle_activity_pane',
+        'click .reply_to_thread': 'toggle_activity_pane',
+        'click #refresh_events': 'render'
     },
 
     initialize: function(options) {
@@ -10,10 +12,12 @@ DemoTime.ReviewActivity = Backbone.View.extend({
     },
 
     toggle_activity_pane: function(event) {
-        var link = $(event.target),
-            self = this;
+        var self = this,
+            link = $('#activity_toggler'),
+            trigger = $(event.target);
 
         event.preventDefault();
+
         this.$el.find('#events').slideToggle(function() {
             if ($(this).is(':visible')) {
                 link.addClass('enabled');
@@ -26,13 +30,32 @@ DemoTime.ReviewActivity = Backbone.View.extend({
             } else {
                 link.trigger("sticky_kit:detach");
                 link.removeClass('enabled');
-                ScrollToLink.jump_to_link('review');
+                // Check to see if the trigger was the Toggler button or
+                // a reply link. Scroll to top if the former, trigger reply
+                // if the latter
+                if (trigger.data('thread')) {
+                    // Get the thread ID from the clicked Reply link
+                    thread_id = $(event.target).data('thread');
+                    // Traverse the DOM to get the page's thread
+                    reply_link = self.$el.find('[data-thread=' + thread_id +']').find('.expand_reply_link');
+                    reply_link.click();
+                } else {
+                    ScrollToLink.jump_to_link('review');
+                }
             }
         });
     },
 
-    render: function() {
-        var self = this;
+    render: function(event) {
+        var self = this,
+            container = $('#events');
+
+        if (event) {
+            event.preventDefault();
+        }
+
+        container.html('<center><img src="/static/images/loading.gif"></center>');
+
         $.ajax({
             url: '/projects/' + self.options.project_slug + '/events/',
             method: 'GET',
@@ -44,7 +67,7 @@ DemoTime.ReviewActivity = Backbone.View.extend({
                 template = _.template(html);
 
             template = template({ moments: data.events });
-            self.$el.find('#events').html(template);
+            container.html(template);
         });
     }
 });
