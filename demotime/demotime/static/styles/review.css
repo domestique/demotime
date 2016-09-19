@@ -277,12 +277,13 @@ input.find_person {
 
 #confetti {
     position: fixed;
-    top: 0;
+    top: 90px;
     left: 0;
     height: 100%;
     width: 100%;
     min-width: 1400px;
     display: block;
+    z-index: 314159;
 }
 
 h1.heading {
@@ -302,11 +303,4 @@ a[data-type="rejected"] {
     background: #904445;
     color: #fff;
     border: 1px solid #fafafa;
-}
-
-/* Syntax Highlighting */
-pre {
-    background: #F2EFEC;
-    max-height: 400px;
-    overflow: auto;
 }
