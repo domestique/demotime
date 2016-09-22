@@ -167,8 +167,13 @@ li.open.state-highlight {
 .comments-reply {
     margin: 1em 0 0 3em;
 }
-.comments-reply_new {
-    margin: 1em 0 0 1em;
+@media screen and (max-width:375px) {
+    .comments-reply {
+        margin-left: 1em;
+    }
+    .comments-reply_new {
+        margin-left: 0;
+    }
 }
 .comments-reply_new {
     overflow: hidden;

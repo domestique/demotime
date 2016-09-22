@@ -56,18 +56,20 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
         container.html('<center><img src="/static/images/loading.gif"></center>');
 
-        $.ajax({
-            url: '/projects/' + self.options.project_slug + '/events/',
-            method: 'GET',
-            data: {
-                review: self.options.review_pk
-            }
-        }).success(function(data) {
-            var html = $('#events_pattern').html(),
-                template = _.template(html);
+        if (self.options) {
+            $.ajax({
+                url: '/projects/' + self.options.project_slug + '/events/',
+                method: 'GET',
+                data: {
+                    review: self.options.review_pk
+                }
+            }).success(function(data) {
+                var html = $('#events_pattern').html(),
+                    template = _.template(html);
 
-            template = template({ moments: data.events });
-            container.html(template);
-        });
+                template = template({ moments: data.events });
+                container.html(template);
+            });
+        }
     }
 });

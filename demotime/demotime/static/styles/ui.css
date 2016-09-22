@@ -200,6 +200,7 @@ input[type="button"].reply_and_approve,
 }
 .comment_parent .attachment-description {
     background: #666;
+    color: #fff;
 }
 .attachment-card {
     margin: 10px;
