@@ -67,7 +67,12 @@ DemoTime.ReviewActivity = Backbone.View.extend({
                 var html = $('#events_pattern').html(),
                     template = _.template(html);
 
-                template = template({ moments: data.events });
+                if (data.events.length) {
+                    template = template({ moments: data.events });
+                } else {
+                    template = "No events to show";
+                }
+
                 container.html(template);
             });
         }
