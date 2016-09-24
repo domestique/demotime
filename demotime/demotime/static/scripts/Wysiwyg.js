@@ -1,5 +1,5 @@
 // Dynamically add/remove reviewers
-var GiphyModel = Backbone.Model.extend({});
+var GiphyModel = Backbone.Model.extend();
 DemoTime.Wysiwyg = Backbone.View.extend({
     el: 'body',
 
@@ -114,6 +114,9 @@ DemoTime.Wysiwyg = Backbone.View.extend({
             template = template();
 
             self.$el.find('.wysiwyg-container').append(template);
+
+            // Setup syntax highlighting
+            var syntax = new DemoTime.Syntax();
         }, 1000);
     },
 

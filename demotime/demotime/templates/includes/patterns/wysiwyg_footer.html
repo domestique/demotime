@@ -2,7 +2,7 @@
 {% if project %}
 <script type="text/x-pattern" id="wysiwyg_footer">
     <div class="footer_panel">
-        <a href="#" class="toggle_html">&lt;html /&gt;</a>
+        <a href="#" class="toggle_html">edit source</a>
         {% setting_value project 'emojis_enabled' as emojis_enabled %}
         {% setting_value project 'gifs_enabled' as gifs_enabled %}
         {% if emojis_enabled or gifs_enabled %}
