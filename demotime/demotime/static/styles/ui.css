@@ -110,6 +110,13 @@ section section {
     border-radius: 2px;
 }
 
+/* Syntax Highlighting */
+pre {
+    background: #F2EFEC;
+    max-height: 400px;
+    overflow: auto;
+}
+
 p, li {
     line-height: 23px;
 }
