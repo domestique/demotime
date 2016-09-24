@@ -37,7 +37,7 @@ class Comment(BaseModel):
     MENTION_REGEX = re.compile(r'@[\w\d_-]+')
 
     commenter = models.ForeignKey('auth.User')
-    comment = models.TextField()
+    comment = models.TextField(blank=True)
     thread = models.ForeignKey('CommentThread')
     attachments = GenericRelation('Attachment')
     events = GenericRelation('Event')
