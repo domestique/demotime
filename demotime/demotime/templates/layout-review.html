@@ -104,9 +104,11 @@ h1 em {
                         </div>
                     </div>
                 </div>
+                {{ review_form.state }}
                 {% block form_warning %}{% endblock %}
                 <div class="form-group">
-                    <input type="submit" value="{% block button_text %}{% endblock %}">
+                    <input id="save-draft" type="submit" value="Save Draft">
+                    <input id="create-demo" type="submit" value="{% block button_text %}{% endblock %}">
                     <input type="button" class="button-clear" value="Cancel" onclick="javascript: history.go(-1)">
                 </div>
             </form>
@@ -118,4 +120,12 @@ h1 em {
 {% block scripts %}
 {{ block.super }}
 <script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script type="text/javascript">
+$('#save-draft').click(function(){
+    $('#id_state').val('draft');
+});
+$('#create-demo').click(function(){
+    $('#id_state').val('open');
+});
+</script>>
 {% endblock %}

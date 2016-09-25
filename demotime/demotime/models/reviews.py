@@ -27,12 +27,14 @@ from demotime.constants import (
     REOPENED,
     CREATED,
     UPDATED,
+    DRAFT,
 )
 
 
 class Review(BaseModel):
 
     STATUS_CHOICES = (
+        (DRAFT, DRAFT.capitalize()),
         (OPEN, OPEN.capitalize()),
         (CLOSED, CLOSED.capitalize()),
         (ABORTED, ABORTED.capitalize()),
@@ -144,7 +146,7 @@ class Review(BaseModel):
     @classmethod
     def create_review(
             cls, creator, title, description,
-            case_link, reviewers, project,
+            case_link, reviewers, project, state=OPEN,
             followers=None, attachments=None):
         ''' Standard review creation method '''
         obj = cls.objects.create(
@@ -152,7 +154,7 @@ class Review(BaseModel):
             title=title,
             description=description,
             case_link=case_link,
-            state=OPEN,
+            state=state,
             reviewer_state=REVIEWING,
             project=project,
         )
@@ -196,13 +198,11 @@ class Review(BaseModel):
             obj, obj.creator, True
         )
 
-        # Messages
-        obj._send_revision_messages()  # pylint: disable=protected-access
+        if state == OPEN:
+            obj._send_revision_messages()  # pylint: disable=protected-access
+            Reminder.create_reminders_for_review(obj)
+            obj.trigger_webhooks(CREATED)
 
-        # Reminders
-        Reminder.create_reminders_for_review(obj)
-
-        obj.trigger_webhooks(CREATED)
         return obj
 
     # pylint: disable=too-many-arguments
@@ -210,22 +210,34 @@ class Review(BaseModel):
     @classmethod
     def update_review(
             cls, review, creator, title, description,
-            case_link, reviewers, project,
+            case_link, reviewers, project, state=OPEN,
             followers=None, attachments=None
         ):
         ''' Standard update review method '''
+        # Figure out if we have a state transition
         obj = cls.objects.get(pk=review)
+        current_state = obj.state
         obj.title = title
         obj.case_link = case_link
         obj.project = project
         obj.save()
-        prev_revision = obj.revision
-        rev_count = obj.reviewrevision_set.count()
-        rev = ReviewRevision.objects.create(
-            review=obj,
-            description=description,
-            number=rev_count + 1
-        )
+
+        state_change = False
+        is_update = False
+        if current_state == DRAFT and state == OPEN:
+            state_change = True
+
+        if state == DRAFT:
+            rev = obj.revision
+        else:
+            is_update = True
+            prev_revision = obj.revision
+            rev_count = obj.reviewrevision_set.count()
+            rev = ReviewRevision.objects.create(
+                review=obj,
+                description=description,
+                number=rev_count + 1
+            )
         for attachment in attachments:
             Attachment.objects.create(
                 attachment=attachment['attachment'],
@@ -281,13 +293,15 @@ class Review(BaseModel):
         for follower in followers:
             follower.drop_follower(obj.creator)
 
-        # Messages
-        obj._send_revision_messages(update=True)  # pylint: disable=protected-access
+        if is_update:
+            # pylint: disable=protected-access
+            obj._send_revision_messages(update=True)
+            obj.trigger_webhooks(UPDATED)
+            Reminder.update_reminders_for_review(obj)
 
-        # Reminders
-        Reminder.update_reminders_for_review(obj)
-
-        obj.trigger_webhooks(UPDATED)
+        if state_change:
+            obj.update_state(state)
+            
         return obj
 
     def _change_reviewer_state(self, state):
@@ -361,12 +375,24 @@ class Review(BaseModel):
 
         return False, ''
 
+    def _open_review(self, state):
+        self.state = state
+        self.save(update_fields=['state', 'modified'])
+        Event.create_event(
+            self.project,
+            EventType.DEMO_CREATED,
+            self,
+            self.creator
+        )
+        Reminder.create_reminders_for_review(self)
+        return True
+
     def _reopen_review(self, state):
         # We take a state because this can be closed or aborted, it's okay
         # we don't judge
         prev_state = self.get_state_display()
         self.state = state
-        self.save(update_fields=['state'])
+        self.save(update_fields=['state', 'modified'])
         Event.create_event(
             self.project,
             EventType.DEMO_OPENED,
@@ -445,7 +471,10 @@ class Review(BaseModel):
 
     def update_state(self, new_state):
         state_changed = False
-        if self.state == OPEN and new_state == CLOSED:
+        if self.state == DRAFT and new_state == OPEN:
+            state_changed = self._open_review(new_state)
+            self.trigger_webhooks(CREATED)
+        elif self.state == OPEN and new_state == CLOSED:
             state_changed = self._close_review(new_state)
             self.trigger_webhooks(CLOSED)
         elif self.state == OPEN and new_state == ABORTED:

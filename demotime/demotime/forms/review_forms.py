@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 
 from demotime import models
+from demotime.constants import DRAFT, OPEN
 
 
 class ReviewQuickEditForm(forms.Form):
@@ -17,6 +18,14 @@ class ReviewQuickEditForm(forms.Form):
 
 
 class ReviewForm(forms.ModelForm):
+
+    state = forms.ChoiceField(
+        choices=(
+            (DRAFT, DRAFT.capitalize()),
+            (OPEN, OPEN.capitalize()),
+        ),
+        widget=forms.HiddenInput()
+    )
 
     def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
