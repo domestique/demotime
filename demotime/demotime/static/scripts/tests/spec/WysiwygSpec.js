@@ -9,7 +9,7 @@ describe("Wysiwyg.js", function() {
             <textarea style="display:none"></textarea>\
             <script type="text/x-pattern" id="wysiwyg_footer">\
                 <div class="footer_panel">\
-                    <a href="#" class="toggle_html">&lt;html /&gt;</a>\
+                    <a href="#" class="toggle_html">edit source</a>\
                     <div class="emoji_panel" title="Click to insert a reaction">\
                         <img src="https://demoti.me/static/images/emoji/gif.png" class="add_gif emoji">\
                         <img src="https://demoti.me/static/images/emoji/smiley.png" class="add_emoji emoji">\
