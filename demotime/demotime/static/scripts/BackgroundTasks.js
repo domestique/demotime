@@ -5,6 +5,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
     initialize: function(options) {
         this.options = options;
         this.options.counter = 0;
+        this.options.message_count = 0;
         this.options.check_every = 15000; // check for msgs every 15 seconds (15,000ms)
         this.options.max_attempts = 480; // after 2 hours of inactivity, ajax stops
         this.render();
@@ -59,6 +60,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         });
 
         req.always(function(data) {
+            console.log(data);
             if (data.message_count > 0) {
                 console.log('Running background tasks and received new messages');
                 $('.msg_notifier').removeClass('read_notification').addClass('unread_notification').find('a').html(data.message_count);
@@ -83,7 +85,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         });
 
         req.success(function(data) {
-            if (data.message_count > 0 && !self.options.noty) {
+            if (data.message_count > 0 && !self.options.noty && (self.options.last_pk != data.bundles[0].bundle_pk)) {
                 var update_obj = data.bundles[0].messages[0],
                     bundle_obj = data.bundles[0];
 
@@ -100,8 +102,9 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                         },
                         callback: {
                             onCloseClick: function() {
-                                self.options.noty = null;
+                                // self.options.noty = null;
                                 // See site activity
+                                self.options.last_pk = data.bundles[0].bundle_pk;
                                 ScrollToLink.jump_to_link('review');
                                 if ($('#events').is(':visible')) {
                                     $('#refresh_events').click();

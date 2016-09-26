@@ -387,10 +387,9 @@
             <% } else if (moment.event_type.code == 'reviewer-reset') { %>
                 <%= moment.user.name %> resets an approval status.
             <% } else if (moment.event_type.code == 'comment-added') { %>
-                <blockquote style="margin:0 0 10px">
+                <blockquote>
                     <%= moment.related_object.comment %>
                 </blockquote>
-                <a data-thread="<%= moment.related_object.thread %>" href="#" class="icon icon-comment reply_to_thread">Reply</a>
             <% } else { %>
                 <%= moment.event_type.name %>
             <% } %>
