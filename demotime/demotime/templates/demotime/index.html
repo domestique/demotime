@@ -31,7 +31,7 @@
 <div class="dashboard aggregated_dashboard">
     <article style="margin-top: 30px">
         <div class="split~720 by:2/1 with-gap:3">
-            <div class="cel">
+            <div id="dashboard_left" class="cel">
                 {% if open_reviews %}
                     <h3 class="icon icon-inbox">
                         Open demos you're <strong>reviewing</strong>
@@ -86,7 +86,7 @@
                                                     <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
                                                 {% endif %}
                                             {% endif %}
-                                            <a class="{{ message.read }} icon icon-mail iframe lightbox_url" href="{{ message.get_absolute_url }}?display_state=hide_header">{{ message.title|truncatechars:55 }}</a>
+                                            <a class="{{ message.read }} icon icon-mail iframe lightbox_url" href="{{ message.get_absolute_url }}?display_state=hide_header">{{ message.title|truncatechars:45 }}</a>
                                             {% include "includes/review_state.html" with demo=message.review %}
                                         </li>
                                     {% endfor %}
@@ -135,8 +135,15 @@
                     </ul>
                 </section>
             </div>
-            <div class="cel">
-                <h3> Recent activity </h3>
+            <div id="dashboard_right" class="cel">
+                <h3>
+                    Recent activity
+                    <select id="events_filter">
+                        {% for project in available_projects %}
+                            <option value={{ project.slug }}>{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
+                </h3>
                 <section class="aggregated_dashboard-activity" id="events"></section>
             </div>
         </article>
@@ -151,13 +158,73 @@
 {% endcomment %}
 {% endblock %}
 
+{% block patterns %}
+{{ block.super }}
+<script type="text/x-pattern" id="events_pattern">
+<a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="10" height="10"></a>
+<div class="events_list">
+<% _.each(moments, function(moment) { %>
+    <div>
+        <strong><a class="has_bubble"
+            data-prj="<%= moment.review.project.id %>"
+            data-pk="<%= moment.review.pk %>"
+            href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
+            <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
+        </strong>,
+
+        <% if (moment.event_type.code == 'comment-added') { %>
+            <a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">new comment</a> from
+        <% } else { %>
+            update by
+        <% } %>
+        <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+        <div style="margin:10px 0 0">
+            <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
+                <a href="/accounts/profile/<%= moment.related_object.user_pk %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
+            <% } else if (moment.event_type.code == 'demo-created') { %>
+                This demo was created
+            <% } else if (moment.event_type.code == 'reviewer-approved') { %>
+                <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
+            <% } else if (moment.event_type.code == 'demo-approved') { %>
+                <a class="icon icon-Approved"></a> <%= moment.event_type.name %>!
+            <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
+                <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects.
+            <% } else if (moment.event_type.code == 'demo-rejected') { %>
+                <a class="icon icon-Rejected"></a> <%= moment.event_type.name %>
+            <% } else if (moment.event_type.code == 'reviewer-reset') { %>
+                <%= moment.user.name %> resets an approval status.
+            <% } else if (moment.event_type.code == 'comment-added') { %>
+                <blockquote>
+                    <% if (moment.related_object.comment) { %>
+                        <%= jQuery.trim(moment.related_object.comment).substring(0, 125).trim(this) + "..." %></span>
+                    <% } %>
+                    <% if (moment.related_object.attachments.length && moment.related_object.attachments[0].attachment_type == 'image') { %>
+                        <img src="<%= moment.related_object.attachments[0].static_url %>">
+                    <% } %>
+                    <span class="jump_to_this">(<a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">jump to this</a>)</span>
+                </blockquote>
+            <% } else { %>
+                <%= moment.event_type.name %>
+            <% } %>
+        </div>
+    </div>
+<% }); %>
+</div>
+</script>
+{% endblock %}
+
 {% block scripts %}
+<script src="/static/scripts/ReviewActivity.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/ArchiveAll.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/DemoState.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
 $('.icon-mail.iframe').click(function() {
     $(this).parents('li').slideUp();
+});
+
+var review_activity = new DemoTime.ReviewActivity({
+    project_slug: null
 });
 
 var archive_all = new DemoTime.ArchiveAll({

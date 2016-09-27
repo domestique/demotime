@@ -245,3 +245,36 @@ th, td {
     min-width: 1400px;
     display: block;
 }
+
+.aggregated_dashboard-activity {
+    background: #f6f6f6;
+}
+@media screen and (max-width:720px) {
+    #dashboard_right {
+        padding-top: 20px;
+    }
+}
+.events_list {
+    color: #555;
+    font-size: 12px;
+    margin-top: 5px !important;
+    overflow: auto;
+}
+.events_list a {
+     color: #32CCAE !important;
+}
+.events_list strong a {
+    font-weight: 700;
+}
+.events_list > div {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #fff;
+}
+.events_list section blockquote {
+    padding: 5px;
+}
+.events_list blockquote .jump_to_this {
+    color: #bbb;
+    font-size: 10px;
+}
