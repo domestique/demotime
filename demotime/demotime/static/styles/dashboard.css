@@ -22,7 +22,7 @@
     margin-top: 50px;
 }
 .dashboard section li {
-    color: #ccc;
+    color: #eee;
     padding: 5px;
 }
 .dashboard section,
@@ -34,7 +34,7 @@
     margin: 0;
 }
 section .review_li a {
-    color: #ccc;
+    color: #eee;
 }
 section .messages-list .message_li a,
 section .review_li.open.approved a,
@@ -58,7 +58,7 @@ section .review_li .time_stamp {
     float: right;
     line-height: 30px;
     vertical-align: middle;
-    color: #777;
+    color: #ddd;
 }
 @media screen and (max-width:350px) {
     section .review_li .time_stamp {
@@ -105,7 +105,7 @@ section.emph_lower {
     text-transform: uppercase;
     margin-left: 3px;
     font-size: 10px;
-    color: #ccc;
+    color: #eee;
     vertical-align: middle;
 }
 .dashboard small.reviewing {
@@ -116,13 +116,18 @@ section.emph_lower {
 section li.review_li {
     background: #3f3f3f;
     padding: 0;
-    margin: 8px 0;
+    margin: 15px 0;
+    border: 1px solid #333;
+}
+section li.review_li:first-child {
+    margin-top: 0;
 }
 section li.review_li:last-child {
     margin-bottom: 0;
 }
 section .review_li-top {
-    background: #2a2a2a;
+    background: #1F8470;
+    border-bottom: 1px solid #aaa;
     padding: 3px 8px;
 }
 section .review_li.Approved {
@@ -130,6 +135,7 @@ section .review_li.Approved {
 }
 section .review_li.Approved .review_li-top {
     background: #3f3f3f;
+    border-bottom: 0;
 }
 section .review_li-bottom {
     padding: 8px;
