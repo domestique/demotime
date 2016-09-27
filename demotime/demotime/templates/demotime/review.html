@@ -106,6 +106,10 @@
             </small>
         </h1>
 
+        {% if request.user.is_authenticated and not request.COOKIES.suppress_new_user_cta %}
+            {% include "includes/new_user_cta.html" %}
+        {% endif %}
+
         <div class="review-meta with-gap:5">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
