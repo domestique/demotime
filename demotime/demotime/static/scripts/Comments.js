@@ -102,6 +102,11 @@ DemoTime.Comments = Backbone.View.extend({
                     self.options.container.before(html);
                 }
 
+                // Syntax highlighting
+                comment_parent.find('pre').each(function(i, block) {
+                    hljs.highlightBlock(block);
+                });
+
                 // If reply and approve, trigger button click, otherwise
                 // just scroll the new comment in to view.
                 if (also_approve) {

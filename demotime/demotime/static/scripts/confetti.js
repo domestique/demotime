@@ -118,6 +118,9 @@ setTimeout(function() {
 
         }).call(this);
 
+        $('canvas').click(function() {
+            $('canvas').remove();
+        })
         setTimeout(function() {
             $('canvas').addClass('fadeOut animated');
         }, 5000);

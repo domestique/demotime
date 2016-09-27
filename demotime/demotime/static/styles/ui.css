@@ -110,6 +110,13 @@ section section {
     border-radius: 2px;
 }
 
+/* Syntax Highlighting */
+pre {
+    background: #F2EFEC;
+    max-height: 400px;
+    overflow: auto;
+}
+
 p, li {
     line-height: 23px;
 }
@@ -200,6 +207,7 @@ input[type="button"].reply_and_approve,
 }
 .comment_parent .attachment-description {
     background: #666;
+    color: #fff;
 }
 .attachment-card {
     margin: 10px;

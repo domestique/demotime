@@ -45,6 +45,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="review" id="review">
     <div class="review-top">
         {% if request.user == object.creator %}
@@ -105,6 +106,12 @@
                 {% endif %}
             </small>
         </h1>
+
+        {# Events #}
+        <div class="review_toggles">
+            <a href="#" id="activity_toggler">Activity log</a>
+        </div>
+        <section class="review-overview events" id="events" style="display:none"></section>
 
         <div class="review-meta with-gap:5">
             <div class="cel">
@@ -211,24 +218,6 @@
             </div>
         </div>
 
-        <article class="review-overview events" style="display: none">
-            <h3>Events</h3>
-            <p>Debug section, move along please</p>
-            <section>
-                {% for event in object.event_set.all %}
-                    <p>Event: {{ event.event_type.name }} - {{ event.event_type.code }}</p>
-                    <ul>
-                        <li>Project: {{ event.project }} - {{ event.project.slug }}</li>
-                        <li>Review: {{ event.review }} - {{ event.review.pk }}</li>
-                        <li>User: {{ event.user }}</li>
-                        <li>Created: {{ event.created }}</li>
-                        <li>Related Object: {{ event.related_object }}</li>
-                        <li>Related Type: {{ event.related_type }}</li>
-                    </ul>
-                {% endfor %}
-            </section>
-        </article>
-
         <article class="review-overview collapser_parent">
             <h3 class="icon icon-lightbulb collapser">Review Overview</h3>
             <section class="collapseable">
@@ -296,7 +285,7 @@
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section data-thread="{{ thread.pk }}" class="comment_parent collapser_parent">
+                        <section id="{{ thread.pk }}" data-thread="{{ thread.pk }}" class="comment_parent collapser_parent">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
                                     <label class="icon collapser icon-minus-squared-alt">
@@ -380,6 +369,34 @@
 <script type="text/x-pattern" id="added_follower">
 <li><a href="/accounts/profile/<%= person.attributes.follower_user_pk %>"><%= person.attributes.follower_name %></a> <small>following</small></li>
 </script>
+<script type="text/x-pattern" id="events_pattern">
+<a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
+<% _.each(moments, function(moment) { %>
+    <% console.log(moment) %>
+    <section>
+        <strong><%= new Date(moment.created) %></strong> <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a> made an update
+        <div style="margin:10px 0 0">
+            <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
+                <a href="/accounts/profile/<%= moment.related_object.user_pk %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
+            <% } else if (moment.event_type.code == 'demo-created') { %>
+                This demo was created
+            <% } else if (moment.event_type.code == 'reviewer-approved') { %>
+                <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
+            <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
+                <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects.
+            <% } else if (moment.event_type.code == 'reviewer-reset') { %>
+                <%= moment.user.name %> resets an approval status.
+            <% } else if (moment.event_type.code == 'comment-added') { %>
+                <blockquote>
+                    <%= moment.related_object.comment %>
+                </blockquote>
+            <% } else { %>
+                <%= moment.event_type.name %>
+            <% } %>
+        </div>
+    </section>
+<% }); %>
+</script>
 {% endblock %}
 
 {% block scripts %}
@@ -387,10 +404,11 @@
 <script src="/static/scripts/Mention.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script>
 var mentions = new DemoTime.Mention({
-    user_url: '{% url 'user-api' %}'
+    user_url: "{% url 'user-api' %}"
 });
 </script>
 <script src="/static/scripts/Review.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/ReviewActivity.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Reviewers.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Comments.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
@@ -404,7 +422,12 @@ $('.review-overview, .comment_parent, .attachment-description').each(function() 
 
     $area.html(linkedText);
 });
+// Remove links from within code areas
+$('pre a').each(function() {
+    $(this).contents().unwrap().wrap('<span />');
+})
 
+// Initialize the Review app
 var review = new DemoTime.Review({
     {% if reviewer %}
         is_reviewer: true
@@ -424,6 +447,12 @@ var review = new DemoTime.Review({
     , creator_pk: {{ object.creator.pk }}
 });
 
+var review_activity = new DemoTime.ReviewActivity({
+    project_slug: '{{ revision.review.project.slug }}'
+    , review_pk: '{{ revision.review.pk }}'
+})
+
+// Initialize the ability to modify demo reviewers
 var modify_reviewers = new DemoTime.Reviewers({
     url: '{% url 'user-api' %}',
     review_pk: '{{ review.pk }}'
@@ -432,9 +461,9 @@ var modify_reviewers = new DemoTime.Reviewers({
 // set up background tasks (new messages, comments etc)
 var background_tasks = new DemoTime.BackgroundTasks({
     json_url: '{% url "messages-json" review.pk %}'
-    , site_url: '{{ review.get_absolute_url }}'
 });
 
+// Initialize AJAXy comments
 var comments = new DemoTime.Comments({
     comments_url: "{% url 'comments-api' proj_slug=revision.review.project.slug review_pk=revision.review.pk rev_num=revision.number %}"
 });

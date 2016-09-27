@@ -167,8 +167,13 @@ li.open.state-highlight {
 .comments-reply {
     margin: 1em 0 0 3em;
 }
-.comments-reply_new {
-    margin: 1em 0 0 1em;
+@media screen and (max-width:375px) {
+    .comments-reply {
+        margin-left: 1em;
+    }
+    .comments-reply_new {
+        margin-left: 0;
+    }
 }
 .comments-reply_new {
     overflow: hidden;
@@ -277,12 +282,13 @@ input.find_person {
 
 #confetti {
     position: fixed;
-    top: 0;
+    top: 90px;
     left: 0;
     height: 100%;
     width: 100%;
     min-width: 1400px;
     display: block;
+    z-index: 314159;
 }
 
 h1.heading {
@@ -302,4 +308,21 @@ a[data-type="rejected"] {
     background: #904445;
     color: #fff;
     border: 1px solid #fafafa;
+}
+
+.review_toggles {
+    text-align: right;
+    padding: 5px 0;
+}
+.review_toggles a {
+    background: #f2f2f2;
+    display: inline-block;
+    padding: 8px 20px;
+    color: #666;
+    cursor: pointer;
+}
+.review_toggles .enabled {
+    z-index: 31415;
+    background: #1f8470;
+    color: #fff;
 }

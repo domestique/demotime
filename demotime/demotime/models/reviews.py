@@ -93,12 +93,18 @@ class Review(BaseModel):
             'state': self.state,
             'reviewer_state': self.reviewer_state,
             'is_public': self.is_public,
-            'project': self.project.to_json(),
+            'project': {
+                'id': self.project.pk,
+                'slug': self.project.slug,
+                'name': self.project.name,
+            },
             'reviewing_count': self.reviewing_count,
             'approved_count': self.approved_count,
             'rejected_count': self.rejected_count,
             'url': self.get_absolute_url(),
             'pk': self.pk,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
 
     def get_absolute_url(self):

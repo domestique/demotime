@@ -7,7 +7,12 @@
 .wysiwyg-container textarea {
     min-height: 100px;
 }
-.comments pre {
+blockquote div br:first-child {
+    display: none;
+}
+.comments pre,
+.comment_parent pre,
+.wysiwyg-container pre {
     font-family: Courier;
     padding: 10px;
     background: #fafafa;

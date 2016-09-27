@@ -52,6 +52,8 @@ class Attachment(BaseModel):
             'static_url': reverse('user-media', args=[self.pk]),
             'attachment_type': self.attachment_type,
             'description': self.description,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
 
     @property
