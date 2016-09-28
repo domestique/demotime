@@ -1,0 +1,40 @@
+<% if (moment.event_type.code == 'comment-added') { %>
+    <a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">new comment</a> from
+<% } else { %>
+    update by
+<% } %>
+<a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+
+<div style="margin:10px 0 0">
+    <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
+        <a href="/accounts/profile/<%= moment.related_object.user_pk %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
+    <% } else if (moment.event_type.code == 'demo-created') { %>
+        This demo was created
+    <% } else if (moment.event_type.code == 'reviewer-approved') { %>
+        <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
+    <% } else if (moment.event_type.code == 'demo-approved') { %>
+        <a class="icon icon-Approved"></a> <%= moment.event_type.name %>!
+    <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
+        <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects.
+    <% } else if (moment.event_type.code == 'demo-rejected') { %>
+        <a class="icon icon-Rejected"></a> <%= moment.event_type.name %>
+    <% } else if (moment.event_type.code == 'reviewer-reset') { %>
+        <%= moment.user.name %> resets an approval status.
+    <% } else if (moment.event_type.code == 'comment-added') { %>
+        <% console.log(moment) %>
+
+        <blockquote>
+            <% if (moment.related_object.comment) { %>
+                <%= jQuery.trim(moment.related_object.comment).substring(0, 125).trim(this) + "..." %></span>
+            <% } %>
+            <% if (moment.related_object.attachments.length && moment.related_object.attachments[0].attachment_type == 'image') { %>
+                <a href="<%= moment.related_object.attachments[0].static_url %>" class="lightbox_img">
+                    <img src="<%= moment.related_object.attachments[0].static_url %>">
+                </a>
+            <% } %>
+            <span class="jump_to_this">(<a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">jump to this</a>)</span>
+        </blockquote>
+    <% } else { %>
+        <%= moment.event_type.name %>
+    <% } %>
+</div>

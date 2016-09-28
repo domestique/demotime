@@ -109,14 +109,16 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         var self = this;
         setTimeout(function() {
             // Grab the container template
-            var html = $('#wysiwyg_footer').html(),
-                template = _.template(html);
-            template = template();
+            if ($('#wysiwyg_footer').length) {
+                var html = $('#wysiwyg_footer').html(),
+                    template = _.template(html);
+                template = template();
 
-            self.$el.find('.wysiwyg-container').append(template);
+                self.$el.find('.wysiwyg-container').append(template);
 
-            // Setup syntax highlighting
-            var syntax = new DemoTime.Syntax();
+                // Setup syntax highlighting
+                var syntax = new DemoTime.Syntax();
+            }
         }, 1000);
     },
 
