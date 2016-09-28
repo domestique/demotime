@@ -115,7 +115,7 @@ DemoTime.Reviewers = Backbone.View.extend({
             swal ({
                 title: 'Whoops',
                 type: 'error',
-                text: 'Your request was denied: ' + err,
+                text: 'Your request was denied: ' + err.responseText,
                 html: true
             });
         });
