@@ -756,7 +756,9 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             self.assertIn(
                 {
                     'user_pk': follower.user.pk, 'name': follower.user.userprofile.name,
-                    'follower_pk': follower.pk, 'review_pk': follower.review.pk
+                    'follower_pk': follower.pk, 'review_pk': follower.review.pk,
+                    'created': follower.created.isoformat(),
+                    'modified': follower.modified.isoformat(),
                 },
                 followers
             )
@@ -768,6 +770,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                     'name': reviewer.reviewer.userprofile.name,
                     'reviewer_status': models.reviews.REVIEWING,
                     'review_pk': reviewer.review.pk,
+                    'created': reviewer.created.isoformat(),
+                    'modified': reviewer.modified.isoformat(),
                 },
                 reviewers
             )

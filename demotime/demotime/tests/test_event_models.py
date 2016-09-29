@@ -101,4 +101,11 @@ class TestEventModels(BaseTestCase):
             'related_type': event.REVIEW,
             'related_type_pretty': 'Review',
             'related_object': review.to_json(),
+            'created': event.created.isoformat(),
+            'modified': event.modified.isoformat(),
+            'user': {
+                'name': event.user.userprofile.name,
+                'username': event.user.username,
+                'pk': event.user.pk
+            },
         })
