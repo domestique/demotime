@@ -152,7 +152,7 @@
                             <small>
                                 {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                             </small>
-                            {% if review.creator == request.user %}
+                            {% if review.creator == request.user or reviewer.reviewer == request.user %}
                                 <small class="person_deleter" style="display:none">
                                     [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
                                 </small>
