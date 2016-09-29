@@ -32,7 +32,7 @@
                     <img src="<%= moment.related_object.attachments[0].static_url %>">
                 </a>
             <% } %>
-            <span class="jump_to_this">(<a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">jump to this</a>)</span>
+            <span class="jump_to_this">(<a href="<%= moment.related_object.url %>">jump to this</a>)</span>
         </blockquote>
     <% } else { %>
         <%= moment.event_type.name %>
