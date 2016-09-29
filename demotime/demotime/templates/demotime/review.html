@@ -224,9 +224,9 @@
             </div>
         </div>
 
-        <article class="review-overview collapser_parent">
-            <h3 class="icon icon-lightbulb collapser">Review Overview</h3>
-            <section class="collapseable">
+        <article class="review-overview">
+            <h3 class="icon icon-lightbulb toggle_sibling">Review Overview</h3>
+            <section>
                 <p>{{ object.description|safe|linebreaksbr }}</p>
 
                 {% if revision.description and object.reviewrevision_set.all.count > 1 and revision.number > 1 %}
@@ -242,9 +242,9 @@
         </article>
 
         {% if revision.attachments.exists %}
-            <article class="collapser_parent">
-                <h3 class="icon icon-attach collapser">Attachments</h3>
-                <section class="attachments collapseable">
+            <article>
+                <h3 class="icon icon-attach toggle_sibling">Attachments</h3>
+                <section class="attachments">
                     {% for attachment in revision.attachments.all %}
                         {% include "includes/review_attachment.html" with attachment=attachment %}
                     {% endfor %}
@@ -254,7 +254,7 @@
 
         {% if revision.commentthread_set.all %}
             <article class="comment_wrapper" id="comments">
-                <h3 class="icon icon-comment collapser">Feedback</h3>
+                <h3 class="icon icon-comment toggle_sibling">Feedback</h3>
                 <section class="comments">
                     {% macro attachments %}
                         {% for attachment in comment.attachments.all %}
@@ -291,52 +291,37 @@
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section id="{{ thread.pk }}" data-thread="{{ thread.pk }}" class="comment_parent collapser_parent">
+                        <section id="{{ thread.pk }}" data-thread="{{ thread.pk }}" class="comment_parent">
                             {% for comment in thread.comment_set.all %}
-                                {% if forloop.first %}
-                                    <label class="icon collapser icon-minus-squared-alt">
-                                        New comment by
-                                        <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
-                                            {{ comment.commenter.userprofile }}
-                                        </a> @
-                                        <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
-                                            {{ comment.created }}
-                                        </a>
-                                        {% if comment.commenter == request.user %}
-                                            (<a href="{% url 'update-comment' comment.pk %}">edit this reply</a>)
-                                        {% endif %}
-                                    </label>
-                                    <blockquote class="collapseable">
-                                        <p>{{ comment.comment|safe|linebreaksbr }}</p>
+                                {% if not forloop.first %}
+                                    <div class="comments-reply">
+                                {% endif %}
+                                    <blockquote>
+                                        <div class="blockquote-header">
+                                            Reply by
+                                            <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                                {{ comment.commenter.userprofile }}
+                                            </a> @
+                                            <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
+                                                {{ comment.created }}
+                                            </a>
+                                            {% if comment.commenter == request.user %}
+                                                (<a href="#" class="comment_edit" data-comment="{{ comment.id }}">edit this reply</a>)
+                                            {% endif %}
+                                        </div>
+                                        <div class="blockquote-body">
+                                            {{ comment.comment|safe|linebreaksbr }}
+                                        </div>
                                     </blockquote>
                                     {% use_macro attachments %}
-                                {% else %}
-                                    <div class="comments-reply collapseable">
-                                        <blockquote>
-                                            <div class="blockquote-header">
-                                                Reply by
-                                                <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
-                                                    {{ comment.commenter.userprofile }}
-                                                </a> @
-                                                <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
-                                                    {{ comment.created }}
-                                                </a>
-                                                {% if comment.commenter == request.user %}
-                                                    (<a href="{% url 'update-comment' comment.pk %}">edit this reply</a>)
-                                                {% endif %}
-                                            </div>
-                                            <div class="blockquote-body">
-                                                <p>{{ comment.comment|safe|linebreaksbr }}</p>
-                                            </div>
-                                        </blockquote>
-                                        {% use_macro attachments %}
-                                    </div>
+                                {% if not forloop.first %}
+                                </div>
                                 {% endif %}
                             {% endfor %}
                             {% if request.user.is_authenticated %}
-                                <div class="comments-reply_new collapseable" style="margin-top: 10px">
+                                <div class="comments-reply_new" style="margin-top: 10px">
                                     <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
-                                    <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
+                                    <div class="comment_form_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
                                         {% use_macro comment 'Reply' %}
                                     </div>
                                 </div>
@@ -351,7 +336,7 @@
             <article class="comment_wrapper">
                 <h3 class="heading">Post a New Comment</h3>
                 <section class="comment_parent new_comment">
-                    <div class="comment_container">
+                    <div class="comment_form_container">
                         {% use_macro comment 'Reply' %}
                     </div>
                 </section>

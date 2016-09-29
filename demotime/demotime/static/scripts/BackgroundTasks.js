@@ -60,7 +60,6 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         });
 
         req.always(function(data) {
-            console.log(data);
             if (data.message_count > 0) {
                 console.log('Running background tasks and received new messages');
                 $('.msg_notifier').removeClass('read_notification').addClass('unread_notification').find('a').html(data.message_count);
