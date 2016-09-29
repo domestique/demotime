@@ -107,6 +107,10 @@
             </small>
         </h1>
 
+        {% if not request.user.is_authenticated and not request.COOKIES.suppress_new_user_cta %}
+            {% include "includes/new_user_cta.html" %}
+        {% endif %}
+
         {# Events #}
         <div class="review_toggles">
             <a href="#" id="activity_toggler">Activity log</a>

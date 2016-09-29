@@ -87,6 +87,10 @@ DemoTime.Comments = Backbone.View.extend({
                     self.options.container.slideUp();
                 } else {
                     comment_parent.find('.wysiwyg-editor').html('').focus();
+                    self.options.container.find('input[type="file"]').val('');
+                    self.options.container.find('select[name="attachment_type"]').val('');
+                    self.options.container.find('input[name="description"]').val('');
+
                 }
 
                 // Write the new comment HTML
@@ -242,7 +246,7 @@ DemoTime.Comments = Backbone.View.extend({
         container.find('.wysiwyg-editor').html('');
         container.find('input[type="file"]').val('');
         container.find('select[name="attachment_type"]').val('');
-        container.find('input[name="attachment_description"]').val('');
+        container.find('input[name="description"]').val('');
 
         // Show new comment container
         this.options.trigger_link.next('.comment_container').slideDown(function() {

@@ -106,7 +106,7 @@ input[type="button"].button-clear,
 button.button-clear {
     background: none;
     color: #333;
-    box-shadow: none;
+    border: 1px solid #ccc;
 }
 
 select[multiple="multiple"]{

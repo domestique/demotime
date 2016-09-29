@@ -301,12 +301,34 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(comment.comment, 'test_comment_json_create_comment_thread')
         self.assertEqual(comment.attachments.count(), 1)
 
+    def test_comment_creation_without_comment(self):
+        fh = StringIO('testing')
+        fh.name = 'test_file_1'
+        response = self.client.post(self.api_url, {
+            'comment': "",
+            'attachment': fh,
+            'attachment_type': 'image',
+            'description': 'Test Description',
+            'sort_order': 1,
+        })
+        self.assertStatusCode(response, 200)
+        comment = models.Comment.objects.latest('created')
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
+        self.assertEqual(comment.comment, '')
+        self.assertEqual(comment.attachments.count(), 1)
+
     def test_comment_json_create_comment_error(self):
         response = self.client.post(self.api_url, {})
         self.assertStatusCode(response, 200)
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'failure',
-            'errors': {'comment': ['This field is required.']},
+            'errors': {
+                'comment': [
+                    'Comment is required if an attachment is not provided'
+                ]
+            },
             'comment': {}
         })
 
