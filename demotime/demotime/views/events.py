@@ -40,6 +40,12 @@ class EventView(CanViewJsonView):
             json_data['errors'] = form.errors
             return json_data
 
+        events = events.select_related(
+            'project', 'review', 'user',
+            'user__userprofile',
+        ).prefetch_related(
+            'related_object',
+        )
         for event in events:
             json_data['events'].append(event.to_json())
 

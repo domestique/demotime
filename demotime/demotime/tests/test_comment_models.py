@@ -294,5 +294,7 @@ class TestCommentModels(BaseTestCase):
             'name': comment.commenter.userprofile.name,
             'comment': comment.comment,
             'attachment_count': comment.attachments.count(),
-            'attachments': [comment.attachments.get().to_json()]
+            'attachments': [comment.attachments.get().to_json()],
+            'created': comment.created.isoformat(),
+            'modified': comment.modified.isoformat(),
         })

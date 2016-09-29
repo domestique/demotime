@@ -5,8 +5,9 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
     initialize: function(options) {
         this.options = options;
         this.options.counter = 0;
-        this.options.check_every = 60000; // check for msgs every minute (60,000ms)
-        this.options.max_attempts = 120; // after 120 mins of inactivity, ajax stops
+        this.options.message_count = 0;
+        this.options.check_every = 15000; // check for msgs every 15 seconds (15,000ms)
+        this.options.max_attempts = 480; // after 2 hours of inactivity, ajax stops
         this.render();
     },
 
@@ -28,7 +29,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
     check_activity_count: function() {
         var self = this;
 
-        // Cancelling background task after an hour of no activity
+        // Cancelling background task after a period of no activity
         if ((self.options.counter > self.options.max_attempts) && self.options.interval) {
             clearInterval(self.options.interval);
             self.options.noty = noty({
@@ -59,6 +60,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         });
 
         req.always(function(data) {
+            console.log(data);
             if (data.message_count > 0) {
                 console.log('Running background tasks and received new messages');
                 $('.msg_notifier').removeClass('read_notification').addClass('unread_notification').find('a').html(data.message_count);
@@ -83,7 +85,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
         });
 
         req.success(function(data) {
-            if (data.message_count > 0 && !self.options.noty) {
+            if (data.message_count > 0 && !self.options.noty && (self.options.last_pk != data.bundles[0].bundle_pk)) {
                 var update_obj = data.bundles[0].messages[0],
                     bundle_obj = data.bundles[0];
 
@@ -100,14 +102,14 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                         },
                         callback: {
                             onCloseClick: function() {
-                                // Redirect the user to the comment
-                                if (update_obj.is_comment) {
-                                    var url_hook = '#comments';
-                                    window.location.href = self.options.site_url + '#comments';
-                                    window.location.reload();
-                                // Or just reload the review
+                                // self.options.noty = null;
+                                // See site activity
+                                self.options.last_pk = data.bundles[0].bundle_pk;
+                                ScrollToLink.jump_to_link('review');
+                                if ($('#events').is(':visible')) {
+                                    $('#refresh_events').click();
                                 } else {
-                                    window.location.href = self.options.site_url;
+                                    $('#activity_toggler').click();
                                 }
                             }
                         }

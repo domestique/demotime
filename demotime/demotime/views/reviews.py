@@ -12,7 +12,15 @@ class ReviewDetail(CanViewMixin, DetailView):
     template_name = 'demotime/review.html'
     model = models.Review
 
-    @method_decorator(login_required)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = None
+        self.review = None
+        self.revision = None
+        self.comment = None
+        self.comment_form = None
+        self.attachment_form = None
+
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(
             models.Project,
@@ -39,15 +47,17 @@ class ReviewDetail(CanViewMixin, DetailView):
             self.revision = self.get_object().revision
 
         self.review = self.revision.review
-        self.comment = models.Comment(
-            commenter=self.request.user
-        )
-        self.attachment_form = None
-        self.comment_form = None
-        models.MessageBundle.objects.filter(
-            owner=request.user,
-            review=self.revision.review
-        ).update(read=True)
+        if self.request.user.is_authenticated():
+            self.comment = models.Comment(
+                commenter=self.request.user
+            )
+            models.MessageBundle.objects.filter(
+                owner=request.user,
+                review=self.revision.review
+            ).update(read=True)
+            self.user = self.request.user
+        else:
+            self.user = None
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -55,7 +65,7 @@ class ReviewDetail(CanViewMixin, DetailView):
         try:
             reviewer = models.Reviewer.objects.get(
                 review=self.revision.review,
-                reviewer=self.request.user
+                reviewer=self.user
             )
         except models.Reviewer.DoesNotExist:
             reviewer = None
@@ -74,14 +84,14 @@ class ReviewDetail(CanViewMixin, DetailView):
                 initial={'review': self.revision.review}
             )
 
-        if self.revision.review.reviewer_set.filter(reviewer=self.request.user).exists():
+        if self.revision.review.reviewer_set.filter(reviewer=self.user).exists():
             context['reviewer'] = self.revision.review.reviewer_set.get(
-                reviewer=self.request.user
+                reviewer=self.user
             )
 
         models.UserReviewStatus.objects.filter(
             review=self.revision.review,
-            user=self.request.user,
+            user=self.user,
         ).update(read=True)
         context['project'] = self.project
         context['revision'] = self.revision
@@ -127,6 +137,13 @@ class ReviewDetail(CanViewMixin, DetailView):
 
 class CreateReviewView(TemplateView):
     template_name = 'demotime/create_review.html'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = None
+        self.review_inst = None
+        self.review_form = None
+        self.attachment_forms = None
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -255,6 +272,12 @@ class ReviewerStatusView(CanViewJsonView):
 
     status = 200
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.reviewer = None
+        self.review = None
+        self.project = None
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         reviewer_pk = kwargs['reviewer_pk']
@@ -265,6 +288,7 @@ class ReviewerStatusView(CanViewJsonView):
         self.project = self.review.project
         return super(ReviewerStatusView, self).dispatch(*args, **kwargs)
 
+    # pylint: disable=unused-argument
     def post(self, *args, **kwargs):
         form = forms.ReviewerStatusForm(self.reviewer, data=self.request.POST)
         if form.is_valid():
@@ -293,6 +317,11 @@ class ReviewStateView(CanViewJsonView):
 
     status = 200
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.review = None
+        self.project = None
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         review_pk = kwargs['pk']
@@ -300,6 +329,7 @@ class ReviewStateView(CanViewJsonView):
         self.project = self.review.project
         return super(ReviewStateView, self).dispatch(*args, **kwargs)
 
+    # pylint: disable=unused-argument
     def post(self, *args, **kwargs):
         form = forms.ReviewStateForm(
             self.request.user, self.review.pk, data=self.request.POST
@@ -324,6 +354,11 @@ class ReviewStateView(CanViewJsonView):
 
 class ReviewJsonView(CanViewJsonView):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.review = None
+        self.project = None
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.review = get_object_or_404(
@@ -334,9 +369,11 @@ class ReviewJsonView(CanViewJsonView):
         self.project = self.review.project
         return super(ReviewJsonView, self).dispatch(*args, **kwargs)
 
+    # pylint: disable=unused-argument
     def get(self, request, *args, **kwargs):
         return self.review.to_json()
 
+    # pylint: disable=unused-argument
     def post(self, request, *args, **kwargs):
         if self.review.creator != request.user:
             self.status = 403
@@ -365,6 +402,10 @@ class ReviewJsonView(CanViewJsonView):
 
 class ReviewSearchJsonView(JsonView):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.projects = None
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.projects = self.request.user.projects
@@ -379,6 +420,7 @@ class ReviewSearchJsonView(JsonView):
             )
         return super(ReviewSearchJsonView, self).dispatch(*args, **kwargs)
 
+    # pylint: disable=unused-argument
     def post(self, *args, **kwargs):
         form = forms.ReviewFilterForm(
             self.projects,
@@ -412,6 +454,7 @@ class DTRedirectView(RedirectView):
         kwargs['proj_slug'] = review.project.slug
         return super(DTRedirectView, self).get_redirect_url(*args, **kwargs)
 
+# pylint: disable=invalid-name
 review_form_view = CreateReviewView.as_view()
 review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
