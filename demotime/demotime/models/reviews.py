@@ -151,7 +151,7 @@ class Review(BaseModel):
     def create_review(
             cls, creator, title, description,
             case_link, reviewers, project,
-            followers=None, attachments=None):
+            is_public=False, followers=None, attachments=None):
         ''' Standard review creation method '''
         obj = cls.objects.create(
             creator=creator,
@@ -161,6 +161,7 @@ class Review(BaseModel):
             state=OPEN,
             reviewer_state=REVIEWING,
             project=project,
+            is_public=is_public,
         )
         rev = ReviewRevision.objects.create(
             review=obj,
@@ -217,13 +218,14 @@ class Review(BaseModel):
     def update_review(
             cls, review, creator, title, description,
             case_link, reviewers, project,
-            followers=None, attachments=None
+            is_public=False, followers=None, attachments=None
         ):
         ''' Standard update review method '''
         obj = cls.objects.get(pk=review)
         obj.title = title
         obj.case_link = case_link
         obj.project = project
+        obj.is_public = is_public
         obj.save()
         prev_revision = obj.revision
         rev_count = obj.reviewrevision_set.count()
