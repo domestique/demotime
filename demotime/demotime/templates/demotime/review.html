@@ -147,61 +147,63 @@
                 <br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
-            <div class="cel reviewers">
-                <h4 class="heading">
-                    Reviewers & Followers:
-                    <span class="help" title="When you assign someone as a 'reviewer' they
-                    will need to either approve or reject a demo. A follower can simply follow
-                    the progress of a demo without the ability or need to approve or reject."></span>
-                </h4>
-                <ul class="reviewer_ul">
-                    {% for reviewer in object.reviewer_set.all %}
-                        <li>
-                            <a class="icon icon-{{ reviewer.get_status_display }}"
-                               href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
-                                {{ reviewer.reviewer.userprofile }}</a>
-                            <small>
-                                {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
-                            </small>
-                            {% if review.creator == request.user or reviewer.reviewer == request.user %}
-                                <small class="person_deleter" style="display:none">
-                                    [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+            {% if request.user.is_authenticated %}
+                <div class="cel reviewers">
+                    <h4 class="heading">
+                        Reviewers & Followers:
+                        <span class="help" title="When you assign someone as a 'reviewer' they
+                        will need to either approve or reject a demo. A follower can simply follow
+                        the progress of a demo without the ability or need to approve or reject."></span>
+                    </h4>
+                    <ul class="reviewer_ul">
+                        {% for reviewer in object.reviewer_set.all %}
+                            <li>
+                                <a class="icon icon-{{ reviewer.get_status_display }}"
+                                   href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
+                                    {{ reviewer.reviewer.userprofile }}</a>
+                                <small>
+                                    {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                                 </small>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-                <ul class="follower_ul">
-                    {% for follower in object.follower_set.all %}
-                        <li>
-                            <a href="{{ follower.user.userprofile.get_absolute_url }}">
-                                {{ follower.user.userprofile }}</a>
-                            <small>
-                                following
-                            </small>
-                            {% if review.creator == request.user or follower.user == request.user %}
-                                <small class="person_deleter" style="display:none">
-                                    [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                {% if review.creator == request.user or reviewer.reviewer == request.user %}
+                                    <small class="person_deleter" style="display:none">
+                                        [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+                                    </small>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="follower_ul">
+                        {% for follower in object.follower_set.all %}
+                            <li>
+                                <a href="{{ follower.user.userprofile.get_absolute_url }}">
+                                    {{ follower.user.userprofile }}</a>
+                                <small>
+                                    following
                                 </small>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-                <ul class="find_person_ul">
-                    {% if object.state != "closed" %}
-                        <li class="find_person_li">
-                            <div class="split by:2 with-gap:2">
-                                <div class="cel">
-                                    <input type="text" class="find_person" data-action="find_reviewer" placeholder="add reviewer" maxlength="3">
+                                {% if review.creator == request.user or follower.user == request.user %}
+                                    <small class="person_deleter" style="display:none">
+                                        [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                    </small>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="find_person_ul">
+                        {% if object.state != "closed" %}
+                            <li class="find_person_li">
+                                <div class="split by:2 with-gap:2">
+                                    <div class="cel">
+                                        <input type="text" class="find_person" data-action="find_reviewer" placeholder="add reviewer" maxlength="3">
+                                    </div>
+                                    <div class="cel">
+                                        <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
+                                    </div>
                                 </div>
-                                <div class="cel">
-                                    <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
-                                </div>
-                            </div>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
             <div class="cel">
                 <h4 class="heading">
                     Demo Revisions:
@@ -331,26 +333,30 @@
                                     </div>
                                 {% endif %}
                             {% endfor %}
-                            <div class="comments-reply_new collapseable">
-                                <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
-                                <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
-                                    {% use_macro comment 'Reply' %}
+                            {% if request.user.is_authenticated %}
+                                <div class="comments-reply_new collapseable" style="margin-top: 10px">
+                                    <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
+                                    <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
+                                        {% use_macro comment 'Reply' %}
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         </section>
                     {% endfor %}
                 </section>
             </article>
         {% endif %}
 
-        <article class="comment_wrapper">
-            <h3 class="heading">Post a New Comment</h3>
-            <section class="comment_parent new_comment">
-                <div class="comment_container">
-                    {% use_macro comment 'Reply' %}
-                </div>
-            </section>
-        </article>
+        {% if request.user.is_authenticated %}
+            <article class="comment_wrapper">
+                <h3 class="heading">Post a New Comment</h3>
+                <section class="comment_parent new_comment">
+                    <div class="comment_container">
+                        {% use_macro comment 'Reply' %}
+                    </div>
+                </section>
+            </article>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

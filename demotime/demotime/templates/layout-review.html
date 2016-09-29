@@ -104,11 +104,16 @@ h1 em {
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <h3 class="">{{ review_form.is_public.label }}</h3>
-                    {{ review_form.is_public.errors }}
-                    {{ review_form.is_public }}
-                </div>
+                <section>
+                    <div class="form-group">
+                        <label>
+                            {{ review_form.is_public }} Make demo <strong>public</strong>
+                            <span class="help" title="Public demos can be viewed by anyone outside of
+                            DemoTime."></span>
+                        </label>
+                        <div>{{ review_form.is_public.errors }}</div>
+                    </div>
+                </section>
                 {% block form_warning %}{% endblock %}
                 <div class="form-group">
                     <input type="submit" value="{% block button_text %}{% endblock %}">
