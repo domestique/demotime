@@ -194,6 +194,11 @@ DemoTime.Comments = Backbone.View.extend({
         this.options.comment_form_container.slideDown(function() {
             self.options.comment_form_container.find('.wysiwyg-editor').html(edit_html);
             self.options.comment_form_container.find('.wysiwyg-editor').focus();
+            if ($(window).width() > 720) {
+                $('html, body').animate({
+                    scrollTop: self.options.comment_form_container.offset().top - 200
+                }, 500);
+            }
         });
     },
 
