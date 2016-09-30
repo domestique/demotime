@@ -360,10 +360,12 @@ class TestUserApiReviewers(BaseTestCase):
             'errors': {'user_pk': 'User not currently on review'}
         })
 
-    def test_delete_reviewer_not_owner(self):
-        ''' Test deleting a reviewer from a review you do not own '''
+    def test_delete_reviewer_not_owner_not_reviewer(self):
+        ''' Test deleting a reviewer from a review you do not own nor are a
+        reviewer on
+        '''
         self.client.logout()
-        self.client.login(
+        assert self.client.login(
             username='test_user_2',
             password='testing',
         )
@@ -376,6 +378,35 @@ class TestUserApiReviewers(BaseTestCase):
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(self.review.reviewers.count(), 2)
+
+    def test_delete_self_as_reviewer(self):
+        ''' Test that asserts that you can remove yourself as a reviewer '''
+        self.client.logout()
+        assert self.client.login(
+            username='test_user_1',
+            password='testing',
+        )
+        test_user_1 = User.objects.get(username='test_user_1')
+        self.assertEqual(self.review.reviewers.count(), 2)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': test_user_1.pk,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'success': True,
+            'errors': {}
+        })
+        self.assertEqual(self.review.reviewers.count(), 1)
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(event.user, test_user_1)
+        self.assertEqual(event.related_object, self.review)
 
 
 class TestUserApiFollowers(BaseTestCase):

@@ -16,6 +16,10 @@ class UserAPI(JsonView):
         'add_reviewer', 'find_reviewer', 'drop_reviewer'
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.review = None
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         self.review = None
@@ -28,6 +32,7 @@ class UserAPI(JsonView):
             pk=sys_user.pk
         )
 
+    # pylint: disable=no-self-use
     def _build_json(self, users, errors, success=True):
         json_dict = {
             'errors': errors,
@@ -43,6 +48,7 @@ class UserAPI(JsonView):
 
         return json_dict
 
+    # pylint: disable=no-self-use
     def _filter_users_by_name(self, users, name):
         return users.filter(
             Q(username__icontains=name) |
@@ -260,15 +266,6 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User identifier missing'}
             }
 
-        if self.request.user != self.review.creator:
-            self.status = 400
-            return {
-                'success': False,
-                'errors': {
-                    'user_pk': "Can not remove reviewers from reviews you don't own"
-                }
-            }
-
         try:
             user = User.objects.get(pk=post_data['user_pk'])
         except User.DoesNotExist:
@@ -289,13 +286,26 @@ class UserAPI(JsonView):
                 'success': False,
                 'errors': {'user_pk': 'User not currently on review'}
             }
-        else:
-            reviewer.drop_reviewer(self.request.user)
+
+        if (
+                self.request.user != self.review.creator and
+                self.request.user != reviewer.reviewer
+            ):
+            self.status = 400
             return {
-                'success': True,
-                'errors': {},
+                'success': False,
+                'errors': {
+                    'user_pk': "Can not remove reviewers from reviews you don't own"
+                }
             }
 
+        reviewer.drop_reviewer(self.request.user)
+        return {
+            'success': True,
+            'errors': {},
+        }
+
+    # pylint: disable=unused-argument
     def post(self, *args, **kwargs):
         post_data = self.request.POST.copy()
         action = post_data.get('action')
