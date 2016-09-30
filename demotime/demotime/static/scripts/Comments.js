@@ -96,9 +96,6 @@ DemoTime.Comments = Backbone.View.extend({
                 // Write the new comment HTML
                 var html = self.get_success_html(data);
 
-                // Save pk for editing
-                self.options.comment_pk = data.comment.id;
-
                 // New comment DOM's a bit different than threaded DOM:
                 if (thread) {
                     self.options.container.parent().before(html);
@@ -139,7 +136,7 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     get_success_html: function(data) {
-        var html = '<div class="comments-reply">';
+        var html = '<div class="comments-reply" data-comment="' + data.comment.id + '">';
 
         html += '<blockquote><div class="blockquote-body">' + this.options.comment;
 
@@ -186,6 +183,9 @@ DemoTime.Comments = Backbone.View.extend({
 
         // Enable 'editing' mode
         this.options.container.data('editing', true);
+
+        // Grab comment ID
+        this.options.comment_pk = reply.data('comment');
 
         // Re-show wysiwyg
         this.options.container.slideDown(function() {
