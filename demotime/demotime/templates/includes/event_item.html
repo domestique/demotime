@@ -1,9 +1,11 @@
 <% if (moment.event_type.code == 'comment-added') { %>
     <a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">new comment</a> from
-<% } else { %>
+    <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+<% } else if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
     update by
+    <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
 <% } %>
-<a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+
 
 <div style="margin:10px 0 0">
     <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
@@ -20,9 +22,11 @@
         <a class="icon icon-Rejected"></a> <%= moment.event_type.name %>
     <% } else if (moment.event_type.code == 'reviewer-reset') { %>
         <%= moment.user.name %> resets an approval status.
+    <% } else if (moment.event_type.code == 'reviewer-removed') { %>
+        <%= moment.user.name %> was removed as a reviewer.
+    <% } else if (moment.event_type.code == 'follower-removed') { %>
+        <%= moment.user.name %> was removed as a follower.
     <% } else if (moment.event_type.code == 'comment-added') { %>
-        <% console.log(moment) %>
-
         <blockquote>
             <% if (moment.related_object.comment) { %>
                 <%= jQuery.trim(moment.related_object.comment).substring(0, 125).trim(this) + "..." %></span>
