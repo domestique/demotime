@@ -26,6 +26,11 @@ class CanViewMixin(UserPassesTestMixin):
                 self.raise_exception = False
             return False
 
+        if (getattr(self, 'review', None)
+                and self.review.state == constants.DRAFT
+                and self.request.user != self.review.creator):
+            return False
+
         if (not self.require_admin_privileges) and (
                 self.project.is_public or (self.review and self.review.is_public)
         ):
@@ -106,6 +111,10 @@ class IndexView(TemplateView):
         context['open_demos'] = models.Review.objects.filter(
             creator=self.request.user,
             state=constants.OPEN,
+        )
+        context['drafts'] = models.Review.objects.filter(
+            creator=self.request.user,
+            state=constants.DRAFT
         )
 
         open_review_pks = models.Reviewer.objects.filter(

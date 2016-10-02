@@ -71,6 +71,16 @@ h1 em {
                     {{ review_form.description }}
                     {{ review_form.description.errors }}
                 </div>
+                {% if review_inst.revision.attachments.exists %}
+                    <article class="collapser_parent">
+                        <h3 class="icon icon-attach collapser">Current Attachments</h3>
+                        <section class="attachments collapseable">
+                            {% for attachment in review_inst.revision.attachments.all %}
+                                {% include "includes/review_attachment.html" with attachment=attachment %}
+                            {% endfor %}
+                        </section>
+                    </article>
+                {% endif %}
                 <div class="attachments">
                     <h3 class="icon icon-attach">Attachments <small>Optionally present with screenshots, screencasts, documents, etc</small></h3>
                     {{ attachment_forms.management_form }}

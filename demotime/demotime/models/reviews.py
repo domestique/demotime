@@ -235,9 +235,14 @@ class Review(BaseModel):
         if current_state == DRAFT and state == OPEN:
             state_change = True
 
-        if state == DRAFT:
+        if state == DRAFT or state_change:
+            obj.description = description
+            obj.save()
             rev = obj.revision
-        else:
+            rev.description = description
+            rev.save()
+
+        if state != DRAFT and not state_change:
             is_update = True
             prev_revision = obj.revision
             rev_count = obj.reviewrevision_set.count()
@@ -256,7 +261,7 @@ class Review(BaseModel):
             )
 
         # No attachments, we'll copy them over
-        if not attachments:
+        if not attachments and state != DRAFT:
             for attachment in prev_revision.attachments.all():
                 attachment.content_object = rev
                 attachment.pk = None
@@ -309,6 +314,7 @@ class Review(BaseModel):
 
         if state_change:
             obj.update_state(state)
+            obj._send_revision_messages() # pylint: disable=protected-access
 
         return obj
 

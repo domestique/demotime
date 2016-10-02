@@ -184,7 +184,6 @@ class CreateReviewView(TemplateView):
             data['creator'] = request.user
             data['project'] = self.project
             data['attachments'] = []
-            state = data['state']
             for form in self.attachment_forms.forms:
                 if form.cleaned_data:
                     if not form.cleaned_data['attachment']:
@@ -213,16 +212,19 @@ class CreateReviewView(TemplateView):
         if request.method == 'GET':
             # If we're using this method as the POST error path, let's
             # preserve the existing forms. Also, maybe this is dumb?
+            description = ''
             if pk:
                 self.review_inst = get_object_or_404(models.Review, pk=pk)
                 self.template_name = 'demotime/edit_review.html'
+                if self.review_inst.state == constants.DRAFT:
+                    description = self.review_inst.description
             else:
                 self.review_inst = models.Review(creator=self.request.user)
             self.review_form = forms.ReviewForm(
                 user=self.request.user,
                 instance=self.review_inst,
                 project=self.project,
-                initial={'description': ''},
+                initial={'description': description},
             )
             # pylint: disable=invalid-name
             AttachmentFormSet = formset_factory(
