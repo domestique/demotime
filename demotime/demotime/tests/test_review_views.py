@@ -473,6 +473,26 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             4
         )
 
+    def test_post_delete_draft(self):
+        draft_kwargs = self.default_review_kwargs.copy()
+        draft_kwargs['state'] = constants.DRAFT
+        draft_review = models.Review.create_review(**draft_kwargs)
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, draft_review.pk]),
+            {
+                'project': self.project.pk,
+                'trash': True,
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+            }
+        )
+        self.assertStatusCode(response, 302)
+        self.assertFalse(
+            models.Review.objects.filter(pk=draft_review.pk).exists()
+        )
+
     def test_post_create_review_empty_attachments_not_created(self):
         fh = StringIO('testing')
         fh.name = 'test_file_1'

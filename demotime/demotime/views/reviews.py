@@ -20,6 +20,7 @@ class ReviewDetail(CanViewMixin, DetailView):
         self.comment = None
         self.comment_form = None
         self.attachment_form = None
+        self.user = None
 
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(
@@ -181,6 +182,12 @@ class CreateReviewView(TemplateView):
         )
         if self.review_form.is_valid() and self.attachment_forms.is_valid():
             data = self.review_form.cleaned_data
+            if (data.get('trash') and self.review_inst and
+                    self.review_inst.state == constants.DRAFT):
+                # Draft deleted!
+                self.review_inst.delete()
+                return redirect('index')
+
             data['creator'] = request.user
             data['project'] = self.project
             data['attachments'] = []

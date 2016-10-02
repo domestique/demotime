@@ -125,9 +125,17 @@ h1 em {
                     </div>
                 </section>
                 {{ review_form.state }}
+                {{ review_form.trash }}
                 {% block form_warning %}{% endblock %}
                 <div class="form-group">
-                    <input id="save-draft" type="submit" value="Save Draft">
+                    {% if review_inst.pk %}
+                        {% if review_inst.state == 'draft' %}
+                            <input id="save-draft" type="submit" value="Save Draft">
+                            <input id="delete-draft" type="submit" value="Delete Draft">
+                        {% endif %}
+                    {% else %}
+                        <input id="save-draft" type="submit" value="Save Draft">
+                    {% endif %}
                     <input id="create-demo" type="submit" value="{% block button_text %}{% endblock %}">
                     <input type="button" class="button-clear" value="Cancel" onclick="javascript: history.go(-1)">
                 </div>
@@ -146,6 +154,9 @@ $('#save-draft').click(function(){
 });
 $('#create-demo').click(function(){
     $('#id_state').val('open');
+});
+$('#delete-draft').click(function(){
+    $('#id_trash').val(true);
 });
 </script>>
 {% endblock %}

@@ -35,11 +35,27 @@ class ReviewForm(forms.ModelForm):
         self.fields['followers'].queryset = user_queryset
         self.fields['followers'].required = False
 
-        for key, value in self.fields.items():
+        for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
         if self.instance.pk:
             self.fields['description'].required = False
+            self.fields['trash'] = forms.BooleanField(
+                required=False,
+                widget=forms.HiddenInput
+            )
+
+    def clean(self):
+        data = self.cleaned_data
+        if self.instance.pk and data.get('trash'):
+            for key, _ in list(self.errors.items()):
+                del self.errors[key]
+            return data
+
+        cleaned_data = super().clean()
+        if cleaned_data.get('trash'):
+            del cleaned_data['trash']
+        return cleaned_data
 
     class Meta:
         model = models.Review
@@ -105,7 +121,7 @@ class ReviewFilterForm(forms.Form):
     def __init__(self, projects, *args, **kwargs):
         super(ReviewFilterForm, self).__init__(*args, **kwargs)
         self.projects = projects
-        for key, value in self.fields.items():
+        for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     def get_reviews(self, initial_qs=None):
