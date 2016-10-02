@@ -68,4 +68,13 @@ class AttachmentForm(forms.Form):
 
 
 class UpdateCommentForm(CommentForm, AttachmentForm):
-    pass
+
+    def clean(self):
+        data = self.cleaned_data
+        comment = data.get('comment')
+        attachment = data.get('attachment')
+        if not comment and not attachment:
+            self.add_error(
+                'comment',
+                'Comment is required if an attachment is not provided'
+            )

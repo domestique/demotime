@@ -120,6 +120,13 @@ class Event(BaseModel):
             'related_type': self.related_type,
             'related_type_pretty': self.get_related_type_display(),
             'related_object': self.related_object.to_json(),
+            'user': {
+                'name': self.user.userprofile.name,
+                'username': self.user.username,
+                'pk': self.user.pk
+            },
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
 
     class Meta:

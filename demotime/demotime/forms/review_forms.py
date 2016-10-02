@@ -45,7 +45,7 @@ class ReviewForm(forms.ModelForm):
         model = models.Review
         fields = (
             'reviewers', 'description', 'title',
-            'case_link', 'followers',
+            'case_link', 'followers', 'is_public'
         )
 
 

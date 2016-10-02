@@ -37,7 +37,7 @@ class Comment(BaseModel):
     MENTION_REGEX = re.compile(r'@[\w\d_-]+')
 
     commenter = models.ForeignKey('auth.User')
-    comment = models.TextField()
+    comment = models.TextField(blank=True)
     thread = models.ForeignKey('CommentThread')
     attachments = GenericRelation('Attachment')
     events = GenericRelation('Event')
@@ -54,7 +54,9 @@ class Comment(BaseModel):
             'comment': self.comment,
             'thread': self.thread.pk,
             'attachment_count': self.attachments.count(),
-            'attachments': []
+            'attachments': [],
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
         for attachment in self.attachments.all():
             comment_json['attachments'].append(attachment.to_json())

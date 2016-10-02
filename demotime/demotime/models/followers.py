@@ -27,6 +27,8 @@ class Follower(BaseModel):
             'user_pk': self.user.pk,
             'follower_pk': self.pk,
             'review_pk': self.review.pk,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
 
     @classmethod

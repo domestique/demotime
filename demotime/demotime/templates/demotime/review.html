@@ -45,6 +45,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="review" id="review">
     <div class="review-top">
         {% if request.user == object.creator %}
@@ -106,6 +107,16 @@
             </small>
         </h1>
 
+        {% if not request.user.is_authenticated and not request.COOKIES.suppress_new_user_cta %}
+            {% include "includes/new_user_cta.html" %}
+        {% endif %}
+
+        {# Events #}
+        <div class="review_toggles">
+            <a href="#" id="activity_toggler">Activity log</a>
+        </div>
+        <section class="review-overview events" id="events" style="display:none"></section>
+
         <div class="review-meta with-gap:5">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
@@ -136,61 +147,63 @@
                 <br><br>
                 <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
             </div>
-            <div class="cel reviewers">
-                <h4 class="heading">
-                    Reviewers & Followers:
-                    <span class="help" title="When you assign someone as a 'reviewer' they
-                    will need to either approve or reject a demo. A follower can simply follow
-                    the progress of a demo without the ability or need to approve or reject."></span>
-                </h4>
-                <ul class="reviewer_ul">
-                    {% for reviewer in object.reviewer_set.all %}
-                        <li>
-                            <a class="icon icon-{{ reviewer.get_status_display }}"
-                               href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
-                                {{ reviewer.reviewer.userprofile }}</a>
-                            <small>
-                                {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
-                            </small>
-                            {% if review.creator == request.user %}
-                                <small class="person_deleter" style="display:none">
-                                    [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+            {% if request.user.is_authenticated %}
+                <div class="cel reviewers">
+                    <h4 class="heading">
+                        Reviewers & Followers:
+                        <span class="help" title="When you assign someone as a 'reviewer' they
+                        will need to either approve or reject a demo. A follower can simply follow
+                        the progress of a demo without the ability or need to approve or reject."></span>
+                    </h4>
+                    <ul class="reviewer_ul">
+                        {% for reviewer in object.reviewer_set.all %}
+                            <li>
+                                <a class="icon icon-{{ reviewer.get_status_display }}"
+                                   href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
+                                    {{ reviewer.reviewer.userprofile }}</a>
+                                <small>
+                                    {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                                 </small>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-                <ul class="follower_ul">
-                    {% for follower in object.follower_set.all %}
-                        <li>
-                            <a href="{{ follower.user.userprofile.get_absolute_url }}">
-                                {{ follower.user.userprofile }}</a>
-                            <small>
-                                following
-                            </small>
-                            {% if review.creator == request.user or follower.user == request.user %}
-                                <small class="person_deleter" style="display:none">
-                                    [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                {% if review.creator == request.user or reviewer.reviewer == request.user %}
+                                    <small class="person_deleter" style="display:none">
+                                        [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+                                    </small>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="follower_ul">
+                        {% for follower in object.follower_set.all %}
+                            <li>
+                                <a href="{{ follower.user.userprofile.get_absolute_url }}">
+                                    {{ follower.user.userprofile }}</a>
+                                <small>
+                                    following
                                 </small>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-                <ul class="find_person_ul">
-                    {% if object.state != "closed" %}
-                        <li class="find_person_li">
-                            <div class="split by:2 with-gap:2">
-                                <div class="cel">
-                                    <input type="text" class="find_person" data-action="find_reviewer" placeholder="add reviewer" maxlength="3">
+                                {% if review.creator == request.user or follower.user == request.user %}
+                                    <small class="person_deleter" style="display:none">
+                                        [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
+                                    </small>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <ul class="find_person_ul">
+                        {% if object.state != "closed" %}
+                            <li class="find_person_li">
+                                <div class="split by:2 with-gap:2">
+                                    <div class="cel">
+                                        <input type="text" class="find_person" data-action="find_reviewer" placeholder="add reviewer" maxlength="3">
+                                    </div>
+                                    <div class="cel">
+                                        <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
+                                    </div>
                                 </div>
-                                <div class="cel">
-                                    <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
-                                </div>
-                            </div>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
             <div class="cel">
                 <h4 class="heading">
                     Demo Revisions:
@@ -210,24 +223,6 @@
                 {% endfor %}
             </div>
         </div>
-
-        <article class="review-overview events" style="display: none">
-            <h3>Events</h3>
-            <p>Debug section, move along please</p>
-            <section>
-                {% for event in object.event_set.all %}
-                    <p>Event: {{ event.event_type.name }} - {{ event.event_type.code }}</p>
-                    <ul>
-                        <li>Project: {{ event.project }} - {{ event.project.slug }}</li>
-                        <li>Review: {{ event.review }} - {{ event.review.pk }}</li>
-                        <li>User: {{ event.user }}</li>
-                        <li>Created: {{ event.created }}</li>
-                        <li>Related Object: {{ event.related_object }}</li>
-                        <li>Related Type: {{ event.related_type }}</li>
-                    </ul>
-                {% endfor %}
-            </section>
-        </article>
 
         <article class="review-overview collapser_parent">
             <h3 class="icon icon-lightbulb collapser">Review Overview</h3>
@@ -296,7 +291,7 @@
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section data-thread="{{ thread.pk }}" class="comment_parent collapser_parent">
+                        <section id="{{ thread.pk }}" data-thread="{{ thread.pk }}" class="comment_parent collapser_parent">
                             {% for comment in thread.comment_set.all %}
                                 {% if forloop.first %}
                                     <label class="icon collapser icon-minus-squared-alt">
@@ -338,26 +333,30 @@
                                     </div>
                                 {% endif %}
                             {% endfor %}
-                            <div class="comments-reply_new collapseable">
-                                <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
-                                <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
-                                    {% use_macro comment 'Reply' %}
+                            {% if request.user.is_authenticated %}
+                                <div class="comments-reply_new collapseable" style="margin-top: 10px">
+                                    <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
+                                    <div class="comment_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
+                                        {% use_macro comment 'Reply' %}
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                         </section>
                     {% endfor %}
                 </section>
             </article>
         {% endif %}
 
-        <article class="comment_wrapper">
-            <h3 class="heading">Post a New Comment</h3>
-            <section class="comment_parent new_comment">
-                <div class="comment_container">
-                    {% use_macro comment 'Reply' %}
-                </div>
-            </section>
-        </article>
+        {% if request.user.is_authenticated %}
+            <article class="comment_wrapper">
+                <h3 class="heading">Post a New Comment</h3>
+                <section class="comment_parent new_comment">
+                    <div class="comment_container">
+                        {% use_macro comment 'Reply' %}
+                    </div>
+                </section>
+            </article>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -380,6 +379,34 @@
 <script type="text/x-pattern" id="added_follower">
 <li><a href="/accounts/profile/<%= person.attributes.follower_user_pk %>"><%= person.attributes.follower_name %></a> <small>following</small></li>
 </script>
+<script type="text/x-pattern" id="events_pattern">
+<a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
+<% _.each(moments, function(moment) { %>
+    <% console.log(moment) %>
+    <section>
+        <strong><%= new Date(moment.created) %></strong> <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a> made an update
+        <div style="margin:10px 0 0">
+            <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
+                <a href="/accounts/profile/<%= moment.related_object.user_pk %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
+            <% } else if (moment.event_type.code == 'demo-created') { %>
+                This demo was created
+            <% } else if (moment.event_type.code == 'reviewer-approved') { %>
+                <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
+            <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
+                <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects.
+            <% } else if (moment.event_type.code == 'reviewer-reset') { %>
+                <%= moment.user.name %> resets an approval status.
+            <% } else if (moment.event_type.code == 'comment-added') { %>
+                <blockquote>
+                    <%= moment.related_object.comment %>
+                </blockquote>
+            <% } else { %>
+                <%= moment.event_type.name %>
+            <% } %>
+        </div>
+    </section>
+<% }); %>
+</script>
 {% endblock %}
 
 {% block scripts %}
@@ -387,10 +414,11 @@
 <script src="/static/scripts/Mention.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script>
 var mentions = new DemoTime.Mention({
-    user_url: '{% url 'user-api' %}'
+    user_url: "{% url 'user-api' %}"
 });
 </script>
 <script src="/static/scripts/Review.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/ReviewActivity.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Reviewers.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Comments.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
@@ -429,21 +457,27 @@ var review = new DemoTime.Review({
     , creator_pk: {{ object.creator.pk }}
 });
 
-// Initialize the ability to modify demo reviewers
-var modify_reviewers = new DemoTime.Reviewers({
-    url: '{% url 'user-api' %}',
-    review_pk: '{{ review.pk }}'
+var review_activity = new DemoTime.ReviewActivity({
+    project_slug: '{{ revision.review.project.slug }}'
+    , review_pk: '{{ revision.review.pk }}'
 });
 
-// set up background tasks (new messages, comments etc)
-var background_tasks = new DemoTime.BackgroundTasks({
-    json_url: '{% url "messages-json" review.pk %}'
-    , site_url: '{{ review.get_absolute_url }}'
-});
+{% if request.user.is_authenticated %}
+    // Initialize the ability to modify demo reviewers
+    var modify_reviewers = new DemoTime.Reviewers({
+        url: '{% url 'user-api' %}',
+        review_pk: '{{ review.pk }}'
+    });
 
-// Initialize AJAXy comments
-var comments = new DemoTime.Comments({
-    comments_url: "{% url 'comments-api' proj_slug=revision.review.project.slug review_pk=revision.review.pk rev_num=revision.number %}"
-});
+    // set up background tasks (new messages, comments etc)
+    var background_tasks = new DemoTime.BackgroundTasks({
+        json_url: '{% url "messages-json" review.pk %}'
+    });
+
+    // Initialize AJAXy comments
+    var comments = new DemoTime.Comments({
+        comments_url: "{% url 'comments-api' proj_slug=revision.review.project.slug review_pk=revision.review.pk rev_num=revision.number %}"
+    });
+{% endif %}
 </script>
 {% endblock %}

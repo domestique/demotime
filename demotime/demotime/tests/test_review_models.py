@@ -321,7 +321,9 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
-        msg = models.Message.objects.get(review=obj.reviewrevision_set.latest(), receipient=obj.creator)
+        msg = models.Message.objects.get(
+            review=obj.reviewrevision_set.latest(), receipient=obj.creator
+        )
         self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
         self.assertTrue(changed)
         self.assertEqual(new_state, models.reviews.REVIEWING)
@@ -564,12 +566,15 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['state'], review.state)
         self.assertEqual(review_json['reviewer_state'], review.reviewer_state)
         self.assertEqual(review_json['is_public'], review.is_public)
-        self.assertEqual(review_json['project'], review.project.to_json())
+        self.assertEqual(review_json['project'], {
+            'id': review.project.pk,
+            'slug': review.project.slug,
+            'name': review.project.name,
+        })
         self.assertEqual(review_json['url'], review.get_absolute_url())
         self.assertEqual(review_json['reviewing_count'], review.reviewing_count)
         self.assertEqual(review_json['approved_count'], review.approved_count)
         self.assertEqual(review_json['rejected_count'], review.rejected_count)
-        self.assertEqual(review_json['project'], review.project.to_json())
 
     @patch('demotime.tasks.fire_webhook')
     def test_trigger_webhooks_fires(self, task_patch):

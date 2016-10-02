@@ -192,17 +192,24 @@
             var ScrollToLink = new DemoTime.ScrollToLink()
         </script>
 
-        {# Logged-in user scripts #}
-        {% if request.user %}
-            {# Syntax Highlighting #}
-            <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
-            <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
-            <script>
-            $('pre').each(function(i, block) {
-                hljs.highlightBlock(block);
-            });
-            </script>
+        {# stick elements #}
+        <script src="/static/scripts/library/sticky.kit.min.js"></script>
 
+        {# Syntax Highlighting #}
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+        <script>
+        $('pre').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });
+        </script>
+
+        {# Fontello #}
+        <link rel="stylesheet" href="/static/fonts/css/fontello.css?{{ site_settings.CACHE_BUSTER }}">
+        <link rel="stylesheet" href="/static/fonts/css/animation.css?{{ site_settings.CACHE_BUSTER }}">
+
+        {# Logged-in user scripts #}
+        {% if request.user.is_authenticated %}
             {# DT-XX Info boxes #}
             <script src="/static/scripts/Info.js?{{ site_settings.CACHE_BUSTER }}"></script>
             <script>
@@ -219,16 +226,9 @@
                 });
             </script>
 
-            {# stick elements #}
-            <script src="/static/scripts/library/sticky.kit.min.js"></script>
-
             {# custom dropdowns #}
             <script src="/static/scripts/library/selects.js"></script>
             <script> $('select.slick').ddslick() </script>
-
-            {# Fontello #}
-            <link rel="stylesheet" href="/static/fonts/css/fontello.css?{{ site_settings.CACHE_BUSTER }}">
-            <link rel="stylesheet" href="/static/fonts/css/animation.css?{{ site_settings.CACHE_BUSTER }}">
 
             {# WYSIWYG editor #}
             <script src="/static/scripts/library/wysiwyg.min.js"></script>
@@ -300,7 +300,7 @@
     </body>
 
     <div id="patterns">
-        {% if request.user %}
+        {% if request.user.is_authenticated %}
             {% include "includes/patterns/mentioner.html" %}
             {% include "includes/patterns/wysiwyg_footer.html" %}
             {% include "includes/patterns/search.html" %}

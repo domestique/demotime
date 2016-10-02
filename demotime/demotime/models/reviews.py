@@ -95,12 +95,18 @@ class Review(BaseModel):
             'state': self.state,
             'reviewer_state': self.reviewer_state,
             'is_public': self.is_public,
-            'project': self.project.to_json(),
+            'project': {
+                'id': self.project.pk,
+                'slug': self.project.slug,
+                'name': self.project.name,
+            },
             'reviewing_count': self.reviewing_count,
             'approved_count': self.approved_count,
             'rejected_count': self.rejected_count,
             'url': self.get_absolute_url(),
             'pk': self.pk,
+            'created': self.created.isoformat(),
+            'modified': self.modified.isoformat(),
         }
 
     def get_absolute_url(self):
@@ -147,7 +153,7 @@ class Review(BaseModel):
     def create_review(
             cls, creator, title, description,
             case_link, reviewers, project, state=OPEN,
-            followers=None, attachments=None):
+            is_public=False, followers=None, attachments=None):
         ''' Standard review creation method '''
         obj = cls.objects.create(
             creator=creator,
@@ -157,6 +163,7 @@ class Review(BaseModel):
             state=state,
             reviewer_state=REVIEWING,
             project=project,
+            is_public=is_public,
         )
         rev = ReviewRevision.objects.create(
             review=obj,
@@ -211,7 +218,7 @@ class Review(BaseModel):
     def update_review(
             cls, review, creator, title, description,
             case_link, reviewers, project, state=OPEN,
-            followers=None, attachments=None
+            is_public=False, followers=None, attachments=None
         ):
         ''' Standard update review method '''
         # Figure out if we have a state transition
@@ -220,6 +227,7 @@ class Review(BaseModel):
         obj.title = title
         obj.case_link = case_link
         obj.project = project
+        obj.is_public = is_public
         obj.save()
 
         state_change = False
@@ -301,7 +309,7 @@ class Review(BaseModel):
 
         if state_change:
             obj.update_state(state)
-            
+
         return obj
 
     def _change_reviewer_state(self, state):

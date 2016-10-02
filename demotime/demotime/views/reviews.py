@@ -21,7 +21,6 @@ class ReviewDetail(CanViewMixin, DetailView):
         self.comment_form = None
         self.attachment_form = None
 
-    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(
             models.Project,
@@ -48,15 +47,17 @@ class ReviewDetail(CanViewMixin, DetailView):
             self.revision = self.get_object().revision
 
         self.review = self.revision.review
-        self.comment = models.Comment(
-            commenter=self.request.user
-        )
-        self.attachment_form = None
-        self.comment_form = None
-        models.MessageBundle.objects.filter(
-            owner=request.user,
-            review=self.revision.review
-        ).update(read=True)
+        if self.request.user.is_authenticated():
+            self.comment = models.Comment(
+                commenter=self.request.user
+            )
+            models.MessageBundle.objects.filter(
+                owner=request.user,
+                review=self.revision.review
+            ).update(read=True)
+            self.user = self.request.user
+        else:
+            self.user = None
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -64,7 +65,7 @@ class ReviewDetail(CanViewMixin, DetailView):
         try:
             reviewer = models.Reviewer.objects.get(
                 review=self.revision.review,
-                reviewer=self.request.user
+                reviewer=self.user
             )
         except models.Reviewer.DoesNotExist:
             reviewer = None
@@ -83,14 +84,14 @@ class ReviewDetail(CanViewMixin, DetailView):
                 initial={'review': self.revision.review}
             )
 
-        if self.revision.review.reviewer_set.filter(reviewer=self.request.user).exists():
+        if self.revision.review.reviewer_set.filter(reviewer=self.user).exists():
             context['reviewer'] = self.revision.review.reviewer_set.get(
-                reviewer=self.request.user
+                reviewer=self.user
             )
 
         models.UserReviewStatus.objects.filter(
             review=self.revision.review,
-            user=self.request.user,
+            user=self.user,
         ).update(read=True)
         context['project'] = self.project
         context['revision'] = self.revision

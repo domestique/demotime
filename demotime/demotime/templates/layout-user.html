@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block sub_nav %}
-{% if not request.GET.display_state = "hide_header" %}
+{% if not request.GET.display_state = "hide_header" and request.user.is_authenticated %}
 <nav class="subnav">
     <div class="container">
         {% block sub_nav_contents %}

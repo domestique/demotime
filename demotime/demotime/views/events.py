@@ -1,6 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 
 from demotime import forms, models
 from demotime.views import CanViewJsonView
@@ -10,15 +8,24 @@ class EventView(CanViewJsonView):
 
     status = 200
 
-    @method_decorator(login_required)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = None
+        self.review = None
+
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(
             models.Project,
             slug=self.kwargs['proj_slug']
         )
-        self.review = None
+        if request.GET.get('review', ''):
+            self.review = get_object_or_404(
+                models.Review,
+                pk=request.GET['review']
+            )
         return super(EventView, self).dispatch(request, *args, **kwargs)
 
+    # pylint: disable=unused-argument
     def get(self, request, *args, **kwargs):
         json_data = {
             'errors': '',
@@ -40,6 +47,12 @@ class EventView(CanViewJsonView):
             json_data['errors'] = form.errors
             return json_data
 
+        events = events.select_related(
+            'project', 'review', 'user',
+            'user__userprofile',
+        ).prefetch_related(
+            'related_object',
+        )
         for event in events:
             json_data['events'].append(event.to_json())
 
