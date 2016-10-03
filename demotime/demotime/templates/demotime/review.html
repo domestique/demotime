@@ -445,22 +445,24 @@ var review = new DemoTime.Review({
 var review_activity = new DemoTime.ReviewActivity({
     project_slug: '{{ revision.review.project.slug }}'
     , review_pk: '{{ revision.review.pk }}'
-})
-
-// Initialize the ability to modify demo reviewers
-var modify_reviewers = new DemoTime.Reviewers({
-    url: '{% url 'user-api' %}',
-    review_pk: '{{ review.pk }}'
 });
 
-// set up background tasks (new messages, comments etc)
-var background_tasks = new DemoTime.BackgroundTasks({
-    json_url: '{% url "messages-json" review.pk %}'
-});
+{% if request.user.is_authenticated %}
+    // Initialize the ability to modify demo reviewers
+    var modify_reviewers = new DemoTime.Reviewers({
+        url: '{% url 'user-api' %}',
+        review_pk: '{{ review.pk }}'
+    });
 
-// Initialize AJAXy comments
-var comments = new DemoTime.Comments({
-    comments_url: "{% url 'comments-api' proj_slug=revision.review.project.slug review_pk=revision.review.pk rev_num=revision.number %}"
-});
+    // set up background tasks (new messages, comments etc)
+    var background_tasks = new DemoTime.BackgroundTasks({
+        json_url: '{% url "messages-json" review.pk %}'
+    });
+
+    // Initialize AJAXy comments
+    var comments = new DemoTime.Comments({
+        comments_url: "{% url 'comments-api' proj_slug=revision.review.project.slug review_pk=revision.review.pk rev_num=revision.number %}"
+    });
+{% endif %}
 </script>
 {% endblock %}
