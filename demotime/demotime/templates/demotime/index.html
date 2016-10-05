@@ -90,7 +90,7 @@
                 {% endif %}
                 {% endcomment %}
                 {% if open_demos %}
-                    <h3 class="icon icon-calendar">
+                    <h3 class="icon icon-pencil">
                         Open demos you've <strong>created</strong>
                         <small>
                             <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
@@ -141,8 +141,8 @@
                 </h3>
                 <section class="aggregated_dashboard-activity" id="events"></section>
             </div>
-        </article>
-    </div>
+        </div>
+    </article>
     {% include "includes/legend.html" %}
 </div>
 
