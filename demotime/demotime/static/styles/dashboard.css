@@ -278,12 +278,3 @@ th, td {
     color: #bbb;
     font-size: 10px;
 }
-#events {
-    position: relative;
-}
-#events #refresh_events {
-    position: absolute;
-    top: -5px;
-    left: 2px;
-    opacity: .5;
-}

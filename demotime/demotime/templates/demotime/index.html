@@ -137,6 +137,7 @@
                             <option value={{ project.slug }}>{{ project.name }}</option>
                         {% endfor %}
                     </select>
+                    <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="10" height="10"></a>
                 </h3>
                 <section class="aggregated_dashboard-activity" id="events"></section>
             </div>
@@ -155,7 +156,6 @@
 {% block patterns %}
 {{ block.super }}
 <script type="text/x-pattern" id="events_pattern">
-<a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="10" height="10"></a>
 <div class="events_list">
 <% _.each(moments, function(moment) { %>
     <div>
