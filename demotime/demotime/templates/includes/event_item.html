@@ -14,29 +14,46 @@
         This demo was created
     <% } else if (moment.event_type.code == 'reviewer-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
+        <% if (moment.review.reviewing_count) { %>
+            Only <%= moment.review.reviewing_count %> more
+            <% if ((moment.review.reviewing_count) > 1) { %>
+                approvals
+            <% } else { %>
+                approval
+            <% } %>
+            needed
+        <% } %>
     <% } else if (moment.event_type.code == 'demo-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.event_type.name %>!
+    <% } else if (moment.event_type.code == 'demo-reviewing') { %>
+        This demo is back under review
     <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
-        <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects.
+        <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects
     <% } else if (moment.event_type.code == 'demo-rejected') { %>
         <a class="icon icon-Rejected"></a> <%= moment.event_type.name %>
     <% } else if (moment.event_type.code == 'reviewer-reset') { %>
-        <%= moment.user.name %> resets an approval status.
+        <%= moment.user.name %> resets an approval status
     <% } else if (moment.event_type.code == 'reviewer-removed') { %>
-        <%= moment.user.name %> was removed as a reviewer.
+        <%= moment.user.name %> was removed as a reviewer
     <% } else if (moment.event_type.code == 'follower-removed') { %>
-        <%= moment.user.name %> was removed as a follower.
+        <%= moment.user.name %> was removed as a follower
+    <% } else if (moment.event_type.code == 'demo-updated') { %>
+        A new revision was added. <a href="<%= moment.related_object.url %>">View it here</a>
     <% } else if (moment.event_type.code == 'comment-added') { %>
         <blockquote>
             <% if (moment.related_object.comment) { %>
-                <%= jQuery.trim(moment.related_object.comment).substring(0, 250).trim(this) + "..." %>
+                <% if (moment.related_object.comment.length > 250) { %>
+                    <%= jQuery.trim(moment.related_object.comment).substring(0, 250).trim(this) + "..." %>
+                <% } else { %>
+                    <%= moment.related_object.comment %>
+                <% } %>
             <% } %>
             <% if (moment.related_object.attachments.length && moment.related_object.attachments[0].attachment_type == 'image') { %>
                 <a href="<%= moment.related_object.attachments[0].static_url %>" class="lightbox_img">
                     <img src="<%= moment.related_object.attachments[0].static_url %>">
                 </a>
             <% } %>
-            <span class="jump_to_this">(<a href="<%= moment.related_object.url %>">jump to this</a>)</span>
+            <div class="jump_to_this"><a href="<%= moment.related_object.url %>">go to this comment</a></div>
         </blockquote>
     <% } else { %>
         <%= moment.event_type.name %>

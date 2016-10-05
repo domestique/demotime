@@ -30,7 +30,7 @@
 
 <div class="dashboard aggregated_dashboard">
     <article style="margin-top: 30px">
-        <div class="split~720 by:2/1 with-gap:3">
+        <div class="split~720 by:2/1 with-gap:1">
             <div id="dashboard_left" class="cel">
                 {% if open_reviews %}
                     <h3 class="icon icon-inbox">
@@ -65,6 +65,7 @@
                         </div>
                     </section>
                 {% endif %}
+                {% comment %}
                 {% if message_bundles %}
                     <h3 class="icon icon-inbox">
                         Unread messages
@@ -95,6 +96,7 @@
                         </div>
                     </section>
                 {% endif %}
+                {% endcomment %}
                 {% if open_demos %}
                     <h3 class="icon icon-calendar">
                         Open demos you've <strong>created</strong>
@@ -170,7 +172,7 @@
             data-pk="<%= moment.review.pk %>"
             href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
             <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
-        </strong>
+        </strong> -
         {% include "includes/event_item.html" %}
     </div>
 <% }); %>

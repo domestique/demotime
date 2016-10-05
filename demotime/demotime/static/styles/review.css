@@ -331,5 +331,6 @@ a[data-type="rejected"] {
     max-width: 375px;
 }
 .review-overview.events .jump_to_this {
-    display: block;
+    margin-top: 5px;
+    font-size: 11px;
 }

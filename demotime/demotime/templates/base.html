@@ -60,7 +60,7 @@
                                                 </ul>
                                             </div>
                                         </li>
-                                        <li><span class="msg_notifier {% if has_unread_messages %}un{% endif %}read_notification"><a href="{% url 'inbox' %}">{{ unread_message_count }}</a></span></li>
+                                        <li style="display: none"><span class="msg_notifier {% if has_unread_messages %}un{% endif %}read_notification"><a href="{% url 'inbox' %}">{{ unread_message_count }}</a></span></li>
                                     {% else %}
                                         <li><a href="{% url 'login' %}">Log in</a></li>
                                     {% endif %}
