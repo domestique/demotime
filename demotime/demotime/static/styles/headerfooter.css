@@ -19,7 +19,7 @@ body.bookmarklet h1 {
 .navbar .navbar-logo {
     background-size: 80px;
     letter-spacing: 2px;
-    line-height: 85px;
+    line-height: 65px;
     vertical-align: middle;
     text-transform: uppercase;
     font-size: .8em;
@@ -35,7 +35,7 @@ body.bookmarklet h1 {
 }
 .navbar .navbar-nav {
     text-align: right;
-    line-height: 85px;
+    line-height: 65px;
 }
 @media screen and (max-width: 370px) {
     .navbar .navbar-nav {
@@ -58,6 +58,9 @@ body.bookmarklet h1 {
     padding: 5px;
     border-radius: 10px;
     display: inline-block;
+}
+.navbar li:last-child {
+    padding-right: 0;
 }
 .navbar .read_notification a {
     background: #777777;
@@ -148,19 +151,6 @@ footer {
 footer a {
     color: #aaaaaa;
     text-decoration: none;
-}
-
-.clock {
-    cursor: pointer;
-    width: 65px;
-    height: 65px;
-    margin: 10px;
-    border-radius: 10px;
-    float: left;
-    margin-right: 10px;
-    transform-origin-x: 50%;
-    transform-origin-y: 50%;
-    transform-origin-z: initial;
 }
 
 nav.subnav {

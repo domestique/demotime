@@ -1,14 +1,6 @@
 {% extends 'layout-user.html' %}
 {% load demo_tags %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <div class="container">
-        Your dashboard
-    </div>
-</div>
-{% endblock %}
-
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css?{{ site_settings.CACHE_BUSTER }}">
