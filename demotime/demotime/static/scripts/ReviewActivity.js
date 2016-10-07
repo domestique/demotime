@@ -1,13 +1,18 @@
 DemoTime.ReviewActivity = Backbone.View.extend({
-    el: '.review',
+    el: 'body',
 
     events: {
         'click #activity_toggler': 'toggle_activity_pane',
+        'change #events_filter': 'render',
         'click #refresh_events': 'render'
     },
 
     initialize: function(options) {
         this.options = options;
+        // If there's no toggler, just launch onload (dashboard)
+        if (!$('#activity_toggler').length) {
+            this.render();
+        }
     },
 
     toggle_activity_pane: function(event) {
@@ -44,6 +49,10 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
         container.html('<center><img src="/static/images/loading.gif"></center>');
 
+        if ($('#events_filter').length) {
+            self.options.project_slug = $('#events_filter').val();
+        }
+
         if (self.options) {
             $.ajax({
                 url: '/projects/' + self.options.project_slug + '/events/',
@@ -62,6 +71,11 @@ DemoTime.ReviewActivity = Backbone.View.extend({
                 }
 
                 container.html(template);
+
+                // For over-arching activity, set the max-height intelligently
+                if ($('.events_list').length && $(window).width() > 720) {
+                    $('.events_list').css('max-height', $('#dashboard_left').height() - 65 + 'px');
+                }
             });
         }
     }
