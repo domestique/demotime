@@ -493,6 +493,46 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             models.Review.objects.filter(pk=draft_review.pk).exists()
         )
 
+    def test_post_delete_non_draft(self):
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            {
+                'project': self.project.pk,
+                'trash': True,
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+            }
+        )
+        self.assertStatusCode(response, 400)
+
+    def test_delete_attachment_on_draft(self):
+        self.review.state = constants.DRAFT
+        self.review.save(update_fields=['state'])
+        attachment = self.review.revision.attachments.all()[0]
+        response = self.client.delete(reverse('delete-review-attachment', kwargs={
+            'proj_slug': self.project.slug,
+            'review_pk': self.review.pk,
+            'attachment_pk': attachment.pk
+        }))
+        self.assertFalse(
+            models.Attachment.objects.filter(pk=attachment.pk).exists()
+        )
+        self.assertStatusCode(response, 204)
+
+    def test_delete_attachment_on_open_review(self):
+        attachment = self.review.revision.attachments.all()[0]
+        response = self.client.delete(reverse('delete-review-attachment', kwargs={
+            'proj_slug': self.project.slug,
+            'review_pk': self.review.pk,
+            'attachment_pk': attachment.pk
+        }))
+        self.assertTrue(
+            models.Attachment.objects.filter(pk=attachment.pk).exists()
+        )
+        self.assertStatusCode(response, 404)
+
     def test_post_create_review_empty_attachments_not_created(self):
         fh = StringIO('testing')
         fh.name = 'test_file_1'

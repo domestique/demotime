@@ -2,7 +2,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
 from django.views.generic import TemplateView, DetailView, ListView, RedirectView
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.utils.decorators import method_decorator
+from django.http import HttpResponseBadRequest
 
 from demotime import constants, forms, models
 from demotime.views import CanViewMixin, CanViewJsonView, JsonView
@@ -182,11 +184,16 @@ class CreateReviewView(TemplateView):
         )
         if self.review_form.is_valid() and self.attachment_forms.is_valid():
             data = self.review_form.cleaned_data
-            if (data.get('trash') and self.review_inst and
-                    self.review_inst.state == constants.DRAFT):
-                # Draft deleted!
-                self.review_inst.delete()
-                return redirect('index')
+            trash = data.pop('trash', None)
+            if trash:
+                if self.review_inst and self.review_inst.state == constants.DRAFT:
+                    # Draft deleted!
+                    self.review_inst.delete()
+                    return redirect('index')
+                else:
+                    return HttpResponseBadRequest(
+                        'You can not delete a Demo that has been opened'
+                    )
 
             data['creator'] = request.user
             data['project'] = self.project
@@ -416,6 +423,38 @@ class ReviewJsonView(CanViewJsonView):
         return json_dict
 
 
+class DeleteReviewAttachmentView(CanViewJsonView):
+
+    status = 204
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.review = None
+        self.project = None
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.review = get_object_or_404(
+            models.Review, pk=kwargs['review_pk'], creator=request.user,
+            state=constants.DRAFT
+        )
+        self.project = self.review.project
+        return super(DeleteReviewAttachmentView, self).dispatch(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        ct = ContentType.objects.get(app_label='demotime', model='reviewrevision')
+        attachment_pk = kwargs['attachment_pk']
+        attachment = get_object_or_404(
+            models.Attachment, pk=attachment_pk,
+            content_type=ct, object_id=self.review.revision.pk
+        )
+        attachment.delete()
+        return {
+            'success': True,
+        }
+        return {}
+
+
 class ReviewSearchJsonView(JsonView):
 
     def __init__(self, *args, **kwargs):
@@ -478,3 +517,4 @@ review_json_view = ReviewJsonView.as_view()
 review_search_json_view = ReviewSearchJsonView.as_view()
 review_list_view = ReviewListView.as_view()
 dt_redirect_view = DTRedirectView.as_view()
+delete_review_attachment_view = DeleteReviewAttachmentView.as_view()

@@ -42,7 +42,7 @@ class ReviewForm(forms.ModelForm):
             self.fields['description'].required = False
             self.fields['trash'] = forms.BooleanField(
                 required=False,
-                widget=forms.HiddenInput
+                widget=forms.HiddenInput,
             )
 
     def clean(self):
@@ -53,8 +53,6 @@ class ReviewForm(forms.ModelForm):
             return data
 
         cleaned_data = super().clean()
-        if cleaned_data.get('trash'):
-            del cleaned_data['trash']
         return cleaned_data
 
     class Meta:
