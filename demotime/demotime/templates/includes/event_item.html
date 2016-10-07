@@ -15,13 +15,13 @@
     <% } else if (moment.event_type.code == 'reviewer-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
         <% if (moment.review.reviewing_count) { %>
-            Only <%= moment.review.reviewing_count %> more
+            Only <%= moment.review.reviewing_count %>
             <% if ((moment.review.reviewing_count) > 1) { %>
                 approvals
             <% } else { %>
                 approval
             <% } %>
-            needed
+            to go!
         <% } %>
     <% } else if (moment.event_type.code == 'demo-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.event_type.name %>!
