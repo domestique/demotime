@@ -323,3 +323,11 @@ a[data-type="rejected"] {
     background: #1f8470;
     color: #fff;
 }
+
+.review-overview.events img {
+    max-width: 375px;
+}
+.review-overview.events .jump_to_this {
+    margin-top: 5px;
+    font-size: 11px;
+}

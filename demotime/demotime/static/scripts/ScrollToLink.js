@@ -40,7 +40,12 @@ DemoTime.ScrollToLink = Backbone.View.extend({
         if ((!$u) || window.location.pathname == $u) {
             // the target's on this page! set URL in url bar and jump to it
             window.history.pushState('object or string', $l.html(), $h);
-            this.jump_to_link(target);
+            if ($('#' + target).length || $('[name="' + target + '"]').length) {
+                this.jump_to_link(target);
+            } else {
+                window.location.href = $h;
+                window.location.reload();
+            }
         } else {
             // Otherwise just load the url
             window.location.href = $h;

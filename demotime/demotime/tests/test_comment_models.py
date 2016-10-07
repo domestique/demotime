@@ -1,5 +1,6 @@
 from mock import patch
 
+from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import constants, models
@@ -40,6 +41,17 @@ class TestCommentModels(BaseTestCase):
             attachment=File(BytesIO(b'test_file_1')),
             attachment_type='image',
             description='Test Description',
+        )
+        self.assertEqual(
+            comment.get_absolute_url(),
+            '{}#{}'.format(
+                reverse('review-rev-detail', kwargs={
+                    'proj_slug': self.review.project.slug,
+                    'pk': self.review.pk,
+                    'rev_num': self.review.revision.number,
+                }),
+                comment.thread.pk
+            )
         )
         self.assertEqual(comment.thread.review_revision, self.review.revision)
         self.assertEqual(comment.attachments.count(), 1)
@@ -295,6 +307,7 @@ class TestCommentModels(BaseTestCase):
             'comment': comment.comment,
             'attachment_count': comment.attachments.count(),
             'attachments': [comment.attachments.get().to_json()],
+            'url': comment.get_absolute_url(),
             'created': comment.created.isoformat(),
             'modified': comment.modified.isoformat(),
         })

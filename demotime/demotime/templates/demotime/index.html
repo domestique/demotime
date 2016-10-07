@@ -1,14 +1,6 @@
 {% extends 'layout-user.html' %}
 {% load demo_tags %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <div class="container">
-        Your dashboard
-    </div>
-</div>
-{% endblock %}
-
 {% block styles %}
 {{ block.super }}
 <link rel="stylesheet" href="/static/styles/dashboard.css?{{ site_settings.CACHE_BUSTER }}">
@@ -30,108 +22,126 @@
 
 <div class="dashboard aggregated_dashboard">
     <article style="margin-top: 30px">
-        {% if open_reviews %}
-            <h3 class="icon icon-inbox">
-                Open demos you're <strong>reviewing</strong>
-                <span class="help" title="These are demos that have been assigned
-                to you to review. You can leave feedback and ultimately approve or
-                reject a demo. Your approval status appears to the left."></span>
-            </h3>
-            <section class="emph_med aggregated_dashboard-reviewing">
-                <div>
+        <div class="split~720 by:2/1 with-gap:1">
+            <div id="dashboard_left" class="cel" style="min-height: 500px">
+                {% if open_reviews %}
+                    <h3 class="icon icon-inbox">
+                        Open demos you're <strong>reviewing</strong>
+                        <span class="help" title="These are demos that have been assigned
+                        to you to review. You can leave feedback and ultimately approve or
+                        reject a demo. Your approval status appears to the left."></span>
+                    </h3>
+                    <section class="emph_med aggregated_dashboard-reviewing">
+                        <div>
+                            <ul>
+                                {% for demo in open_reviews %}
+                                    {% include "includes/reviews_li.html" %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </section>
+                {% endif %}
+                {% if followed_demos %}
+                    <h3 class="icon icon-inbox">
+                        Open demos you're <strong>following</strong>
+                        <span class="help" title="Demos you are following do not require any
+                        action on your part. You can simply follow their progress."></span>
+                    </h3>
+                    <section class="emph_med aggregated_dashboard-following">
+                        <div>
+                            <ul>
+                                {% for demo in followed_demos %}
+                                    {% include "includes/reviews_li.html" %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </section>
+                {% endif %}
+                {% comment %}
+                {% if message_bundles %}
+                    <h3 class="icon icon-inbox">
+                        Unread messages
+                        <small>
+                            <a href="{% url 'inbox' %}" class="normal_text">view all</a> |
+                            <a href="#" id="archive_all" class="normal_text">archive all</a>
+                        </small>
+                    </h3>
+                    <section class="emph_med aggregated_dashboard-messages">
+                        <div>
+                            <div class="messages-list">
+                                <ul>
+                                    {% for message in message_bundles %}
+                                        <li class="message_li {% if message.read %}de-emphasize{% endif %}">
+                                            {% if message.review %}
+                                                {% if message.review.creator != request.user %}
+                                                    <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" title="Your approval status" class="has_bubble dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                                {% else %}
+                                                    <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
+                                                {% endif %}
+                                            {% endif %}
+                                            <a class="{{ message.read }} icon icon-mail iframe lightbox_url" href="{{ message.get_absolute_url }}?display_state=hide_header">{{ message.title|truncatechars:45 }}</a>
+                                            {% include "includes/review_state.html" with demo=message.review %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                {% endif %}
+                {% endcomment %}
+                {% if open_demos %}
+                    <h3 class="icon icon-pencil">
+                        Open demos you've <strong>created</strong>
+                        <small>
+                            <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
+                        </small>
+                    </h3>
+                    <section class="emph_med aggregated_dashboard-created">
+                        <div>
+                            <ul>
+                                {% for demo in open_demos %}
+                                    {% include "includes/reviews_li.html" %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </section>
+                {% endif %}
+                <h3>
+                    <strong>Projects</strong> you're a member of
+                    <span class="help" title="A Project consists of one or more demos.
+                    Think of it as a group of demos that all have something in common.
+                    Projects are a way of organizing demos."></span>
+                </h3>
+                <section class="emph_lower" style="margin-bottom: 0">
                     <ul>
-                        {% for demo in open_reviews %}
-                            {% include "includes/reviews_li.html" %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            </section>
-        {% endif %}
-        {% if followed_demos %}
-            <h3 class="icon icon-inbox">
-                Open demos you're <strong>following</strong>
-                <span class="help" title="Demos you are following do not require any
-                action on your part. You can simply follow their progress."></span>
-            </h3>
-            <section class="emph_med aggregated_dashboard-following">
-                <div>
-                    <ul>
-                        {% for demo in followed_demos %}
-                            {% include "includes/reviews_li.html" %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            </section>
-        {% endif %}
-        {% if message_bundles %}
-            <h3 class="icon icon-inbox">
-                Unread messages
-                <small>
-                    <a href="{% url 'inbox' %}" class="normal_text">view all</a> |
-                    <a href="#" id="archive_all" class="normal_text">archive all</a>
-                </small>
-            </h3>
-            <section class="emph_med aggregated_dashboard-messages">
-                <div>
-                    <div class="messages-list">
-                        <ul>
-                            {% for message in message_bundles %}
-                                <li class="message_li {% if message.read %}de-emphasize{% endif %}">
-                                    {% if message.review %}
-                                        {% if message.review.creator != request.user %}
-                                            <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" title="Your approval status" class="has_bubble dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
-                                        {% else %}
-                                            <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
-                                        {% endif %}
-                                    {% endif %}
-                                    <a class="{{ message.read }} icon icon-mail iframe lightbox_url" href="{{ message.get_absolute_url }}?display_state=hide_header">{{ message.title }}</a>
-                                    {% include "includes/review_state.html" with demo=message.review %}
-                                </li>
+                        {% if available_projects %}
+                            {% for project in available_projects %}
+                                <li><a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a></li>
                             {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </section>
-        {% endif %}
-        {% if open_demos %}
-            <h3 class="icon icon-calendar">
-                Open demos you've <strong>created</strong>
-                <small>
-                    <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
-                </small>
-            </h3>
-            <section class="emph_med aggregated_dashboard-created">
-                <div>
-                    <ul>
-                        {% for demo in open_demos %}
-                            {% include "includes/reviews_li.html" %}
-                        {% endfor %}
+                        {% else %}
+                            <li>You aren't a member of any projects</li>
+                        {% endif %}
+                        {% if request.user.is_superuser %}
+                            <li>
+                                <a class="icon icon-plus" href="{% url 'project-create' %}">New project</a>
+                            </li>
+                        {% endif %}
                     </ul>
-                </div>
-            </section>
-        {% endif %}
-        <h3>
-            <strong>Projects</strong> you're a member of
-            <span class="help" title="A Project consists of one or more demos.
-            Think of it as a group of demos that all have something in common.
-            Projects are a way of organizing demos."></span>
-        </h3>
-        <section class="emph_lower" style="margin-bottom: 0">
-            <ul>
-                {% if available_projects %}
-                    {% for project in available_projects %}
-                        <li><a href="{% url 'project-dashboard' project.slug %}">{{ project.name }}</a></li>
-                    {% endfor %}
-                {% else %}
-                    <li>You aren't a member of any projects</li>
-                {% endif %}
-                {% if request.user.is_superuser %}
-                    <li>
-                        <a class="icon icon-plus" href="{% url 'project-create' %}">New project</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </section>
+                </section>
+            </div>
+            <div id="dashboard_right" class="cel">
+                <h3 class="icon icon-cloud">
+                    Demo feed
+                    <select id="events_filter">
+                        {% for project in available_projects %}
+                            <option value={{ project.slug }}>{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="10" height="10"></a>
+                </h3>
+                <section class="aggregated_dashboard-activity" id="events"></section>
+            </div>
+        </div>
     </article>
     {% include "includes/legend.html" %}
 </div>
@@ -143,13 +153,37 @@
 {% endcomment %}
 {% endblock %}
 
+{% block patterns %}
+{{ block.super }}
+<script type="text/x-pattern" id="events_pattern">
+<div class="events_list">
+<% _.each(moments, function(moment) { %>
+    <div>
+        <strong><a class="has_bubble"
+            data-prj="<%= moment.review.project.id %>"
+            data-pk="<%= moment.review.pk %>"
+            href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
+            <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
+        </strong> -
+        {% include "includes/event_item.html" %}
+    </div>
+<% }); %>
+</div>
+</script>
+{% endblock %}
+
 {% block scripts %}
+<script src="/static/scripts/ReviewActivity.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/ArchiveAll.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/DemoState.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
 $('.icon-mail.iframe').click(function() {
     $(this).parents('li').slideUp();
+});
+
+var review_activity = new DemoTime.ReviewActivity({
+    project_slug: null
 });
 
 var archive_all = new DemoTime.ArchiveAll({

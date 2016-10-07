@@ -113,7 +113,7 @@
 
         {# Events #}
         <div class="review_toggles">
-            <a href="#" id="activity_toggler">Activity log</a>
+            <a href="#" id="activity_toggler">Demo feed</a>
         </div>
         <section class="review-overview events" id="events" style="display:none"></section>
 
@@ -367,28 +367,9 @@
 <script type="text/x-pattern" id="events_pattern">
 <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
 <% _.each(moments, function(moment) { %>
-    <% console.log(moment) %>
     <section>
-        <strong><%= new Date(moment.created) %></strong> <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a> made an update
-        <div style="margin:10px 0 0">
-            <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
-                <a href="/accounts/profile/<%= moment.related_object.user_pk %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
-            <% } else if (moment.event_type.code == 'demo-created') { %>
-                This demo was created
-            <% } else if (moment.event_type.code == 'reviewer-approved') { %>
-                <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
-            <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
-                <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects.
-            <% } else if (moment.event_type.code == 'reviewer-reset') { %>
-                <%= moment.user.name %> resets an approval status.
-            <% } else if (moment.event_type.code == 'comment-added') { %>
-                <blockquote>
-                    <%= moment.related_object.comment %>
-                </blockquote>
-            <% } else { %>
-                <%= moment.event_type.name %>
-            <% } %>
-        </div>
+        <strong><%= new Date(moment.created) %></strong>
+        {% include "includes/event_item.html" %}
     </section>
 <% }); %>
 </script>
