@@ -98,7 +98,7 @@ section blockquote p:first-child {
     margin: 0 0 5px;
     color: #666;
     margin: 0;
-    font-size: 1.1em;
+    font-size: 12px;
 }
 .blockquote-body {
     padding: 10px;
