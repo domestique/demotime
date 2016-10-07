@@ -118,15 +118,8 @@ li.closed.state-highlight,
 li.open.state-highlight {
     display: none;
 }
-.comments-reply {
-    font-size:0.8em;
-}
-.comments-reply blockquote {
+.comment_parent blockquote {
     padding: 3px;
-}
-.comments-reply .comment_edit {
-    display: block;
-    margin-top: 10px;
 }
 
 /* Special attachments display for comments */
@@ -166,6 +159,10 @@ li.open.state-highlight {
 }
 .comments-reply {
     margin: 1em 0 0 3em;
+}
+/* Don't indent the only reply child */
+.comment_parent > .comment_parent:first-child.comments-reply {
+    margin-left: 0;
 }
 @media screen and (max-width:375px) {
     .comments-reply {
@@ -325,4 +322,12 @@ a[data-type="rejected"] {
     z-index: 31415;
     background: #1f8470;
     color: #fff;
+}
+
+.review-overview.events img {
+    max-width: 375px;
+}
+.review-overview.events .jump_to_this {
+    margin-top: 5px;
+    font-size: 11px;
 }

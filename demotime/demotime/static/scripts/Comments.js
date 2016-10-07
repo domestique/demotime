@@ -14,7 +14,7 @@ DemoTime.Comments = Backbone.View.extend({
         this.options = options || [];
 
         Mousetrap.bind('command+enter', function(e) {
-            $(e.target).parents('.comment_container').find('.new_comment_button').click();
+            $(e.target).parents('.comment_form_container').find('.new_comment_button').click();
             return false;
         });
     },
@@ -29,13 +29,13 @@ DemoTime.Comments = Backbone.View.extend({
             attachment_desc = comment_parent.find('input[name="description"]');
 
         // Saving container as an option for global use
-        this.options.container = button.parents('.comment_container');
+        this.options.comment_form_container = button.parents('.comment_form_container');
         this.options.comment = comment_parent.find('.form-control').val();
 
         this.start_loading_state();
 
         // Check for 'editing' data attr, otherwise it's a new comment
-        if (this.options.container.data('editing')) {
+        if (this.options.comment_form_container.data('editing')) {
             // PATCH needs data jsonified
             var data = {
                 comment_pk: self.options.comment_pk,
@@ -84,12 +84,12 @@ DemoTime.Comments = Backbone.View.extend({
             } else {
                 // Slide up the editor if in a thread
                 if (thread) {
-                    self.options.container.slideUp();
+                    self.options.comment_form_container.slideUp();
                 } else {
                     comment_parent.find('.wysiwyg-editor').html('').focus();
-                    self.options.container.find('input[type="file"]').val('');
-                    self.options.container.find('select[name="attachment_type"]').val('');
-                    self.options.container.find('input[name="description"]').val('');
+                    self.options.comment_form_container.find('input[type="file"]').val('');
+                    self.options.comment_form_container.find('select[name="attachment_type"]').val('');
+                    self.options.comment_form_container.find('input[name="description"]').val('');
 
                 }
 
@@ -98,9 +98,9 @@ DemoTime.Comments = Backbone.View.extend({
 
                 // New comment DOM's a bit different than threaded DOM:
                 if (thread) {
-                    self.options.container.parent().before(html);
+                    self.options.comment_form_container.parent().before(html);
                 } else {
-                    self.options.container.before(html);
+                    self.options.comment_form_container.before(html);
                 }
 
                 // Syntax highlighting
@@ -136,9 +136,10 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     get_success_html: function(data) {
-        var html = '<div class="comments-reply" data-comment="' + data.comment.id + '">';
-
-        html += '<blockquote><div class="blockquote-body">' + this.options.comment;
+        var html = '<div class="comment_parent comments-reply">';
+        html += '<blockquote>'
+        html += '<div class="blockquote-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
+        html += '<div class="blockquote-body">' + this.options.comment;
 
         if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
             html += '<br><br><div class="attachment-card image collapseable">\
@@ -157,8 +158,6 @@ DemoTime.Comments = Backbone.View.extend({
             html += '<p><em>Your attachment was uploaded successfully.</em></p>';
         }
 
-        html += '<a href="#" class="comment_edit">(edit)</a></div></blockquote>';
-
         html += '</div>'
 
         return html;
@@ -166,73 +165,62 @@ DemoTime.Comments = Backbone.View.extend({
 
     comment_edit: function(event) {
         var self = this,
-            reply = $(event.target).parents('.comments-reply'),
-            contents = reply.find('.blockquote-body .comment_edit').remove();
+            link = $(event.target),
+            comment = link.parents('.comment_parent');
 
         // Grab edit html
-        reply.find('.comment_edit').remove();
-        var edit_html = reply.find('.blockquote-body').html();
+        var edit_html = link.parents('blockquote').find('.blockquote-body').html();
 
         event.preventDefault();
 
         // Remove old comment
-        reply.slideUp().remove();
+        link.parents('blockquote').slideUp().remove();
+        // Clean up conflicting DOM
+        comment.find('.expand_reply_link, .icon-comment').remove();
 
         // Disable attachment editing (for now)
-        reply.find('.attachments, .summary').remove();
-
-        // Enable 'editing' mode
-        this.options.container.data('editing', true);
+        comment.find('.attachments, .summary').remove();
 
         // Grab comment ID
-        this.options.comment_pk = reply.data('comment');
+        this.options.comment_pk = link.data('comment');
+
+        // Set the form container
+        this.options.comment_form_container = comment.find('.comment_form_container');
+
+        // Enable 'editing' mode
+        this.options.comment_form_container.data('editing', true);
 
         // Re-show wysiwyg
-        this.options.container.slideDown(function() {
-            self.options.container.find('.wysiwyg-editor').html(edit_html);
-            self.options.container.find('.wysiwyg-editor').focus();
+        this.options.comment_form_container.slideDown(function() {
+            self.options.comment_form_container.find('.wysiwyg-editor').html(edit_html);
+            self.options.comment_form_container.find('.wysiwyg-editor').focus();
+            if ($(window).width() > 720) {
+                $('html, body').animate({
+                    scrollTop: self.options.comment_form_container.offset().top - 200
+                }, 500);
+            }
         });
     },
 
     show_errors: function(msg) {
         var self = this;
-        this.options.container.before('<ul class="errorlist"><li>' + msg + '</li></ul>');
+        this.options.comment_form_container.before('<ul class="errorlist"><li>' + msg + '</li></ul>');
         $('html, body').animate({
-            scrollTop: self.options.container.offset().top - 150
+            scrollTop: self.options.comment_form_container.offset().top - 150
         }, 500);
     },
 
     start_loading_state: function() {
-        this.options.container.find('input, button').prop('disabled', true);
+        this.options.comment_form_container.find('input, button').prop('disabled', true);
     },
 
     end_loading_state: function() {
-        this.options.container.find('input, button').prop('disabled', false);
+        this.options.comment_form_container.find('input, button').prop('disabled', false);
     },
 
     // Leave a comment and approve at the same time
     reply_and_approve: function(event) {
         this.post_new_comment(event, true);
-    },
-
-    // Expand collapse top level comments
-    collapse_comment: function(event) {
-        var e = event,
-            collapser = $(event.target);
-
-        if (collapser.prop("tagName") != "A") {
-            collapser.parents('.collapser_parent').find('.collapseable').slideToggle(function() {
-                if (collapser.attr('class').match('squared')) {
-                    if ($(this).is(":visible")) {
-                        collapser.removeClass('icon-plus-squared-alt');
-                        collapser.addClass('icon-minus-squared-alt');
-                    } else {
-                        collapser.addClass('icon-plus-squared-alt');
-                        collapser.removeClass('icon-minus-squared-alt');
-                    }
-                }
-            });
-        }
     },
 
     // Expand 'reply' wysiwyg on 'Leave a reply' click
@@ -241,19 +229,19 @@ DemoTime.Comments = Backbone.View.extend({
 
         this.options.trigger_link = $(event.target);
 
-        // Grab and clean-up new container
-        var container = this.options.trigger_link.next('.comment_container');
-        container.find('.wysiwyg-editor').html('');
-        container.find('input[type="file"]').val('');
-        container.find('select[name="attachment_type"]').val('');
-        container.find('input[name="description"]').val('');
+        // Grab and clean-up new comment_form_container
+        var comment_form_container = this.options.trigger_link.next('.comment_form_container');
+        comment_form_container.find('.wysiwyg-editor').html('');
+        comment_form_container.find('input[type="file"]').val('');
+        comment_form_container.find('select[name="attachment_type"]').val('');
+        comment_form_container.find('input[name="description"]').val('');
 
         // Show new comment container
-        this.options.trigger_link.next('.comment_container').slideDown(function() {
-            container.find('.wysiwyg-editor').focus();
+        this.options.trigger_link.next('.comment_form_container').slideDown(function() {
+            comment_form_container.find('.wysiwyg-editor').focus();
             if ($(window).width() > 720) {
                 $('html, body').animate({
-                    scrollTop: container.offset().top - 200
+                    scrollTop: comment_form_container.offset().top - 200
                 }, 500);
             }
         });
