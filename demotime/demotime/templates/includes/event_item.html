@@ -42,11 +42,7 @@
     <% } else if (moment.event_type.code == 'comment-added') { %>
         <blockquote>
             <% if (moment.related_object.comment) { %>
-                <% if (moment.related_object.comment.length > 250) { %>
-                    <%= jQuery.trim(moment.related_object.comment).substring(0, 250).trim(this) + "..." %>
-                <% } else { %>
-                    <%= moment.related_object.comment %>
-                <% } %>
+                <%= moment.related_object.comment %>
             <% } %>
             <% if (moment.related_object.attachments.length && moment.related_object.attachments[0].attachment_type == 'image') { %>
                 <a href="<%= moment.related_object.attachments[0].static_url %>" class="lightbox_img">
