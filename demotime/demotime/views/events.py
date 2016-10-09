@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 
-from demotime import forms, models
+from demotime import constants, forms, models
 from demotime.views import CanViewJsonView
 
 
@@ -33,8 +33,8 @@ class EventView(CanViewJsonView):
             'events': [],
         }
         events = models.Event.objects.filter(
-            project=self.project
-        )
+            project=self.project,
+        ).exclude(review__state=constants.DRAFT)
         form = forms.EventFilterForm(project=self.project, data=request.GET)
         if form.is_valid():
             data = form.cleaned_data

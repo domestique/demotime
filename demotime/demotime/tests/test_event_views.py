@@ -2,7 +2,7 @@ import json
 
 from django.core.urlresolvers import reverse
 
-from demotime import models
+from demotime import constants, models
 from demotime.tests import BaseTestCase
 
 
@@ -35,6 +35,17 @@ class TestEventViews(BaseTestCase):
         self.assertEqual(
             len(data['events']),
             self.project.event_set.count()
+        )
+
+    def test_get_events_hides_drafts(self):
+        models.Review.objects.update(state=constants.DRAFT)
+        response = self.client.get(self.url)
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['errors'], '')
+        self.assertEqual(
+            len(data['events']), 0
         )
 
     def test_filter_events_by_review(self):
