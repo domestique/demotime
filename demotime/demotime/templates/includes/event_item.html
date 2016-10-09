@@ -15,13 +15,13 @@
     <% } else if (moment.event_type.code == 'reviewer-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.user.name %> approves!
         <% if (moment.review.reviewing_count) { %>
-            Only <%= moment.review.reviewing_count %> more
+            Only <%= moment.review.reviewing_count %>
             <% if ((moment.review.reviewing_count) > 1) { %>
                 approvals
             <% } else { %>
                 approval
             <% } %>
-            needed
+            to go!
         <% } %>
     <% } else if (moment.event_type.code == 'demo-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.event_type.name %>!
@@ -42,11 +42,7 @@
     <% } else if (moment.event_type.code == 'comment-added') { %>
         <blockquote>
             <% if (moment.related_object.comment) { %>
-                <% if (moment.related_object.comment.length > 250) { %>
-                    <%= jQuery.trim(moment.related_object.comment).substring(0, 250).trim(this) + "..." %>
-                <% } else { %>
-                    <%= moment.related_object.comment %>
-                <% } %>
+                <%= moment.related_object.comment %>
             <% } %>
             <% if (moment.related_object.attachments.length && moment.related_object.attachments[0].attachment_type == 'image') { %>
                 <a href="<%= moment.related_object.attachments[0].static_url %>" class="lightbox_img">

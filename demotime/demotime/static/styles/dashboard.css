@@ -254,6 +254,12 @@ th, td {
         padding-top: 20px;
     }
 }
+
+#events_filter {
+    margin: 0 0 0 8px;
+    position: relative;
+    top: -1px;
+}
 .events_list {
     color: #555;
     font-size: 12px;
