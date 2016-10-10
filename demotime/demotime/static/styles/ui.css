@@ -67,8 +67,8 @@ section {
     background: #fafafa;
     margin-top: .50em;
     margin-bottom: 1em;
-    padding: 20px;
-    box-shadow: 4px 4px 0 #ccc;
+    padding: 15px;
+    box-shadow: 4px 4px 0 #ddd;
     border: 1px solid #eaeaea;
     border-radius: 2px;
 }
@@ -147,7 +147,7 @@ p, li {
 }
 .review_info a,
 .content a {
-    color: #32CCAE;
+    color: #2a9c86;
     text-decoration: none;
     font-weight: 700;
 }
@@ -170,8 +170,8 @@ p, li {
 .icon-document:before { content: '\e801'; } /* '' */
 
 a.button-link {
-    background: #32CCAE;
-    box-shadow: 4px 4px 0 #ccc;
+    background: #2a9c86;
+    box-shadow: 4px 4px 0 #ddd;
     padding: 5px 8px;
     display: inline-block;
     color: #fff;
@@ -503,7 +503,7 @@ h3 small {
     bottom: 0;
     padding-right: 5px;
     left: 10px;
-    background: #26C59E;
+    background: #2a9c86;
 }
 #feedbacker a {
     color: #fff;

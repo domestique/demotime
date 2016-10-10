@@ -65,20 +65,16 @@ li.de-emphasize * {
     padding:0;
 }
 section.emph_high {
-    background:rgba(48, 48, 48, 1);
-    color: #eee;
+    background: #fff;
 }
 section.emph_med {
-    background: rgba(48, 48, 48, .8);
-    color: #eee;
+    background: #fafafa;
 }
 section.emph_low {
-    background: rgba(48, 48, 48, .7);
-    color: #eee;
+    background: #f0f0f0;
 }
 section.emph_lower {
-    background: rgba(48, 48, 48, .6);
-    color: #eee;
+    background: #e5e5e5;
 }
 .dashboard section.done {
     background-image: url(/static/images/done.png);
@@ -108,7 +104,7 @@ section li.review_li {
     padding: 3px;
     margin: 20px 0;
     border: 1px solid #eaeaea;
-    box-shadow: 4px 4px 0 #ccc;
+    box-shadow: 4px 4px 0 #ddd;
 }
 section li.review_li:first-child {
     margin-top: 0;
@@ -142,7 +138,7 @@ section .review_li-bottom a {
 }
 section .review_li-top a,
 section .review_li-bottom a {
-    color: #2a9c86;
+    color: #1f8470;
 }
 section .review_li-bottom,
 section .review_li-bottom a {
@@ -200,7 +196,7 @@ th, td {
 }
 
 .tertiary {
-    background: #26C59E;
+    background: #2a9c86;
     text-align: left;
     padding: 10px;
 }

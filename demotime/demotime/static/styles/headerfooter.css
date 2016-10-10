@@ -132,7 +132,7 @@ a.footer-blog.highlight:after {
 .navbar .manage_user li a {
     font-weight: bold;
     display: block;
-    color: #32ccae;
+    color: #2a9c86;
     padding: 3px 10px;
     font-size: 12px;
 }
@@ -154,7 +154,7 @@ footer a {
 }
 
 nav.subnav {
-    background: #32ccae;
+    background: #2a9c86;
     margin-top: 0;
     padding: 8px 0;
 }

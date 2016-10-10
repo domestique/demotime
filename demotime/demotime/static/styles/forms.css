@@ -51,7 +51,7 @@ textarea {
         -ms-transition: .3s;
             transition: .3s;
     border: 1px solid #eeeeee;
-    box-shadow: 4px 4px 0 #cccccc;
+    box-shadow: 4px 4px 0 #ddd;
 }
 textarea:focus {
     outline: none;
@@ -82,7 +82,7 @@ textarea:focus {
          -o-transition: .2s ease-out;
         -ms-transition: .2s ease-out;
             transition: .2s ease-out;
-    box-shadow: 4px 4px 0 #cccccc;
+    box-shadow: 4px 4px 0 #ddd;
 }
 button:hover,
 input[type='submit']:hover,
@@ -115,7 +115,7 @@ select[multiple='multiple'] {
     min-width: 30%;
     font-size: 1.4em;
     border: 1px solid #eeeeee;
-    box-shadow: 4px 4px 0 #cccccc;
+    box-shadow: 4px 4px 0 #ddd;
     min-height: 300px;
     width: 100%;
 }
