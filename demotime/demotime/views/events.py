@@ -52,7 +52,7 @@ class EventView(CanViewJsonView):
             'user__userprofile',
         ).prefetch_related(
             'related_object',
-        )
+        )[:20]
         for event in events:
             json_data['events'].append(event.to_json())
 
