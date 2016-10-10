@@ -22,7 +22,7 @@
 
 <div class="dashboard aggregated_dashboard">
     <article style="margin-top: 30px">
-        <div class="split~720 by:2/1 with-gap:1">
+        <div class="split~720 by:2/1 with-gap:2">
             <div id="dashboard_left" class="cel" style="min-height: 500px">
                 {% if open_reviews %}
                     <h3 class="icon icon-inbox">
@@ -31,7 +31,7 @@
                         to you to review. You can leave feedback and ultimately approve or
                         reject a demo. Your approval status appears to the left."></span>
                     </h3>
-                    <section class="emph_med aggregated_dashboard-reviewing">
+                    <section class="aggregated_dashboard-section aggregated_dashboard-reviewing">
                         <div>
                             <ul>
                                 {% for demo in open_reviews %}
@@ -47,7 +47,7 @@
                         <span class="help" title="Demos you are following do not require any
                         action on your part. You can simply follow their progress."></span>
                     </h3>
-                    <section class="emph_med aggregated_dashboard-following">
+                    <section class="aggregated_dashboard-section aggregated_dashboard-following">
                         <div>
                             <ul>
                                 {% for demo in followed_demos %}
@@ -96,7 +96,7 @@
                             <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
                         </small>
                     </h3>
-                    <section class="emph_med aggregated_dashboard-created">
+                    <section class="aggregated_dashboard-section aggregated_dashboard-created">
                         <div>
                             <ul>
                                 {% for demo in open_demos %}
@@ -112,7 +112,7 @@
                     Think of it as a group of demos that all have something in common.
                     Projects are a way of organizing demos."></span>
                 </h3>
-                <section class="emph_lower" style="margin-bottom: 0">
+                <section class="aggregated_dashboard-section aggregated_dashboard-projects" style="margin-bottom: 0">
                     <ul>
                         {% if available_projects %}
                             {% for project in available_projects %}
@@ -128,6 +128,7 @@
                         {% endif %}
                     </ul>
                 </section>
+                {% include "includes/legend.html" %}
             </div>
             <div id="dashboard_right" class="cel">
                 <h3 class="icon icon-cloud">
@@ -143,7 +144,6 @@
             </div>
         </div>
     </article>
-    {% include "includes/legend.html" %}
 </div>
 
 {% comment %}

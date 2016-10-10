@@ -13,7 +13,6 @@
 }
 .content .dashboard article section h3 {
     font-size: 16px;
-    color: #eee;
 }
 .content section > div:not(:first-child) {
     margin-top: 25px;
@@ -27,20 +26,15 @@
 }
 .dashboard section,
 .dashboard section a {
-    color: #fff;
     font-weight: 200;
 }
 .dashboard li p:first-child {
     margin: 0;
 }
-section .review_li a {
-    color: #eee;
-}
 section .messages-list .message_li a,
 section .review_li.open.approved a,
 section .review_li.Reviewing a {
-    color: #fff;
-    font-weight: 400;
+    font-weight: 700;
 }
 .messages-list .de-emphasize .icon-mail:before {
     display: none;
@@ -53,17 +47,6 @@ section .review_li.de-emphasize * {
 }
 section .review_li-top {
     overflow: hidden;
-}
-section .review_li .time_stamp {
-    float: right;
-    line-height: 30px;
-    vertical-align: middle;
-    color: #ddd;
-}
-@media screen and (max-width:350px) {
-    section .review_li .time_stamp {
-        display: none;
-    }
 }
 
 /* Message center messages */
@@ -116,8 +99,8 @@ section.emph_lower {
 section li.review_li {
     background: #3f3f3f;
     padding: 0;
-    margin: 15px 0;
-    border: 1px solid #333;
+    margin: 20px 0;
+    border: 1px solid #ddd;
 }
 section li.review_li:first-child {
     margin-top: 0;
@@ -126,8 +109,8 @@ section li.review_li:last-child {
     margin-bottom: 0;
 }
 section .review_li-top {
-    background: #1F8470;
-    border-bottom: 1px solid #aaa;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ddd;
     padding: 3px 8px;
 }
 section .review_li.Approved {
@@ -138,7 +121,26 @@ section .review_li.Approved .review_li-top {
     border-bottom: 0;
 }
 section .review_li-bottom {
+    background: #fafafa;
     padding: 8px;
+}
+section .review_li-top,
+section .review_li-top a,
+section .review_li-top small,
+section .review_li-bottom,
+section .review_li-bottom a {
+    color: #666;
+}
+section .review_li .time_stamp {
+    float: right;
+    line-height: 30px;
+    vertical-align: middle;
+    color: #999;
+}
+@media screen and (max-width:350px) {
+    section .review_li .time_stamp {
+        display: none;
+    }
 }
 
 .dashboard .review_state {
