@@ -285,9 +285,12 @@ th, td {
     margin-bottom: 15px;
     padding: 10px;
     background: #fff;
+    border: 1px solid #eaeaea;
 }
 .events_list blockquote {
     padding: 8px;
+    border: 0;
+    background: #fafafa;
 }
 .events_list blockquote .jump_to_this {
     color: #bbb;
