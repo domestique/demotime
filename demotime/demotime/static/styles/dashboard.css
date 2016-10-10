@@ -8,9 +8,12 @@
         font-size:14px;
     }
 }
-.dashboard section {
-    padding:10px;
+.dashboard section.aggregated_dashboard-section {
+    padding: 0;
+    background: none;
+    box-shadow: none;
 }
+.dashboard aggregated_dashboard-section
 .content .dashboard article section h3 {
     font-size: 16px;
 }
@@ -20,8 +23,10 @@
 .content .aggregated_dashboard > div:not(:first-child) {
     margin-top: 50px;
 }
+#dashboard_left h3:not(:first-child) {
+    margin-top: 30px;
+}
 .dashboard section li {
-    color: #eee;
     padding: 5px;
 }
 .dashboard section,
@@ -45,9 +50,6 @@ section .review_li.de-emphasize {
 section .review_li.de-emphasize * {
     font-weight: 200 !important;
 }
-section .review_li-top {
-    overflow: hidden;
-}
 
 /* Message center messages */
 li.de-emphasize {
@@ -64,15 +66,19 @@ li.de-emphasize * {
 }
 section.emph_high {
     background:rgba(48, 48, 48, 1);
+    color: #eee;
 }
 section.emph_med {
     background: rgba(48, 48, 48, .8);
+    color: #eee;
 }
 section.emph_low {
     background: rgba(48, 48, 48, .7);
+    color: #eee;
 }
 section.emph_lower {
     background: rgba(48, 48, 48, .6);
+    color: #eee;
 }
 .dashboard section.done {
     background-image: url(/static/images/done.png);
@@ -96,11 +102,13 @@ section.emph_lower {
     font-weight: 800;
 }
 
+/* Boxes */
 section li.review_li {
-    background: #3f3f3f;
-    padding: 0;
+    background: #fff;
+    padding: 3px;
     margin: 20px 0;
-    border: 1px solid #ddd;
+    border: 1px solid #eaeaea;
+    box-shadow: 4px 4px 0 #ccc;
 }
 section li.review_li:first-child {
     margin-top: 0;
@@ -109,27 +117,36 @@ section li.review_li:last-child {
     margin-bottom: 0;
 }
 section .review_li-top {
+    overflow: hidden;
     background: #f0f0f0;
-    border-bottom: 1px solid #ddd;
-    padding: 3px 8px;
+    padding: 5px 10px;
 }
 section .review_li.Approved {
     opacity: 0.8;
 }
 section .review_li.Approved .review_li-top {
-    background: #3f3f3f;
+    background: #fff;
     border-bottom: 0;
 }
 section .review_li-bottom {
     background: #fafafa;
-    padding: 8px;
+    padding: 10px;
 }
+.aggregated_dashboard-projects a,
 section .review_li-top,
 section .review_li-top a,
 section .review_li-top small,
 section .review_li-bottom,
 section .review_li-bottom a {
-    color: #666;
+    color: #555;
+}
+section .review_li-top a,
+section .review_li-bottom a {
+    color: #2a9c86;
+}
+section .review_li-bottom,
+section .review_li-bottom a {
+    font-size: 16px;
 }
 section .review_li .time_stamp {
     float: right;
@@ -160,12 +177,9 @@ section .review_li .time_stamp {
     background-size: 16px;
 }
 
-.legend {
-    margin-top: 50px;
-}
 .legend li span {
-    color: #666;
     font-weight: 300;
+    color: #999;
 }
 
 table {
@@ -268,9 +282,6 @@ th, td {
     margin-top: 5px !important;
     overflow: auto;
 }
-.events_list a {
-     color: #32CCAE !important;
-}
 .events_list strong a {
     font-weight: 700;
 }
@@ -279,8 +290,8 @@ th, td {
     padding: 10px;
     background: #fff;
 }
-.events_list section blockquote {
-    padding: 5px;
+.events_list blockquote {
+    padding: 8px;
 }
 .events_list blockquote .jump_to_this {
     color: #bbb;

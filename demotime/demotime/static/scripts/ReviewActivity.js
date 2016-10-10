@@ -74,7 +74,7 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
                 // For over-arching activity, set the max-height intelligently
                 if ($('.events_list').length && $(window).width() > 720) {
-                    $('.events_list').css('max-height', $('#dashboard_left').height() - 77 + 'px');
+                    $('.events_list').css('max-height', $('#dashboard_left').height() - 98 + 'px');
                 }
             });
         }
