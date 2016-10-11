@@ -367,10 +367,14 @@
 <script type="text/x-pattern" id="events_pattern">
 <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
 <% _.each(moments, function(moment) { %>
-    <section>
-        <strong><%= new Date(moment.created) %></strong>
-        {% include "includes/event_item.html" %}
-    </section>
+    <div class="demobox">
+        <div class="demobox-header">
+            <strong><%= new Date(moment.created) %></strong>
+        </div>
+        <div class="demobox-body">
+            {% include "includes/event_item.html" %}
+        </div>
+    </div>
 <% }); %>
 </script>
 {% endblock %}

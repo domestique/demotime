@@ -8,7 +8,6 @@
 {% endblock %}
 
 {% block content %}
-<canvas id="fireworks" style="display: none"></canvas>
 <h1 class="heading">
     <strong>Your</strong> Dashboard
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
@@ -152,14 +151,18 @@
 <script type="text/x-pattern" id="events_pattern">
 <div class="events_list">
 <% _.each(moments, function(moment) { %>
-    <div>
-        <strong><a class="has_bubble"
-            data-prj="<%= moment.review.project.id %>"
-            data-pk="<%= moment.review.pk %>"
-            href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
-            <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
-        </strong> -
-        {% include "includes/event_item.html" %}
+    <div class="demobox">
+        <div class="demobox-header">
+            <strong><a class="has_bubble"
+                data-prj="<%= moment.review.project.id %>"
+                data-pk="<%= moment.review.pk %>"
+                href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
+                <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
+            </strong>
+        </div>
+        <div class="demobox-body">
+            {% include "includes/event_item.html" %}
+        </div>
     </div>
 <% }); %>
 </div>
