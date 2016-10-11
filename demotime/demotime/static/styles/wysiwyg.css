@@ -47,6 +47,10 @@ blockquote div br:first-child {
         display: none;
     }
 }
+a.wysiwyg-toolbar-icon:hover {
+    background: #f6f6f6;
+    text-decoration: none;
+}
 
 .emoji_panel {
     float: right;

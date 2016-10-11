@@ -145,7 +145,7 @@
                 {% endif %}
 
                 <br><br>
-                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
+                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link|truncatechars:35 }}</a>
             </div>
             {% if request.user.is_authenticated %}
                 <div class="cel reviewers">
