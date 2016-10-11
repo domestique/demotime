@@ -266,6 +266,7 @@ input[type='button'].reply_and_approve,
 .attachment-card video {
     max-width: 100%;
     width: 100%;
+    max-height: 500px;
 }
 .attachment-card.audio {
     width: 100%;
