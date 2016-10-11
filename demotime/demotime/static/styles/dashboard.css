@@ -1,11 +1,11 @@
 /* Reviews list (profile/dashboard) */
 .dashboard h3 {
-    margin:0;
-    font-size:18px;
+    margin: 0;
+    font-size: 18px;
 }
 @media screen and (max-width:680px) {
     .dashboard h3 {
-        font-size:14px;
+        font-size: 14px;
     }
 }
 .dashboard section.aggregated_dashboard-section {
@@ -37,35 +37,38 @@
     margin: 0;
 }
 section .messages-list .message_li a,
-section .review_li.open.approved a,
-section .review_li.Reviewing a {
+section .demobox.open.approved a,
+section .demobox.Reviewing a {
     font-weight: 700;
 }
 .messages-list .de-emphasize .icon-mail:before {
     display: none;
 }
-section .review_li.de-emphasize {
-    opacity: 0.4
+section .demobox.de-emphasize {
+    opacity: .4;
 }
-section .review_li.de-emphasize * {
+section .demobox.de-emphasize * {
     font-weight: 200 !important;
+}
+section .demobox .demobox-body {
+    font-size: 16px;
 }
 
 /* Message center messages */
 li.de-emphasize {
-    opacity: 0.4
+    opacity: .4;
 }
 li.de-emphasize * {
     font-weight: 200 !important;
 }
 
 .dashboard ul {
-    list-style:none;
-    margin:0;
-    padding:0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 section.emph_high {
-    background: #fff;
+    background: #ffffff;
 }
 section.emph_med {
     background: #fafafa;
@@ -90,7 +93,6 @@ section.emph_lower {
     text-transform: uppercase;
     margin-left: 3px;
     font-size: 10px;
-    color: #eee;
     vertical-align: middle;
 }
 .dashboard small.reviewing {
@@ -99,59 +101,25 @@ section.emph_lower {
 }
 
 /* Boxes */
-section li.review_li {
-    background: #fff;
-    padding: 3px;
-    margin: 20px 0;
-    border: 1px solid #eaeaea;
-    box-shadow: 4px 4px 0 #ddd;
+section .demobox.Approved {
+    opacity: .8;
 }
-section li.review_li:first-child {
-    margin-top: 0;
+section .demobox.Approved .demobox-header {
+    background: #ffffff;
 }
-section li.review_li:last-child {
-    margin-bottom: 0;
+
+section .demobox {
+    margin-bottom: 10px;
 }
-section .review_li-top {
-    overflow: hidden;
-    background: #f0f0f0;
-    padding: 5px 10px;
-}
-section .review_li.Approved {
-    opacity: 0.8;
-}
-section .review_li.Approved .review_li-top {
-    background: #fff;
-    border-bottom: 0;
-}
-section .review_li-bottom {
-    background: #fafafa;
-    padding: 10px;
-}
-.aggregated_dashboard-projects a,
-section .review_li-top,
-section .review_li-top a,
-section .review_li-top small,
-section .review_li-bottom,
-section .review_li-bottom a {
-    color: #555;
-}
-section .review_li-top a,
-section .review_li-bottom a {
-    color: #1f8470;
-}
-section .review_li-bottom,
-section .review_li-bottom a {
-    font-size: 16px;
-}
-section .review_li .time_stamp {
+
+section .demobox .time_stamp {
     float: right;
-    line-height: 30px;
+    line-height: 21px;
     vertical-align: middle;
-    color: #999;
+    color: #999999;
 }
 @media screen and (max-width:350px) {
-    section .review_li .time_stamp {
+    section .demobox .time_stamp {
         display: none;
     }
 }
@@ -168,29 +136,31 @@ section .review_li .time_stamp {
     top: 1px;
 }
 
-.icon-Reviewing, .icon-reviewing {
+.icon-Reviewing,
+.icon-reviewing {
     background: url(/static/images/emoji/clock.png) 0 50% no-repeat;
     background-size: 16px;
 }
 
 .legend li span {
     font-weight: 300;
-    color: #999;
+    color: #999999;
 }
 
 table {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: #ffffff;
+    border: 1px solid #dddddd;
 }
-th, td {
+th,
+td {
     font-size: 14px;
     vertical-align: top;
     text-align: left;
     padding: 8px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #dddddd;
 }
 .dashboard td small {
-    color: #555;
+    color: #555555;
     font-weight: 700;
     white-space: nowrap;
 }
@@ -199,6 +169,7 @@ th, td {
     background: #2a9c86;
     text-align: left;
     padding: 10px;
+    border-radius: 2px;
 }
 .tertiary ul {
     width: auto;
@@ -212,9 +183,9 @@ th, td {
     display: inline-block;
 }
 .tertiary a {
-    color: #fff;
+    color: #ffffff;
     border: 1px solid white;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, .2);
     font-size: 12px;
     padding: 5px;
     min-width: 25px;
@@ -223,9 +194,10 @@ th, td {
     text-transform: uppercase;
     display: inline-block;
     position: relative;
+    border-radius: 2px;
 }
 .tertiary a:hover {
-    background: rgba(255, 255, 255, 0.5) !important;
+    background: rgba(255, 255, 255, .5) !important;
     text-decoration: none;
 }
 .tertiary li.new a {
@@ -233,7 +205,7 @@ th, td {
 }
 .tertiary li.new a:after {
     content: 'new!';
-    background: #E03743;
+    background: #e03743;
     border-radius: 2px;
     color: white;
     font-weight: 700;
@@ -246,7 +218,7 @@ th, td {
     right: 3px;
 }
 .your_dashboard .your_dashboard a {
-    background: rgba(255, 255, 231, 0.4);
+    background: rgba(255, 255, 231, .4);
 }
 
 #fireworks {
@@ -260,6 +232,7 @@ th, td {
 
 .aggregated_dashboard-activity {
     background: #f6f6f6;
+    border-radius: 2px;
 }
 @media screen and (max-width:720px) {
     #dashboard_right {
@@ -273,7 +246,7 @@ th, td {
     top: -1px;
 }
 .events_list {
-    color: #555;
+    color: #555555;
     font-size: 12px;
     margin-top: 5px !important;
     overflow: auto;
@@ -284,8 +257,9 @@ th, td {
 .events_list > div {
     margin-bottom: 15px;
     padding: 10px;
-    background: #fff;
+    background: #ffffff;
     border: 1px solid #eaeaea;
+    border-radius: 2px;
 }
 .events_list blockquote {
     padding: 8px;
@@ -293,6 +267,6 @@ th, td {
     background: #fafafa;
 }
 .events_list blockquote .jump_to_this {
-    color: #bbb;
+    color: #bbbbbb;
     font-size: 10px;
 }

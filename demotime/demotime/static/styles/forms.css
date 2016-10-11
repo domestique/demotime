@@ -176,7 +176,7 @@ select[multiple='multiple']:focus {
 }
 .dd-container .dd-select {
     border: 0;
-    border-radius: 0;
+    border-radius: 2px;
 }
 .dd-select label {
     color: #666666;

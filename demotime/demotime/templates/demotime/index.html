@@ -33,11 +33,9 @@
                     </h3>
                     <section class="aggregated_dashboard-section aggregated_dashboard-reviewing">
                         <div>
-                            <ul>
-                                {% for demo in open_reviews %}
-                                    {% include "includes/reviews_li.html" %}
-                                {% endfor %}
-                            </ul>
+                            {% for demo in open_reviews %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
                         </div>
                     </section>
                 {% endif %}
@@ -49,11 +47,9 @@
                     </h3>
                     <section class="aggregated_dashboard-section aggregated_dashboard-following">
                         <div>
-                            <ul>
-                                {% for demo in followed_demos %}
-                                    {% include "includes/reviews_li.html" %}
-                                {% endfor %}
-                            </ul>
+                            {% for demo in followed_demos %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
                         </div>
                     </section>
                 {% endif %}
@@ -98,11 +94,9 @@
                     </h3>
                     <section class="aggregated_dashboard-section aggregated_dashboard-created">
                         <div>
-                            <ul>
-                                {% for demo in open_demos %}
-                                    {% include "includes/reviews_li.html" %}
-                                {% endfor %}
-                            </ul>
+                            {% for demo in open_demos %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
                         </div>
                     </section>
                 {% endif %}

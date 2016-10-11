@@ -137,9 +137,9 @@ DemoTime.Comments = Backbone.View.extend({
 
     get_success_html: function(data) {
         var html = '<div class="comment_parent comments-reply">';
-        html += '<blockquote>'
-        html += '<div class="blockquote-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
-        html += '<div class="blockquote-body">' + this.options.comment;
+        html += '<div class="demobox">'
+        html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
+        html += '<div class="demobox-body">' + this.options.comment;
 
         if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
             html += '<br><br><div class="attachment-card image collapseable">\
@@ -169,12 +169,12 @@ DemoTime.Comments = Backbone.View.extend({
             comment = link.parents('.comment_parent');
 
         // Grab edit html
-        var edit_html = link.parents('blockquote').find('.blockquote-body').html();
+        var edit_html = link.parents('.demobox').find('.demobox-body').html();
 
         event.preventDefault();
 
         // Remove old comment
-        link.parents('blockquote').slideUp().remove();
+        link.parents('.demobox').slideUp().remove();
         // Clean up conflicting DOM
         comment.find('.expand_reply_link, .icon-comment').remove();
 

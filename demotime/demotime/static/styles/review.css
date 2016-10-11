@@ -5,7 +5,7 @@
     text-transform: none;
     font-size: 35px;
     line-height: 42px;
-    color:#333;
+    color: #333333;
     padding: 25px;
     font-weight: 300;
     position: relative;
@@ -25,7 +25,7 @@
 
 h1 .alert {
     font-size: 10px;
-    color: #aaa;
+    color: #aaaaaa;
 }
 .review ul br,
 .review ol br {
@@ -112,13 +112,13 @@ h1 .alert {
     clear: both;
 }
 li.updated a.subnav-item {
-    background: #FFF2EE;
+    background: #fff2ee;
 }
 li.closed.state-highlight,
 li.open.state-highlight {
     display: none;
 }
-.comment_parent blockquote {
+.comment_parent .demobox {
     padding: 3px;
 }
 
@@ -130,7 +130,7 @@ li.open.state-highlight {
 }
 .attachment-card section {
     overflow: hidden;
-    background: #fff;
+    background: #ffffff;
     min-height: 0;
     border-top: 0;
 }
@@ -209,7 +209,7 @@ article {
     font-weight: 400;
 }
 .revision.current a {
-    color: #555;
+    color: #555555;
     font-weight: 700;
 }
 
@@ -224,11 +224,11 @@ article {
     margin-bottom: 0;
 }
 
-main a[target="_blank"] {
+main a[target='_blank'] {
     display: inline-block;
     padding-right: 15px;
     margin-right: 3px;
-    background:url(/static/images/new_window.png) 100% 20% no-repeat;
+    background: url(/static/images/new_window.png) 100% 20% no-repeat;
 }
 
 input.find_person {
@@ -242,12 +242,13 @@ input.find_person {
 }
 
 .your-status {
-    box-shadow:4px 4px 0 #ddd;
-    border: 1px solid #ddd;
+    box-shadow: 4px 4px 0 #dddddd;
+    border: 1px solid #dddddd;
     background: #fafafa;
     padding: 10px 25px;
     margin: 15px 0 5px;
     float: left;
+    border-radius: 2px;
 }
 @media screen and (max-width:680px) {
     .your-status {
@@ -270,7 +271,7 @@ input.find_person {
     margin: 0;
 }
 .your-status span {
-    color: #333;
+    color: #333333;
     font-weight: 700;
 }
 
@@ -293,14 +294,14 @@ h1.heading {
     cursor: pointer;
 }
 
-a[data-type="approved"] {
-    background: #1B9074;
-    color: #fff;
+a[data-type='approved'] {
+    background: #1b9074;
+    color: #ffffff;
     border: 1px solid #fafafa;
 }
-a[data-type="rejected"] {
+a[data-type='rejected'] {
     background: #904445;
-    color: #fff;
+    color: #ffffff;
     border: 1px solid #fafafa;
 }
 
@@ -312,13 +313,13 @@ a[data-type="rejected"] {
     background: #f2f2f2;
     display: inline-block;
     padding: 8px 20px;
-    color: #666;
+    color: #666666;
     cursor: pointer;
 }
 .review_toggles .enabled {
     z-index: 31415;
     background: #1f8470;
-    color: #fff;
+    color: #ffffff;
 }
 
 .review-overview.events img {

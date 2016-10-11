@@ -296,8 +296,8 @@
                                 {% if not forloop.first %}
                                     <div class="comments-reply">
                                 {% endif %}
-                                    <blockquote>
-                                        <div class="blockquote-header">
+                                    <div class="demobox">
+                                        <div class="demobox-header">
                                             Reply by
                                             <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
                                                 {{ comment.commenter.userprofile }}
@@ -309,10 +309,10 @@
                                                 (<a href="#" class="comment_edit" data-comment="{{ comment.id }}">edit this reply</a>)
                                             {% endif %}
                                         </div>
-                                        <div class="blockquote-body">
+                                        <div class="demobox-body">
                                             {{ comment.comment|safe|linebreaksbr }}
                                         </div>
-                                    </blockquote>
+                                    </div>
                                     {% use_macro attachments %}
                                 {% if not forloop.first %}
                                 </div>

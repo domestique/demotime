@@ -170,7 +170,7 @@ nav.subnav {
     font-weight: 400;
     display: inline-block;
     padding: 3px 10px;
-    border-radius: 3px;
+    border-radius: 2px;
     margin: 0;
 }
 @media screen and (max-width: 680px) {
@@ -227,7 +227,6 @@ nav.subnav {
 .new_demo a.subnav-item {
     padding-top: 7px;
     padding-bottom: 7px;
-    border-radius: 0;
 }
 
 .hide_header .breadcrumbs {
