@@ -34,7 +34,7 @@ class EventView(CanViewJsonView):
         }
         events = models.Event.objects.filter(
             project=self.project,
-        ).exclude(review__state=constants.DRAFT)
+        )
         form = forms.EventFilterForm(project=self.project, data=request.GET)
         if form.is_valid():
             data = form.cleaned_data

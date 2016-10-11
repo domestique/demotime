@@ -31,8 +31,17 @@ class Follower(BaseModel):
             'modified': self.modified.isoformat(),
         }
 
+    def create_follower_event(self, user):
+        Event.create_event(
+            project=self.review.project,
+            event_type_code=EventType.FOLLOWER_ADDED,
+            related_object=self,
+            user=user
+        )
+
     @classmethod
-    def create_follower(cls, review, user, creator, skip_notifications=False):
+    def create_follower(cls, review, user, creator,
+                        skip_notifications=False, draft=False):
         existing_reviewer = review.reviewer_set.filter(reviewer=user)
         if existing_reviewer.exists():
             return existing_reviewer.get()
@@ -41,13 +50,10 @@ class Follower(BaseModel):
             review=review,
             user=user
         )
-        Event.create_event(
-            project=review.project,
-            event_type_code=EventType.FOLLOWER_ADDED,
-            related_object=obj,
-            user=creator
-        )
-        if skip_notifications:
+        if not draft:
+            obj.create_follower_event(creator)
+
+        if skip_notifications or draft:
             notify_follower = notify_creator = False
         else:
             notify_follower = creator != user
@@ -62,13 +68,14 @@ class Follower(BaseModel):
 
         return obj
 
-    def drop_follower(self, dropper):  # pylint: disable=unused-argument
-        Event.create_event(
-            project=self.review.project,
-            event_type_code=EventType.FOLLOWER_REMOVED,
-            related_object=self.review,
-            user=self.user
-        )
+    def drop_follower(self, dropper, draft=False):  # pylint: disable=unused-argument
+        if not draft:
+            Event.create_event(
+                project=self.review.project,
+                event_type_code=EventType.FOLLOWER_REMOVED,
+                related_object=self.review,
+                user=self.user
+            )
         self.delete()
 
     def _send_follower_message(self, notify_follower=False, notify_creator=False):

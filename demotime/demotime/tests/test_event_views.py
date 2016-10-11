@@ -37,17 +37,6 @@ class TestEventViews(BaseTestCase):
             self.project.event_set.count()
         )
 
-    def test_get_events_hides_drafts(self):
-        models.Review.objects.update(state=constants.DRAFT)
-        response = self.client.get(self.url)
-        self.assertStatusCode(response, 200)
-        data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['status'], 'success')
-        self.assertEqual(data['errors'], '')
-        self.assertEqual(
-            len(data['events']), 0
-        )
-
     def test_filter_events_by_review(self):
         response = self.client.get(self.url, {'review': self.review_one.pk})
         self.assertStatusCode(response, 200)

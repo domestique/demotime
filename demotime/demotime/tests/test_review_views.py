@@ -342,7 +342,15 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         event = obj.event_set.filter(
             event_type__code=models.EventType.DEMO_CREATED
         )
-        self.assertTrue(event.exists())
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertFalse(event.exists())
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.state, constants.DRAFT)
         self.assertEqual(obj.title, title)
@@ -376,8 +384,11 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         fh.name = 'test_file_1'
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)
+        draft_kwargs = self.default_review_kwargs.copy()
+        draft_kwargs['state'] = constants.DRAFT
+        draft_review = models.Review.create_review(**draft_kwargs)
         response = self.client.post(
-            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            reverse('edit-review', args=[self.project.slug, draft_review.pk]),
             {
                 'creator': self.user,
                 'title': title,
@@ -399,8 +410,22 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         )
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
-        event = obj.event_set.filter(event_type__code=models.EventType.DEMO_UPDATED)
-        self.assertTrue(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.DEMO_UPDATED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertFalse(event.exists())
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, title)
         # Drafts update the Review description
@@ -410,6 +435,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.followers.count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 3)
+        self.assertEqual(obj.state, constants.DRAFT)
 
     def test_post_update_draft_review_to_open(self):
         fh = StringIO('testing')
@@ -442,7 +468,78 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         )
         self.assertStatusCode(response, 302)
         obj = models.Review.objects.get(title=title)
-        event = obj.event_set.filter(event_type__code=models.EventType.DEMO_UPDATED)
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertTrue(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.DEMO_UPDATED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertTrue(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertFalse(event.exists())
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.title, title)
+        # Drafts update the Review description
+        self.assertEqual(obj.description, 'Updated Description')
+        self.assertEqual(obj.revision.description, 'Updated Description')
+        self.assertEqual(obj.case_link, 'http://www.example.org/1/')
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.followers.count(), 0)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.revision.attachments.count(), 3)
+        self.assertEqual(
+            models.Message.objects.filter(title__contains='POST').count(),
+            3
+        )
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            5
+        )
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user).exists()
+        )
+        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            4
+        )
+
+    def test_post_update_draft_review_to_open_no_attachments(self):
+        title = 'Test Title Update Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        draft_kwargs = self.default_review_kwargs.copy()
+        draft_kwargs['state'] = constants.DRAFT
+        draft_review = models.Review.create_review(**draft_kwargs)
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, draft_review.pk]),
+            {
+                'creator': self.user,
+                'title': title,
+                'description': 'Updated Description',
+                'case_link': 'http://www.example.org/1/',
+                'reviewers': self.test_users.values_list('pk', flat=True),
+                'followers': [],
+                'project': self.project.pk,
+                'state': constants.OPEN,
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+            }
+        )
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.filter(event_type__code=models.EventType.DEMO_CREATED)
         self.assertTrue(event.exists())
         self.assertEqual(obj.creator, self.user)
         self.assertEqual(obj.title, title)
@@ -452,7 +549,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
         self.assertEqual(obj.reviewers.count(), 3)
         self.assertEqual(obj.followers.count(), 0)
-        self.assertEqual(obj.revision.attachments.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(
             models.Message.objects.filter(title__contains='POST').count(),
             3

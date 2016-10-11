@@ -106,58 +106,60 @@ class Comment(BaseModel):
                 sort_order=sort_order,
             )
 
-        system_user = User.objects.get(username='demotime_sys')
-        if starts_with_mention:
-            users = User.objects.filter(pk__in=mentioned_users)
-        else:
-            users = User.objects.filter(
-                (
-                    # Reviewers
-                    models.Q(reviewer__review=review.review) |
-                    # Followers
-                    models.Q(follower__review=review.review) |
-                    # Creator
-                    models.Q(pk=review.review.creator.pk) |
-                    # Mentions
-                    models.Q(pk__in=mentioned_users)
-                )
-            ).distinct()
-
-        for user in users:
-            if user == commenter:
-                continue
-
-            UserReviewStatus.objects.filter(
-                review=review.review,
-                user=user,
-            ).update(read=False)
-
-            context = {
-                'receipient': user,
-                'sender': system_user,
-                'comment': obj,
-                'url': review.get_absolute_url(),
-                'title': review.review.title,
-            }
-            Message.send_system_message(
-                'New Comment on {}'.format(review.review.title),
-                'demotime/messages/new_comment.html',
-                context,
-                user,
-                revision=review,
-                thread=thread,
+        if not review.review.state == constants.DRAFT:
+            Event.create_event(
+                project=review.review.project,
+                event_type_code=EventType.COMMENT_ADDED,
+                related_object=obj,
+                user=commenter,
+            )
+            review.review.trigger_webhooks(
+                constants.COMMENT,
+                {'comment': obj.to_json()}
             )
 
-        Event.create_event(
-            project=review.review.project,
-            event_type_code=EventType.COMMENT_ADDED,
-            related_object=obj,
-            user=commenter,
-        )
-        review.review.trigger_webhooks(
-            constants.COMMENT,
-            {'comment': obj.to_json()}
-        )
+            system_user = User.objects.get(username='demotime_sys')
+            if starts_with_mention:
+                users = User.objects.filter(pk__in=mentioned_users)
+            else:
+                users = User.objects.filter(
+                    (
+                        # Reviewers
+                        models.Q(reviewer__review=review.review) |
+                        # Followers
+                        models.Q(follower__review=review.review) |
+                        # Creator
+                        models.Q(pk=review.review.creator.pk) |
+                        # Mentions
+                        models.Q(pk__in=mentioned_users)
+                    )
+                ).distinct()
+
+            for user in users:
+                if user == commenter:
+                    continue
+
+                UserReviewStatus.objects.filter(
+                    review=review.review,
+                    user=user,
+                ).update(read=False)
+
+                context = {
+                    'receipient': user,
+                    'sender': system_user,
+                    'comment': obj,
+                    'url': review.get_absolute_url(),
+                    'title': review.review.title,
+                }
+                Message.send_system_message(
+                    'New Comment on {}'.format(review.review.title),
+                    'demotime/messages/new_comment.html',
+                    context,
+                    user,
+                    revision=review,
+                    thread=thread,
+                )
+
         return obj
 
     class Meta:

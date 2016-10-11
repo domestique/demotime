@@ -180,23 +180,28 @@ class Review(BaseModel):
             )
 
         # Events
-        Event.create_event(
-            project,
-            EventType.DEMO_CREATED,
-            obj,
-            creator
-        )
+        if state != DRAFT:
+            Event.create_event(
+                project,
+                EventType.DEMO_CREATED,
+                obj,
+                creator
+            )
 
         for reviewer in reviewers:
-            Reviewer.create_reviewer(obj, reviewer, creator, True)
+            Reviewer.create_reviewer(
+                obj, reviewer, creator, True, draft=state == DRAFT
+            )
             UserReviewStatus.create_user_review_status(
-                obj, reviewer
+                obj, reviewer,
             )
 
         for follower in followers:
-            Follower.create_follower(obj, follower, creator, True)
+            Follower.create_follower(
+                obj, follower, creator, True, draft=state == DRAFT
+            )
             UserReviewStatus.create_user_review_status(
-                obj, follower
+                obj, follower,
             )
 
         # Creator UserReviewStatus, set read to True, cuz they just created it
@@ -241,6 +246,7 @@ class Review(BaseModel):
             rev = obj.revision
             rev.description = description
             rev.save()
+            prev_revision = None
 
         if state != DRAFT and not state_change:
             is_update = True
@@ -261,28 +267,33 @@ class Review(BaseModel):
             )
 
         # No attachments, we'll copy them over
-        if not attachments and state != DRAFT:
+        if prev_revision and not attachments:
             for attachment in prev_revision.attachments.all():
                 attachment.content_object = rev
                 attachment.pk = None
                 attachment.save()
 
         # Events
-        Event.create_event(
-            project,
-            EventType.DEMO_UPDATED,
-            obj,
-            creator
-        )
+        if state == OPEN and not state_change:
+            Event.create_event(
+                project,
+                EventType.DEMO_UPDATED,
+                obj,
+                creator
+            )
 
         for reviewer in reviewers:
             try:
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
-                reviewer = Reviewer.create_reviewer(obj, reviewer, creator, True)
+                reviewer = Reviewer.create_reviewer(
+                    obj, reviewer, creator, True, draft=state == DRAFT
+                )
             else:
                 reviewer.status = REVIEWING
                 reviewer.save()
+                if state_change:
+                    reviewer.create_reviewer_event(creator)
 
         for follower in followers:
             try:
@@ -290,8 +301,12 @@ class Review(BaseModel):
             except Follower.DoesNotExist:
                 Follower.create_follower(
                     review=obj, user=follower,
-                    creator=creator, skip_notifications=True
+                    creator=creator, skip_notifications=True,
+                    draft=state == DRAFT
                 )
+            else:
+                if state_change:
+                    follower.create_follower_event(creator)
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
@@ -300,11 +315,12 @@ class Review(BaseModel):
 
         # Drop Reviewers no longer assigned
         reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
+        skip_drop_events = state == DRAFT or state_change
         for reviewer in reviewers:
-            reviewer.drop_reviewer(obj.creator)
+            reviewer.drop_reviewer(obj.creator, draft=skip_drop_events)
         followers = obj.follower_set.exclude(review=obj, user__in=followers)
         for follower in followers:
-            follower.drop_follower(obj.creator)
+            follower.drop_follower(obj.creator, draft=skip_drop_events)
 
         if is_update:
             # pylint: disable=protected-access
