@@ -243,6 +243,10 @@ section.aggregated_dashboard-activity {
 .events_list strong a {
     font-weight: 700;
 }
+.events_list img {
+    max-width: 100%;
+    height: auto;
+}
 .events_list .demobox {
     margin-bottom: 15px;
 }
