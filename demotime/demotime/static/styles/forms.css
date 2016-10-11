@@ -20,15 +20,15 @@ input[type=date],
 input[type=tel],
 input[type=number],
 input[type=search] {
-    background-color: transparent;
     border: none;
-    border-bottom: 1px solid #dddddd;
+    border: 1px solid #dddddd;
+    border-radius: 2px;
     outline: none;
-    height: 3rem;
     width: 100%;
     font-size: 1rem;
     margin: 0 0 15px 0;
-    padding: 0;
+    padding: 15px;
+    background-color: #fff;
     box-shadow: none;
     box-sizing: border-box;
     -webkit-transition: .3s;
@@ -118,6 +118,7 @@ select[multiple='multiple'] {
     box-shadow: 4px 4px 0 #ddd;
     min-height: 300px;
     width: 100%;
+    border-radius: 2px;
 }
 select[multiple='multiple'] option {
     color: #666666;

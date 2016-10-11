@@ -27,6 +27,7 @@ blockquote div br:first-child {
 }
 .wysiwyg-container {
     position: relative;
+    border-radius: 2px;
 }
 
 .footer_panel {

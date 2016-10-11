@@ -34,19 +34,9 @@ h1 .alert {
 .review p {
     margin: 3px 0;
 }
-.review-top {
-    overflow: hidden;
-}
+.review-top,
 .review-meta {
-    padding: 20px 25px;
-    background: #f2f2f2;
-    font-size: 14px;
     overflow: hidden;
-}
-@media screen and (max-width:680px) {
-    .review-meta {
-        padding: 10px;
-    }
 }
 .review-meta .cel {
     float: left;
@@ -235,10 +225,11 @@ input.find_person {
     font-size: 11px;
     margin-top: 0;
     width: 95%;
-    background: #f7f7f7;
+    background: #fff;
     padding: 3px 10px;
     height: 30px;
     margin-top: 5px;
+    border: 1px solid #ddd;
 }
 
 .your-status {
@@ -321,6 +312,7 @@ a[data-type='rejected'] {
     background: #1f8470;
     color: #ffffff;
     white-space: nowrap;
+    border-radius: 2px;
 }
 
 .review-overview.events img {
