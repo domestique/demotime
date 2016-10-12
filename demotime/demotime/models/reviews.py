@@ -28,6 +28,7 @@ from demotime.constants import (
     CREATED,
     UPDATED,
     DRAFT,
+    CANCELLED,
 )
 
 
@@ -38,6 +39,7 @@ class Review(BaseModel):
         (OPEN, OPEN.capitalize()),
         (CLOSED, CLOSED.capitalize()),
         (ABORTED, ABORTED.capitalize()),
+        (CANCELLED, CANCELLED.capitalize()),
     )
 
     REVIEWER_STATE_CHOICES = (
@@ -516,6 +518,9 @@ class Review(BaseModel):
         elif self.state == ABORTED and new_state == OPEN:
             state_changed = self._reopen_review(new_state)
             self.trigger_webhooks(REOPENED)
+        elif self.state == DRAFT and new_state == CLOSED:
+            self.state = CANCELLED
+            self.save()
 
         if state_changed:
             self._common_state_change()

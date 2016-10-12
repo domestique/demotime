@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from demotime import models
+from demotime import constants, models
 from demotime.constants import DRAFT, OPEN
 
 
@@ -130,7 +130,13 @@ class ReviewFilterForm(forms.Form):
             return models.Review.objects.none()
 
         qs = models.Review.objects.all() if not initial_qs else initial_qs
-        qs = qs.filter(project__in=self.projects)
+        qs = qs.filter(
+            project__in=self.projects
+        ).exclude(
+            state=constants.DRAFT
+        ).exclude(
+            state=constants.CANCELLED
+        )
         data = self.cleaned_data
         if data.get('reviewer'):
             qs = qs.filter(reviewer__reviewer=data['reviewer'])
