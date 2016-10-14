@@ -237,23 +237,29 @@ section.aggregated_dashboard-activity {
     position: relative;
     top: -1px;
 }
-.events_list {
+.events {
     overflow: auto;
 }
-.events_list strong a {
+.events strong a {
     font-weight: 700;
 }
-.events_list img {
+.events img {
     max-width: 100%;
     height: auto;
 }
-.events_list .demobox {
+.events blockquote {
+    padding: 8px;
+    border: 0;
+    background: #fafafa;
+}
+.events .demobox {
+    margin: 0 3px 15px 0;
     margin-bottom: 15px;
 }
-section .events_list .demobox-body {
+section .events .demobox-body {
     font-size: 11px;
 }
-.events_list blockquote .jump_to_this {
+.events blockquote .jump_to_this {
     color: #bbbbbb;
     font-size: 10px;
 }
