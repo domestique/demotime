@@ -41,7 +41,9 @@ class EventView(CanViewJsonView):
             if data.get('review'):
                 events = events.filter(review=data['review'])
             if data.get('event_type'):
-                events = events.filter(event_type=data['event_type'])
+                events = events.filter(
+                    event_type__in=data['event_type']
+                )
         else:
             self.status = 400
             json_data['errors'] = form.errors

@@ -43,11 +43,13 @@ class TestEventViews(BaseTestCase):
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['status'], 'success')
         self.assertEqual(data['errors'], '')
+        expected_events = models.Event.objects.filter(
+            review=self.review_one
+        )
+        self.assertTrue(expected_events.exists())
         self.assertEqual(
             len(data['events']),
-            models.Event.objects.filter(
-                review=self.review_one
-            ).count()
+            expected_events.count()
         )
 
     def test_filter_events_by_event_type(self):
@@ -58,12 +60,40 @@ class TestEventViews(BaseTestCase):
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['status'], 'success')
         self.assertEqual(data['errors'], '')
+        expected_events = models.Event.objects.filter(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertTrue(expected_events.exists())
         self.assertEqual(
             len(data['events']),
-            models.Event.objects.filter(
-                event_type__code=models.EventType.DEMO_CREATED
-            ).count()
+            expected_events.count()
         )
+
+    def test_filter_events_by_multiple_event_types(self):
+        models.Comment.create_comment(
+            self.user, 'comment', self.review_one.revision
+        )
+        response = self.client.get(self.url, {
+            'event_type': [
+                models.EventType.DEMO_CREATED, models.EventType.COMMENT_ADDED
+            ]
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['errors'], '')
+        expected_events = models.Event.objects.filter(
+            event_type__code__in=(
+                models.EventType.COMMENT_ADDED, models.EventType.DEMO_CREATED
+            )
+        )
+        self.assertEqual(expected_events.count(), 3)
+        self.assertEqual(len(data['events']), expected_events.count())
+        for event in data['events']:
+            self.assertIn(
+                event['event_type']['code'],
+                (models.EventType.COMMENT_ADDED, models.EventType.DEMO_CREATED)
+            )
 
     def test_filter_events_by_type_and_review(self):
         response = self.client.get(self.url, {
@@ -74,10 +104,12 @@ class TestEventViews(BaseTestCase):
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['status'], 'success')
         self.assertEqual(data['errors'], '')
+        expected_events = models.Event.objects.filter(
+            event_type__code=models.EventType.DEMO_CREATED,
+            review=self.review_one
+        )
+        self.assertTrue(expected_events.exists())
         self.assertEqual(
             len(data['events']),
-            models.Event.objects.filter(
-                event_type__code=models.EventType.DEMO_CREATED,
-                review=self.review_one
-            ).count()
+            expected_events.count()
         )

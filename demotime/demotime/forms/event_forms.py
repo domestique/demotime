@@ -6,7 +6,7 @@ from demotime import models
 
 class EventFilterForm(forms.Form):
 
-    event_type = forms.ModelChoiceField(
+    event_type = forms.ModelMultipleChoiceField(
         queryset=models.EventType.objects.all(),
         to_field_name='code',
         required=False
