@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.models import User
 
 from demotime import models
 
@@ -13,6 +12,11 @@ class EventFilterForm(forms.Form):
     )
     review = forms.ModelChoiceField(
         queryset=models.Review.objects.none(),
+        required=False
+    )
+    exclude_type = forms.ModelMultipleChoiceField(
+        queryset=models.EventType.objects.all(),
+        to_field_name='code',
         required=False
     )
 

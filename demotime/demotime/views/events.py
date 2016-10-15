@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import get_object_or_404
 
 from demotime import forms, models
@@ -7,6 +8,7 @@ from demotime.views import CanViewJsonView
 class EventView(CanViewJsonView):
 
     status = 200
+    paginate_by = 25
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,6 +46,10 @@ class EventView(CanViewJsonView):
                 events = events.filter(
                     event_type__in=data['event_type']
                 )
+            if data.get('exclude_type'):
+                events = events.exclude(
+                    event_type__in=data['exclude_type']
+                )
         else:
             self.status = 400
             json_data['errors'] = form.errors
@@ -54,8 +60,22 @@ class EventView(CanViewJsonView):
             'user__userprofile',
         ).prefetch_related(
             'related_object',
-        )[:20]
+        )
+        paginator = Paginator(events, self.paginate_by)
+        page = request.GET.get('page')
+        try:
+            events = paginator.page(page)
+        except PageNotAnInteger:
+            page = 1
+            events = paginator.page(page)
+        except EmptyPage:
+            page = paginator.num_pages
+            events = paginator.page(page)
+
         for event in events:
             json_data['events'].append(event.to_json())
 
+        json_data['page'] = page
+        json_data['page_count'] = paginator.num_pages
+        json_data['count'] = paginator.count
         return json_data
