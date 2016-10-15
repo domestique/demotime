@@ -149,10 +149,12 @@ class TestReviewModels(BaseTestCase):
     def test_draft_review_opened(self):
         self.default_review_kwargs['state'] = constants.DRAFT
         obj = models.Review.create_review(**self.default_review_kwargs)
+        created_time = obj.created
         self.assertEqual(len(mail.outbox), 0)
         self.default_review_kwargs['state'] = constants.OPEN
         self.default_review_kwargs['review'] = obj.pk
         obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertNotEqual(created_time, obj.created)
         self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(len(mail.outbox), 5)

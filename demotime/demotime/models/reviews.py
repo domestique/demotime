@@ -3,6 +3,7 @@ from django.db.models import Max
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from demotime.models.base import BaseModel
 from demotime.models import (
@@ -244,6 +245,9 @@ class Review(BaseModel):
 
         if state == DRAFT or state_change:
             obj.description = description
+            # We want the created time to represent when the user started the
+            # Demo, not when they created the draft
+            obj.created = timezone.now()
             obj.save()
             rev = obj.revision
             rev.description = description
