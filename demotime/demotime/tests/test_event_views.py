@@ -81,3 +81,27 @@ class TestEventViews(BaseTestCase):
                 review=self.review_one
             ).count()
         )
+
+    def test_no_draft_or_cancelled_events(self):
+        self.default_review_kwargs['state'] = constants.DRAFT
+        review = models.Review.create_review(**self.default_review_kwargs)
+        response = self.client.get(self.url, {
+            'review': review.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['errors'], '')
+        self.assertEqual(len(data['events']), 0)
+
+        self.default_review_kwargs['state'] = constants.CANCELLED
+        self.default_review_kwargs['review'] = review.pk
+        review = models.Review.update_review(**self.default_review_kwargs)
+        response = self.client.get(self.url, {
+            'review': review.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['errors'], '')
+        self.assertEqual(len(data['events']), 0)

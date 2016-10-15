@@ -32,7 +32,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(attachment.pretty_name, 'test_file')
         self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(obj.revision.number, 1)
-        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
         self.assertEqual(statuses.count(), 6)
@@ -52,6 +52,128 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator)
+
+    def test_create_draft_review(self):
+        self.assertEqual(len(mail.outbox), 0)
+        self.default_review_kwargs['state'] = constants.DRAFT
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        assert obj.revision
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.title, 'Test Title')
+        self.assertEqual(obj.description, 'Test Description')
+        self.assertEqual(obj.case_link, 'http://example.org/')
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.follower_set.count(), 2)
+        attachment = obj.revision.attachments.all()[0]
+        attachment.attachment.name = 'test/test_file'
+        self.assertEqual(attachment.pretty_name, 'test_file')
+        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.DRAFT)
+        self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
+        statuses = models.UserReviewStatus.objects.filter(review=obj)
+        self.assertEqual(statuses.count(), 6)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 5)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertFalse(
+            models.Reminder.objects.filter(review=obj, active=True).exists()
+        )
+        self.hook_patch_run.assert_not_called()
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.DEMO_CREATED
+            ).exists()
+        )
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.REVIEWER_ADDED
+            ).exists()
+        )
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.FOLLOWER_ADDED
+            ).exists()
+        )
+
+    def test_update_draft_review(self):
+        self.default_review_kwargs['state'] = constants.DRAFT
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(len(mail.outbox), 0)
+        models.UserReviewStatus.objects.filter(review=obj).update(read=True)
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'reviewers': self.test_users.exclude(username='test_user_0'),
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        # Should still be the same, singular revision
+        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(obj.revision.attachments.count(), 4)
+        self.assertEqual(obj.description, 'New Description')
+        self.assertEqual(obj.case_link, 'http://badexample.org')
+        self.assertFalse(
+            models.Reminder.objects.filter(review=obj, active=True).exists()
+        )
+        self.hook_patch_run.assert_not_called()
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.DEMO_CREATED
+            ).exists()
+        )
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.REVIEWER_ADDED
+            ).exists()
+        )
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.REVIEWER_REMOVED
+            ).exists()
+        )
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.FOLLOWER_ADDED
+            ).exists()
+        )
+
+    def test_draft_review_opened(self):
+        self.default_review_kwargs['state'] = constants.DRAFT
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 0)
+        self.default_review_kwargs['state'] = constants.OPEN
+        self.default_review_kwargs['review'] = obj.pk
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(len(mail.outbox), 5)
+        self.assertTrue(
+            obj.event_set.filter(
+                event_type__code=models.EventType.DEMO_CREATED
+            ).exists()
+        )
+        self.assertTrue(
+            obj.event_set.filter(
+                event_type__code=models.EventType.REVIEWER_ADDED
+            ).exists()
+        )
+        self.assertTrue(
+            obj.event_set.filter(
+                event_type__code=models.EventType.FOLLOWER_ADDED
+            ).exists()
+        )
+        self.hook_patch_run.assert_called_once_with(
+            constants.CREATED
+        )
 
     def test_create_review_duped_reviewer_follower(self):
         ''' Test creating a review with a user in both the Reviwers and the
@@ -76,7 +198,7 @@ class TestReviewModels(BaseTestCase):
         attachment.attachment.name = 'test/test_file'
         self.assertEqual(attachment.pretty_name, 'test_file')
         self.assertEqual(obj.revision.number, 1)
-        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
         self.assertEqual(statuses.count(), 6)
@@ -350,7 +472,7 @@ class TestReviewModels(BaseTestCase):
 
     def test_review_state_unchanged(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
-        self.assertFalse(obj.update_state(models.reviews.OPEN))
+        self.assertFalse(obj.update_state(constants.OPEN))
 
     def test_review_state_change_closed(self):
         self.assertEqual(len(mail.outbox), 0)
@@ -450,10 +572,10 @@ class TestReviewModels(BaseTestCase):
         obj.save(update_fields=['state'])
         models.UserReviewStatus.objects.update(read=True)
         models.Reminder.objects.filter(review=obj).update(active=False)
-        self.assertTrue(obj.update_state(models.reviews.OPEN))
+        self.assertTrue(obj.update_state(constants.OPEN))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
-        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.state, constants.OPEN)
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
@@ -495,10 +617,10 @@ class TestReviewModels(BaseTestCase):
         obj.save(update_fields=['state'])
         models.UserReviewStatus.objects.update(read=True)
         models.Reminder.objects.filter(review=obj).update(active=False)
-        self.assertTrue(obj.update_state(models.reviews.OPEN))
+        self.assertTrue(obj.update_state(constants.OPEN))
         # refresh it
         obj = models.Review.objects.get(pk=obj.pk)
-        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.state, constants.OPEN)
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)

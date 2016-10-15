@@ -721,6 +721,36 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             4
         )
 
+    def test_post_update_review_no_attachments(self):
+        ''' Attachments from the previous revision should be copied over '''
+        title = 'Test Title Update Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            {
+                'creator': self.user,
+                'title': title,
+                'description': 'Updated Description',
+                'case_link': 'http://www.example.org/1/',
+                'reviewers': self.test_users.values_list('pk', flat=True),
+                'followers': [],
+                'project': self.project.pk,
+                'state': constants.OPEN,
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+            }
+        )
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_UPDATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.title, title)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 2)
+
     def test_post_create_review_with_errors(self):
         response = self.client.post(reverse('create-review', args=[self.project.slug]), {
             'creator': self.user,
@@ -1048,6 +1078,24 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         # Bad Search
         response = self.client.get(reverse('review-list'), {
             'title': 'IASIP'
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+
+    def test_review_list_search_no_drafts(self):
+        self.review.state = constants.DRAFT
+        self.review.save()
+        response= self.client.get(reverse('review-list'), {
+            'title': self.review.title
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(len(response.context['object_list']), 0)
+
+    def test_review_list_no_cancellations(self):
+        self.review.state = constants.CANCELLED
+        self.review.save()
+        response= self.client.get(reverse('review-list'), {
+            'title': self.review.title
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 0)

@@ -452,7 +452,6 @@ class DeleteReviewAttachmentView(CanViewJsonView):
         return {
             'success': True,
         }
-        return {}
 
 
 class ReviewSearchJsonView(JsonView):

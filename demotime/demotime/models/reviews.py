@@ -299,7 +299,7 @@ class Review(BaseModel):
 
         for follower in followers:
             try:
-                Follower.objects.get(review=obj, user=follower)
+                follower = Follower.objects.get(review=obj, user=follower)
             except Follower.DoesNotExist:
                 Follower.create_follower(
                     review=obj, user=follower,

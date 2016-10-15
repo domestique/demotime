@@ -67,7 +67,10 @@ class ReviewFilterForm(forms.Form):
 
     STATE_CHOICES = (
         ('', '-----------'),
-    ) + models.Review.STATUS_CHOICES
+        (constants.OPEN, constants.OPEN.capitalize()),
+        (constants.CLOSED, constants.CLOSED.capitalize()),
+        (constants.ABORTED, constants.ABORTED.capitalize()),
+    )
 
     REVIEWER_STATE_CHOICES = (
         ('', '-----------'),
