@@ -216,9 +216,9 @@
             {# set up background tasks (new messages, comments etc) #}
             <script src="/static/scripts/BackgroundTasks.js?{{ site_settings.CACHE_BUSTER }}"></script>
             <script>
-                var BackgroundTasks = new DemoTime.BackgroundTasks({
+                /*var BackgroundTasks = new DemoTime.BackgroundTasks({
                     messages_url: '{% url "messages-json" %}'
-                });
+                });*/
             </script>
 
             {# custom dropdowns #}
