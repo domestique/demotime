@@ -120,7 +120,9 @@ a.footer-blog.highlight:after {
     top: 30px;
     right: 0;
     padding: 10px;
-    background: rgba(70, 70, 70, .95);
+    background: #eee;
+    opacity: 0.95;
+    border-radius: 2px;
     width: 111px;
     z-index: 2;
 }

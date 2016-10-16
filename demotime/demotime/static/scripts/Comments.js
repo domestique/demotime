@@ -139,26 +139,25 @@ DemoTime.Comments = Backbone.View.extend({
         var html = '<div class="comment_parent comments-reply">';
         html += '<div class="demobox">'
         html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
-        html += '<div class="demobox-body">' + this.options.comment;
+        html += '<div class="demobox-body">' + this.options.comment + '</div>'
 
         if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
-            html += '<br><br><div class="attachment-card image collapseable">\
-                <section>\
-                    <h3 class="heading icon icon-image">\
-                        Image\
-                    </h3>\
-                    <span class="attachment-image">\
+            html += '<br>\
+                <div class="demobox attachment-card" style="margin: 10px 0">\
+                    <div class="demobox-header">\
+                        <div class="icon icon-image">\
+                            Image\
+                        </div>\
+                    </div>\
+                    <div class="demobox-body">\
                         <a href="' + data.comment.attachments[0].static_url + '" class="lightbox_img">\
-                            <img src="' + data.comment.attachments[0].static_url + '" class="img-thumbnail" height="300" width="300">\
+                            <img src="' + data.comment.attachments[0].static_url + '" class="img-thumbnail">\
                         </a>\
-                    </span>\
-                </section>\
-            </div>';
+                    </div>\
+                </div>';
         } else if (data.comment.attachment_count) {
             html += '<p><em>Your attachment was uploaded successfully.</em></p>';
         }
-
-        html += '</div>'
 
         return html;
     },

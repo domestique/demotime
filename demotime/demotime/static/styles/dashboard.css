@@ -95,6 +95,10 @@ section.emph_lower {
     font-size: 10px;
     vertical-align: middle;
 }
+.dashboard .events small {
+    text-transform: none;
+    margin-left: 0;
+}
 .dashboard small.reviewing {
     color: #ffffe7;
     font-weight: 800;

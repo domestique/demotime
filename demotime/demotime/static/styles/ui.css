@@ -102,6 +102,7 @@ section .demobox p:first-child {
 }
 .demobox {
     box-shadow: 4px 4px 0 #dddddd;
+    box-sizing: border-box;
 }
 .demobox-header {
     clear: both;
@@ -216,27 +217,7 @@ input[type='button'].reply_and_approve,
 .review-attachments {
     overflow: hidden;
 }
-.attachment h4 {
-    margin-top: 3em;
-}
-.attachment h4:first-child {
-    margin-top: 0;
-}
-.attachment-description {
-    background: #eeeeee;
-    padding: 5px;
-    margin-bottom: 10px;
-    font-size: 12px;
-    line-height: 22px;
-}
-.comment_parent .attachment-description {
-    background: #666666;
-    color: #ffffff;
-}
-.attachment-card {
-    margin: 10px;
-}
-.attachment-card section {
+.attachment-card .demobox {
     min-height: 250px;
 }
 .attachment-card.image {
@@ -244,8 +225,13 @@ input[type='button'].reply_and_approve,
     float: left;
     margin-top: 0;
 }
-.attachment-card.image section {
+.attachment-card.image .demobox {
     margin-top: 0;
+}
+.comment_parent .attachment-card {
+    position: relative;
+    top: -15px;
+    border-top: 0;
 }
 .comment_parent .attachment-card.image {
     width: 100%;
@@ -279,11 +265,7 @@ input[type='button'].reply_and_approve,
     max-height: 200px;
     margin: 0 auto;
 }
-.attachment-card .attachment-image {
-    position: relative;
-    display: block;
-    text-align: center;
-}
+
 /* Fixing filename bleedthrough */
 .attachment-file {
     overflow: hidden;
