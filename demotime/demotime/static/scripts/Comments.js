@@ -140,10 +140,11 @@ DemoTime.Comments = Backbone.View.extend({
         html += '<div class="demobox">'
         html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
         html += '<div class="demobox-body">' + this.options.comment + '</div>'
+        html += '</div>';
 
         if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
-            html += '<br>\
-                <div class="demobox attachment-card" style="margin: 10px 0">\
+            html += '\
+                <div class="demobox attachment-card">\
                     <div class="demobox-header">\
                         <div class="icon icon-image">\
                             Image\

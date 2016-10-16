@@ -112,44 +112,75 @@ li.open.state-highlight {
     padding: 3px;
 }
 
-/* Special attachments display for comments */
-.attachment-card {
-    margin: 0;
-    position: relative;
-    top: -3px;
-}
-.attachment-card section {
-    overflow: hidden;
-    background: #ffffff;
-    min-height: 0;
-    border-top: 0;
-}
-.attachment-card h3 {
-    font-size: 16px;
-}
-.attachment-card.image {
+.review-attachments {
     overflow: hidden;
 }
-.attachment-card.other,
-.attachment-card.document {
-    overflow: hidden;
+.attachment-card .demobox {
+    min-height: 250px;
+}
+.comment_parent .attachment-card {
+    margin: 10px 0;
+}
+.attachments .attachment-card.image {
+    width: 47%;
+    float: left;
+    margin: 0 5px;
+}
+@media screen and (max-width:480px) {
+    .attachments .attachment-card.image {
+        width: 100%;
+        margin: 5px 0;
+        float: none;
+    }
+}
+.attachments .attachment-card.image .demobox {
+    margin-top: 0;
+}
+.comment_parent .attachment-card.image {
+    width: 100%;
+    float: none;
+}
+@media screen and (max-width:680px) {
+    .attachment-card.image {
+        width: 100%;
+        float: none;
+    }
+}
+.attachment-card.movie,
+.attachment-card.document,
+.attachment-card.audio,
+.attachment-card.other {
+    clear: both;
+}
+.attachment-card video {
+    max-width: 100%;
+    width: 100%;
+    max-height: 500px;
 }
 .attachment-card.audio {
-    overflow: hidden;
+    width: 100%;
+    height: auto;
 }
-.attachment-card section img {
-    max-height: 100px;
-}
-.attachment-card .attachment-image {
-    text-align: left;
+.attachment-card img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 240px;
+    margin: 0 auto;
 }
 
-.attachment-card h3 {
-    font-size: 16px;
+/* Fixing filename bleedthrough */
+.attachment-file {
+    overflow: hidden;
 }
+.attachment-card .demobox img {
+    max-height: 100px;
+}
+
 .comments-reply {
     margin: 1em 0 0 3em;
 }
+
 /* Don't indent the only reply child */
 .comment_parent > .comment_parent:first-child.comments-reply {
     margin-left: 0;

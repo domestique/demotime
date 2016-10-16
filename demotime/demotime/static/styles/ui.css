@@ -63,7 +63,7 @@ article {
 }
 @media screen and (max-width: 680px) {
     article {
-        padding: 5px;
+        padding: 10px;
         margin: 20px 0;
     }
 }
@@ -117,6 +117,7 @@ section .demobox p:first-child {
 .demobox-body {
     padding: 10px;
     font-size: 14px;
+    background: #fff;
 }
 section section {
     background: #f7f7f7;
@@ -212,63 +213,6 @@ input[type='button'].reply_and_approve,
 .subnav a.subnav-item.confirm {
     background-color: #ffd94b;
     color: #555555;
-}
-
-.review-attachments {
-    overflow: hidden;
-}
-.attachment-card .demobox {
-    min-height: 250px;
-}
-.attachment-card.image {
-    width: 47%;
-    float: left;
-    margin-top: 0;
-}
-.attachment-card.image .demobox {
-    margin-top: 0;
-}
-.comment_parent .attachment-card {
-    position: relative;
-    top: -15px;
-    border-top: 0;
-}
-.comment_parent .attachment-card.image {
-    width: 100%;
-    float: none;
-}
-@media screen and (max-width:680px) {
-    .attachment-card.image {
-        width: 100%;
-        float: none;
-    }
-}
-.attachment-card.movie,
-.attachment-card.document,
-.attachment-card.audio,
-.attachment-card.other {
-    clear: both;
-}
-.attachment-card video {
-    max-width: 100%;
-    width: 100%;
-    max-height: 500px;
-}
-.attachment-card.audio {
-    width: 100%;
-    height: auto;
-}
-.attachment-card img {
-    width: auto;
-    max-width: 100%;
-    height: auto;
-    max-height: 200px;
-    margin: 0 auto;
-}
-
-/* Fixing filename bleedthrough */
-.attachment-file {
-    overflow: hidden;
 }
 
 .summary a {

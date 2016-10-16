@@ -177,7 +177,7 @@ nav.subnav {
 }
 @media screen and (max-width: 680px) {
     .subnav a.subnav-item {
-        padding: 3px;
+        padding: 3px 10px 3px 3px;
     }
 }
 @media screen and (max-width: 450px) {
@@ -199,6 +199,9 @@ nav.subnav {
     padding-top: 3px;
 }
 @media screen and (max-width: 680px) {
+    .subnav ul.subnav-item li {
+        margin: 0 0 0 5px;
+    }
     .subnav input[type='text'] {
         font-size: 12px;
     }
