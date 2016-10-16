@@ -1,11 +1,11 @@
 /* Review overview */
 .content h1 {
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     text-transform: none;
     font-size: 35px;
     line-height: 42px;
-    color:#333;
+    color: #333333;
     padding: 25px;
     font-weight: 300;
     position: relative;
@@ -25,7 +25,7 @@
 
 h1 .alert {
     font-size: 10px;
-    color: #aaa;
+    color: #aaaaaa;
 }
 .review ul br,
 .review ol br {
@@ -34,19 +34,9 @@ h1 .alert {
 .review p {
     margin: 3px 0;
 }
-.review-top {
-    overflow: hidden;
-}
+.review-top,
 .review-meta {
-    padding: 20px 25px;
-    background: #f2f2f2;
-    font-size: 14px;
     overflow: hidden;
-}
-@media screen and (max-width:680px) {
-    .review-meta {
-        padding: 10px;
-    }
 }
 .review-meta .cel {
     float: left;
@@ -112,54 +102,85 @@ h1 .alert {
     clear: both;
 }
 li.updated a.subnav-item {
-    background: #FFF2EE;
+    background: #fff2ee;
 }
 li.closed.state-highlight,
 li.open.state-highlight {
     display: none;
 }
-.comment_parent blockquote {
+.comment_parent .demobox {
     padding: 3px;
 }
 
-/* Special attachments display for comments */
-.attachment-card {
-    margin: 0;
-    position: relative;
-    top: -3px;
-}
-.attachment-card section {
-    overflow: hidden;
-    background: #fff;
-    min-height: 0;
-    border-top: 0;
-}
-.attachment-card h3 {
-    font-size: 16px;
-}
-.attachment-card.image {
+.review-attachments {
     overflow: hidden;
 }
-.attachment-card.other,
-.attachment-card.document {
-    overflow: hidden;
+.attachment-card .demobox {
+    min-height: 250px;
+}
+.comment_parent .attachment-card {
+    margin: 10px 0;
+}
+.attachments .attachment-card.image {
+    width: 47%;
+    float: left;
+    margin: 0 5px;
+}
+@media screen and (max-width:480px) {
+    .attachments .attachment-card.image {
+        width: 100%;
+        margin: 5px 0;
+        float: none;
+    }
+}
+.attachments .attachment-card.image .demobox {
+    margin-top: 0;
+}
+.comment_parent .attachment-card.image {
+    width: 100%;
+    float: none;
+}
+@media screen and (max-width:680px) {
+    .attachment-card.image {
+        width: 100%;
+        float: none;
+    }
+}
+.attachment-card.movie,
+.attachment-card.document,
+.attachment-card.audio,
+.attachment-card.other {
+    clear: both;
+}
+.attachment-card video {
+    max-width: 100%;
+    width: 100%;
+    max-height: 500px;
 }
 .attachment-card.audio {
-    overflow: hidden;
+    width: 100%;
+    height: auto;
 }
-.attachment-card section img {
-    max-height: 100px;
-}
-.attachment-card .attachment-image {
-    text-align: left;
+.attachment-card img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 240px;
+    margin: 0 auto;
 }
 
-.attachment-card h3 {
-    font-size: 16px;
+/* Fixing filename bleedthrough */
+.attachment-file {
+    overflow: hidden;
 }
+.attachment-card .demobox img {
+    max-height: 100px;
+}
+
 .comments-reply {
     margin: 1em 0 0 3em;
 }
+
 /* Don't indent the only reply child */
 .comment_parent > .comment_parent:first-child.comments-reply {
     margin-left: 0;
@@ -185,9 +206,6 @@ li.open.state-highlight {
         font-size: 10px;
     }
 }
-section section {
-    padding: 1em;
-}
 
 article > section {
     margin: 0;
@@ -212,7 +230,7 @@ article {
     font-weight: 400;
 }
 .revision.current a {
-    color: #555;
+    color: #555555;
     font-weight: 700;
 }
 
@@ -227,30 +245,32 @@ article {
     margin-bottom: 0;
 }
 
-main a[target="_blank"] {
+main a[target='_blank'] {
     display: inline-block;
     padding-right: 15px;
     margin-right: 3px;
-    background:url(/static/images/new_window.png) 100% 20% no-repeat;
+    background: url(/static/images/new_window.png) 100% 20% no-repeat;
 }
 
 input.find_person {
     font-size: 11px;
     margin-top: 0;
     width: 95%;
-    background: #f7f7f7;
+    background: #fff;
     padding: 3px 10px;
     height: 30px;
     margin-top: 5px;
+    border: 1px solid #ddd;
 }
 
 .your-status {
-    box-shadow:4px 4px 0 #ccc;
-    border: 1px solid #ddd;
+    box-shadow: 4px 4px 0 #dddddd;
+    border: 1px solid #dddddd;
     background: #fafafa;
     padding: 10px 25px;
     margin: 15px 0 5px;
     float: left;
+    border-radius: 2px;
 }
 @media screen and (max-width:680px) {
     .your-status {
@@ -273,7 +293,7 @@ input.find_person {
     margin: 0;
 }
 .your-status span {
-    color: #333;
+    color: #333333;
     font-weight: 700;
 }
 
@@ -296,14 +316,14 @@ h1.heading {
     cursor: pointer;
 }
 
-a[data-type="approved"] {
-    background: #1B9074;
-    color: #fff;
+a[data-type='approved'] {
+    background: #1b9074;
+    color: #ffffff;
     border: 1px solid #fafafa;
 }
-a[data-type="rejected"] {
+a[data-type='rejected'] {
     background: #904445;
-    color: #fff;
+    color: #ffffff;
     border: 1px solid #fafafa;
 }
 
@@ -315,18 +335,35 @@ a[data-type="rejected"] {
     background: #f2f2f2;
     display: inline-block;
     padding: 8px 20px;
-    color: #666;
+    color: #666666;
     cursor: pointer;
 }
 .review_toggles .enabled {
     z-index: 31415;
     background: #1f8470;
-    color: #fff;
+    color: #ffffff;
+    white-space: nowrap;
+    border-radius: 2px;
 }
 
 .review-overview.events img {
     max-width: 375px;
 }
+
+.events blockquote {
+    padding: 8px;
+    border: 0;
+    background: #fafafa;
+}
+.events a.lightbox_img:before {
+    content: ' ';
+    margin-top: 10px;
+    display: block;
+}
+.events .demobox {
+    margin-bottom: 15px;
+}
+
 .review-overview.events .jump_to_this {
     margin-top: 5px;
     font-size: 11px;

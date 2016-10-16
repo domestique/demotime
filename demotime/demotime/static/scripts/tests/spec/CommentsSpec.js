@@ -20,14 +20,14 @@ describe("Comments.js", function() {
                             <button class="reply_and_approve"></button>\
                         </div>\
                         <div class="comments-reply">\
-                            <blockquote>\
-                            <div class="blockquote-header">\
-                                <a href="#" class="comment_edit"></a>\
+                            <div class="demobox">\
+                                <div class="demobox-header">\
+                                    <a href="#" class="comment_edit"></a>\
+                                </div>\
+                                <div class="demobox-body">\
+                                Hi there\
+                                </div>\
                             </div>\
-                            <div class="blockquote-body">\
-                            Hi there\
-                            </div>\
-                            <blockquote>\
                             <div class="attachments">\
                                 <div class="summary">foo</div>\
                             </div>\
@@ -92,7 +92,7 @@ describe("Comments.js", function() {
         expect($('.comments-reply').is(':visible')).toBeTruthy();
         expect($('.attachments .summary').length).toBeTruthy();
         $('.comment_edit').click();
-        expect($('.blockquote-body').is(':visible')).toBeFalsy();
+        expect($('.demobox-body').is(':visible')).toBeFalsy();
         expect($('.attachments .summary').length).toBeFalsy();
         expect(this.comments.options.comment_form_container.data('editing')).toBe(true);
         expect(this.comments.options.comment_form_container.is(':visible')).toBeTruthy();
@@ -102,7 +102,7 @@ describe("Comments.js", function() {
         $('.new_comment_button').click();
         var html = this.comments.get_success_html({"comment": {"comment": "asdf", "thread": 426, "id": 801, "name": "Danny", "attachment_count": 1, "attachments": [{"static_url": "/file/496", "attachment_type": "image", "description": ""}]}, "errors": "", "status": "success"});
         expect(html).toContain('comments-reply');
-        expect(html).toContain('blockquote');
+        expect(html).toContain('demobox');
         expect(html).toContain('attachment-card');
         expect(html).toContain('comment_edit');
     });

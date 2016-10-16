@@ -27,6 +27,7 @@ blockquote div br:first-child {
 }
 .wysiwyg-container {
     position: relative;
+    border-radius: 2px;
 }
 
 .footer_panel {
@@ -45,6 +46,10 @@ blockquote div br:first-child {
     .wysiwyg-toolbar {
         display: none;
     }
+}
+a.wysiwyg-toolbar-icon:hover {
+    background: #f6f6f6;
+    text-decoration: none;
 }
 
 .emoji_panel {
@@ -161,7 +166,7 @@ button.giphy_button {
     text-decoration: none !important;
 }
 .mentioned {
-    color: #32CCAE;
+    color: #2a9c86;
     font-weight: 700;
 }
 .mentioned:before {

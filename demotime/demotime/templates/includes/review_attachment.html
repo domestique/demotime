@@ -1,11 +1,13 @@
-<div class="attachment-card {{ attachment.attachment_type }} collapseable">
-    <section>
-        <h3 class="heading icon icon-{{ attachment.attachment_type }}">
+<div class="demobox attachment-card {{ attachment.attachment_type }}">
+    <div class="demobox-header">
+        <div class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}
-        </h3>
-        {% if attachment.description %}
-            <div class="attachment-description">{{ attachment.description }}</div>
-        {% endif %}
+            {% if attachment.description %}
+                - <strong class="attachment-description">{{ attachment.description }}</strong>
+            {% endif %}
+        </div>
+    </div>
+    <div class="demobox-body">
         {% if attachment.attachment_type == "audio" %}
             <audio src="{% url "user-media" attachment.pk %}" controls="true"></audio>
         {% endif %}
@@ -18,7 +20,7 @@
         {% if attachment.attachment_type == "image" %}
             <span class="attachment-image">
                 <a href="{% url "user-media" attachment.pk %}" class="lightbox_img">
-                    <img src="{% url "user-media" attachment.pk %}" class="img-thumbnail" height=300 width=300>
+                    <img src="{% url "user-media" attachment.pk %}" class="img-thumbnail">
                 </a>
             </span>
         {% endif %}
@@ -28,5 +30,5 @@
         {% if attachment.attachment_type == "other" %}
             <a href="{% url "user-media" attachment.pk %}">Unknown File Type: {{ attachment.pretty_name|urlencode }}</a>
         {% endif %}
-    </section>
+    </div>
 </div>

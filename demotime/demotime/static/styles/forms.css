@@ -20,15 +20,15 @@ input[type=date],
 input[type=tel],
 input[type=number],
 input[type=search] {
-    background-color: transparent;
     border: none;
-    border-bottom: 1px solid #dddddd;
+    border: 1px solid #dddddd;
+    border-radius: 2px;
     outline: none;
-    height: 3rem;
     width: 100%;
     font-size: 1rem;
     margin: 0 0 15px 0;
-    padding: 0;
+    padding: 15px;
+    background-color: #fff;
     box-shadow: none;
     box-sizing: border-box;
     -webkit-transition: .3s;
@@ -51,7 +51,7 @@ textarea {
         -ms-transition: .3s;
             transition: .3s;
     border: 1px solid #eeeeee;
-    box-shadow: 4px 4px 0 #cccccc;
+    box-shadow: 4px 4px 0 #ddd;
 }
 textarea:focus {
     outline: none;
@@ -82,7 +82,7 @@ textarea:focus {
          -o-transition: .2s ease-out;
         -ms-transition: .2s ease-out;
             transition: .2s ease-out;
-    box-shadow: 4px 4px 0 #cccccc;
+    box-shadow: 4px 4px 0 #ddd;
 }
 button:hover,
 input[type='submit']:hover,
@@ -115,9 +115,10 @@ select[multiple='multiple'] {
     min-width: 30%;
     font-size: 1.4em;
     border: 1px solid #eeeeee;
-    box-shadow: 4px 4px 0 #cccccc;
+    box-shadow: 4px 4px 0 #ddd;
     min-height: 300px;
     width: 100%;
+    border-radius: 2px;
 }
 select[multiple='multiple'] option {
     color: #666666;
@@ -129,7 +130,7 @@ select[multiple='multiple']:focus {
 }
 
 .form-group {
-    margin-top: 2em;
+    margin-top: 15px;
 }
 .form-group input {
     margin-right: 15px;
@@ -176,7 +177,7 @@ select[multiple='multiple']:focus {
 }
 .dd-container .dd-select {
     border: 0;
-    border-radius: 0;
+    border-radius: 2px;
 }
 .dd-select label {
     color: #666666;

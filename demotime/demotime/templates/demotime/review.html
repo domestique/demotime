@@ -117,7 +117,7 @@
         </div>
         <section class="review-overview events" id="events" style="display:none"></section>
 
-        <div class="review-meta with-gap:5">
+        <section class="review-meta with-gap:5">
             <div class="cel">
                 <h4 class="heading">Owner:</h4>
                 <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
@@ -145,7 +145,7 @@
                 {% endif %}
 
                 <br><br>
-                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link }}</a>
+                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link|truncatechars:35 }}</a>
             </div>
             {% if request.user.is_authenticated %}
                 <div class="cel reviewers">
@@ -222,7 +222,7 @@
                     </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
 
         <article class="review-overview">
             <h3 class="icon icon-lightbulb toggle_sibling">Review Overview</h3>
@@ -238,7 +238,6 @@
                     </div>
                 {% endif %}
             </section>
-
         </article>
 
         {% if revision.attachments.exists %}
@@ -296,8 +295,8 @@
                                 {% if not forloop.first %}
                                     <div class="comments-reply">
                                 {% endif %}
-                                    <blockquote>
-                                        <div class="blockquote-header">
+                                    <div class="demobox">
+                                        <div class="demobox-header">
                                             Reply by
                                             <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
                                                 {{ comment.commenter.userprofile }}
@@ -309,10 +308,12 @@
                                                 (<a href="#" class="comment_edit" data-comment="{{ comment.id }}">edit this reply</a>)
                                             {% endif %}
                                         </div>
-                                        <div class="blockquote-body">
+                                        {% if comment.comment %}
+                                        <div class="demobox-body">
                                             {{ comment.comment|safe|linebreaksbr }}
                                         </div>
-                                    </blockquote>
+                                        {% endif %}
+                                    </div>
                                     {% use_macro attachments %}
                                 {% if not forloop.first %}
                                 </div>
@@ -367,10 +368,14 @@
 <script type="text/x-pattern" id="events_pattern">
 <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
 <% _.each(moments, function(moment) { %>
-    <section>
-        <strong><%= new Date(moment.created) %></strong>
-        {% include "includes/event_item.html" %}
-    </section>
+    <div class="demobox">
+        <div class="demobox-header">
+            <strong><%= new Date(moment.created) %></strong>
+        </div>
+        <div class="demobox-body">
+            {% include "includes/event_item.html" %}
+        </div>
+    </div>
 <% }); %>
 </script>
 {% endblock %}

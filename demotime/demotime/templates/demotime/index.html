@@ -8,7 +8,6 @@
 {% endblock %}
 
 {% block content %}
-<canvas id="fireworks" style="display: none"></canvas>
 <h1 class="heading">
     <strong>Your</strong> Dashboard
     <small><a href="{% url 'review-list' %}">View/Filter all demos</a></small>
@@ -22,7 +21,7 @@
 
 <div class="dashboard aggregated_dashboard">
     <article style="margin-top: 30px">
-        <div class="split~720 by:2/1 with-gap:1">
+        <div class="split~720 by:2/1 with-gap:2">
             <div id="dashboard_left" class="cel" style="min-height: 500px">
                 {% if open_reviews %}
                     <h3 class="icon icon-inbox">
@@ -31,13 +30,11 @@
                         to you to review. You can leave feedback and ultimately approve or
                         reject a demo. Your approval status appears to the left."></span>
                     </h3>
-                    <section class="emph_med aggregated_dashboard-reviewing">
+                    <section class="aggregated_dashboard-section aggregated_dashboard-reviewing">
                         <div>
-                            <ul>
-                                {% for demo in open_reviews %}
-                                    {% include "includes/reviews_li.html" %}
-                                {% endfor %}
-                            </ul>
+                            {% for demo in open_reviews %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
                         </div>
                     </section>
                 {% endif %}
@@ -47,13 +44,11 @@
                         <span class="help" title="Demos you are following do not require any
                         action on your part. You can simply follow their progress."></span>
                     </h3>
-                    <section class="emph_med aggregated_dashboard-following">
+                    <section class="aggregated_dashboard-section aggregated_dashboard-following">
                         <div>
-                            <ul>
-                                {% for demo in followed_demos %}
-                                    {% include "includes/reviews_li.html" %}
-                                {% endfor %}
-                            </ul>
+                            {% for demo in followed_demos %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
                         </div>
                     </section>
                 {% endif %}
@@ -96,13 +91,11 @@
                             <a href="{% url 'review-list' %}?creator={{ request.user.pk }}" class="normal_text">View all</a>
                         </small>
                     </h3>
-                    <section class="emph_med aggregated_dashboard-created">
+                    <section class="aggregated_dashboard-section aggregated_dashboard-created">
                         <div>
-                            <ul>
-                                {% for demo in open_demos %}
-                                    {% include "includes/reviews_li.html" %}
-                                {% endfor %}
-                            </ul>
+                            {% for demo in open_demos %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
                         </div>
                     </section>
                 {% endif %}
@@ -112,7 +105,7 @@
                     Think of it as a group of demos that all have something in common.
                     Projects are a way of organizing demos."></span>
                 </h3>
-                <section class="emph_lower" style="margin-bottom: 0">
+                <section class="aggregated_dashboard-projects" style="margin-bottom: 0">
                     <ul>
                         {% if available_projects %}
                             {% for project in available_projects %}
@@ -128,6 +121,7 @@
                         {% endif %}
                     </ul>
                 </section>
+                {% include "includes/legend.html" %}
             </div>
             <div id="dashboard_right" class="cel">
                 <h3 class="icon icon-cloud">
@@ -143,7 +137,6 @@
             </div>
         </div>
     </article>
-    {% include "includes/legend.html" %}
 </div>
 
 {% comment %}
@@ -156,16 +149,20 @@
 {% block patterns %}
 {{ block.super }}
 <script type="text/x-pattern" id="events_pattern">
-<div class="events_list">
+<div class="events">
 <% _.each(moments, function(moment) { %>
-    <div>
-        <strong><a class="has_bubble"
-            data-prj="<%= moment.review.project.id %>"
-            data-pk="<%= moment.review.pk %>"
-            href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
-            <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
-        </strong> -
-        {% include "includes/event_item.html" %}
+    <div class="demobox">
+        <div class="demobox-header">
+            <strong><a class="has_bubble"
+                data-prj="<%= moment.review.project.id %>"
+                data-pk="<%= moment.review.pk %>"
+                href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
+                <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
+            </strong>
+        </div>
+        <div class="demobox-body">
+            {% include "includes/event_item.html" %}
+        </div>
     </div>
 <% }); %>
 </div>
