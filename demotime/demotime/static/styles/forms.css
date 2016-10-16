@@ -130,7 +130,7 @@ select[multiple='multiple']:focus {
 }
 
 .form-group {
-    margin-top: 2em;
+    margin-top: 15px;
 }
 .form-group input {
     margin-right: 15px;

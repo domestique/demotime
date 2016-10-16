@@ -3,7 +3,7 @@
         <div class="heading icon icon-{{ attachment.attachment_type }}">
             {{ attachment.attachment_type|capfirst }}
             {% if attachment.description %}
-                <div class="attachment-description">{{ attachment.description }}</div>
+                - <strong class="attachment-description">{{ attachment.description }}</strong>
             {% endif %}
         </div>
     </div>

@@ -26,7 +26,7 @@ DemoTime.Comments = Backbone.View.extend({
             thread = comment_parent.data('thread'),
             attachment_file = comment_parent.find('input[type="file"]'),
             attachment_type = comment_parent.find('select[name="attachment_type"]').val(),
-            attachment_desc = comment_parent.find('input[name="description"]');
+            attachment_desc = comment_parent.find('input[name="description"]').val();
 
         // Saving container as an option for global use
         this.options.comment_form_container = button.parents('.comment_form_container');
@@ -57,6 +57,7 @@ DemoTime.Comments = Backbone.View.extend({
             if (attachment_file[0].files[0]) {
                 formData.append('attachment', attachment_file[0].files[0]);
                 formData.append('attachment_type', attachment_type);
+                formData.append('description', attachment_desc);
                 formData.append('sort_order', 1);
             }
 
@@ -90,7 +91,6 @@ DemoTime.Comments = Backbone.View.extend({
                     self.options.comment_form_container.find('input[type="file"]').val('');
                     self.options.comment_form_container.find('select[name="attachment_type"]').val('');
                     self.options.comment_form_container.find('input[name="description"]').val('');
-
                 }
 
                 // Write the new comment HTML
@@ -137,18 +137,23 @@ DemoTime.Comments = Backbone.View.extend({
 
     get_success_html: function(data) {
         var html = '<div class="comment_parent comments-reply">';
-        html += '<div class="demobox">'
-        html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
-        html += '<div class="demobox-body">' + this.options.comment + '</div>'
-        html += '</div>';
-
+        if (this.options.comment) {
+            html += '<div class="demobox">'
+            html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
+            html += '<div class="demobox-body">' + this.options.comment + '</div>'
+            html += '</div>';
+        }
+        console.log(data);
         if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
             html += '\
                 <div class="demobox attachment-card">\
                     <div class="demobox-header">\
                         <div class="icon icon-image">\
-                            Image\
-                        </div>\
+                            Image';
+                            if (data.comment.attachments[0].description) {
+                                html += '<strong> - ' + data.comment.attachments[0].description + '</strong>'
+                            }
+               html += '</div>\
                     </div>\
                     <div class="demobox-body">\
                         <a href="' + data.comment.attachments[0].static_url + '" class="lightbox_img">\

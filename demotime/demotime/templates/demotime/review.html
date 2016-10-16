@@ -308,9 +308,11 @@
                                                 (<a href="#" class="comment_edit" data-comment="{{ comment.id }}">edit this reply</a>)
                                             {% endif %}
                                         </div>
+                                        {% if comment.comment %}
                                         <div class="demobox-body">
                                             {{ comment.comment|safe|linebreaksbr }}
                                         </div>
+                                        {% endif %}
                                     </div>
                                     {% use_macro attachments %}
                                 {% if not forloop.first %}
