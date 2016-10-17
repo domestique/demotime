@@ -1,3 +1,4 @@
+
 .container .row {
     margin-left: 0;
     margin-right: 0;
@@ -130,7 +131,7 @@ select[multiple='multiple']:focus {
 }
 
 .form-group {
-    margin-top: 15px;
+    margin-top: 25px;
 }
 .form-group input {
     margin-right: 15px;
