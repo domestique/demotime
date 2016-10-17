@@ -13,7 +13,7 @@ DemoTime.DemoState = Backbone.View.extend({
     change_demo_state: function(event) {
         var self = this,
             link = $(event.target),
-            parent = link.parents('li'),
+            parent = link.parents('.demobox'),
             state = link.data('state'),
             pk = link.data('pk'),
             creator = link.data('creator'),
