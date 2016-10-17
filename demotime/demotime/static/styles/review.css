@@ -122,15 +122,15 @@ li.open.state-highlight {
     margin: 10px 0;
 }
 .attachments .attachment-card.image {
-    width: 47%;
-    float: left;
-    margin: 0 5px;
+    width: 48%;
+    display: inline-block;
+    margin: 5px;
 }
 @media screen and (max-width:480px) {
     .attachments .attachment-card.image {
         width: 100%;
         margin: 5px 0;
-        float: none;
+        display: block;
     }
 }
 .attachments .attachment-card.image .demobox {
