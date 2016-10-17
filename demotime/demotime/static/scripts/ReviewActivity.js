@@ -72,6 +72,10 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
                 container.html(template);
 
+                $('.events').linkify({
+                    target: "_blank"
+                });
+
                 // For over-arching activity, set the max-height intelligently
                 if ($('.events').length && $(window).width() > 720) {
                     $('.events').css('max-height', $('#dashboard_left').height() - 80 + 'px');

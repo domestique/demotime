@@ -108,6 +108,11 @@ DemoTime.Comments = Backbone.View.extend({
                     hljs.highlightBlock(block);
                 });
 
+                // Make urls clickable
+                comment_parent.linkify({
+                    target: "_blank"
+                });
+
                 // If reply and approve, trigger button click, otherwise
                 // just scroll the new comment in to view.
                 if (also_approve) {
