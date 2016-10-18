@@ -56,6 +56,7 @@ class Comment(BaseModel):
             'attachment_count': self.attachments.count(),
             'attachments': [],
             'url': self.get_absolute_url(),
+            'thread_url': self.get_absolute_thread_url(),
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
         }
@@ -65,6 +66,11 @@ class Comment(BaseModel):
         return comment_json
 
     def get_absolute_url(self):
+        return '{}#{}'.format(
+            self.thread.review_revision.get_absolute_url(), self.pk
+        )
+
+    def get_absolute_thread_url(self):
         return '{}#{}'.format(
             self.thread.review_revision.get_absolute_url(), self.thread.pk
         )
