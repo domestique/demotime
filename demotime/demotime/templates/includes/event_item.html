@@ -50,7 +50,7 @@
                     <img src="<%= moment.related_object.attachments[0].static_url %>">
                 </a>
             <% } %>
-            <div class="jump_to_this"><a href="<%= moment.related_object.url %>">go to this comment</a></div>
+            <div class="jump_to_this"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
         </blockquote>
     <% } else { %>
         <%= moment.event_type.name %>

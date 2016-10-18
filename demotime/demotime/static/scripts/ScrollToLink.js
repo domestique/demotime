@@ -72,9 +72,11 @@ DemoTime.ScrollToLink = Backbone.View.extend({
         setTimeout(function () {
             // Animate to the element
             if (target.length) {
-                $('html, body').animate({
-                    scrollTop: target.offset().top - 20
-                }, 500);
+                setTimeout(function() {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 20
+                    }, 500);
+                }, 250);
             }
             // Sometimes we travel to a 'collapsed' element. if we do,
             // expand it.

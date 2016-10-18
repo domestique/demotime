@@ -122,15 +122,15 @@ li.open.state-highlight {
     margin: 10px 0;
 }
 .attachments .attachment-card.image {
-    width: 47%;
-    float: left;
-    margin: 0 5px;
+    width: 48%;
+    display: inline-block;
+    margin: 5px;
 }
 @media screen and (max-width:480px) {
     .attachments .attachment-card.image {
         width: 100%;
         margin: 5px 0;
-        float: none;
+        display: block;
     }
 }
 .attachments .attachment-card.image .demobox {
@@ -348,6 +348,7 @@ a[data-type='rejected'] {
 
 .review-overview.events img {
     max-width: 375px;
+    height: auto;
 }
 
 .events blockquote {
@@ -355,6 +356,7 @@ a[data-type='rejected'] {
     border: 0;
     background: #fafafa;
 }
+.review-overview.events img:before,
 .events a.lightbox_img:before {
     content: ' ';
     margin-top: 10px;

@@ -19,4 +19,9 @@
         </p>
     {% endif %}
 {% endif %}
+{% if comment.attachments %}
+    <p>
+        <small>This comment includes an attachment. Visit <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">the demo</a> to have a look.</small>
+    </p>
+{% endif %}
 {% endblock %}

@@ -3,8 +3,13 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
     events: {
         'click #activity_toggler': 'toggle_activity_pane',
+        'click .comment_link': 'jump_to_comment',
         'change #events_filter': 'render',
         'click #refresh_events': 'render'
+    },
+
+    jump_to_comment: function(event) {
+        this.hide_pane();
     },
 
     initialize: function(options) {
@@ -16,26 +21,37 @@ DemoTime.ReviewActivity = Backbone.View.extend({
     },
 
     toggle_activity_pane: function(event) {
-        var self = this,
-            link = $('#activity_toggler'),
-            trigger = $(event.target);
-
         event.preventDefault();
 
-        this.$el.find('#events').slideToggle(function() {
-            if ($(this).is(':visible')) {
-                link.addClass('enabled');
-                link.stick_in_parent({
-                    'parent': '.main-content',
-                    'offset_top': 75,
-                    'recalc_every': 100,
-                });
-                self.render();
-            } else {
-                link.trigger("sticky_kit:detach");
-                link.removeClass('enabled');
-                ScrollToLink.jump_to_link('review');
-            }
+        if ($('#events').is(':visible')) {
+            this.hide_pane();
+            ScrollToLink.jump_to_link('review');
+        } else {
+            this.show_pane();
+        }
+    },
+
+    hide_pane: function() {
+        var triggerer = $('#activity_toggler');
+
+        this.$el.find('#events').slideUp('fast', function() {
+            triggerer.trigger("sticky_kit:detach");
+            triggerer.removeClass('enabled');
+        });
+    },
+
+    show_pane: function() {
+        var triggerer = $('#activity_toggler'),
+            self = this;
+
+        this.$el.find('#events').slideDown('fast', function() {
+            triggerer.addClass('enabled');
+            triggerer.stick_in_parent({
+                'parent': '.main-content',
+                'offset_top': 75,
+                'recalc_every': 100,
+            });
+            self.render();
         });
     },
 
@@ -71,6 +87,10 @@ DemoTime.ReviewActivity = Backbone.View.extend({
                 }
 
                 container.html(template);
+
+                $('.events').linkify({
+                    target: "_blank"
+                });
 
                 // For over-arching activity, set the max-height intelligently
                 if ($('.events').length && $(window).width() > 720) {
