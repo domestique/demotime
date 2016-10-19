@@ -69,9 +69,12 @@ DemoTime.ReviewActivity = Backbone.View.extend({
             self.options.project_slug = $('#events_filter').val();
         }
 
+
         if (self.options) {
+            self.options.exclusion_list = self.options.exclusion_list || '';
+
             $.ajax({
-                url: '/projects/' + self.options.project_slug + '/events/',
+                url: '/projects/' + self.options.project_slug + '/events/' + self.options.exclusion_list,
                 method: 'GET',
                 data: {
                     review: self.options.review_pk
