@@ -30,15 +30,18 @@ def run_tests(ctx, test_module='demotime', opts='', pty=True):
 
 
 @task
-def load_test_data(ctx, filename='demotime_data.sql.gz'):
+def load_test_data(ctx, filename='demotime_test_data.sql.gz'):
     print("This will delete all of the data in the database, and recreate it from a backup. Are you sure?")
     print("Press ctrl-c to exit, enter to continue")
     input()
+    ctx.run('cp data/{} ~/dt_backups/'.format(filename))
     ctx.run('docker exec -i src_db_1 su - postgres -c "dropdb postgres && createdb -EUNICODE -Opostgres postgres && zcat /backups/{} | psql postgres"'.format(
         filename
     ))
     ctx.run('docker exec -i src_demotime_1 python3 manage.py migrate')
-    ctx.run('docker exec -i src_demotime_1 ./reset_all_user_passwords.sh')
+    ctx.run('docker restart src_demotime_1')
+    ctx.run('docker restart src_demotime_celery_1')
+    ctx.run('rm -f ~/dt_backups/{}'.format(filename))
 
 
 @task

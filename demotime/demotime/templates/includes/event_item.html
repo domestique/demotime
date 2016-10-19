@@ -1,3 +1,4 @@
+<small>
 <% if (moment.event_type.code == 'comment-added') { %>
     <a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">new comment</a> from
     <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
@@ -5,7 +6,7 @@
     update by
     <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
 <% } %>
-
+</small>
 
 <div style="margin:10px 0 0">
     <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
@@ -49,7 +50,7 @@
                     <img src="<%= moment.related_object.attachments[0].static_url %>">
                 </a>
             <% } %>
-            <div class="jump_to_this"><a href="<%= moment.related_object.url %>">go to this comment</a></div>
+            <div class="jump_to_this"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
         </blockquote>
     <% } else { %>
         <%= moment.event_type.name %>

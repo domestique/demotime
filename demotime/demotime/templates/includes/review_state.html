@@ -35,10 +35,12 @@
     {% endif %}
     {% if demo.reviewer_state != "approved" %}
         <small style="margin-left: 0">
-            {% if request.user == demo.creator %}
-                your demo
-            {% else %}
-                <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}'s</a> demo
+            {% if demo.reviewer_state != 'rejected' %}
+                {% if request.user == demo.creator %}
+                    your demo
+                {% else %}
+                    <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}'s</a> demo
+                {% endif %}
             {% endif %}
         </small>
     {% endif %}

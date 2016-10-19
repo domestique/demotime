@@ -1,18 +1,22 @@
 from django import forms
-from django.contrib.auth.models import User
 
 from demotime import models
 
 
 class EventFilterForm(forms.Form):
 
-    event_type = forms.ModelChoiceField(
+    event_type = forms.ModelMultipleChoiceField(
         queryset=models.EventType.objects.all(),
         to_field_name='code',
         required=False
     )
     review = forms.ModelChoiceField(
         queryset=models.Review.objects.none(),
+        required=False
+    )
+    exclude_type = forms.ModelMultipleChoiceField(
+        queryset=models.EventType.objects.all(),
+        to_field_name='code',
         required=False
     )
 
