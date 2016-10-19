@@ -77,6 +77,7 @@ class Reviewer(BaseModel):
                 notify_reviewer=False, notify_creator=True
             )
 
+        review.update_reviewer_state()
         return obj
 
     def _send_reviewer_message(self, deleted=False, notify_reviewer=False, notify_creator=False):
