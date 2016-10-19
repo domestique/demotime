@@ -19,7 +19,7 @@ leave it unwrapped so it looks better in the Inbox.
 
 {% if is_email %}
                 <p style="margin-top: 40px; color: #777; font-size: 13px; font-style: italic;">Thank you for using DemoTime!</p>
-                <img src="{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}/messages/pixel/{{ bundle.pk }}.png?{{ site_settings.CACHE_BUSTER }}" width="1" height="1">
+                <img src="{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}/messages/pixel/{{ bundle.pk }}.png?{{ site_settings.CACHE_BUSTER }}" width="1" height="1" style="display: none">
             </div>
         </body>
     </html>

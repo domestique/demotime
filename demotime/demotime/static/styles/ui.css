@@ -162,6 +162,7 @@ li {
     }
 }
 .review_info a,
+.sweet-alert a,
 .content a {
     color: #2a9c86;
     text-decoration: none;

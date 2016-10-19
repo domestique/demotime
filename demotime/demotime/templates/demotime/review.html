@@ -350,14 +350,18 @@
 {% block patterns %}
 {{ block.super }}
 <script type="text/x-pattern" id="new_reviewers">
+<ul>
 <% _.each(person, function(person) { %>
 <li><a href="#" data-reviewer="<%= person.pk %>" data-action="add_reviewer" class="add_person_click"><%= person.name %></a></li>
 <% }) %>
+</ul>
 </script>
 <script type="text/x-pattern" id="new_followers">
+<ul>
 <% _.each(person, function(person) { %>
 <li><a href="#" data-reviewer="<%= person.pk %>" data-action="add_follower" class="add_person_click"><%= person.name %></a></li>
 <% }) %>
+</ul>
 </script>
 <script type="text/x-pattern" id="added_reviewer">
 <li><a href="/accounts/profile/<%= person.attributes.reviewer_user_pk %>"><%= person.attributes.reviewer_name %></a> <small><%= person.attributes.reviewer_status %></small></li>
