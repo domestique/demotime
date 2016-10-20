@@ -375,6 +375,10 @@
     <div class="demobox">
         <div class="demobox-header">
             <strong><%= new Date(moment.created) %></strong>
+            <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+                update by
+                <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+            <% } %>
         </div>
         <div class="demobox-body">
             {% include "includes/event_item.html" %}
