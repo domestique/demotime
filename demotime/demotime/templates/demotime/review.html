@@ -296,7 +296,7 @@
                                     <div class="comments-reply">
                                 {% endif %}
                                     <div class="demobox">
-                                        <div class="demobox-header">
+                                        <div class="demobox-header" id="{{ comment.pk }}">
                                             Reply by
                                             <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
                                                 {{ comment.commenter.userprofile }}

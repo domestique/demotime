@@ -1,8 +1,5 @@
 <small>
-<% if (moment.event_type.code == 'comment-added') { %>
-    <a href="<%= moment.review.url %>#<%= moment.related_object.thread %>">new comment</a> from
-    <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
-<% } else if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+<% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
     update by
     <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
 <% } %>
