@@ -11,7 +11,7 @@ class CommentForm(forms.ModelForm):
         required=False
     )
 
-    def __init__(self, thread=None, *args, **kwargs):
+    def __init__(self, thread=None, has_attachments=False, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)
         if thread:
             self.fields['thread'].queryset = models.CommentThread.objects.filter(
@@ -19,7 +19,10 @@ class CommentForm(forms.ModelForm):
             )
             self.fields['thread'].required = True
 
-        for key, value in self.fields.items():
+        if not has_attachments:
+            self.fields['comment'].required = True
+
+        for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     class Meta:
@@ -29,7 +32,7 @@ class CommentForm(forms.ModelForm):
         )
 
 
-class AttachmentForm(forms.Form):
+class CommentAttachmentForm(forms.Form):
 
     attachment = forms.FileField(
         required=False,
@@ -47,10 +50,6 @@ class AttachmentForm(forms.Form):
         widget=forms.widgets.TextInput(attrs={'class': 'form-control'}),
         max_length=2048
     )
-    sort_order = forms.IntegerField(
-        required=False,
-        widget=forms.HiddenInput,
-    )
 
     def clean_attachment_type(self):
         data = self.cleaned_data
@@ -59,22 +58,17 @@ class AttachmentForm(forms.Form):
 
         return data['attachment_type']
 
+
+class DemoAttachmentForm(CommentAttachmentForm):
+
+    sort_order = forms.IntegerField(
+        required=False,
+        widget=forms.HiddenInput,
+    )
+
     def clean_sort_order(self):
         data = self.cleaned_data
         if data.get('attachment') and not data.get('sort_order'):
             raise forms.ValidationError('Attachments require a sort_order')
 
         return data['sort_order']
-
-
-class UpdateCommentForm(CommentForm, AttachmentForm):
-
-    def clean(self):
-        data = self.cleaned_data
-        comment = data.get('comment')
-        attachment = data.get('attachment')
-        if not comment and not attachment:
-            self.add_error(
-                'comment',
-                'Comment is required if an attachment is not provided'
-            )

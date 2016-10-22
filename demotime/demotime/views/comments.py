@@ -1,18 +1,24 @@
+import re
 import json
 
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from demotime import forms, models
-from . import CanViewJsonView
+from demotime.views import CanViewJsonView
 
 
 class CommentJsonView(CanViewJsonView):
 
     status = 200
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = None
+        self.revision = None
+        self.review = None
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -28,7 +34,7 @@ class CommentJsonView(CanViewJsonView):
         self.review = self.revision.review
         return super(CommentJsonView, self).dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs): # pylint: disable=unused-argument
         if 'comment_pk' in request.GET:
             try:
                 comment = models.Comment.objects.get(pk=request.GET['comment_pk'])
@@ -60,7 +66,40 @@ class CommentJsonView(CanViewJsonView):
 
         return json_data
 
-    def post(self, request, *args, **kwargs):
+    def _process_attachments(self, post_data=None):
+        post_data = post_data or self.request.POST
+        attachment_forms = []
+        file_keys = self.request.FILES.keys()
+        search_str = r'(\d+-)?attachment'
+        form_count = 0
+        for key in file_keys:
+            match = re.search(search_str, key)
+            if match:
+                prefix = re.search(r'(\d+)?', key).group()
+                attachment_forms.append((
+                    forms.CommentAttachmentForm(
+                        data=post_data,
+                        files=self.request.FILES,
+                        prefix=prefix
+                    ),
+                    prefix
+                ))
+                form_count += 1
+
+        attachments = []
+        if all(form.is_valid() for form, prefix in attachment_forms):
+            for form, prefix in attachment_forms:
+                data = form.cleaned_data
+                attachments.append({
+                    'attachment': data['attachment'],
+                    'attachment_type': data['attachment_type'],
+                    'description': data['description'],
+                    'sort_order': prefix,
+                })
+
+        return attachments
+
+    def post(self, request, *args, **kwargs): # pylint: disable=unused-argument
         thread = None
         if 'thread' in request.POST:
             try:
@@ -73,8 +112,10 @@ class CommentJsonView(CanViewJsonView):
                     'comment': {}
                 }
 
-        comment_form = forms.UpdateCommentForm(
-            data=request.POST, files=request.FILES, thread=thread
+        attachments = self._process_attachments()
+        has_attachments = True if attachments else False
+        comment_form = forms.CommentForm(
+            thread=thread, data=request.POST, has_attachments=has_attachments
         )
         if comment_form.is_valid():
             data = comment_form.cleaned_data
@@ -83,9 +124,7 @@ class CommentJsonView(CanViewJsonView):
                 comment=data['comment'],
                 review=self.revision,
                 thread=thread,
-                attachment=data['attachment'],
-                attachment_type=data['attachment_type'],
-                description=data.get('description', '')
+                attachments=attachments,
             )
             return {
                 'errors': '',
@@ -99,7 +138,8 @@ class CommentJsonView(CanViewJsonView):
             'comment': {},
         }
 
-    def patch(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs): # pylint: disable=unused-argument
+        import ipdb; ipdb.set_trace()
         try:
             body = json.loads(request.body.decode('utf-8'))
         except json.JSONDecodeError:
@@ -121,20 +161,24 @@ class CommentJsonView(CanViewJsonView):
             }
 
         body['thread'] = comment.thread.pk
-        comment_form = forms.UpdateCommentForm(
+        attachments = self._process_attachments(post_data=body)
+        has_attachments = True if attachments else False
+        comment_form = forms.CommentForm(
             data=body, files=request.FILES,
             thread=comment.thread, instance=comment,
+            has_attachments=has_attachments
         )
         if comment_form.is_valid():
             data = comment_form.cleaned_data
             comment.comment = data['comment']
             comment.save(update_fields=['modified', 'comment'])
-            if data.get('attachment'):
+            for attachment in attachments:
                 models.Attachment.objects.create(
-                    attachment=data['attachment'],
-                    attachment_type=data['attachment_type'],
-                    description=data.get('description', ''),
+                    attachment=attachment['attachment'],
+                    attachment_type=attachment['attachment_type'],
+                    description=attachment['description'],
                     content_object=self.comment,
+                    sort_order=attachment['sort_order']
                 )
 
             if body.get('delete_attachments'):
@@ -162,6 +206,12 @@ class DeleteCommentAttachmentView(CanViewJsonView):
 
     status = 200
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.comment = None
+        self.review = None
+        self.project = None
+
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         comment_pk = kwargs['comment_pk']
@@ -172,7 +222,7 @@ class DeleteCommentAttachmentView(CanViewJsonView):
         self.project = self.review.project
         return super(DeleteCommentAttachmentView, self).dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs): # pylint: disable=unused-argument
         ct = ContentType.objects.get(app_label='demotime', model='comment')
         attachment_pk = kwargs['attachment_pk']
         attachment = get_object_or_404(
@@ -188,54 +238,5 @@ class DeleteCommentAttachmentView(CanViewJsonView):
         return {}
 
 
-class UpdateCommentView(DetailView):
-
-    model = models.Comment
-    template_name = 'demotime/edit_comment.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        comment_pk = kwargs['pk']
-        self.comment = get_object_or_404(
-            models.Comment, pk=comment_pk, commenter=self.request.user
-        )
-        return super(UpdateCommentView, self).dispatch(request, *args, **kwargs)
-
-    def init_form(self, data=None, files=None):
-        kwargs = {}
-        if data:
-            kwargs['data'] = data
-        if files:
-            kwargs['files'] = files
-        return forms.UpdateCommentForm(instance=self.comment, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(UpdateCommentView, self).get_context_data(**kwargs)
-        context['form'] = self.comment_form
-        return context
-
-    def get(self, *args, **kwargs):
-        if not hasattr(self, 'comment_form'):
-            self.comment_form = self.init_form()
-        return super(UpdateCommentView, self).get(*args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        self.comment_form = self.init_form(self.request.POST, self.request.FILES)
-        if self.comment_form.is_valid():
-            data = self.comment_form.cleaned_data
-            self.comment.comment = data['comment']
-            self.comment.save(update_fields=['modified', 'comment'])
-            if data.get('attachment'):
-                models.Attachment.objects.create(
-                    attachment=data['attachment'],
-                    attachment_type=data['attachment_type'],
-                    description=data.get('description', ''),
-                    content_object=self.comment,
-                )
-            return redirect(self.comment.thread.review_revision.get_absolute_url())
-        else:
-            return self.get(*args, **kwargs)
-
 comments_json_view = CommentJsonView.as_view()
-update_comment_view = UpdateCommentView.as_view()
 delete_comment_attachment_view = DeleteCommentAttachmentView.as_view()

@@ -77,8 +77,7 @@ class Comment(BaseModel):
 
     @classmethod
     def create_comment(cls, commenter, comment, review,
-                       thread=None, attachment=None, attachment_type=None,
-                       description=None, sort_order=1):
+                       thread=None, attachments=None):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
 
@@ -103,13 +102,16 @@ class Comment(BaseModel):
             comment=comment,
             thread=thread
         )
-        if attachment or attachment_type:
+        if not attachments:
+            attachments = []
+
+        for count, attachment in enumerate(attachments):
             Attachment.objects.create(
-                attachment=attachment,
-                attachment_type=attachment_type,
-                description=description,
+                attachment=attachment['attachment'],
+                attachment_type=attachment['attachment_type'],
+                description=attachment['description'],
                 content_object=obj,
-                sort_order=sort_order,
+                sort_order=attachment.get('sort_order') or count
             )
 
         system_user = User.objects.get(username='demotime_sys')

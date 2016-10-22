@@ -17,9 +17,7 @@ class ReviewDetail(CanViewMixin, DetailView):
         self.project = None
         self.review = None
         self.revision = None
-        self.comment = None
-        self.comment_form = None
-        self.attachment_form = None
+        self.user = None
 
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(
@@ -48,16 +46,11 @@ class ReviewDetail(CanViewMixin, DetailView):
 
         self.review = self.revision.review
         if self.request.user.is_authenticated():
-            self.comment = models.Comment(
-                commenter=self.request.user
-            )
             models.MessageBundle.objects.filter(
                 owner=request.user,
                 review=self.revision.review
             ).update(read=True)
             self.user = self.request.user
-        else:
-            self.user = None
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -95,44 +88,9 @@ class ReviewDetail(CanViewMixin, DetailView):
         ).update(read=True)
         context['project'] = self.project
         context['revision'] = self.revision
-        if self.comment_form:
-            context['comment_form'] = self.comment_form
-        else:
-            context['comment_form'] = forms.CommentForm(instance=self.comment)
-        if self.attachment_form:
-            context['attachment_form'] = self.attachment_form
-        else:
-            context['attachment_form'] = forms.AttachmentForm(
-                initial={'sort_order': 1}
-            )
+        context['comment_form'] = forms.CommentForm()
+        context['attachment_form'] = forms.DemoAttachmentForm(prefix='0')
         return context
-
-    def post(self, request, *args, **kwargs):
-        thread = None
-        if request.POST.get('thread'):
-            if self.revision.commentthread_set.filter(
-                    pk=request.POST.get('thread')
-            ):
-                thread = models.CommentThread.objects.get(pk=request.POST['thread'])
-
-        self.comment_form = forms.CommentForm(
-            thread=thread, data=request.POST, instance=self.comment
-        )
-        self.attachment_form = forms.AttachmentForm(data=request.POST, files=request.FILES)
-        data = {}
-        if self.comment_form.is_valid():
-            data = self.comment_form.cleaned_data
-        else:
-            return self.get(request, *args, **kwargs)
-
-        if self.attachment_form.is_valid():
-            data.update(self.attachment_form.cleaned_data)
-
-        obj = self.get_object()
-        data['commenter'] = self.request.user
-        data['review'] = obj.revision
-        models.Comment.create_comment(**data)
-        return redirect(obj.get_absolute_url())
 
 
 class CreateReviewView(TemplateView):
@@ -169,7 +127,7 @@ class CreateReviewView(TemplateView):
             project=self.project,
             data=request.POST
         )
-        AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)
+        AttachmentFormSet = formset_factory(forms.DemoAttachmentForm, extra=10, max_num=25)
         self.attachment_forms = AttachmentFormSet(
             data=request.POST,
             files=request.FILES
@@ -218,7 +176,7 @@ class CreateReviewView(TemplateView):
                 project=self.project,
                 initial={'description': ''},
             )
-            AttachmentFormSet = formset_factory(forms.AttachmentForm, extra=10, max_num=25)
+            AttachmentFormSet = formset_factory(forms.DemoAttachmentForm, extra=10, max_num=25)
             initial_data = [{'sort_order': x} for x in range(1, AttachmentFormSet.extra + 1)]
             self.attachment_forms = AttachmentFormSet(initial=initial_data)
         return super(CreateReviewView, self).get(request, *args, **kwargs)
