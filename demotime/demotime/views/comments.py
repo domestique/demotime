@@ -139,7 +139,6 @@ class CommentJsonView(CanViewJsonView):
         }
 
     def patch(self, request, *args, **kwargs): # pylint: disable=unused-argument
-        import ipdb; ipdb.set_trace()
         try:
             body = json.loads(request.body.decode('utf-8'))
         except json.JSONDecodeError:
