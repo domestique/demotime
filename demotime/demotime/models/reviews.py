@@ -264,6 +264,7 @@ class Review(BaseModel):
             else:
                 reviewer.status = REVIEWING
                 reviewer.save()
+                obj.update_reviewer_state()
 
         for follower in followers:
             try:
@@ -286,6 +287,9 @@ class Review(BaseModel):
         followers = obj.follower_set.exclude(review=obj, user__in=followers)
         for follower in followers:
             follower.drop_follower(obj.creator)
+
+        if obj.state in (CLOSED, ABORTED):
+            obj.update_state(OPEN)
 
         # Messages
         obj._send_revision_messages(update=True)  # pylint: disable=protected-access
