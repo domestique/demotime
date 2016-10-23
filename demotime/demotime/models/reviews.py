@@ -298,6 +298,7 @@ class Review(BaseModel):
             else:
                 reviewer.status = REVIEWING
                 reviewer.save()
+                obj.update_reviewer_state()
                 if state_change:
                     reviewer.create_reviewer_event(creator)
 
@@ -333,6 +334,8 @@ class Review(BaseModel):
             obj._send_revision_messages(update=True)
             obj.trigger_webhooks(UPDATED)
             Reminder.update_reminders_for_review(obj)
+            if obj.state in (CLOSED, ABORTED):
+                obj.update_state(OPEN)
 
         if state_change:
             obj.update_state(state)
