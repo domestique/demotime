@@ -19,7 +19,7 @@ class CommentForm(forms.ModelForm):
             )
             self.fields['thread'].required = True
 
-        for key, value in self.fields.items():
+        for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     class Meta:
@@ -37,11 +37,6 @@ class AttachmentForm(forms.Form):
             attrs={'class': 'form-control'}
         )
     )
-    attachment_type = forms.ChoiceField(
-        required=False,
-        choices=models.Attachment.ATTACHMENT_TYPE_CHOICES,
-        widget=forms.Select
-    )
     description = forms.CharField(
         required=False,
         widget=forms.widgets.TextInput(attrs={'class': 'form-control'}),
@@ -51,13 +46,6 @@ class AttachmentForm(forms.Form):
         required=False,
         widget=forms.HiddenInput,
     )
-
-    def clean_attachment_type(self):
-        data = self.cleaned_data
-        if data.get('attachment') and not data.get('attachment_type'):
-            raise forms.ValidationError('Attachments require an Attachment Type')
-
-        return data['attachment_type']
 
     def clean_sort_order(self):
         data = self.cleaned_data
