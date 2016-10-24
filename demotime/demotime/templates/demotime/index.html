@@ -153,12 +153,15 @@
 <% _.each(moments, function(moment) { %>
     <div class="demobox">
         <div class="demobox-header">
-            <strong><a class="has_bubble"
+            <a class="has_bubble"
                 data-prj="<%= moment.review.project.id %>"
                 data-pk="<%= moment.review.pk %>"
                 href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
                 <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
-            </strong>
+            <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+                was updated by
+                <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+            <% } %>
         </div>
         <div class="demobox-body">
             {% include "includes/event_item.html" %}

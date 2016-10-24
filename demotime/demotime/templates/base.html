@@ -184,7 +184,9 @@
         <script src="/static/scripts/ScrollToLink.js?{{ site_settings.CACHE_BUSTER }}"></script>
         <script>
             // initialize scroll lib
-            var ScrollToLink = new DemoTime.ScrollToLink()
+            $(window).ready(function() {
+                var ScrollToLink = new DemoTime.ScrollToLink()
+            });
         </script>
 
         {# stick elements #}
