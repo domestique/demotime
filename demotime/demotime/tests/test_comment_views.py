@@ -1,11 +1,10 @@
 import json
-from io import StringIO
 
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import BytesIO, File
 
-from demotime import models
+from demotime import constants, models
 from demotime.tests import BaseTestCase
 
 
@@ -23,23 +22,19 @@ class TestCommentViews(BaseTestCase):
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1')),
-            attachment_type='image',
+            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             description='Test Description',
         )
         # Reset out mail queue
         mail.outbox = []
 
     def test_comment_on_review(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(
             reverse('review-detail', args=[self.project.slug, self.review.pk]),
             {
                 'comment': "Oh nice demo!",
-                'attachment': fh,
-                'attachment_type': 'image',
+                'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
                 'description': 'Test Description',
                 'sort_order': 1,
             }
@@ -56,7 +51,7 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(comment.comment, 'Oh nice demo!')
         self.assertEqual(comment.attachments.count(), 1)
         attachment = comment.attachments.get()
-        self.assertEqual(attachment.attachment_type, models.Attachment.IMAGE)
+        self.assertEqual(attachment.attachment_type, constants.IMAGE)
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
@@ -146,13 +141,10 @@ class TestCommentViews(BaseTestCase):
         self.assertEqual(comment.comment, 'This is an update')
 
     def test_update_comment_with_attachment(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         self.assertEqual(self.comment.attachments.count(), 1)
         response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
             'comment': 'This is an attachment update',
-            'attachment': fh,
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'description': 'Test Comment Edit Description',
             'sort_order': 1,
         })
@@ -163,29 +155,12 @@ class TestCommentViews(BaseTestCase):
         attachment = self.comment.attachments.latest()
         self.assertEqual(attachment.description, 'Test Comment Edit Description')
 
-    def test_update_comment_with_attachment_requires_type(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
-        self.assertEqual(self.comment.attachments.count(), 1)
-        response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
-            'comment': 'This is an attachment update',
-            'attachment': fh,
-            'description': 'Test Comment Edit Description',
-            'sort_order': 1,
-        })
-        self.assertStatusCode(response, 200)
-        self.assertFormError(response, 'form', 'attachment_type',
-                             'Attachments require an Attachment Type')
-
     def test_update_comment_with_attachment_without_sort_order(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         self.assertEqual(self.comment.attachments.count(), 1)
         response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
             'comment': 'This is an attachment update',
-            'attachment': fh,
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'description': 'Test Comment Edit Description',
-            'attachment_type': 'image',
         })
         self.assertStatusCode(response, 200)
         self.assertFormError(response, 'form', 'sort_order',
@@ -233,8 +208,7 @@ class TestCommentAPIViews(BaseTestCase):
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1')),
-            attachment_type='image',
+            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             description='Test Description',
         )
         self.api_url = reverse('comments-api', kwargs={
@@ -275,12 +249,9 @@ class TestCommentAPIViews(BaseTestCase):
         })
 
     def test_comment_json_create_comment_thread(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         response = self.client.post(self.api_url, {
             'comment': "test_comment_json_create_comment_thread",
-            'attachment': fh,
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'description': 'Test Description',
             'sort_order': 1,
         })
@@ -302,12 +273,9 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(comment.attachments.count(), 1)
 
     def test_comment_creation_without_comment(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         response = self.client.post(self.api_url, {
             'comment': "",
-            'attachment': fh,
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'description': 'Test Description',
             'sort_order': 1,
         })
@@ -333,13 +301,10 @@ class TestCommentAPIViews(BaseTestCase):
         })
 
     def test_comment_json_reply_comment(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         thread = self.review.revision.commentthread_set.latest()
         response = self.client.post(self.api_url, {
             'comment': "test_comment_json_reply_comment",
-            'attachment': fh,
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'description': 'Test Description',
             'sort_order': 1,
             'thread': thread.pk

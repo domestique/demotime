@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
+from demotime import constants
 from demotime.models.base import BaseModel
 
 
@@ -17,22 +18,24 @@ def attachment_filename(instance, filename):
     folder = str(folder)
     return os.path.join('reviews', folder, filename)
 
+def determine_attachment_type(filename):
+    suffix = filename.split('.')[-1]
+    for attachment_type, suffixes in constants.ATTACHMENT_MAP.items():
+        if suffix in suffixes:
+            return attachment_type
+
+    return constants.OTHER
+
 
 class Attachment(BaseModel):
 
-    IMAGE = 'image'
-    DOCUMENT = 'document'
-    MOVIE = 'movie'
-    AUDIO = 'audio'
-    OTHER = 'other'
-
     ATTACHMENT_TYPE_CHOICES = (
         ('', '-----'),
-        (IMAGE, 'Image'),
-        (DOCUMENT, 'Document'),
-        (MOVIE, 'Movie/Screencast'),
-        (AUDIO, 'Audio'),
-        (OTHER, 'Other'),
+        (constants.IMAGE, 'Image'),
+        (constants.DOCUMENT, 'Document'),
+        (constants.MOVIE, 'Movie/Screencast'),
+        (constants.AUDIO, 'Audio'),
+        (constants.OTHER, 'Other'),
     )
 
     attachment = models.FileField(upload_to=attachment_filename)
@@ -55,6 +58,18 @@ class Attachment(BaseModel):
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
         }
+
+    @classmethod
+    def create_attachment(cls, attachment, content_object,
+                          description='', sort_order=0):
+        obj = cls.objects.create(
+            attachment=attachment,
+            content_object=content_object,
+            attachment_type=determine_attachment_type(attachment.name),
+            sort_order=sort_order,
+            description=description,
+        )
+        return obj
 
     @property
     def pretty_name(self):
