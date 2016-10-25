@@ -6,13 +6,13 @@
     font-size: 35px;
     line-height: 42px;
     color: #333333;
-    padding: 25px;
+    padding: 25px 25px 5px;
     font-weight: 300;
     position: relative;
 }
 @media screen and (max-width:680px) {
     .content h1 {
-        padding: 10px;
+        padding: 10px 10px 5px;
         font-size: 20px;
         line-height: 24px;
     }
