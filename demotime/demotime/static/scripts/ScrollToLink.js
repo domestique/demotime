@@ -54,11 +54,8 @@ DemoTime.ScrollToLink = Backbone.View.extend({
         return true;
     },
 
-    jump_to_link: function (target, timeout) {
+    jump_to_link: function (target) {
         // Perform the actual jump to a link
-        //
-        // Set a default timeout before animation of 0
-        var timeout = timeout || 0;
 
         // Sometimes we use name='blah' other times
         // we target an ID. So lets look for names first, then
@@ -69,20 +66,18 @@ DemoTime.ScrollToLink = Backbone.View.extend({
             target = $('#' + target);
         }
 
-        setTimeout(function () {
-            // Animate to the element
-            if (target.length) {
-                setTimeout(function() {
-                    $('html, body').animate({
-                        scrollTop: target.offset().top - 20
-                    }, 500);
-                }, 250);
-            }
-            // Sometimes we travel to a 'collapsed' element. if we do,
-            // expand it.
-            if (target.first().hasClass('collapsed')) {
-                target.find('[data-ui-toggle-handle]').trigger('click');
-            }
-        }, timeout);
+        // Animate to the element
+        if (target.length) {
+            setTimeout(function() {
+                $('html, body').animate({
+                    scrollTop: target.offset().top - 60
+                }, 500);
+            }, 500);
+        }
+        // Sometimes we travel to a 'collapsed' element. if we do,
+        // expand it.
+        if (target.first().hasClass('collapsed')) {
+            target.find('[data-ui-toggle-handle]').trigger('click');
+        }
     }
 });

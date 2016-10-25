@@ -38,8 +38,7 @@ class TestCommentModels(BaseTestCase):
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1')),
-            attachment_type='image',
+            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             description='Test Description',
         )
         self.assertEqual(
@@ -98,8 +97,7 @@ class TestCommentModels(BaseTestCase):
             commenter=self.user,
             review=review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1')),
-            attachment_type='image',
+            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             description='Test Description',
             thread=thread,
         )
@@ -297,8 +295,7 @@ class TestCommentModels(BaseTestCase):
             review=review.revision,
             comment="test comment",
             thread=thread,
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1'),
-            attachment_type='image',
+            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
         )
         self.assertEqual(comment.to_json(), {
             'id': comment.pk,

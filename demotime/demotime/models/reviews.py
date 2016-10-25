@@ -169,9 +169,8 @@ class Review(BaseModel):
             number=1,
         )
         for attachment in attachments:
-            Attachment.objects.create(
+            Attachment.create_attachment(
                 attachment=attachment['attachment'],
-                attachment_type=attachment['attachment_type'],
                 description=attachment['description'],
                 content_object=rev,
                 sort_order=attachment['sort_order'],
@@ -235,9 +234,8 @@ class Review(BaseModel):
             number=rev_count + 1
         )
         for attachment in attachments:
-            Attachment.objects.create(
+            Attachment.create_attachment(
                 attachment=attachment['attachment'],
-                attachment_type=attachment['attachment_type'],
                 description=attachment['description'],
                 content_object=rev,
                 sort_order=attachment['sort_order'],
@@ -266,6 +264,7 @@ class Review(BaseModel):
             else:
                 reviewer.status = REVIEWING
                 reviewer.save()
+                obj.update_reviewer_state()
 
         for follower in followers:
             try:
@@ -288,6 +287,9 @@ class Review(BaseModel):
         followers = obj.follower_set.exclude(review=obj, user__in=followers)
         for follower in followers:
             follower.drop_follower(obj.creator)
+
+        if obj.state in (CLOSED, ABORTED):
+            obj.update_state(OPEN)
 
         # Messages
         obj._send_revision_messages(update=True)  # pylint: disable=protected-access

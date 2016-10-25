@@ -170,6 +170,36 @@ class TestReviewModels(BaseTestCase):
             constants.UPDATED,
         )
 
+    def test_update_closed_review(self):
+        ''' Updating a closed review should reopen it '''
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        for reviewer in obj.reviewer_set.all():
+            reviewer.set_status(constants.APPROVED)
+        obj.update_state(constants.CLOSED)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.CLOSED)
+        self.assertEqual(obj.reviewer_state, constants.APPROVED)
+        models.UserReviewStatus.objects.filter(review=obj).update(read=True)
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'reviewers': self.test_users.exclude(username='test_user_0'),
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        # Should still be the same, singular revision
+        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.description, 'New Description')
+        self.assertEqual(obj.reviewrevision_set.count(), 2)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+
     def test_update_review_duped_reviewer_follower(self):
         self.assertEqual(len(mail.outbox), 0)
         review_kwargs = self.default_review_kwargs.copy()

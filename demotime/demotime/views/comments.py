@@ -84,7 +84,6 @@ class CommentJsonView(CanViewJsonView):
                 review=self.revision,
                 thread=thread,
                 attachment=data['attachment'],
-                attachment_type=data['attachment_type'],
                 description=data.get('description', '')
             )
             return {
@@ -130,9 +129,8 @@ class CommentJsonView(CanViewJsonView):
             comment.comment = data['comment']
             comment.save(update_fields=['modified', 'comment'])
             if data.get('attachment'):
-                models.Attachment.objects.create(
+                models.Attachment.create_attachment(
                     attachment=data['attachment'],
-                    attachment_type=data['attachment_type'],
                     description=data.get('description', ''),
                     content_object=self.comment,
                 )
@@ -226,9 +224,8 @@ class UpdateCommentView(DetailView):
             self.comment.comment = data['comment']
             self.comment.save(update_fields=['modified', 'comment'])
             if data.get('attachment'):
-                models.Attachment.objects.create(
+                models.Attachment.create_attachment(
                     attachment=data['attachment'],
-                    attachment_type=data['attachment_type'],
                     description=data.get('description', ''),
                     content_object=self.comment,
                 )

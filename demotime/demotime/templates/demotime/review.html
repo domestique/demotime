@@ -263,7 +263,7 @@
 
                     {% macro attachment %}
                         <section>
-                            {% include "includes/attachments_form.html" with form=attachment_form cols=3 %}
+                            {% include "includes/attachments_form.html" with form=attachment_form cols=2 %}
                             {{ form.attachment.errors }}
                         </section>
                     {% endmacro %}
@@ -295,7 +295,7 @@
                                 {% if not forloop.first %}
                                     <div class="comments-reply">
                                 {% endif %}
-                                    <div class="demobox">
+                                    <div class="demobox" id="{{ comment.pk }}">
                                         <div class="demobox-header">
                                             Reply by
                                             <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
@@ -309,9 +309,9 @@
                                             {% endif %}
                                         </div>
                                         {% if comment.comment %}
-                                        <div class="demobox-body">
-                                            {{ comment.comment|safe|linebreaksbr }}
-                                        </div>
+                                            <div class="demobox-body">
+                                                {{ comment.comment|safe|linebreaksbr }}
+                                            </div>
                                         {% endif %}
                                     </div>
                                     {% use_macro attachments %}
@@ -375,6 +375,10 @@
     <div class="demobox">
         <div class="demobox-header">
             <strong><%= new Date(moment.created) %></strong>
+            <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+                update by
+                <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+            <% } %>
         </div>
         <div class="demobox-body">
             {% include "includes/event_item.html" %}
