@@ -25,11 +25,6 @@ body.bookmarklet h1 {
     font-size: .8em;
     display: inline-block;
 }
-@media screen and (max-width: 680px) {
-    .navbar .navbar-logo {
-        display: none;
-    }
-}
 .navbar .navbar-brand {
     padding: 5px 0;
 }
