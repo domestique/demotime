@@ -312,8 +312,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         )
 
     def test_post_create_draft_review(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         title = 'Test Title Create Review POST'
         self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(reverse('create-review', args=[self.project.slug]), {
@@ -329,8 +327,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'form-INITIAL_FORMS': 0,
             'form-MIN_NUM_FORMS': 0,
             'form-MAX_NUM_FORMS': 5,
-            'form-0-attachment': fh,
-            'form-0-attachment_type': 'image',
+            'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'form-0-description': 'Test Description',
             'form-0-sort_order': 1,
         })
@@ -377,8 +374,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         )
 
     def test_post_update_draft_review(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)
         draft_kwargs = self.default_review_kwargs.copy()
@@ -399,8 +394,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                 'form-INITIAL_FORMS': 0,
                 'form-MIN_NUM_FORMS': 0,
                 'form-MAX_NUM_FORMS': 5,
-                'form-0-attachment': fh,
-                'form-0-attachment_type': 'image',
+                'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
                 'form-0-description': 'Test Description',
                 'form-0-sort_order': 1,
             }
@@ -435,8 +429,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.state, constants.DRAFT)
 
     def test_post_update_draft_review_to_open(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)
         draft_kwargs = self.default_review_kwargs.copy()
@@ -457,8 +449,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                 'form-INITIAL_FORMS': 0,
                 'form-MIN_NUM_FORMS': 0,
                 'form-MAX_NUM_FORMS': 5,
-                'form-0-attachment': fh,
-                'form-0-attachment_type': 'image',
+                'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
                 'form-0-description': 'Test Description',
                 'form-0-sort_order': 1,
             }
@@ -1075,7 +1066,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
     def test_review_list_search_no_drafts(self):
         self.review.state = constants.DRAFT
         self.review.save()
-        response= self.client.get(reverse('review-list'), {
+        response = self.client.get(reverse('review-list'), {
             'title': self.review.title
         })
         self.assertStatusCode(response, 200)
@@ -1084,7 +1075,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
     def test_review_list_no_cancellations(self):
         self.review.state = constants.CANCELLED
         self.review.save()
-        response= self.client.get(reverse('review-list'), {
+        response = self.client.get(reverse('review-list'), {
             'title': self.review.title
         })
         self.assertStatusCode(response, 200)
