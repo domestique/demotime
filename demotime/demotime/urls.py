@@ -54,7 +54,6 @@ urlpatterns += [
         comments.comments_json_view,
         name='comments-api',
     ),
-    url(r'^comment/update/(?P<pk>[\d]+)/$', comments.update_comment_view, name='update-comment'),
     url(
         r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         comments.delete_comment_attachment_view,
