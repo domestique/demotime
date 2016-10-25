@@ -125,6 +125,7 @@ li.open.state-highlight {
     width: 48%;
     display: inline-block;
     margin: 5px;
+    vertical-align: top;
 }
 @media screen and (max-width:480px) {
     .attachments .attachment-card.image {

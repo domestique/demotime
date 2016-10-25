@@ -174,9 +174,8 @@ class Review(BaseModel):
             number=1,
         )
         for attachment in attachments:
-            Attachment.objects.create(
+            Attachment.create_attachment(
                 attachment=attachment['attachment'],
-                attachment_type=attachment['attachment_type'],
                 description=attachment['description'],
                 content_object=rev,
                 sort_order=attachment['sort_order'],
@@ -264,9 +263,8 @@ class Review(BaseModel):
                 number=rev_count + 1
             )
         for attachment in attachments:
-            Attachment.objects.create(
+            Attachment.create_attachment(
                 attachment=attachment['attachment'],
-                attachment_type=attachment['attachment_type'],
                 description=attachment['description'],
                 content_object=rev,
                 sort_order=attachment['sort_order'],

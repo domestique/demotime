@@ -77,7 +77,7 @@ class Comment(BaseModel):
 
     @classmethod
     def create_comment(cls, commenter, comment, review,
-                       thread=None, attachment=None, attachment_type=None,
+                       thread=None, attachment=None,
                        description=None, sort_order=1):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
@@ -103,10 +103,9 @@ class Comment(BaseModel):
             comment=comment,
             thread=thread
         )
-        if attachment or attachment_type:
-            Attachment.objects.create(
+        if attachment:
+            Attachment.create_attachment(
                 attachment=attachment,
-                attachment_type=attachment_type,
                 description=description,
                 content_object=obj,
                 sort_order=sort_order,

@@ -1,9 +1,9 @@
 import json
-from io import StringIO
 
 from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import constants, models
 from demotime.tests import BaseTestCase
@@ -255,8 +255,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertNotIn(unauthed_user, followers)
 
     def test_post_create_review(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         title = 'Test Title Create Review POST'
         self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(reverse('create-review', args=[self.project.slug]), {
@@ -272,8 +270,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'form-INITIAL_FORMS': 0,
             'form-MIN_NUM_FORMS': 0,
             'form-MAX_NUM_FORMS': 5,
-            'form-0-attachment': fh,
-            'form-0-attachment_type': 'image',
+            'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'form-0-description': 'Test Description',
             'form-0-sort_order': 1,
         })
@@ -631,8 +628,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertStatusCode(response, 404)
 
     def test_post_create_review_empty_attachments_not_created(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         title = 'Test Title Create Review POST'
         self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(reverse('create-review', args=[self.project.slug]), {
@@ -648,12 +643,10 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'form-INITIAL_FORMS': 0,
             'form-MIN_NUM_FORMS': 0,
             'form-MAX_NUM_FORMS': 5,
-            'form-0-attachment': fh,
-            'form-0-attachment_type': 'image',
+            'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'form-0-description': 'Test Description',
             'form-0-sort_order': 1,
             'form-1-attachment': '',
-            'form-1-attachment_type': 'image',
             'form-1-description': 'Test Description',
             'form-1-sort_order': 2,
         })
@@ -666,8 +659,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.revision.attachments.count(), 1)
 
     def test_post_update_review(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)
         response = self.client.post(
@@ -685,8 +676,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                 'form-INITIAL_FORMS': 0,
                 'form-MIN_NUM_FORMS': 0,
                 'form-MAX_NUM_FORMS': 5,
-                'form-0-attachment': fh,
-                'form-0-attachment_type': 'image',
+                'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
                 'form-0-description': 'Test Description',
                 'form-0-sort_order': 1,
             }
