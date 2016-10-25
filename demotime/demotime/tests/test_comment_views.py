@@ -1,5 +1,4 @@
 import json
-from io import StringIO
 
 from django.core import mail
 from django.core.urlresolvers import reverse
@@ -20,8 +19,7 @@ class TestCommentViews(BaseTestCase):
         # Sample review
         self.review = models.Review.create_review(**self.default_review_kwargs)
         attachments = [{
-            'attachment': File(BytesIO(b'test_file_1')),
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'description': 'Test Description',
         }]
         self.comment = models.Comment.create_comment(
@@ -35,7 +33,6 @@ class TestCommentViews(BaseTestCase):
 
     # TODO: Attachments API - Move these tests to go with that, y'know, when
     # you actually do that someday.
-
     def test_delete_comment_attachment(self):
         attachment = self.comment.attachments.get()
         url = reverse('update-comment-attachment', kwargs={
@@ -75,8 +72,7 @@ class TestCommentAPIViews(BaseTestCase):
         # Sample review
         self.review = models.Review.create_review(**self.default_review_kwargs)
         attachments = [{
-            'attachment': File(BytesIO(b'test_file_1')),
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'description': 'Test Description',
         }]
         self.comment = models.Comment.create_comment(
@@ -123,12 +119,9 @@ class TestCommentAPIViews(BaseTestCase):
         })
 
     def test_comment_json_create_comment_thread(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         response = self.client.post(self.api_url, {
             'comment': "test_comment_json_create_comment_thread",
-            '0-attachment': fh,
-            '0-attachment_type': 'image',
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             '0-description': 'Test Description',
         })
         self.assertStatusCode(response, 200)
@@ -149,12 +142,9 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(comment.attachments.count(), 1)
 
     def test_comment_creation_without_comment(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         response = self.client.post(self.api_url, {
             'comment': "",
-            '0-attachment': fh,
-            '0-attachment_type': 'image',
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             '0-description': 'Test Description',
         })
         self.assertStatusCode(response, 200)
@@ -168,14 +158,11 @@ class TestCommentAPIViews(BaseTestCase):
     def test_comment_with_multiple_attachments(self):
         response = self.client.post(self.api_url, {
             'comment': 'Test comment with multiple attachments',
-            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1'),
-            '0-attachment_type': 'image',
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             '0-description': 'Image Attachment',
-            '1-attachment': File(BytesIO(b'test_file_2'), name='test_file_2'),
-            '1-attachment_type': 'movie',
+            '1-attachment': File(BytesIO(b'test_file_2'), name='test_file_2.mov'),
             '1-description': 'Movie Attachment',
-            '2-attachment': File(BytesIO(b'test_file_3'), name='test_file_3'),
-            '2-attachment_type': 'audio',
+            '2-attachment': File(BytesIO(b'test_file_3'), name='test_file_3.wav'),
             '2-description': 'Audio Attachment',
         })
         self.assertStatusCode(response, 200)
@@ -219,13 +206,10 @@ class TestCommentAPIViews(BaseTestCase):
         })
 
     def test_comment_json_reply_comment(self):
-        fh = StringIO('testing')
-        fh.name = 'test_file_1'
         thread = self.review.revision.commentthread_set.latest()
         response = self.client.post(self.api_url, {
             'comment': "test_comment_json_reply_comment",
-            '0-attachment': fh,
-            '0-attachment_type': 'image',
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             '0-description': 'Test Description',
             '0-sort_order': 1,
             'thread': thread.pk

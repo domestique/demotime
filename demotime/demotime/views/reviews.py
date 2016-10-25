@@ -143,7 +143,6 @@ class CreateReviewView(TemplateView):
                         continue
                     data['attachments'].append({
                         'attachment': form.cleaned_data['attachment'],
-                        'attachment_type': form.cleaned_data['attachment_type'],
                         'description': form.cleaned_data['description'],
                         'sort_order': form.cleaned_data['sort_order'],
                     })

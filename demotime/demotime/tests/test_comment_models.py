@@ -36,13 +36,11 @@ class TestCommentModels(BaseTestCase):
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
         attachments = [
             {
-                'attachment': File(BytesIO(b'test_file_1')),
-                'attachment_type': 'image',
+                'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
                 'description': 'Image 1',
             },
             {
-                'attachment': File(BytesIO(b'test_file_2')),
-                'attachment_type': 'image',
+                'attachment': File(BytesIO(b'test_file_2'), name='test_file_2.jpg'),
                 'description': 'Image 2',
             },
         ]
@@ -108,8 +106,7 @@ class TestCommentModels(BaseTestCase):
         thread = models.CommentThread.create_comment_thread(review.revision)
         models.UserReviewStatus.objects.filter(review=review).update(read=True)
         attachments = [{
-            'attachment': File(BytesIO(b'test_file_1')),
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'sort_order': 1,
             'description': 'Test Description'
         }]
@@ -310,8 +307,7 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
         attachments = [{
-            'attachment': File(BytesIO(b'test_file_1')),
-            'attachment_type': 'image',
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
             'sort_order': 1,
             'description': 'Test Description'
         }]

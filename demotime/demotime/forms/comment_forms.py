@@ -40,23 +40,11 @@ class CommentAttachmentForm(forms.Form):
             attrs={'class': 'form-control'}
         )
     )
-    attachment_type = forms.ChoiceField(
-        required=False,
-        choices=models.Attachment.ATTACHMENT_TYPE_CHOICES,
-        widget=forms.Select
-    )
     description = forms.CharField(
         required=False,
         widget=forms.widgets.TextInput(attrs={'class': 'form-control'}),
         max_length=2048
     )
-
-    def clean_attachment_type(self):
-        data = self.cleaned_data
-        if data.get('attachment') and not data.get('attachment_type'):
-            raise forms.ValidationError('Attachments require an Attachment Type')
-
-        return data['attachment_type']
 
 
 class DemoAttachmentForm(CommentAttachmentForm):

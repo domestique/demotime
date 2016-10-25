@@ -106,10 +106,9 @@ class Comment(BaseModel):
             attachments = []
 
         for count, attachment in enumerate(attachments):
-            Attachment.objects.create(
+            Attachment.create_attachment(
                 attachment=attachment['attachment'],
-                attachment_type=attachment['attachment_type'],
-                description=attachment['description'],
+                description=attachment.get('description', ''),
                 content_object=obj,
                 sort_order=attachment.get('sort_order') or count
             )

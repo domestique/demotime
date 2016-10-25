@@ -92,7 +92,6 @@ class CommentJsonView(CanViewJsonView):
                 data = form.cleaned_data
                 attachments.append({
                     'attachment': data['attachment'],
-                    'attachment_type': data['attachment_type'],
                     'description': data['description'],
                     'sort_order': prefix,
                 })
@@ -171,13 +170,12 @@ class CommentJsonView(CanViewJsonView):
             data = comment_form.cleaned_data
             comment.comment = data['comment']
             comment.save(update_fields=['modified', 'comment'])
-            for attachment in attachments:
-                models.Attachment.objects.create(
-                    attachment=attachment['attachment'],
-                    attachment_type=attachment['attachment_type'],
-                    description=attachment['description'],
+            for count, attachment in enumerate(attachments):
+                models.Attachment.create_attachment(
+                    attachment=data['attachment'],
+                    description=data.get('description', ''),
                     content_object=self.comment,
-                    sort_order=attachment['sort_order']
+                    sort_order=attachment.get('sort_order') or count
                 )
 
             if body.get('delete_attachments'):
