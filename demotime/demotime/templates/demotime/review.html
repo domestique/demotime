@@ -364,10 +364,10 @@
 </ul>
 </script>
 <script type="text/x-pattern" id="added_reviewer">
-<li><a href="/accounts/profile/<%= person.attributes.reviewer_user_pk %>"><%= person.attributes.reviewer_name %></a> <small><%= person.attributes.reviewer_status %></small></li>
+<li><strong><%= person.attributes.reviewer_name %></strong> <small><%= person.attributes.reviewer_status %></small></li>
 </script>
 <script type="text/x-pattern" id="added_follower">
-<li><a href="/accounts/profile/<%= person.attributes.follower_user_pk %>"><%= person.attributes.follower_name %></a> <small>following</small></li>
+<li><strong><%= person.attributes.follower_name %></strong> <small>following</small></li>
 </script>
 <script type="text/x-pattern" id="events_pattern">
 <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
@@ -377,7 +377,7 @@
             <strong><%= new Date(moment.created) %></strong>
             <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
                 update by
-                <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+                <a href="<%= moment.user.url %>"><%= moment.user.name %></a>
             <% } %>
         </div>
         <div class="demobox-body">
