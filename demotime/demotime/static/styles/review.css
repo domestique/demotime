@@ -170,6 +170,16 @@ li.open.state-highlight {
     margin: 0 auto;
 }
 
+.comments .demobox + .demobox.attachment-card {
+    position: relative;
+    top: -12px;
+    border-top: 0;
+}
+
+.comment_parent + .comment_form_container {
+    margin-top: 10px;
+}
+
 /* Fixing filename bleedthrough */
 .attachment-file {
     overflow: hidden;
