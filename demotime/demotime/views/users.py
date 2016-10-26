@@ -43,7 +43,8 @@ class UserAPI(JsonView):
             json_dict['users'].append({
                 'name': user.userprofile.name,
                 'username': user.username,
-                'pk': user.pk
+                'pk': user.pk,
+                'url': user.userprofile.get_absolute_url(),
             })
 
         return json_dict

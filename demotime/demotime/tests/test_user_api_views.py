@@ -39,6 +39,7 @@ class TestUserApiReviewers(BaseTestCase):
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.userprofile.name,
                 'username': self.test_user_2.username,
+                'url': self.test_user_2.userprofile.get_absolute_url(),
             }],
             'errors': {},
             'success': True,
@@ -57,6 +58,7 @@ class TestUserApiReviewers(BaseTestCase):
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.userprofile.name,
                 'username': self.test_user_2.username,
+                'url': self.test_user_2.userprofile.get_absolute_url(),
             }],
             'errors': {},
             'success': True,
@@ -82,6 +84,7 @@ class TestUserApiReviewers(BaseTestCase):
                 'pk': user.pk,
                 'name': user.userprofile.name,
                 'username': user.username,
+                'url': user.userprofile.get_absolute_url(),
             })
         for user in user_list:
             self.assertIn(user, data['users'])
@@ -441,6 +444,7 @@ class TestUserApiFollowers(BaseTestCase):
                     'pk': self.test_user_2.pk,
                     'name': self.test_user_2.userprofile.name,
                     'username': self.test_user_2.username,
+                    'url': self.test_user_2.userprofile.get_absolute_url(),
                 }
             ],
             'errors': {},
@@ -467,6 +471,7 @@ class TestUserApiFollowers(BaseTestCase):
                 'pk': user.pk,
                 'name': user.userprofile.name,
                 'username': user.username,
+                'url': user.userprofile.get_absolute_url(),
             })
         self.assertEqual(data, {
             'users': user_list,
@@ -784,6 +789,7 @@ class TestUserAPI(BaseTestCase):
                 'pk': self.test_user_2.pk,
                 'name': self.test_user_2.userprofile.display_name,
                 'username': self.test_user_2.username,
+                'url': self.test_user_2.userprofile.get_absolute_url(),
             }],
             'errors': {},
             'success': True,
