@@ -7,6 +7,27 @@ $('body').on('click', '.toggle_sibling', function(event) {
     event.preventDefault();
     $(this).next().slideToggle();
 });
+$('body').on('click', 'a.attachment_delete', function(event) {
+    var el = $(this);
+
+    event.preventDefault();
+
+    var del = $.ajax({
+        type: "DELETE",
+        url: el.data('url'),
+        data: {}
+    });
+
+    del.always(function() {
+        parent = el.parents('.demobox');
+        parent.slideUp(function() {
+            $(this).remove();
+            if (!$('.current_attachments .demobox').length) {
+                $('.current_attachments .attachments').html('No attachments found');
+            }
+        });
+    });
+});
 
 $(document).ready(function() {
     if ($(window).width() > 375) {

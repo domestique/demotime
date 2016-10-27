@@ -38,7 +38,10 @@ h1 em {
     margin-top: 0;
 }
 .attachments {
-    margin-top: 30px;
+    margin-top: 20px;
+}
+.current_attachments .demobox {
+    margin-bottom: 10px;
 }
 @media screen and (max-width:680px) {
     h3 small {
@@ -72,11 +75,11 @@ h1 em {
                     {{ review_form.description.errors }}
                 </div>
                 {% if review_inst.revision.attachments.exists %}
-                    <article class="collapser_parent">
-                        <h3 class="icon icon-attach collapser">Current Attachments</h3>
-                        <section class="attachments collapseable">
+                    <article class="current_attachments">
+                        <h3 class="icon icon-attach">Current Attachments</h3>
+                        <section class="attachments">
                             {% for attachment in review_inst.revision.attachments.all %}
-                                {% include "includes/review_attachment.html" with attachment=attachment %}
+                                {% include "includes/review_attachment.html" with project=project review_inst=review_inst attachment=attachment %}
                             {% endfor %}
                         </section>
                     </article>
@@ -177,15 +180,4 @@ h1 em {
 {% block scripts %}
 {{ block.super }}
 <script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
-<script type="text/javascript">
-$('#save-draft').click(function(){
-    $('#id_state').val('draft');
-});
-$('#create-demo').click(function(){
-    $('#id_state').val('open');
-});
-$('#delete-draft').click(function(){
-    $('#id_trash').val(true);
-});
-</script>>
 {% endblock %}
