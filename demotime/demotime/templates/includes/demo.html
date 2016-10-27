@@ -5,7 +5,7 @@
             owner
         {% endif %}
         {% reviewer_status demo user %}
-            {{ demo.state }}
+        {{ demo.state }}
         {{ demo.reviewer_state }}">
     <div class="demobox-header">
         <span class="icon-{% reviewer_status demo user %}">
@@ -34,5 +34,6 @@
         <a href="{{ demo.get_absolute_url }}">
             {{ demo.title }}
         </a>
+        <div class="{{ demo.reviewer_state }} {{ demo.state }}"></div>
     </div>
 </div>
