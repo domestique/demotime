@@ -48,6 +48,10 @@ ul {
     }
 }
 
+.right {
+    text-align: right;
+}
+
 h3 {
     font-size: 1.5em;
     color: #555555;
@@ -210,7 +214,6 @@ a.button-link:hover {
     background: #f14d51;
     color: #ffffff;
 }
-input[type='button'].reply_and_approve,
 .subnav a.subnav-item.confirm {
     background-color: #ffd94b;
     color: #555555;

@@ -281,9 +281,9 @@
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <div class="form-group">
-                                <input type="button" class="new_comment_button" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
+                                <button type="button" class="new_comment_button">{% if button_text %}{{ button_text }}{% else %}Post{% endif %}</button>
                                 {% if reviewer and request.user != object.creator and reviewer.status != 'approved' %}
-                                    <input class="reply_and_approve" data-type="approved" type="button" value="Reply and Approve">
+                                    <button class="button-bright reply_and_approve" data-type="approved" type="button">Reply and Approve</button>
                                 {% endif %}
                             </div>
                         </form>

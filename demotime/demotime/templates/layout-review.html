@@ -128,16 +128,22 @@ h1 em {
                 {{ review_form.trash }}
                 {% block form_warning %}{% endblock %}
                 <div class="form-group">
-                    {% if review_inst.pk %}
-                        {% if review_inst.state == 'draft' %}
-                            <input id="save-draft" type="submit" value="Save Draft">
-                            <input id="delete-draft" type="submit" value="Delete Draft">
-                        {% endif %}
-                    {% else %}
-                        <input id="save-draft" type="submit" value="Save Draft">
-                    {% endif %}
-                    <input id="create-demo" type="submit" value="{% block button_text %}{% endblock %}">
-                    <input type="button" class="button-clear" value="Cancel" onclick="javascript: history.go(-1)">
+                    <div class="split by:2">
+                        <div class="cel">
+                            <button id="create-demo" type="submit">{% block button_text %}{% endblock %}</button>
+                            <button type="button" class="button-clear" onclick="javascript: history.go(-1)">Cancel</button>
+                        </div>
+                        <div class="cel right">
+                            {% if review_inst.pk %}
+                                {% if review_inst.state == 'draft' %}
+                                    <button id="save-draft" type="submit">Save draft</button>
+                                    <button id="delete-draft" type="submit">Delete draft</button>
+                                {% endif %}
+                            {% else %}
+                                <button id="save-draft" type="submit">Save draft</button>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
