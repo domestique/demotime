@@ -106,7 +106,7 @@
                     <section class="aggregated_dashboard-section aggregated_dashboard-drafts">
                         <div>
                             {% for demo in drafts %}
-                                {% include "includes/demo.html" %}
+                                {% include "includes/demo.html" with draft=True %}
                             {% endfor %}
                         </div>
                     </section>

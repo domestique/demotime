@@ -118,6 +118,9 @@ section .demobox p:first-child {
     margin: 0;
     font-size: 12px;
 }
+.demobox-header strong a {
+    font-weight: 700;
+}
 .demobox-body {
     padding: 10px;
     font-size: 14px;
@@ -170,7 +173,6 @@ li {
 .content a {
     color: #2a9c86;
     text-decoration: none;
-    font-weight: 700;
 }
 .content a:hover {
     text-decoration: underline;

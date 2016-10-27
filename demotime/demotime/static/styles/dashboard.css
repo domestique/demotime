@@ -29,17 +29,18 @@
 .dashboard section li {
     padding: 5px;
 }
-.dashboard section,
-.dashboard section a {
+.dashboard section {
     font-weight: 200;
 }
 .dashboard li p:first-child {
     margin: 0;
 }
-section .messages-list .message_li a,
 section .demobox.open.approved a,
 section .demobox.Reviewing a {
     font-weight: 700;
+}
+section .demobox.owner.open.approved .demobox-header {
+    background-color: #f9fdaa;
 }
 .messages-list .de-emphasize .icon-mail:before {
     display: none;
