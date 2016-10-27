@@ -15,7 +15,16 @@
 {% block sub_nav_actions %}
 <ul class="subnav-item">
     {% if request.user == object.creator %}
-        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Revise</a></li>
+        <li class="updated">
+            <a href="{% url 'edit-review' object.project.slug object.pk %}"
+               class="subnav-item icon icon-pencil">
+               {% if object.state == "draft" %}
+                   Edit
+               {% else %}
+                   Revise
+               {% endif %}
+            </a>
+        </li>
         {% if object.state == 'closed' %}
             <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
         {% else %}

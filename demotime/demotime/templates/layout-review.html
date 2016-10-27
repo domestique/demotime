@@ -130,18 +130,41 @@ h1 em {
                 <div class="form-group">
                     <div class="split by:2">
                         <div class="cel">
-                            <button id="create-demo" type="submit">{% block button_text %}{% endblock %}</button>
-                            <button type="button" class="button-clear" onclick="javascript: history.go(-1)">Cancel</button>
+                            <button id="create-demo"
+                                onclick="$('#id_state').val('open')"
+                                type="submit">
+                                {% block button_text %}{% endblock %}
+                            </button>
                         </div>
                         <div class="cel right">
                             {% if review_inst.pk %}
                                 {% if review_inst.state == 'draft' %}
-                                    <button id="save-draft" type="submit">Save draft</button>
-                                    <button id="delete-draft" type="submit">Delete draft</button>
+                                    <button id="save-draft"
+                                        class="button-confirm"
+                                        onclick="$('#id_state').val('draft')"
+                                        type="submit">
+                                        Save
+                                    </button>
+                                    <button id="delete-draft"
+                                        class="button-alert"
+                                        onclick="$('#id_trash').val(true)"
+                                        type="submit">
+                                        Delete
+                                    </button>
                                 {% endif %}
                             {% else %}
-                                <button id="save-draft" type="submit">Save draft</button>
+                                <button id="save-draft"
+                                    class="button-confirm"
+                                    onclick="$('#id_state').val('draft')"
+                                    type="submit">
+                                    Save Draft
+                                </button>
                             {% endif %}
+                            <button type="button"
+                                class="button-clear"
+                                onclick="javascript: history.go(-1)">
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>

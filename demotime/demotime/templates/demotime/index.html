@@ -99,6 +99,18 @@
                         </div>
                     </section>
                 {% endif %}
+                {% if drafts %}
+                    <h3 class="icon icon-pencil">
+                        Your demo <strong>drafts</strong>
+                    </h3>
+                    <section class="aggregated_dashboard-section aggregated_dashboard-drafts">
+                        <div>
+                            {% for demo in drafts %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
                 <h3>
                     <strong>Projects</strong> you're a member of
                     <span class="help" title="A Project consists of one or more demos.

@@ -108,6 +108,14 @@ button.button-bright {
     background-color: #ffd94b;
     color: #555555;
 }
+button.button-confirm {
+    background-color: #7591cc;
+    color: #fff;
+}
+button.button-alert {
+    background-color: #d27d7d;
+    color: #fff;
+}
 
 select[multiple='multiple'] {
     padding: 10px;
