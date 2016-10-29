@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from demotime import models
+from demotime import constants, models
 from demotime.views import JsonView
 
 
@@ -105,7 +105,8 @@ class UserAPI(JsonView):
             follower = models.Follower.create_follower(
                 review=self.review,
                 user=user,
-                creator=self.request.user
+                creator=self.request.user,
+                draft=self.review.state == constants.DRAFT,
             )
             return {
                 'follower_name': follower.user.userprofile.name,
@@ -227,6 +228,7 @@ class UserAPI(JsonView):
                 review=self.review,
                 reviewer=user,
                 creator=self.request.user,
+                draft=self.review.state == constants.DRAFT,
             )
             return {
                 'reviewer_name': reviewer.reviewer.userprofile.name,
