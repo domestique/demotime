@@ -362,22 +362,9 @@ a[data-type='rejected'] {
     height: auto;
 }
 
-.events blockquote {
-    padding: 8px;
-    border: 0;
-    background: #fafafa;
-}
 .review-overview.events img:before,
 .events a.lightbox_img:before {
     content: ' ';
     margin-top: 10px;
     display: block;
-}
-.events .demobox {
-    margin-bottom: 15px;
-}
-
-.review-overview.events .jump_to_this {
-    margin-top: 5px;
-    font-size: 11px;
 }

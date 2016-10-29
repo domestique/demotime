@@ -244,26 +244,10 @@ section.aggregated_dashboard-activity {
 .events {
     overflow: auto;
 }
-.events strong a {
-    font-weight: 700;
-}
 .events img {
     max-width: 100%;
     height: auto;
 }
-.events blockquote {
-    padding: 8px;
-    border: 0;
-    background: #fafafa;
-}
-.events .demobox {
-    margin: 0 3px 15px 0;
-    margin-bottom: 15px;
-}
 section .events .demobox-body {
     font-size: 11px;
-}
-.events blockquote .jump_to_this {
-    color: #bbbbbb;
-    font-size: 10px;
 }

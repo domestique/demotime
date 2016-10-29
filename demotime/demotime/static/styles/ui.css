@@ -104,15 +104,23 @@ section .demobox p:first-child {
     box-shadow: 4px 4px 0 #dddddd;
     box-sizing: border-box;
 }
-.demobox-header {
+.demobox-header,
+.demobox-footer {
     clear: both;
-    text-align: left;
     background: #f0f0f0;
+    color: #666666;
+    font-size: 12px;
+}
+.demobox-header {
+    text-align: left;
     padding: 10px;
     margin: 0 0 5px;
-    color: #666666;
-    margin: 0;
-    font-size: 12px;
+}
+.demobox-footer {
+    background: #f7f7f7;
+    padding: 5px 10px;
+    text-align: right;
+    margin: 15px 0 0;
 }
 .demobox-body {
     padding: 10px;
@@ -492,4 +500,15 @@ h3 small {
     color: #dddddd;
     font-weight: 700;
     font-size: 9px;
+}
+
+.events strong a {
+    font-weight: 700;
+}
+.events blockquote {
+    padding: 8px;
+    border: 1px dashed #e0e0e0;
+}
+.events .demobox {
+    margin: 0 3px 15px 0;
 }
