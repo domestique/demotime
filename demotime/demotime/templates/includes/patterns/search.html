@@ -4,7 +4,7 @@
         <ul>
         <% if (user.length) { %>
             <% _.each(user, function(user) { %>
-                <li><a href="/accounts/profile/<%= user.pk %>"><%= user.name %></a></li>
+                <li><a href="<%= user.url %>"><%= user.name %></a></li>
             <% }) %>
         <% } else { %>
             <li>No matching users found</li>
