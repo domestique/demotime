@@ -1,4 +1,4 @@
-<div style="margin:10px 0 0">
+<div>
     <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
         <a href="<%= moment.user.url %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
     <% } else if (moment.event_type.code == 'demo-created') { %>
@@ -44,8 +44,8 @@
                     <img src="<%= moment.related_object.attachments[0].static_url %>">
                 </a>
             <% } %>
-            <div class="jump_to_this"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
         </blockquote>
+        <div class="demobox-footer"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
     <% } else { %>
         <strong><%= moment.event_type.name %></strong>
     <% } %>
