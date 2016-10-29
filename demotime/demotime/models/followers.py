@@ -69,14 +69,16 @@ class Follower(BaseModel):
         return obj
 
     def drop_follower(self, dropper, draft=False):  # pylint: disable=unused-argument
-        if not draft:
+        if draft:
+            self.delete()
+        else:
             Event.create_event(
                 project=self.review.project,
                 event_type_code=EventType.FOLLOWER_REMOVED,
                 related_object=self.review,
                 user=self.user
             )
-        self.delete()
+            self.delete()
 
     def _send_follower_message(self, notify_follower=False, notify_creator=False):
         if not notify_follower and not notify_creator:

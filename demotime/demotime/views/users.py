@@ -177,7 +177,10 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User not currently on review'}
             }
         else:
-            follower.drop_follower(self.request.user)
+            follower.drop_follower(
+                self.request.user,
+                draft=self.review.state == constants.DRAFT,
+            )
             return {
                 'success': True,
                 'errors': {},
@@ -302,7 +305,10 @@ class UserAPI(JsonView):
                 }
             }
 
-        reviewer.drop_reviewer(self.request.user)
+        reviewer.drop_reviewer(
+            self.request.user,
+            draft=self.review.state == constants.DRAFT
+        )
         return {
             'success': True,
             'errors': {},

@@ -171,7 +171,10 @@ class Reviewer(BaseModel):
         return self.review.update_reviewer_state()
 
     def drop_reviewer(self, dropper, draft=False):  # pylint: disable=unused-argument
-        if not draft:
+        review = self.review
+        if draft:
+            self.delete()
+        else:
             self._send_reviewer_message(deleted=True)
             Event.create_event(
                 project=self.review.project,
@@ -179,6 +182,5 @@ class Reviewer(BaseModel):
                 related_object=self.review,
                 user=self.reviewer
             )
-        review = self.review
-        self.delete()
-        review.update_reviewer_state()
+            self.delete()
+            review.update_reviewer_state()
