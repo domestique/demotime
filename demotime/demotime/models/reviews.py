@@ -82,10 +82,10 @@ class Review(BaseModel):
     def to_json(self):
         reviewers = []
         followers = []
-        for reviewer in self.reviewer_set.all():
+        for reviewer in self.reviewer_set.filter(is_active=True):
             reviewers.append(reviewer.to_json())
 
-        for follower in self.follower_set.all():
+        for follower in self.follower_set.filter(is_active=True):
             followers.append(follower.to_json())
 
         return {
@@ -120,9 +120,9 @@ class Review(BaseModel):
         if update:
             title = 'Update on Review: {}'.format(self.title)
 
-        for reviewer in self.reviewers.all():
+        for reviewer in self.reviewer_set.filter(is_active=True):
             context = {
-                'receipient': reviewer,
+                'receipient': reviewer.reviewer,
                 'url': self.get_absolute_url(),
                 'update': update,
                 'title': self.title,
@@ -131,11 +131,11 @@ class Review(BaseModel):
                 title,
                 'demotime/messages/review.html',
                 context,
-                reviewer,
+                reviewer.reviewer,
                 revision=self.revision,
             )
 
-        for follower in self.follower_set.all():
+        for follower in self.follower_set.filter(is_active=True):
             context = {
                 'receipient': follower.user,
                 'url': self.get_absolute_url(),
@@ -394,7 +394,9 @@ class Review(BaseModel):
             raise RuntimeError('Invalid Demo State')
 
     def update_reviewer_state(self):
-        statuses = self.reviewer_set.values_list('status', flat=True)
+        statuses = self.reviewer_set.filter(is_active=True).values_list(
+            'status', flat=True
+        )
         approved = all(status == APPROVED for status in statuses)
         rejected = all(status == REJECTED for status in statuses)
         reviewing = not approved and not rejected

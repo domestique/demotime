@@ -87,11 +87,13 @@ class UserAPI(JsonView):
 
         follower = models.Follower.objects.filter(
             review=self.review,
-            user=user
+            user=user,
+            is_active=True,
         )
         is_reviewer = models.Reviewer.objects.filter(
             review=self.review,
-            reviewer=user
+            reviewer=user,
+            is_active=True,
         ).exists()
         if follower.exists() or is_reviewer or self.review.creator == user:
             self.status = 400
@@ -123,12 +125,15 @@ class UserAPI(JsonView):
                 success=False
             )
 
+        followers = self.review.follower_set.filter(is_active=True).values_list(
+            'user__pk', flat=True
+        )
+        reviewers = self.review.reviewer_set.filter(is_active=True).values_list(
+            'reviewer__pk', flat=True
+        )
+        excluded_pks = tuple(followers) + tuple(reviewers) + (self.review.creator.pk,)
         users = self.default_user_list.exclude(
-            follower__review=self.review,
-        ).exclude(
-            reviewer__review=self.review,
-        ).exclude(
-            pk=self.review.creator.pk,
+            pk__in=excluded_pks
         ).filter(
             Q(projectmember__project=self.review.project) |
             Q(groupmember__group__project=self.review.project)
@@ -167,7 +172,8 @@ class UserAPI(JsonView):
         try:
             follower = models.Follower.objects.get(
                 review=self.review,
-                user=user
+                user=user,
+                is_active=True
             )
         except models.Follower.DoesNotExist:
             self.status = 400
@@ -246,10 +252,12 @@ class UserAPI(JsonView):
                 success=False
             )
 
+        reviewers = self.review.reviewer_set.filter(is_active=True).values_list(
+            'reviewer', flat=True
+        )
+        excluded_pks =  tuple(reviewers) + (self.review.creator.pk,)
         users = self.default_user_list.exclude(
-            reviewer__review=self.review,
-        ).exclude(
-            pk=self.review.creator.pk
+            pk__in=excluded_pks
         ).filter(
             Q(projectmember__project=self.review.project) |
             Q(groupmember__group__project=self.review.project)
@@ -279,7 +287,8 @@ class UserAPI(JsonView):
         try:
             reviewer = models.Reviewer.objects.get(
                 review=self.review,
-                reviewer=user
+                reviewer=user,
+                is_active=True
             )
         except models.Reviewer.DoesNotExist:
             self.status = 400

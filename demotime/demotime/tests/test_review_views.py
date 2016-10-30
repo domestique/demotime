@@ -424,7 +424,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
         self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.followers.count(), 0)
+        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 3)
         self.assertEqual(obj.state, constants.DRAFT)
 
@@ -478,8 +478,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.description, 'Updated Description')
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
-        self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.followers.count(), 0)
+        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 3)
+        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
         self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.revision.attachments.count(), 3)
         self.assertEqual(
@@ -535,8 +535,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.description, 'Updated Description')
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
-        self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.followers.count(), 0)
+        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 3)
+        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(
             models.Message.objects.filter(title__contains='POST').count(),
@@ -681,8 +681,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
-        self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.followers.count(), 0)
+        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 3)
+        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 1)
         attachment = obj.revision.attachments.get()
         self.assertEqual(attachment.attachment_type, 'image')
@@ -1146,6 +1146,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                     'name': reviewer.reviewer.userprofile.name,
                     'reviewer_status': models.reviews.REVIEWING,
                     'review_pk': reviewer.review.pk,
+                    'is_active': reviewer.is_active,
                     'created': reviewer.created.isoformat(),
                     'modified': reviewer.modified.isoformat(),
                 },

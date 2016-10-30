@@ -25,6 +25,7 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(self.review.follower_set.count(), 1)
         self.assertEqual(follower_obj.review, self.review)
         self.assertEqual(follower_obj.user, follower)
+        self.assertTrue(follower_obj.is_active)
         self.assertEqual(
             follower_obj.__str__(),
             '{} Follower on {}'.format(follower_obj.display_name, self.review.title)
@@ -166,6 +167,8 @@ class TestFollowerModels(BaseTestCase):
             self.review, follower, self.user, True
         )
         follower_obj.drop_follower(self.review.creator)
+        follower_obj.refresh_from_db()
+        self.assertFalse(follower_obj.is_active)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.FOLLOWER_REMOVED
@@ -175,8 +178,8 @@ class TestFollowerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.FOLLOWER_REMOVED
         )
-        self.assertEqual(event.user, follower)
-        self.assertEqual(event.related_object, self.review)
+        self.assertEqual(event.user, self.review.creator)
+        self.assertEqual(event.related_object, follower_obj)
 
     def test_drop_follower_draft(self):
         follower = self.followers[0]

@@ -25,6 +25,7 @@ class Reviewer(BaseModel):
         default='reviewing', db_index=True
     )
     events = GenericRelation('Event')
+    is_active = models.BooleanField(default=True, db_index=True)
 
     def __str__(self):
         return '{} Reviewer on {}'.format(
@@ -39,6 +40,7 @@ class Reviewer(BaseModel):
             'reviewer_pk': self.pk,
             'reviewer_status': self.status,
             'review_pk': self.review.pk,
+            'is_active': self.is_active,
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
         }
@@ -58,32 +60,46 @@ class Reviewer(BaseModel):
     @classmethod
     def create_reviewer(cls, review, reviewer, creator,
                         skip_notifications=False, draft=False):
-        obj = cls.objects.create(
+        obj, _ = cls.objects.get_or_create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
         )
+        obj.is_active = True
+        obj.save()
         if not draft:
             obj.create_reviewer_event(creator)
-
-        if skip_notifications:
-            notify_reviewer = notify_creator = False
-        else:
-            notify_reviewer = creator != reviewer
-            notify_creator = creator != review.creator
-        if notify_reviewer:
-            # pylint: disable=protected-access
-            obj._send_reviewer_message(
-                notify_reviewer=True, notify_creator=False
+            reminder = Reminder.objects.filter(
+                user=obj.reviewer,
+                review=review,
+                reminder_type=Reminder.REVIEWER
             )
+            if reminder.exists():
+                reminder = reminder.get()
+                Reminder.set_activity(review, obj.reviewer, active=True)
+            else:
+                Reminder.create_reminder(
+                    review, obj.reviewer, Reminder.REVIEWER
+                )
 
-        if notify_creator:
-            # pylint: disable=protected-access
-            obj._send_reviewer_message(
-                notify_reviewer=False, notify_creator=True
-            )
+            if skip_notifications:
+                notify_reviewer = notify_creator = False
+            else:
+                notify_reviewer = creator != reviewer
+                notify_creator = creator != review.creator
+            if notify_reviewer:
+                # pylint: disable=protected-access
+                obj._send_reviewer_message(
+                    notify_reviewer=True, notify_creator=False
+                )
 
-        review.update_reviewer_state()
+            if notify_creator:
+                # pylint: disable=protected-access
+                obj._send_reviewer_message(
+                    notify_reviewer=False, notify_creator=True
+                )
+
+            review.update_reviewer_state()
         return obj
 
     def _send_reviewer_message(self, deleted=False, notify_reviewer=False, notify_creator=False):
@@ -142,7 +158,9 @@ class Reviewer(BaseModel):
         )
 
         # Send a message if this isn't the last person to approve/reject
-        all_statuses = self.review.reviewer_set.values_list('status', flat=True)
+        all_statuses = self.review.reviewer_set.filter(is_active=True).values_list(
+            'status', flat=True
+        )
         consensus = all(x == APPROVED for x in all_statuses) or all(
             x == REJECTED for x in all_statuses)
         if status != old_status and not consensus:
@@ -176,9 +194,15 @@ class Reviewer(BaseModel):
             Event.create_event(
                 project=self.review.project,
                 event_type_code=EventType.REVIEWER_REMOVED,
-                related_object=self.review,
-                user=self.reviewer
+                related_object=self,
+                user=dropper
             )
         review = self.review
-        self.delete()
+        self.is_active = False
+        self.status = REVIEWING
+        Reminder.objects.filter(
+            review=self.review,
+            user=self.reviewer
+        ).delete()
+        self.save()
         review.update_reviewer_state()

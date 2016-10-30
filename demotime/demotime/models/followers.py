@@ -10,6 +10,7 @@ class Follower(BaseModel):
     review = models.ForeignKey('Review')
     user = models.ForeignKey('auth.User')
     events = GenericRelation('Event')
+    is_active = models.BooleanField(default=True, db_index=True)
 
     @property
     def display_name(self):
@@ -73,10 +74,11 @@ class Follower(BaseModel):
             Event.create_event(
                 project=self.review.project,
                 event_type_code=EventType.FOLLOWER_REMOVED,
-                related_object=self.review,
-                user=self.user
+                related_object=self,
+                user=dropper
             )
-        self.delete()
+        self.is_active = False
+        self.save()
 
     def _send_follower_message(self, notify_follower=False, notify_creator=False):
         if not notify_follower and not notify_creator:

@@ -115,7 +115,8 @@ class TestReviewModels(BaseTestCase):
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
         # Should still be the same, singular revision
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 2)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(obj.revision.attachments.count(), 4)
@@ -257,9 +258,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
         self.assertEqual(new_obj.revision.number, 2)
         self.assertTrue(new_obj.revision.is_max_revision)
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 2)
         self.assertEqual(obj.follower_set.count(), 2)
-        self.assertEqual(obj.reviewer_set.count(), 2)
         for reviewer in obj.reviewer_set.all():
             self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         self.assertEqual(second_review.reviewers.count(), 3)
@@ -315,7 +316,8 @@ class TestReviewModels(BaseTestCase):
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
         # Should still be the same, singular revision
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 2)
         self.assertEqual(obj.revision.number, 2)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.revision.description, 'New Description')
@@ -360,9 +362,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
         self.assertEqual(new_obj.revision.number, 2)
         self.assertTrue(new_obj.revision.is_max_revision)
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.follower_set.count(), 2)
-        self.assertEqual(obj.reviewer_set.count(), 2)
         for reviewer in obj.reviewer_set.all():
             self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
