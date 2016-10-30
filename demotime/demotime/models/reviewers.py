@@ -47,19 +47,25 @@ class Reviewer(BaseModel):
     def reviewer_display_name(self):
         return self.reviewer.userprofile.display_name or self.reviewer.username
 
+    def create_reviewer_event(self, user):
+        Event.create_event(
+            project=self.review.project,
+            event_type_code=EventType.REVIEWER_ADDED,
+            related_object=self,
+            user=user
+        )
+
     @classmethod
-    def create_reviewer(cls, review, reviewer, creator, skip_notifications=False):
+    def create_reviewer(cls, review, reviewer, creator,
+                        skip_notifications=False, draft=False):
         obj = cls.objects.create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
         )
-        Event.create_event(
-            project=review.project,
-            event_type_code=EventType.REVIEWER_ADDED,
-            related_object=obj,
-            user=creator
-        )
+        if not draft:
+            obj.create_reviewer_event(creator)
+
         if skip_notifications:
             notify_reviewer = notify_creator = False
         else:
@@ -164,14 +170,15 @@ class Reviewer(BaseModel):
             )
         return self.review.update_reviewer_state()
 
-    def drop_reviewer(self, dropper):  # pylint: disable=unused-argument
-        self._send_reviewer_message(deleted=True)
-        Event.create_event(
-            project=self.review.project,
-            event_type_code=EventType.REVIEWER_REMOVED,
-            related_object=self.review,
-            user=self.reviewer
-        )
+    def drop_reviewer(self, dropper, draft=False):  # pylint: disable=unused-argument
+        if not draft:
+            self._send_reviewer_message(deleted=True)
+            Event.create_event(
+                project=self.review.project,
+                event_type_code=EventType.REVIEWER_REMOVED,
+                related_object=self.review,
+                user=self.reviewer
+            )
         review = self.review
         self.delete()
         review.update_reviewer_state()

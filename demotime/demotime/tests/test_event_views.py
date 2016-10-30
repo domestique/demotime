@@ -3,7 +3,7 @@ from mock import patch
 
 from django.core.urlresolvers import reverse
 
-from demotime import models
+from demotime import constants, models
 from demotime.views import events
 from demotime.tests import BaseTestCase
 
@@ -133,6 +133,30 @@ class TestEventViews(BaseTestCase):
             expected_events.count()
         )
 
+    def test_no_draft_or_cancelled_events(self):
+        self.default_review_kwargs['state'] = constants.DRAFT
+        review = models.Review.create_review(**self.default_review_kwargs)
+        response = self.client.get(self.url, {
+            'review': review.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['errors'], '')
+        self.assertEqual(len(data['events']), 0)
+
+        self.default_review_kwargs['state'] = constants.CANCELLED
+        self.default_review_kwargs['review'] = review.pk
+        review = models.Review.update_review(**self.default_review_kwargs)
+        response = self.client.get(self.url, {
+            'review': review.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['errors'], '')
+        self.assertEqual(len(data['events']), 0)
+
     @patch.object(events.EventView, 'paginate_by', new=2)
     def test_events_view_pagination(self):
         response = self.client.get(self.url)
@@ -157,7 +181,6 @@ class TestEventViews(BaseTestCase):
         self.assertEqual(data['page'], '2')
         self.assertEqual(data['page_count'], 6)
         self.assertEqual(data['count'], models.Event.objects.all().count())
-
 
     @patch.object(events.EventView, 'paginate_by', new=2)
     def test_events_view_not_an_int_page(self):

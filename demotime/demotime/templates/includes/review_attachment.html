@@ -5,6 +5,13 @@
             {% if attachment.description %}
                 - <strong class="attachment-description">{{ attachment.description }}</strong>
             {% endif %}
+            {% if review_inst.state == "draft" %}
+                - <a href="#"
+                     class="attachment_delete"
+                     data-url="{% url 'delete-review-attachment' project.slug review_inst.pk attachment.pk %}">
+                     delete
+                  </a>
+            {% endif %}
         </div>
     </div>
     <div class="demobox-body">

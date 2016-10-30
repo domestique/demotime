@@ -38,6 +38,28 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(event.user, self.user)
         self.assertEqual(event.related_object, follower_obj)
 
+    def test_create_follower_draft(self):
+        self.assertEqual(self.review.follower_set.count(), 0)
+        self.assertEqual(self.review.reviewer_set.count(), 3)
+        mail.outbox = []
+        follower = self.followers[0]
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.user, False, True
+        )
+
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(self.review.follower_set.count(), 1)
+        self.assertEqual(follower_obj.review, self.review)
+        self.assertEqual(follower_obj.user, follower)
+        self.assertEqual(
+            follower_obj.__str__(),
+            '{} Follower on {}'.format(follower_obj.display_name, self.review.title)
+        )
+        event = follower_obj.events.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertFalse(event.exists())
+
     def test_create_follower_notify_follower(self):
         self.assertEqual(self.review.follower_set.count(), 0)
         self.assertEqual(self.review.reviewer_set.count(), 3)
@@ -155,3 +177,16 @@ class TestFollowerModels(BaseTestCase):
         )
         self.assertEqual(event.user, follower)
         self.assertEqual(event.related_object, self.review)
+
+    def test_drop_follower_draft(self):
+        follower = self.followers[0]
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.user, False, True
+        )
+        follower_obj.drop_follower(self.review.creator, True)
+        self.assertEqual(
+            models.Event.objects.filter(
+                event_type__code=models.EventType.FOLLOWER_REMOVED
+            ).count(),
+            0
+        )

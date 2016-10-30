@@ -106,6 +106,7 @@ class TestEventModels(BaseTestCase):
             'user': {
                 'name': event.user.userprofile.name,
                 'username': event.user.username,
-                'pk': event.user.pk
+                'pk': event.user.pk,
+                'url': event.user.userprofile.get_absolute_url(),
             },
         })

@@ -123,7 +123,8 @@ class Event(BaseModel):
             'user': {
                 'name': self.user.userprofile.name,
                 'username': self.user.username,
-                'pk': self.user.pk
+                'pk': self.user.pk,
+                'url': self.user.userprofile.get_absolute_url(),
             },
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),

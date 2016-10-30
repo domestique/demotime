@@ -26,3 +26,9 @@ class TestUserModels(BaseTestCase):
         self.assertEqual(status.review, self.review)
         self.assertEqual(status.user, self.user)
         self.assertTrue(status.read)
+
+    def test_absolute_url(self):
+        self.assertEqual(
+            self.user.userprofile.get_absolute_url(),
+            '/accounts/profile/{}/'.format(self.user.username)
+        )

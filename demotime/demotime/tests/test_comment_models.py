@@ -100,6 +100,54 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(event.related_object, comment)
         self.assertEqual(event.user, comment.commenter)
 
+    def test_create_comment_on_draft(self):
+        self.review.state = constants.DRAFT
+        self.review.save(update_fields=['state'])
+        self.assertEqual(models.Message.objects.count(), 0)
+        models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=self.review.revision,
+            comment='Test Comment',
+            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            description='Test Description',
+        )
+        self.assertEqual(
+            comment.get_absolute_url(),
+            '{}#{}'.format(
+                reverse('review-rev-detail', kwargs={
+                    'proj_slug': self.review.project.slug,
+                    'pk': self.review.pk,
+                    'rev_num': self.review.revision.number,
+                }),
+                comment.thread.pk
+            )
+        )
+        self.assertEqual(comment.thread.review_revision, self.review.revision)
+        self.assertEqual(comment.attachments.count(), 1)
+        attachment = comment.attachments.get()
+        self.assertEqual(attachment.description, 'Test Description')
+        self.assertEqual(attachment.attachment_type, 'image')
+        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(comment.commenter, self.user)
+        self.assertEqual(comment.comment, 'Test Comment')
+        self.assertEqual(
+            models.Message.objects.filter(title__contains='New Comment').count(),
+            0
+        )
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user).exists()
+        )
+        self.assertEqual(
+            comment.__str__(),
+            'Comment by {} on Review: {}'.format(
+                comment.commenter.username,
+                self.review.title
+            )
+        )
+        self.assertFalse(self.task_patch.delay.called)
+        self.assertFalse(comment.events.exists())
+
     def test_create_comment_with_thread(self):
         self.assertEqual(models.Message.objects.count(), 0)
         review = models.Review.create_review(**self.default_review_kwargs)

@@ -15,7 +15,16 @@
 {% block sub_nav_actions %}
 <ul class="subnav-item">
     {% if request.user == object.creator %}
-        <li class="updated"><a href="{% url 'edit-review' object.project.slug object.pk %}" class="subnav-item icon icon-pencil">Revise</a></li>
+        <li class="updated">
+            <a href="{% url 'edit-review' object.project.slug object.pk %}"
+               class="subnav-item icon icon-pencil">
+               {% if object.state == "draft" %}
+                   Edit
+               {% else %}
+                   Revise
+               {% endif %}
+            </a>
+        </li>
         {% if object.state == 'closed' %}
             <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
         {% else %}
@@ -281,9 +290,9 @@
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <div class="form-group">
-                                <input type="button" class="new_comment_button" value="{% if button_text %}{{ button_text }}{% else %}Post{% endif %}">
+                                <button type="button" class="new_comment_button">{% if button_text %}{{ button_text }}{% else %}Post{% endif %}</button>
                                 {% if reviewer and request.user != object.creator and reviewer.status != 'approved' %}
-                                    <input class="reply_and_approve" data-type="approved" type="button" value="Reply and Approve">
+                                    <button class="button-bright reply_and_approve" data-type="approved" type="button">Reply and Approve</button>
                                 {% endif %}
                             </div>
                         </form>
@@ -364,10 +373,10 @@
 </ul>
 </script>
 <script type="text/x-pattern" id="added_reviewer">
-<li><a href="/accounts/profile/<%= person.attributes.reviewer_user_pk %>"><%= person.attributes.reviewer_name %></a> <small><%= person.attributes.reviewer_status %></small></li>
+<li><strong><%= person.attributes.reviewer_name %></strong> <small><%= person.attributes.reviewer_status %></small></li>
 </script>
 <script type="text/x-pattern" id="added_follower">
-<li><a href="/accounts/profile/<%= person.attributes.follower_user_pk %>"><%= person.attributes.follower_name %></a> <small>following</small></li>
+<li><strong><%= person.attributes.follower_name %></strong> <small>following</small></li>
 </script>
 <script type="text/x-pattern" id="events_pattern">
 <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
@@ -377,7 +386,7 @@
             <strong><%= new Date(moment.created) %></strong>
             <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
                 update by
-                <a href="/accounts/profile/<%= moment.user.pk %>"><%= moment.user.name %></a>
+                <a href="<%= moment.user.url %>"><%= moment.user.name %></a>
             <% } %>
         </div>
         <div class="demobox-body">

@@ -6,13 +6,13 @@
     font-size: 35px;
     line-height: 42px;
     color: #333333;
-    padding: 25px;
+    padding: 25px 25px 5px;
     font-weight: 300;
     position: relative;
 }
 @media screen and (max-width:680px) {
     .content h1 {
-        padding: 10px;
+        padding: 10px 10px 5px;
         font-size: 20px;
         line-height: 24px;
     }
@@ -33,6 +33,9 @@ h1 .alert {
 }
 .review p {
     margin: 3px 0;
+}
+.review a {
+    font-weight: 700;
 }
 .review-top,
 .review-meta {
@@ -168,6 +171,16 @@ li.open.state-highlight {
     height: auto;
     max-height: 240px;
     margin: 0 auto;
+}
+
+.comments .demobox + .demobox.attachment-card {
+    position: relative;
+    top: -12px;
+    border-top: 0;
+}
+
+.comment_parent + .comment_form_container {
+    margin-top: 10px;
 }
 
 /* Fixing filename bleedthrough */
@@ -352,22 +365,9 @@ a[data-type='rejected'] {
     height: auto;
 }
 
-.events blockquote {
-    padding: 8px;
-    border: 0;
-    background: #fafafa;
-}
 .review-overview.events img:before,
 .events a.lightbox_img:before {
     content: ' ';
     margin-top: 10px;
     display: block;
-}
-.events .demobox {
-    margin-bottom: 15px;
-}
-
-.review-overview.events .jump_to_this {
-    margin-top: 5px;
-    font-size: 11px;
 }

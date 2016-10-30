@@ -3,7 +3,7 @@
 {% block styles %}
 {{ block.super }}
 <style>
-    input[type="submit"] {
+    button[type="submit"] {
         margin-top:2em;
     }
 </style>
@@ -22,7 +22,7 @@
             <p>By registering you agree that you've read and understand our
             <a href="{% url 'privacy-policy' %}">privacy policy</a> and
             <a href="{% url 'terms-of-use' %}">terms of use</a>.</p>
-            <input type="submit" value="Sign up!">
+            <button type="submit">Sign up!</button>
         </form>
     </section>
 {% endblock %}
