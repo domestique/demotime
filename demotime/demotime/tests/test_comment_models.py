@@ -109,8 +109,12 @@ class TestCommentModels(BaseTestCase):
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            description='Test Description',
+            attachments=[
+                {
+                    'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+                    'description': 'Image 1',
+                },
+            ]
         )
         self.assertEqual(
             comment.get_absolute_url(),
@@ -126,9 +130,9 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(comment.thread.review_revision, self.review.revision)
         self.assertEqual(comment.attachments.count(), 1)
         attachment = comment.attachments.get()
-        self.assertEqual(attachment.description, 'Test Description')
+        self.assertEqual(attachment.description, 'Image 1')
         self.assertEqual(attachment.attachment_type, 'image')
-        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(attachment.sort_order, 0)
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(
