@@ -182,12 +182,6 @@
 
         {# Smooth scroll to links #}
         <script src="/static/scripts/ScrollToLink.js?{{ site_settings.CACHE_BUSTER }}"></script>
-        <script>
-            // initialize scroll lib
-            $(window).ready(function() {
-                var ScrollToLink = new DemoTime.ScrollToLink()
-            });
-        </script>
 
         {# stick elements #}
         <script src="/static/scripts/library/sticky.kit.min.js"></script>
@@ -266,7 +260,7 @@
                 });
 
                 // Update this date to trigger new blog post notifications
-                var blog_update = '20161003';
+                var blog_update = '20161031';
 
                 if (!Cookies.get('blog_entry') || Cookies.get('blog_entry') != blog_update) {
                     Cookies.set('blog_entry', blog_update);
