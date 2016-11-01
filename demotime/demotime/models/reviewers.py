@@ -66,24 +66,24 @@ class Reviewer(BaseModel):
         if not draft:
             obj.create_reviewer_event(creator)
 
-        if skip_notifications:
-            notify_reviewer = notify_creator = False
-        else:
-            notify_reviewer = creator != reviewer
-            notify_creator = creator != review.creator
-        if notify_reviewer:
-            # pylint: disable=protected-access
-            obj._send_reviewer_message(
-                notify_reviewer=True, notify_creator=False
-            )
+            if skip_notifications:
+                notify_reviewer = notify_creator = False
+            else:
+                notify_reviewer = creator != reviewer
+                notify_creator = creator != review.creator
+            if notify_reviewer:
+                # pylint: disable=protected-access
+                obj._send_reviewer_message(
+                    notify_reviewer=True, notify_creator=False
+                )
 
-        if notify_creator:
-            # pylint: disable=protected-access
-            obj._send_reviewer_message(
-                notify_reviewer=False, notify_creator=True
-            )
+            if notify_creator:
+                # pylint: disable=protected-access
+                obj._send_reviewer_message(
+                    notify_reviewer=False, notify_creator=True
+                )
 
-        review.update_reviewer_state()
+            review.update_reviewer_state()
         return obj
 
     def _send_reviewer_message(self, deleted=False, notify_reviewer=False, notify_creator=False):
@@ -171,7 +171,10 @@ class Reviewer(BaseModel):
         return self.review.update_reviewer_state()
 
     def drop_reviewer(self, dropper, draft=False):  # pylint: disable=unused-argument
-        if not draft:
+        review = self.review
+        if draft:
+            self.delete()
+        else:
             self._send_reviewer_message(deleted=True)
             Event.create_event(
                 project=self.review.project,
@@ -179,6 +182,5 @@ class Reviewer(BaseModel):
                 related_object=self.review,
                 user=self.reviewer
             )
-        review = self.review
-        self.delete()
-        review.update_reviewer_state()
+            self.delete()
+            review.update_reviewer_state()

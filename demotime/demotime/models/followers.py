@@ -53,30 +53,32 @@ class Follower(BaseModel):
         if not draft:
             obj.create_follower_event(creator)
 
-        if skip_notifications or draft:
-            notify_follower = notify_creator = False
-        else:
-            notify_follower = creator != user
-            notify_creator = creator != review.creator
-        if notify_follower:
-            # pylint: disable=protected-access
-            obj._send_follower_message(notify_follower=True)
+            if skip_notifications or draft:
+                notify_follower = notify_creator = False
+            else:
+                notify_follower = creator != user
+                notify_creator = creator != review.creator
+            if notify_follower:
+                # pylint: disable=protected-access
+                obj._send_follower_message(notify_follower=True)
 
-        if notify_creator:
-            # pylint: disable=protected-access
-            obj._send_follower_message(notify_creator=True)
+            if notify_creator:
+                # pylint: disable=protected-access
+                obj._send_follower_message(notify_creator=True)
 
         return obj
 
     def drop_follower(self, dropper, draft=False):  # pylint: disable=unused-argument
-        if not draft:
+        if draft:
+            self.delete()
+        else:
             Event.create_event(
                 project=self.review.project,
                 event_type_code=EventType.FOLLOWER_REMOVED,
                 related_object=self.review,
                 user=self.user
             )
-        self.delete()
+            self.delete()
 
     def _send_follower_message(self, notify_follower=False, notify_creator=False):
         if not notify_follower and not notify_creator:
