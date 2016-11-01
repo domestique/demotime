@@ -2,6 +2,34 @@
 {% load macros %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
+{% block meta %}
+{{ block.super }}
+<!-- for Google -->
+<meta name="description" content="{{ object.description|safe|linebreaksbr }}" />
+<meta name="author" content="{{ object.creator.userprofile }}" />
+<meta name="application-name" content="DemoTime" />
+
+<!-- for Facebook -->
+<meta property="og:title" content="DT-{{ object.pk }}: {{ object.title }}" />
+<meta property="og:type" content="article" />
+{% if revision.attachments.exists %}
+    {% for attachment in revision.attachments.all %}
+        {% if attachment.attachment_type == "image" and forloop.first %}
+            <meta property="og:image" content="https://{{ site_settings.SERVER_URL }}{% url "user-media" attachment.pk %}" />
+            <meta name="twitter:image" content="https://{{ site_settings.SERVER_URL }}{% url "user-media" attachment.pk %}" />
+        {% endif %}
+    {% endfor %}
+{% else %}
+{% endif %}
+<meta property="og:url" content="https://{{ site_settings.SERVER_URL }}/DT-{{ object.pk }}" />
+<meta property="og:description" content="{{ object.description|safe|linebreaksbr }}" />
+
+<!-- for Twitter -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="DT-{{ object.pk }}: {{ object.title }}" />
+<meta name="twitter:description" content="{{ object.description|safe|linebreaksbr }}" />
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <div class="container">
