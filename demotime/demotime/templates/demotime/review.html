@@ -291,7 +291,7 @@
                             </div>
                             <div class="form-group">
                                 <button type="button" class="new_comment_button">{% if button_text %}{{ button_text }}{% else %}Post{% endif %}</button>
-                                {% if reviewer and request.user != object.creator and reviewer.status == 'reviewing' %}
+                                {% if reviewer and request.user != object.creator and review.state == 'open' and reviewer.status != 'approved' %}
                                     <button class="button-bright reply_and_approve" data-type="approved" type="button">Reply and Approve</button>
                                 {% endif %}
                             </div>
