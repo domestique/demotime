@@ -29,7 +29,7 @@
         max-width: 175px;
         width: 100%;
     }
-    .filters input[type="submit"] {
+    .filters button[type="submit"] {
         margin-top: 10px;
     }
     .filters label {
@@ -40,7 +40,7 @@
             margin-bottom: 10px;
         }
     }
-    .filters input[type="text"] {
+    .filters button[type="text"] {
         padding: 10px;
         height: auto;
         border: 1px solid #ddd;
@@ -88,7 +88,7 @@
                     {{ form }}
                 {% endfor %}
                 <div class="form-actions">
-                    <input type="submit" value="Filter Demos">
+                    <button type="submit">Filter Demos</button>
                 </div>
             </form>
         </div>

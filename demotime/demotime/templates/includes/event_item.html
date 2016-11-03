@@ -1,18 +1,25 @@
-<div style="margin:10px 0 0">
+<div>
     <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
-        <a href="/accounts/profile/<%= moment.related_object.user_pk %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
+        <a href="<%= moment.user.url %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
     <% } else if (moment.event_type.code == 'demo-created') { %>
         This demo was <strong>created</strong>. Let the games begin
     <% } else if (moment.event_type.code == 'reviewer-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.user.name %> <strong>approves</strong>!
         <% if (moment.review.reviewing_count) { %>
-            Only <%= moment.review.reviewing_count %>
-            <% if ((moment.review.reviewing_count) > 1) { %>
-                approvals
-            <% } else { %>
-                approval
-            <% } %>
-            to go!
+            <span class="has_bubble"
+                data-prj="<%= moment.review.project.id %>"
+                data-pk="<%= moment.review.pk %>"
+                href="<%= moment.review.url %>" style="margin-left: 5px; cursor: pointer">
+                <% if (moment.review.reviewing_count) { %>
+                    <span class="icon icon-reviewing"><sup><%= moment.review.reviewing_count %></sup></span>
+                <% } %>
+                <% if (moment.review.approved_count) { %>
+                    <span class="icon icon-approved"><sup><%= moment.review.approved_count %></sup></span>
+                <% } %>
+                <% if (moment.review.rejected_count) { %>
+                    <span class="icon icon-rejected"><sup><%= moment.review.rejected_count %></sup></span>
+                <% } %>
+            </span>
         <% } %>
     <% } else if (moment.event_type.code == 'demo-approved') { %>
         <a class="icon icon-Approved"></a> This demo was <strong>fully approved</strong>!
@@ -44,8 +51,8 @@
                     <img src="<%= moment.related_object.attachments[0].static_url %>">
                 </a>
             <% } %>
-            <div class="jump_to_this"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
         </blockquote>
+        <div class="demobox-footer"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
     <% } else { %>
         <strong><%= moment.event_type.name %></strong>
     <% } %>

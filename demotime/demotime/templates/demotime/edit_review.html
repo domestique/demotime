@@ -1,9 +1,15 @@
-{% extends 'layout-review.html' %}
+{% extends 'layout-create.html' %}
 {% block title %} - Updating DT-{{ review_inst.pk }}{% endblock %}
-{% block page_title %}Updating DT-{{ review_inst.pk }}{% endblock %}
-{% block button_text %}Update demo{% endblock %}
-{% block description_leader %}Revision {% endblock %}
-{% block description_follower %}<small>Give your revision some context</small>{% endblock %}
+{% block page_title %}Updating {% if review_inst.state == "draft"%}Draft {% endif %}DT-{{ review_inst.pk }}{% endblock %}
+{% block button_text %}
+    {% if review_inst.state == "draft" %}
+        Publish Demo
+    {% else %}
+        Update demo
+    {% endif %}
+{% endblock %}
+{% block description_leader %}{% if review_inst.state != "draft" %}Revision {% endif %}{% endblock %}
+{% block description_follower %}{% if review_inst.state != "draft" %}<small>Give your revision some context</small>{% endif %}{% endblock %}
 {% block form_warning %}
 <section>
     <strong>Heads up!</strong> Adding a revision to your demo will

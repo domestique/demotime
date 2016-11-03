@@ -25,7 +25,7 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
         if ($('#events').is(':visible')) {
             this.hide_pane();
-            ScrollToLink.jump_to_link('review');
+            new DemoTime.ScrollToLink().jump_to_link('review');
         } else {
             this.show_pane();
         }

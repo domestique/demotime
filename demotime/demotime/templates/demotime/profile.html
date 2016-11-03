@@ -13,8 +13,8 @@
 {% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="/static/styles/dashboard.css">
 {{ block.super }}
+<link rel="stylesheet" href="/static/styles/dashboard.css">
 <style>
     main .avatar {
         display: block;
@@ -58,6 +58,9 @@
     }
     section label:first-child {
         margin-top: 0;
+    }
+    .demobox {
+        margin-bottom: 10px;
     }
 </style>
 {% endblock %}
@@ -110,11 +113,9 @@
             </h3>
             <section class="emph_med aggregated_dashboard-reviewing">
                 <div>
-                    <ul>
-                        {% for demo in open_reviews %}
-                            {% include "includes/reviews_li.html" %}
-                        {% endfor %}
-                    </ul>
+                    {% for demo in open_reviews %}
+                        {% include "includes/demo.html" %}
+                    {% endfor %}
                 </div>
             </section>
         {% endif %}
@@ -124,11 +125,9 @@
             </h3>
             <section class="emph_med aggregated_dashboard-following">
                 <div>
-                    <ul>
-                        {% for demo in followed_demos %}
-                            {% include "includes/reviews_li.html" %}
-                        {% endfor %}
-                    </ul>
+                    {% for demo in followed_demos %}
+                        {% include "includes/demo.html" %}
+                    {% endfor %}
                 </div>
             </section>
         {% endif %}
@@ -141,11 +140,9 @@
             </h3>
             <section class="emph_med aggregated_dashboard-created">
                 <div>
-                    <ul>
-                        {% for demo in open_demos %}
-                            {% include "includes/reviews_li.html" %}
-                        {% endfor %}
-                    </ul>
+                    {% for demo in open_demos %}
+                        {% include "includes/demo.html" %}
+                    {% endfor %}
                 </div>
             </section>
         {% endif %}

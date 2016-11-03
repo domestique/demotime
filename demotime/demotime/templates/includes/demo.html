@@ -1,6 +1,12 @@
 {% load demo_tags %}
 
-<div class="demobox {% reviewer_status demo user %} {{ demo.state }} {{ demo.reviewer_state }}">
+<div class="demobox
+        {% if request.user == demo.creator %}
+            owner
+        {% endif %}
+        {% reviewer_status demo user %}
+        {{ demo.state }}
+        {{ demo.reviewer_state }}">
     <div class="demobox-header">
         <span class="icon-{% reviewer_status demo user %}">
             <a class="has_bubble"
@@ -9,6 +15,10 @@
             href="{{ demo.get_absolute_url }}">DT-{{ demo.pk }}</a>
 
             {% include "includes/review_state.html" %}
+
+            {% if draft %}
+                <strong>- <a href="{% url 'edit-review' demo.project.slug demo.pk %}">edit this draft</a></strong>
+            {% endif %}
 
             <small class="time_stamp">
                 {{ demo.state|capfirst }}
@@ -24,5 +34,6 @@
         <a href="{{ demo.get_absolute_url }}">
             {{ demo.title }}
         </a>
+        <div class="{{ demo.reviewer_state }} {{ demo.state }}"></div>
     </div>
 </div>

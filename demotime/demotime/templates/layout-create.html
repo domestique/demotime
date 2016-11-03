@@ -38,7 +38,10 @@ h1 em {
     margin-top: 0;
 }
 .attachments {
-    margin-top: 30px;
+    margin-top: 20px;
+}
+.current_attachments .demobox {
+    margin-bottom: 10px;
 }
 @media screen and (max-width:680px) {
     h3 small {
@@ -71,6 +74,16 @@ h1 em {
                     {{ review_form.description }}
                     {{ review_form.description.errors }}
                 </div>
+                {% if review_inst.revision.attachments.exists %}
+                    <article class="current_attachments">
+                        <h3 class="icon icon-attach">Current Attachments</h3>
+                        <section class="attachments">
+                            {% for attachment in review_inst.revision.attachments.all %}
+                                {% include "includes/review_attachment.html" with project=project review_inst=review_inst attachment=attachment %}
+                            {% endfor %}
+                        </section>
+                    </article>
+                {% endif %}
                 <div class="attachments">
                     <h3 class="icon icon-attach">Attachments <small>Optionally present with screenshots, screencasts, documents, etc</small></h3>
                     {{ attachment_forms.management_form }}
@@ -114,10 +127,49 @@ h1 em {
                         <div>{{ review_form.is_public.errors }}</div>
                     </div>
                 </section>
+                {{ review_form.state }}
+                {{ review_form.trash }}
                 {% block form_warning %}{% endblock %}
                 <div class="form-group">
-                    <input type="submit" value="{% block button_text %}{% endblock %}">
-                    <input type="button" class="button-clear" value="Cancel" onclick="javascript: history.go(-1)">
+                    <div class="split by:2">
+                        <div class="cel">
+                            <button id="create-demo"
+                                onclick="$('#id_state').val('open')"
+                                type="submit">
+                                {% block button_text %}{% endblock %}
+                            </button>
+                        </div>
+                        <div class="cel right">
+                            {% if review_inst.pk %}
+                                {% if review_inst.state == 'draft' %}
+                                    <button id="save-draft"
+                                        class="button-confirm"
+                                        onclick="$('#id_state').val('draft')"
+                                        type="submit">
+                                        Save
+                                    </button>
+                                    <button id="delete-draft"
+                                        class="button-alert"
+                                        onclick="$('#id_trash').val(true)"
+                                        type="submit">
+                                        Delete
+                                    </button>
+                                {% endif %}
+                            {% else %}
+                                <button id="save-draft"
+                                    class="button-confirm"
+                                    onclick="$('#id_state').val('draft')"
+                                    type="submit">
+                                    Save Draft
+                                </button>
+                            {% endif %}
+                            <button type="button"
+                                class="button-clear"
+                                onclick="javascript: history.go(-1)">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

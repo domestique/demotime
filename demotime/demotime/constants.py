@@ -9,6 +9,8 @@ CREATED = 'created'
 COMMENT = 'comment'
 UPDATED = 'updated'
 REOPENED = 'reopened'
+DRAFT = 'draft'
+CANCELLED = 'cancelled'
 
 # Attachment Constants
 IMAGE = 'image'

@@ -102,6 +102,11 @@ urlpatterns += [
     url(r'^reviews/list/$', reviews.review_list_view, name='review-list'),
     url(r'^reviews/search/$', reviews.review_search_json_view, name='reviews-search-json'),
     url(r'^reviews/(?P<proj_slug>[\w-]+)/search/$', reviews.review_search_json_view, name='reviews-search-json'),
+    url(
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
+        reviews.delete_review_attachment_view,
+        name='delete-review-attachment'
+    ),
 ]
 
 # Messages

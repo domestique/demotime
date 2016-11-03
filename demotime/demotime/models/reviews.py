@@ -3,6 +3,7 @@ from django.db.models import Max
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from demotime.models.base import BaseModel
 from demotime.models import (
@@ -27,15 +28,19 @@ from demotime.constants import (
     REOPENED,
     CREATED,
     UPDATED,
+    DRAFT,
+    CANCELLED,
 )
 
 
 class Review(BaseModel):
 
     STATUS_CHOICES = (
+        (DRAFT, DRAFT.capitalize()),
         (OPEN, OPEN.capitalize()),
         (CLOSED, CLOSED.capitalize()),
         (ABORTED, ABORTED.capitalize()),
+        (CANCELLED, CANCELLED.capitalize()),
     )
 
     REVIEWER_STATE_CHOICES = (
@@ -56,7 +61,7 @@ class Review(BaseModel):
         through='Follower'
     )
     title = models.CharField(max_length=1024)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     case_link = models.CharField('Case URL', max_length=2048, blank=True)
     state = models.CharField(
         max_length=128, choices=STATUS_CHOICES,
@@ -150,7 +155,7 @@ class Review(BaseModel):
     @classmethod
     def create_review(
             cls, creator, title, description,
-            case_link, reviewers, project,
+            case_link, reviewers, project, state=OPEN,
             is_public=False, followers=None, attachments=None):
         ''' Standard review creation method '''
         obj = cls.objects.create(
@@ -158,7 +163,7 @@ class Review(BaseModel):
             title=title,
             description=description,
             case_link=case_link,
-            state=OPEN,
+            state=state,
             reviewer_state=REVIEWING,
             project=project,
             is_public=is_public,
@@ -177,23 +182,28 @@ class Review(BaseModel):
             )
 
         # Events
-        Event.create_event(
-            project,
-            EventType.DEMO_CREATED,
-            obj,
-            creator
-        )
+        if state != DRAFT:
+            Event.create_event(
+                project,
+                EventType.DEMO_CREATED,
+                obj,
+                creator
+            )
 
         for reviewer in reviewers:
-            Reviewer.create_reviewer(obj, reviewer, creator, True)
+            Reviewer.create_reviewer(
+                obj, reviewer, creator, True, draft=state == DRAFT
+            )
             UserReviewStatus.create_user_review_status(
-                obj, reviewer
+                obj, reviewer,
             )
 
         for follower in followers:
-            Follower.create_follower(obj, follower, creator, True)
+            Follower.create_follower(
+                obj, follower, creator, True, draft=state == DRAFT
+            )
             UserReviewStatus.create_user_review_status(
-                obj, follower
+                obj, follower,
             )
 
         # Creator UserReviewStatus, set read to True, cuz they just created it
@@ -202,13 +212,11 @@ class Review(BaseModel):
             obj, obj.creator, True
         )
 
-        # Messages
-        obj._send_revision_messages()  # pylint: disable=protected-access
+        if state == OPEN:
+            obj._send_revision_messages()  # pylint: disable=protected-access
+            Reminder.create_reminders_for_review(obj)
+            obj.trigger_webhooks(CREATED)
 
-        # Reminders
-        Reminder.create_reminders_for_review(obj)
-
-        obj.trigger_webhooks(CREATED)
         return obj
 
     # pylint: disable=too-many-arguments
@@ -216,23 +224,44 @@ class Review(BaseModel):
     @classmethod
     def update_review(
             cls, review, creator, title, description,
-            case_link, reviewers, project,
+            case_link, reviewers, project, state=OPEN,
             is_public=False, followers=None, attachments=None
         ):
         ''' Standard update review method '''
+        # Figure out if we have a state transition
         obj = cls.objects.get(pk=review)
+        current_state = obj.state
         obj.title = title
         obj.case_link = case_link
         obj.project = project
         obj.is_public = is_public
         obj.save()
-        prev_revision = obj.revision
-        rev_count = obj.reviewrevision_set.count()
-        rev = ReviewRevision.objects.create(
-            review=obj,
-            description=description,
-            number=rev_count + 1
-        )
+
+        state_change = False
+        is_update = False
+        if current_state == DRAFT and state == OPEN:
+            state_change = True
+
+        if state == DRAFT or state_change:
+            obj.description = description
+            # We want the created time to represent when the user started the
+            # Demo, not when they created the draft
+            obj.created = timezone.now()
+            obj.save()
+            rev = obj.revision
+            rev.description = description
+            rev.save()
+            prev_revision = None
+
+        if state != DRAFT and not state_change:
+            is_update = True
+            prev_revision = obj.revision
+            rev_count = obj.reviewrevision_set.count()
+            rev = ReviewRevision.objects.create(
+                review=obj,
+                description=description,
+                number=rev_count + 1
+            )
         for attachment in attachments:
             Attachment.create_attachment(
                 attachment=attachment['attachment'],
@@ -242,38 +271,47 @@ class Review(BaseModel):
             )
 
         # No attachments, we'll copy them over
-        if not attachments:
+        if prev_revision and not attachments:
             for attachment in prev_revision.attachments.all():
                 attachment.content_object = rev
                 attachment.pk = None
                 attachment.save()
 
         # Events
-        Event.create_event(
-            project,
-            EventType.DEMO_UPDATED,
-            obj,
-            creator
-        )
+        if state == OPEN and not state_change:
+            Event.create_event(
+                project,
+                EventType.DEMO_UPDATED,
+                obj,
+                creator
+            )
 
         for reviewer in reviewers:
             try:
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
-                reviewer = Reviewer.create_reviewer(obj, reviewer, creator, True)
+                reviewer = Reviewer.create_reviewer(
+                    obj, reviewer, creator, True, draft=state == DRAFT
+                )
             else:
                 reviewer.status = REVIEWING
                 reviewer.save()
                 obj.update_reviewer_state()
+                if state_change:
+                    reviewer.create_reviewer_event(creator)
 
         for follower in followers:
             try:
-                Follower.objects.get(review=obj, user=follower)
+                follower = Follower.objects.get(review=obj, user=follower)
             except Follower.DoesNotExist:
                 Follower.create_follower(
                     review=obj, user=follower,
-                    creator=creator, skip_notifications=True
+                    creator=creator, skip_notifications=True,
+                    draft=state == DRAFT
                 )
+            else:
+                if state_change:
+                    follower.create_follower_event(creator)
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
@@ -282,22 +320,25 @@ class Review(BaseModel):
 
         # Drop Reviewers no longer assigned
         reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
+        skip_drop_events = state == DRAFT or state_change
         for reviewer in reviewers:
-            reviewer.drop_reviewer(obj.creator)
+            reviewer.drop_reviewer(obj.creator, draft=skip_drop_events)
         followers = obj.follower_set.exclude(review=obj, user__in=followers)
         for follower in followers:
-            follower.drop_follower(obj.creator)
+            follower.drop_follower(obj.creator, draft=skip_drop_events)
 
-        if obj.state in (CLOSED, ABORTED):
-            obj.update_state(OPEN)
+        if is_update:
+            # pylint: disable=protected-access
+            obj._send_revision_messages(update=True)
+            obj.trigger_webhooks(UPDATED)
+            Reminder.update_reminders_for_review(obj)
+            if obj.state in (CLOSED, ABORTED):
+                obj.update_state(OPEN)
 
-        # Messages
-        obj._send_revision_messages(update=True)  # pylint: disable=protected-access
+        if state_change:
+            obj.update_state(state)
+            obj._send_revision_messages() # pylint: disable=protected-access
 
-        # Reminders
-        Reminder.update_reminders_for_review(obj)
-
-        obj.trigger_webhooks(UPDATED)
         return obj
 
     def _change_reviewer_state(self, state):
@@ -371,12 +412,24 @@ class Review(BaseModel):
 
         return False, ''
 
+    def _open_review(self, state):
+        self.state = state
+        self.save(update_fields=['state', 'modified'])
+        Event.create_event(
+            self.project,
+            EventType.DEMO_CREATED,
+            self,
+            self.creator
+        )
+        Reminder.create_reminders_for_review(self)
+        return True
+
     def _reopen_review(self, state):
         # We take a state because this can be closed or aborted, it's okay
         # we don't judge
         prev_state = self.get_state_display()
         self.state = state
-        self.save(update_fields=['state'])
+        self.save(update_fields=['state', 'modified'])
         Event.create_event(
             self.project,
             EventType.DEMO_OPENED,
@@ -455,7 +508,10 @@ class Review(BaseModel):
 
     def update_state(self, new_state):
         state_changed = False
-        if self.state == OPEN and new_state == CLOSED:
+        if self.state == DRAFT and new_state == OPEN:
+            state_changed = self._open_review(new_state)
+            self.trigger_webhooks(CREATED)
+        elif self.state == OPEN and new_state == CLOSED:
             state_changed = self._close_review(new_state)
             self.trigger_webhooks(CLOSED)
         elif self.state == OPEN and new_state == ABORTED:
@@ -467,6 +523,9 @@ class Review(BaseModel):
         elif self.state == ABORTED and new_state == OPEN:
             state_changed = self._reopen_review(new_state)
             self.trigger_webhooks(REOPENED)
+        elif self.state == DRAFT and new_state == CLOSED:
+            self.state = CANCELLED
+            self.save()
 
         if state_changed:
             self._common_state_change()

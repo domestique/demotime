@@ -40,7 +40,6 @@ class TestReviewerModels(BaseTestCase):
         obj.refresh_from_db()
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
 
-
     def test_drop_reviewer(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         models.MessageBundle.objects.all().delete()
@@ -58,6 +57,19 @@ class TestReviewerModels(BaseTestCase):
         )
         self.assertEqual(event.user, reviewer.reviewer)
         self.assertEqual(event.related_object, obj)
+
+    def test_drop_reviewer_draft(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        models.MessageBundle.objects.all().delete()
+        reviewer = obj.reviewer_set.last()
+        reviewer.drop_reviewer(obj.creator, draft=True)
+        self.assertEqual(models.MessageBundle.objects.count(), 0)
+        self.assertEqual(
+            models.Event.objects.filter(
+                event_type__code=models.EventType.REVIEWER_REMOVED
+            ).count(),
+            0
+        )
 
     def test_drop_reviewer_updates_state_approved(self):
         test_user_1 = User.objects.get(username='test_user_1')

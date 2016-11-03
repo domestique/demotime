@@ -37,15 +37,19 @@ ul {
 @media screen and (max-width: 1000px) {
     .cradle {
         margin: 0 auto;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: 15px;
+        padding-right: 15px;
     }
 }
 @media screen and (max-width: 480px) {
     .cradle {
-        padding-left: 5px;
-        padding-right: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
     }
+}
+
+.right {
+    text-align: right;
 }
 
 h3 {
@@ -104,15 +108,27 @@ section .demobox p:first-child {
     box-shadow: 4px 4px 0 #dddddd;
     box-sizing: border-box;
 }
-.demobox-header {
+.demobox-header,
+.demobox-footer {
     clear: both;
-    text-align: left;
     background: #f0f0f0;
+    color: #666666;
+    font-size: 12px;
+}
+.demobox-header strong a {
+    font-weight: 700;
+}
+
+.demobox-header {
+    text-align: left;
     padding: 10px;
     margin: 0 0 5px;
-    color: #666666;
-    margin: 0;
-    font-size: 12px;
+}
+.demobox-footer {
+    background: #f7f7f7;
+    padding: 5px 10px;
+    text-align: right;
+    margin: 15px 0 0;
 }
 .demobox-body {
     padding: 10px;
@@ -166,7 +182,6 @@ li {
 .content a {
     color: #2a9c86;
     text-decoration: none;
-    font-weight: 700;
 }
 .content a:hover {
     text-decoration: underline;
@@ -210,7 +225,6 @@ a.button-link:hover {
     background: #f14d51;
     color: #ffffff;
 }
-input[type='button'].reply_and_approve,
 .subnav a.subnav-item.confirm {
     background-color: #ffd94b;
     color: #555555;
@@ -492,4 +506,46 @@ h3 small {
     color: #dddddd;
     font-weight: 700;
     font-size: 9px;
+}
+
+.events strong a {
+    font-weight: 700;
+}
+.events blockquote {
+    padding: 8px;
+    border: 1px dashed #e0e0e0;
+}
+.events .demobox {
+    margin: 0 3px 15px 0;
+}
+
+/* Attachment cards appear in a demo
+ * as well as in a demo edit page (drafts) */
+@media screen and (max-width:680px) {
+    .attachment-card.image {
+        width: 100%;
+        float: none;
+    }
+}
+.attachment-card.movie,
+.attachment-card.document,
+.attachment-card.audio,
+.attachment-card.other {
+    clear: both;
+}
+.attachment-card video {
+    max-width: 100%;
+    width: 100%;
+    max-height: 500px;
+}
+.attachment-card.audio {
+    width: 100%;
+    height: auto;
+}
+.attachment-card img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 240px;
+    margin: 0 auto;
 }

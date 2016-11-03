@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from demotime import models
+from demotime import constants, models
+from demotime.constants import DRAFT, OPEN
 
 
 class ReviewQuickEditForm(forms.Form):
@@ -18,19 +19,49 @@ class ReviewQuickEditForm(forms.Form):
 
 class ReviewForm(forms.ModelForm):
 
+    state = forms.ChoiceField(
+        choices=(
+            (DRAFT, DRAFT.capitalize()),
+            (OPEN, OPEN.capitalize()),
+        ),
+        widget=forms.HiddenInput()
+    )
+
     def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
         self.project = project
         user_queryset = self.project.project_members.exclude(pk=user.pk)
         self.fields['reviewers'].queryset = user_queryset
+        self.fields['reviewers'].required = False
         self.fields['followers'].queryset = user_queryset
         self.fields['followers'].required = False
 
-        for key, value in self.fields.items():
+        for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
         if self.instance.pk:
             self.fields['description'].required = False
+            self.fields['trash'] = forms.BooleanField(
+                required=False,
+                widget=forms.HiddenInput,
+            )
+
+    def clean(self):
+        data = super().clean()
+        if self.instance.pk and data.get('trash'):
+            for key, _ in list(self.errors.items()):
+                del self.errors[key]
+            return data
+
+        state = data.get('state')
+        skip_deep_clean = state == constants.DRAFT or state == constants.CANCELLED
+        if not skip_deep_clean and not data.get('reviewers'):
+            self.add_error('reviewers', 'This field is required')
+
+        if not skip_deep_clean and not data.get('description'):
+            self.add_error('description', 'This field is required')
+
+        return data
 
     class Meta:
         model = models.Review
@@ -44,7 +75,10 @@ class ReviewFilterForm(forms.Form):
 
     STATE_CHOICES = (
         ('', '-----------'),
-    ) + models.Review.STATUS_CHOICES
+        (constants.OPEN, constants.OPEN.capitalize()),
+        (constants.CLOSED, constants.CLOSED.capitalize()),
+        (constants.ABORTED, constants.ABORTED.capitalize()),
+    )
 
     REVIEWER_STATE_CHOICES = (
         ('', '-----------'),
@@ -96,7 +130,7 @@ class ReviewFilterForm(forms.Form):
     def __init__(self, projects, *args, **kwargs):
         super(ReviewFilterForm, self).__init__(*args, **kwargs)
         self.projects = projects
-        for key, value in self.fields.items():
+        for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
 
     def get_reviews(self, initial_qs=None):
@@ -107,7 +141,13 @@ class ReviewFilterForm(forms.Form):
             return models.Review.objects.none()
 
         qs = models.Review.objects.all() if not initial_qs else initial_qs
-        qs = qs.filter(project__in=self.projects)
+        qs = qs.filter(
+            project__in=self.projects
+        ).exclude(
+            state=constants.DRAFT
+        ).exclude(
+            state=constants.CANCELLED
+        )
         data = self.cleaned_data
         if data.get('reviewer'):
             qs = qs.filter(reviewer__reviewer=data['reviewer'])

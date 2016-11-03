@@ -2,9 +2,11 @@ from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
 from django.views.generic import TemplateView, DetailView, ListView, RedirectView
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.utils.decorators import method_decorator
+from django.http import HttpResponseBadRequest
 
-from demotime import forms, models
+from demotime import constants, forms, models
 from demotime.views import CanViewMixin, CanViewJsonView, JsonView
 
 
@@ -99,7 +101,9 @@ class CreateReviewView(TemplateView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = None
+        self.review = None
         self.review_inst = None
+        self.comment_form = None
         self.review_form = None
         self.attachment_forms = None
 
@@ -127,13 +131,27 @@ class CreateReviewView(TemplateView):
             project=self.project,
             data=request.POST
         )
-        AttachmentFormSet = formset_factory(forms.DemoAttachmentForm, extra=10, max_num=25)
+        # pylint: disable=invalid-name
+        AttachmentFormSet = formset_factory(
+            forms.DemoAttachmentForm, extra=10, max_num=25
+        )
         self.attachment_forms = AttachmentFormSet(
             data=request.POST,
             files=request.FILES
         )
         if self.review_form.is_valid() and self.attachment_forms.is_valid():
             data = self.review_form.cleaned_data
+            trash = data.pop('trash', None)
+            if trash:
+                if self.review_inst and self.review_inst.state == constants.DRAFT:
+                    # Draft deleted!
+                    self.review_inst.delete()
+                    return redirect('index')
+                else:
+                    return HttpResponseBadRequest(
+                        'You can not delete a Demo that has been opened'
+                    )
+
             data['creator'] = request.user
             data['project'] = self.project
             data['attachments'] = []
@@ -164,19 +182,27 @@ class CreateReviewView(TemplateView):
         if request.method == 'GET':
             # If we're using this method as the POST error path, let's
             # preserve the existing forms. Also, maybe this is dumb?
+            description = ''
             if pk:
                 self.review_inst = get_object_or_404(models.Review, pk=pk)
                 self.template_name = 'demotime/edit_review.html'
+                if self.review_inst.state == constants.DRAFT:
+                    description = self.review_inst.description
             else:
                 self.review_inst = models.Review(creator=self.request.user)
             self.review_form = forms.ReviewForm(
                 user=self.request.user,
                 instance=self.review_inst,
                 project=self.project,
-                initial={'description': ''},
+                initial={'description': description},
             )
-            AttachmentFormSet = formset_factory(forms.DemoAttachmentForm, extra=10, max_num=25)
-            initial_data = [{'sort_order': x} for x in range(1, AttachmentFormSet.extra + 1)]
+            # pylint: disable=invalid-name
+            AttachmentFormSet = formset_factory(
+                forms.DemoAttachmentForm, extra=10, max_num=25
+            )
+            initial_data = [
+                {'sort_order': x} for x in range(1, AttachmentFormSet.extra + 1)
+            ]
             self.attachment_forms = AttachmentFormSet(initial=initial_data)
         return super(CreateReviewView, self).get(request, *args, **kwargs)
 
@@ -231,9 +257,9 @@ class ReviewerStatusView(CanViewJsonView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.reviewer = None
         self.review = None
         self.project = None
+        self.reviewer = None
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -245,8 +271,7 @@ class ReviewerStatusView(CanViewJsonView):
         self.project = self.review.project
         return super(ReviewerStatusView, self).dispatch(*args, **kwargs)
 
-    # pylint: disable=unused-argument
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs):  # pylint: disable=unused-argument
         form = forms.ReviewerStatusForm(self.reviewer, data=self.request.POST)
         if form.is_valid():
             state_changed, new_state = self.reviewer.set_status(
@@ -286,8 +311,7 @@ class ReviewStateView(CanViewJsonView):
         self.project = self.review.project
         return super(ReviewStateView, self).dispatch(*args, **kwargs)
 
-    # pylint: disable=unused-argument
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs): # pylint: disable=unused-argument
         form = forms.ReviewStateForm(
             self.request.user, self.review.pk, data=self.request.POST
         )
@@ -326,12 +350,10 @@ class ReviewJsonView(CanViewJsonView):
         self.project = self.review.project
         return super(ReviewJsonView, self).dispatch(*args, **kwargs)
 
-    # pylint: disable=unused-argument
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         return self.review.to_json()
 
-    # pylint: disable=unused-argument
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         if self.review.creator != request.user:
             self.status = 403
             return {
@@ -357,6 +379,37 @@ class ReviewJsonView(CanViewJsonView):
         return json_dict
 
 
+class DeleteReviewAttachmentView(CanViewJsonView):
+
+    status = 204
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.review = None
+        self.project = None
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.review = get_object_or_404(
+            models.Review, pk=kwargs['review_pk'], creator=request.user,
+            state=constants.DRAFT
+        )
+        self.project = self.review.project
+        return super(DeleteReviewAttachmentView, self).dispatch(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        ct = ContentType.objects.get(app_label='demotime', model='reviewrevision')
+        attachment_pk = kwargs['attachment_pk']
+        attachment = get_object_or_404(
+            models.Attachment, pk=attachment_pk,
+            content_type=ct, object_id=self.review.revision.pk
+        )
+        attachment.delete()
+        return {
+            'success': True,
+        }
+
+
 class ReviewSearchJsonView(JsonView):
 
     def __init__(self, *args, **kwargs):
@@ -377,8 +430,7 @@ class ReviewSearchJsonView(JsonView):
             )
         return super(ReviewSearchJsonView, self).dispatch(*args, **kwargs)
 
-    # pylint: disable=unused-argument
-    def post(self, *args, **kwargs):
+    def post(self, *args, **kwargs):  # pylint: disable=unused-argument
         form = forms.ReviewFilterForm(
             self.projects,
             data=self.request.POST
@@ -420,3 +472,4 @@ review_json_view = ReviewJsonView.as_view()
 review_search_json_view = ReviewSearchJsonView.as_view()
 review_list_view = ReviewListView.as_view()
 dt_redirect_view = DTRedirectView.as_view()
+delete_review_attachment_view = DeleteReviewAttachmentView.as_view()

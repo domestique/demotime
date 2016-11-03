@@ -47,37 +47,43 @@ class Reviewer(BaseModel):
     def reviewer_display_name(self):
         return self.reviewer.userprofile.display_name or self.reviewer.username
 
+    def create_reviewer_event(self, user):
+        Event.create_event(
+            project=self.review.project,
+            event_type_code=EventType.REVIEWER_ADDED,
+            related_object=self,
+            user=user
+        )
+
     @classmethod
-    def create_reviewer(cls, review, reviewer, creator, skip_notifications=False):
+    def create_reviewer(cls, review, reviewer, creator,
+                        skip_notifications=False, draft=False):
         obj = cls.objects.create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
         )
-        Event.create_event(
-            project=review.project,
-            event_type_code=EventType.REVIEWER_ADDED,
-            related_object=obj,
-            user=creator
-        )
-        if skip_notifications:
-            notify_reviewer = notify_creator = False
-        else:
-            notify_reviewer = creator != reviewer
-            notify_creator = creator != review.creator
-        if notify_reviewer:
-            # pylint: disable=protected-access
-            obj._send_reviewer_message(
-                notify_reviewer=True, notify_creator=False
-            )
+        if not draft:
+            obj.create_reviewer_event(creator)
 
-        if notify_creator:
-            # pylint: disable=protected-access
-            obj._send_reviewer_message(
-                notify_reviewer=False, notify_creator=True
-            )
+            if skip_notifications:
+                notify_reviewer = notify_creator = False
+            else:
+                notify_reviewer = creator != reviewer
+                notify_creator = creator != review.creator
+            if notify_reviewer:
+                # pylint: disable=protected-access
+                obj._send_reviewer_message(
+                    notify_reviewer=True, notify_creator=False
+                )
 
-        review.update_reviewer_state()
+            if notify_creator:
+                # pylint: disable=protected-access
+                obj._send_reviewer_message(
+                    notify_reviewer=False, notify_creator=True
+                )
+
+            review.update_reviewer_state()
         return obj
 
     def _send_reviewer_message(self, deleted=False, notify_reviewer=False, notify_creator=False):
@@ -164,14 +170,17 @@ class Reviewer(BaseModel):
             )
         return self.review.update_reviewer_state()
 
-    def drop_reviewer(self, dropper):  # pylint: disable=unused-argument
-        self._send_reviewer_message(deleted=True)
-        Event.create_event(
-            project=self.review.project,
-            event_type_code=EventType.REVIEWER_REMOVED,
-            related_object=self.review,
-            user=self.reviewer
-        )
+    def drop_reviewer(self, dropper, draft=False):  # pylint: disable=unused-argument
         review = self.review
-        self.delete()
-        review.update_reviewer_state()
+        if draft:
+            self.delete()
+        else:
+            self._send_reviewer_message(deleted=True)
+            Event.create_event(
+                project=self.review.project,
+                event_type_code=EventType.REVIEWER_REMOVED,
+                related_object=self.review,
+                user=self.reviewer
+            )
+            self.delete()
+            review.update_reviewer_state()
