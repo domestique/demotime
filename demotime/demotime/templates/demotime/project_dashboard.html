@@ -72,7 +72,7 @@
                         </td>
                         <td width="240">
                             <ul>
-                                {% for reviewer in demo.reviewer_set.all %}
+                                {% for reviewer in demo.reviewer_set.active %}
                                     <li>
                                         <a class="icon icon-{{ reviewer.get_status_display }}"
                                         href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">

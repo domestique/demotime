@@ -5,12 +5,20 @@ from demotime.models.base import BaseModel
 from demotime.models import Event, EventType, Message
 
 
+class FollowerManager(models.Manager):
+
+    def active(self):
+        return self.filter(is_active=True)
+
+
 class Follower(BaseModel):
 
     review = models.ForeignKey('Review')
     user = models.ForeignKey('auth.User')
     events = GenericRelation('Event')
     is_active = models.BooleanField(default=True, db_index=True)
+
+    objects = FollowerManager()
 
     @property
     def display_name(self):

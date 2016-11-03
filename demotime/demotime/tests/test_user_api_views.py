@@ -320,7 +320,7 @@ class TestUserApiReviewers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(
-            self.review.reviewer_set.filter(is_active=True).count(), 1
+            self.review.reviewer_set.active().count(), 1
         )
         event = self.review.event_set.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
@@ -353,7 +353,7 @@ class TestUserApiReviewers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(
-            self.review.reviewer_set.filter(is_active=True).count(), 1
+            self.review.reviewer_set.active().count(), 1
         )
         self.assertEqual(self.review.reviewer_state, constants.APPROVED)
         event = self.review.event_set.get(
@@ -454,7 +454,7 @@ class TestUserApiReviewers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(
-            self.review.reviewer_set.filter(is_active=True).count(), 1
+            self.review.reviewer_set.active().count(), 1
         )
         event = self.review.event_set.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
@@ -759,7 +759,7 @@ class TestUserApiFollowers(BaseTestCase):
             'errors': {}
         })
         self.assertEqual(
-            self.review.follower_set.filter(is_active=True).count(), 1
+            self.review.follower_set.active().count(), 1
         )
         event = self.review.event_set.get(
             event_type__code=models.EventType.FOLLOWER_REMOVED

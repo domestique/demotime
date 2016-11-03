@@ -22,9 +22,4 @@ class Migration(migrations.Migration):
             name='is_active',
             field=models.BooleanField(db_index=True, default=True),
         ),
-        migrations.AlterField(
-            model_name='review',
-            name='state',
-            field=models.CharField(choices=[('draft', 'Draft'), ('open', 'Open'), ('closed', 'Closed'), ('aborted', 'Aborted'), ('cancelled', 'Cancelled')], db_index=True, default='open', max_length=128),
-        ),
     ]

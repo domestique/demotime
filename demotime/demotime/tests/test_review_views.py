@@ -29,37 +29,53 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
         followed_kwargs = self.default_review_kwargs.copy()
         followed_kwargs['creator'] = self.test_users[0]
-        followed_kwargs['reviewers'] = self.test_users.exclude(pk=self.test_users[0].pk)
+        followed_kwargs['reviewers'] = self.test_users.exclude(
+            pk=self.test_users[0].pk
+        )
         followed_kwargs['followers'] = [self.user]
         followed_review = models.Review.create_review(**followed_kwargs)
 
         reviewer_kwargs = self.default_review_kwargs.copy()
         reviewer_kwargs['creator'] = self.test_users[0]
-        reviewer_kwargs['followers'] = self.test_users.exclude(pk=self.test_users[0].pk)
+        reviewer_kwargs['followers'] = self.test_users.exclude(
+            pk=self.test_users[0].pk
+        )
         reviewer_kwargs['reviewers'] = [self.user]
         reviewer_review = models.Review.create_review(**reviewer_kwargs)
+
+        deleted_reviewer_kwargs = self.default_review_kwargs.copy()
+        deleted_reviewer_kwargs['reviewers'] = [self.user]
+        deleted_reviewer_kwargs['creator'] = self.test_users[0]
+        deleted_reviewer_review = models.Review.create_review(
+            **deleted_reviewer_kwargs
+        )
+        deleted_reviewer = deleted_reviewer_review.reviewer_set.active()[0]
+        deleted_reviewer.drop_reviewer(deleted_reviewer_review.creator)
+
+        deleted_follower_kwargs = self.default_review_kwargs.copy()
+        deleted_follower_kwargs['followers'] = [self.user]
+        deleted_follower_kwargs['creator'] = self.followers[0]
+        deleted_follower_review = models.Review.create_review(
+            **deleted_follower_kwargs
+        )
+        deleted_follower = deleted_follower_review.follower_set.active()[0]
+        deleted_follower.drop_follower(deleted_follower_review.creator)
 
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         self.assertTemplateUsed(response, 'demotime/index.html')
-        for key in ['open_demos', 'open_reviews', 'updated_demos',
-                    'drafts', 'message_bundles', 'followed_demos']:
-            assert key in response.context
+        for key in ['open_demos', 'open_reviews', 'drafts',
+                    'message_bundles', 'followed_demos']:
+            self.assertIn(key, response.context)
 
         self.assertIn(followed_review, response.context['followed_demos'])
+        self.assertNotIn(deleted_follower_review, response.context['followed_demos'])
         self.assertIn(self.review, response.context['open_demos'])
         self.assertIn(reviewer_review, response.context['open_reviews'])
+        self.assertNotIn(deleted_reviewer_review, response.context['open_reviews'])
         self.assertIn(draft_review, response.context['drafts'])
-        self.assertEqual(
-            list(response.context['updated_demos'].values_list('pk', flat=True)),
-            list(
-                models.UserReviewStatus.objects.filter(
-                    user=self.user
-                ).values_list('pk', flat=True)
-            )
-        )
-        self.assertEqual(models.Review.objects.count(), 4)
-        self.assertEqual(len(response.context['message_bundles']), 2)
+        self.assertEqual(models.Review.objects.count(), 6)
+        self.assertEqual(len(response.context['message_bundles']), 4)
 
     def test_index_does_not_hide_approved_reviews_from_open_reviews(self):
         review_one_kwargs = self.default_review_kwargs.copy()
@@ -130,6 +146,25 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                 read=False,
                 deleted=False,
             ).exists()
+        )
+
+    def test_review_detail_hides_inactive_reviewer_followers(self):
+        reviewer = self.review.reviewer_set.active()[0]
+        follower = self.review.follower_set.active()[0]
+        reviewer.drop_reviewer(self.review.creator)
+        follower.drop_follower(self.review.creator)
+        response = self.client.get(reverse(
+            'review-detail',
+            args=[self.project.slug, self.review.pk]
+        ))
+        self.assertStatusCode(response, 200)
+        self.assertNotIn(
+            reviewer.reviewer.userprofile.name,
+            response.content.decode('utf-8')
+        )
+        self.assertNotIn(
+            follower.user.userprofile.name,
+            response.content.decode('utf-8')
         )
 
     def test_get_draft_review_as_creator(self):
@@ -482,7 +517,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
         self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
+        self.assertEqual(obj.follower_set.active().count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 3)
         self.assertEqual(obj.state, constants.DRAFT)
 
@@ -536,8 +571,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.description, 'Updated Description')
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
-        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 3)
-        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.follower_set.active().count(), 0)
         self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.revision.attachments.count(), 3)
         self.assertEqual(
@@ -593,8 +628,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.description, 'Updated Description')
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
-        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 3)
-        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.follower_set.active().count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(
             models.Message.objects.filter(title__contains='POST').count(),
@@ -739,8 +774,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.revision.description, 'Updated Description')
         self.assertEqual(obj.case_link, 'http://www.example.org/1/')
-        self.assertEqual(obj.reviewer_set.filter(is_active=True).count(), 3)
-        self.assertEqual(obj.follower_set.filter(is_active=True).count(), 0)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.follower_set.active().count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 1)
         attachment = obj.revision.attachments.get()
         self.assertEqual(attachment.attachment_type, 'image')

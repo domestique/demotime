@@ -126,10 +126,10 @@ class UserAPI(JsonView):
                 success=False
             )
 
-        followers = self.review.follower_set.filter(is_active=True).values_list(
+        followers = self.review.follower_set.active().values_list(
             'user__pk', flat=True
         )
-        reviewers = self.review.reviewer_set.filter(is_active=True).values_list(
+        reviewers = self.review.reviewer_set.active().values_list(
             'reviewer__pk', flat=True
         )
         excluded_pks = tuple(followers) + tuple(reviewers) + (self.review.creator.pk,)
@@ -257,7 +257,7 @@ class UserAPI(JsonView):
                 success=False
             )
 
-        reviewers = self.review.reviewer_set.filter(is_active=True).values_list(
+        reviewers = self.review.reviewer_set.active().values_list(
             'reviewer', flat=True
         )
         excluded_pks =  tuple(reviewers) + (self.review.creator.pk,)

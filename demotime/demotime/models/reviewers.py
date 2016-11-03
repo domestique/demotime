@@ -7,7 +7,16 @@ from demotime.constants import (
     APPROVED,
     REJECTED
 )
-from demotime.models import Event, EventType, Message, Reminder
+from demotime.models import (
+    Event, EventType, Message,
+    Reminder
+)
+
+
+class ReviewerManager(models.Manager):
+
+    def active(self):
+        return self.filter(is_active=True)
 
 
 class Reviewer(BaseModel):
@@ -26,6 +35,8 @@ class Reviewer(BaseModel):
     )
     events = GenericRelation('Event')
     is_active = models.BooleanField(default=True, db_index=True)
+
+    objects = ReviewerManager()
 
     def __str__(self):
         return '{} Reviewer on {}'.format(
@@ -158,7 +169,7 @@ class Reviewer(BaseModel):
         )
 
         # Send a message if this isn't the last person to approve/reject
-        all_statuses = self.review.reviewer_set.filter(is_active=True).values_list(
+        all_statuses = self.review.reviewer_set.active().values_list(
             'status', flat=True
         )
         consensus = all(x == APPROVED for x in all_statuses) or all(

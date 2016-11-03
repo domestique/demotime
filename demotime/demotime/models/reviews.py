@@ -82,10 +82,10 @@ class Review(BaseModel):
     def to_json(self):
         reviewers = []
         followers = []
-        for reviewer in self.reviewer_set.filter(is_active=True):
+        for reviewer in self.reviewer_set.active():
             reviewers.append(reviewer.to_json())
 
-        for follower in self.follower_set.filter(is_active=True):
+        for follower in self.follower_set.active():
             followers.append(follower.to_json())
 
         return {
@@ -120,7 +120,7 @@ class Review(BaseModel):
         if update:
             title = 'Update on Review: {}'.format(self.title)
 
-        for reviewer in self.reviewer_set.filter(is_active=True):
+        for reviewer in self.reviewer_set.active():
             context = {
                 'receipient': reviewer.reviewer,
                 'url': self.get_absolute_url(),
@@ -135,7 +135,7 @@ class Review(BaseModel):
                 revision=self.revision,
             )
 
-        for follower in self.follower_set.filter(is_active=True):
+        for follower in self.follower_set.active():
             context = {
                 'receipient': follower.user,
                 'url': self.get_absolute_url(),
@@ -394,7 +394,7 @@ class Review(BaseModel):
             raise RuntimeError('Invalid Demo State')
 
     def update_reviewer_state(self):
-        statuses = self.reviewer_set.filter(is_active=True).values_list(
+        statuses = self.reviewer_set.active().values_list(
             'status', flat=True
         )
         approved = all(status == APPROVED for status in statuses)
