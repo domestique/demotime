@@ -6,13 +6,20 @@
     <% } else if (moment.event_type.code == 'reviewer-approved') { %>
         <a class="icon icon-Approved"></a> <%= moment.user.name %> <strong>approves</strong>!
         <% if (moment.review.reviewing_count) { %>
-            Only <%= moment.review.reviewing_count %>
-            <% if ((moment.review.reviewing_count) > 1) { %>
-                approvals
-            <% } else { %>
-                approval
-            <% } %>
-            to go!
+            <span class="has_bubble"
+                data-prj="<%= moment.review.project.id %>"
+                data-pk="<%= moment.review.pk %>"
+                href="<%= moment.review.url %>" style="margin-left: 5px; cursor: pointer">
+                <% if (moment.review.reviewing_count) { %>
+                    <span class="icon icon-reviewing"><sup><%= moment.review.reviewing_count %></sup></span>
+                <% } %>
+                <% if (moment.review.approved_count) { %>
+                    <span class="icon icon-approved"><sup><%= moment.review.approved_count %></sup></span>
+                <% } %>
+                <% if (moment.review.rejected_count) { %>
+                    <span class="icon icon-rejected"><sup><%= moment.review.rejected_count %></sup></span>
+                <% } %>
+            </span>
         <% } %>
     <% } else if (moment.event_type.code == 'demo-approved') { %>
         <a class="icon icon-Approved"></a> This demo was <strong>fully approved</strong>!

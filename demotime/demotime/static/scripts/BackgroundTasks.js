@@ -104,7 +104,7 @@ DemoTime.BackgroundTasks = Backbone.View.extend({
                                 // self.options.noty = null;
                                 // See site activity
                                 self.options.last_pk = data.bundles[0].bundle_pk;
-                                ScrollToLink.jump_to_link('review');
+                                new DemoTime.ScrollToLink().jump_to_link('review');
                                 if ($('#events').is(':visible')) {
                                     $('#refresh_events').click();
                                 } else {

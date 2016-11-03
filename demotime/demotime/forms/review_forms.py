@@ -32,6 +32,7 @@ class ReviewForm(forms.ModelForm):
         self.project = project
         user_queryset = self.project.project_members.exclude(pk=user.pk)
         self.fields['reviewers'].queryset = user_queryset
+        self.fields['reviewers'].required = False
         self.fields['followers'].queryset = user_queryset
         self.fields['followers'].required = False
 
@@ -46,14 +47,21 @@ class ReviewForm(forms.ModelForm):
             )
 
     def clean(self):
-        data = self.cleaned_data
+        data = super().clean()
         if self.instance.pk and data.get('trash'):
             for key, _ in list(self.errors.items()):
                 del self.errors[key]
             return data
 
-        cleaned_data = super().clean()
-        return cleaned_data
+        state = data.get('state')
+        skip_deep_clean = state == constants.DRAFT or state == constants.CANCELLED
+        if not skip_deep_clean and not data.get('reviewers'):
+            self.add_error('reviewers', 'This field is required')
+
+        if not skip_deep_clean and not data.get('description'):
+            self.add_error('description', 'This field is required')
+
+        return data
 
     class Meta:
         model = models.Review

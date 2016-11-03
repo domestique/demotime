@@ -373,6 +373,64 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             0
         )
 
+    def test_post_create_review_description_and_reviewers_not_required(self):
+        title = 'Test Title Create Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
+            'creator': self.user,
+            'title': title,
+            'project': self.project.pk,
+            'state': constants.DRAFT,
+            'form-TOTAL_FORMS': 4,
+            'form-INITIAL_FORMS': 0,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 5,
+            'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            'form-0-description': 'Test Description',
+            'form-0-sort_order': 1,
+        })
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertFalse(event.exists())
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.state, constants.DRAFT)
+        self.assertEqual(obj.title, title)
+        self.assertEqual(obj.description, '')
+        self.assertEqual(obj.case_link, '')
+        self.assertEqual(obj.reviewers.count(), 0)
+        self.assertEqual(obj.followers.count(), 0)
+        self.assertEqual(obj.revision.attachments.count(), 1)
+        self.assertEqual(
+            models.Message.objects.filter(title__contains='POST').count(),
+            0
+        )
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            0
+        )
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user).exists()
+        )
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            0
+        )
+
     def test_post_update_draft_review(self):
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)
@@ -743,6 +801,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertStatusCode(response, 200)
         form = response.context['review_form']
         self.assertIn('title', form.errors)
+        self.assertIn('description', form.errors)
+        self.assertIn('reviewers', form.errors)
 
     def test_update_reviewer_status(self):
         user = User.objects.get(username='test_user_0')

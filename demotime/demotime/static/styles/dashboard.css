@@ -255,6 +255,7 @@ section.aggregated_dashboard-activity {
 }
 section .events .demobox-body {
     font-size: 11px;
+    color: #888;
 }
 
 .events blockquote .jump_to_this {

@@ -157,6 +157,48 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertEqual(event.user, self.user)
         self.assertEqual(event.related_object, reviewer)
 
+    def test_add_reviewer_to_draft(self):
+        review_kwargs = self.default_review_kwargs.copy()
+        review_kwargs['reviewers'] = User.objects.filter(
+            username__startswith='test_user_'
+        )[:2]
+        review_kwargs['state'] = constants.DRAFT
+        draft_review = models.Review.create_review(**review_kwargs)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(draft_review.reviewers.count(), 2)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'review_pk': draft_review.pk,
+            'user_pk': self.test_user_2.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(len(mail.outbox), 0)
+        reviewer = models.Reviewer.objects.get(
+            review=draft_review, reviewer=self.test_user_2
+        )
+        self.assertEqual(reviewer.status, constants.REVIEWING)
+        self.assertEqual(draft_review.reviewers.count(), 3)
+        self.assertEqual(data, {
+            'reviewer_name': self.test_user_2.userprofile.__str__(),
+            'reviewer_user_pk': self.test_user_2.pk,
+            'reviewer_status': constants.REVIEWING,
+            'removed_follower': False,
+            'success': True,
+            'errors': {},
+        })
+        self.assertFalse(
+            models.Message.objects.filter(
+                title='You have been added as a reviewer on: {}'.format(self.review.title),
+                receipient=self.test_user_2,
+                review=reviewer.review.revision,
+            ).exists()
+        )
+        events = reviewer.events.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertFalse(events.exists())
+
     def test_add_follower_as_reviewer(self):
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(self.review.reviewers.count(), 2)
@@ -548,6 +590,47 @@ class TestUserApiFollowers(BaseTestCase):
         )
         self.assertEqual(event.user, self.user)
         self.assertEqual(event.related_object, follower)
+
+    def test_add_follower_to_draft(self):
+        review_kwargs = self.default_review_kwargs.copy()
+        review_kwargs['reviewers'] = User.objects.filter(
+            username__startswith='test_user_'
+        )[:2]
+        review_kwargs['state'] = constants.DRAFT
+        draft_review = models.Review.create_review(**review_kwargs)
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(draft_review.follower_set.count(), 2)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_follower',
+            'review_pk': draft_review.pk,
+            'user_pk': self.test_user_2.pk
+        })
+        self.assertStatusCode(response, 200)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(len(mail.outbox), 0)
+        follower = models.Follower.objects.get(
+            review=draft_review, user=self.test_user_2
+        )
+        self.assertEqual(draft_review.follower_set.count(), 3)
+        self.assertEqual(data, {
+            'follower_name': self.test_user_2.userprofile.name,
+            'follower_user_pk': self.test_user_2.pk,
+            'success': True,
+            'errors': {},
+        })
+        self.assertFalse(
+            models.Message.objects.filter(
+                title='You are now following {}'.format(
+                    draft_review.title
+                ),
+                receipient=self.test_user_2,
+                review=follower.review.revision,
+            ).exists()
+        )
+        events = follower.events.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertFalse(events.exists())
 
     def test_add_follower_notify_follower_and_creator(self):
         extra_follower = User.objects.create(username='extra')
