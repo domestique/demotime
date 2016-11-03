@@ -7,7 +7,9 @@ DemoTime.Comments = Backbone.View.extend({
         'click .expand_reply_link': 'expand_new_reply',
         'click .reply_and_approve': 'reply_and_approve',
         'click .new_comment_button': 'post_new_comment',
-        'click .comment_edit': 'comment_edit'
+        'click .comment_edit': 'comment_edit',
+        'click .attachment-add': 'attachment_add',
+        'click .attachment-remove': 'attachment_remove'
     },
 
     initialize: function(options) {
@@ -255,5 +257,43 @@ DemoTime.Comments = Backbone.View.extend({
             }
         });
         this.options.trigger_link.hide();
+    },
+
+    attachment_add: function(event) {
+        event.preventDefault();
+        var attachment = $(event.target).parents('.ajaxy_attachment'),
+            new_attachment = attachment[0].outerHTML;
+
+        this.attachment_parent = attachment.parents('.ajaxy_attachments');
+
+        attachment.after(new_attachment);
+        this.reorder_attachments(event);
+    },
+
+    attachment_remove: function(event) {
+        var self = this;
+        event.preventDefault();
+
+        this.attachment_parent = $(event.target).parents('.ajaxy_attachments');
+
+        $(event.target).parents('.ajaxy_attachment').slideUp(function() {
+            $(this).remove();
+            self.reorder_attachments();
+        });
+    },
+
+    reorder_attachments: function() {
+        var attachment_list = this.attachment_parent.find('.ajaxy_attachment');
+
+        for (var x=0; x < attachment_list.length; x++) {
+            var attachment = attachment_list.eq(x);
+            attachment.find('.attachment-file input').prop('id', 'id_' + x + '-attachment');
+            attachment.find('.attachment-file input').attr('name', x + '-attachment');
+            attachment.find('.attachment-desc input').prop('id', 'id_' + x + '-description');
+            attachment.find('.attachment-desc input').attr('name', x + '-description');
+            if (x == 9) {
+                attachment.find('.attachment-add').remove();
+            }
+        }
     }
 });

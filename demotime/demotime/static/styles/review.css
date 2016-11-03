@@ -343,3 +343,7 @@ a[data-type='rejected'] {
     margin-top: 10px;
     display: block;
 }
+
+.ajaxy_attachment:first-child .attachment-remove {
+    display: none;
+}
