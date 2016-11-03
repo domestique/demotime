@@ -282,7 +282,7 @@
                 <h3 class="icon icon-attach toggle_sibling">Attachments</h3>
                 <section class="attachments">
                     {% for attachment in revision.attachments.all %}
-                        {% include "includes/review_attachment.html" with attachment=attachment %}
+                        {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment %}
                     {% endfor %}
                 </section>
             </article>
@@ -294,7 +294,7 @@
                 <section class="comments">
                     {% macro attachments %}
                         {% for attachment in comment.attachments.all %}
-                            {% include "includes/review_attachment.html" with attachment=attachment %}
+                            {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment %}
                         {% endfor %}
                     {% endmacro %}
 

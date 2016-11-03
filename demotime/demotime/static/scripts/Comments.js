@@ -9,7 +9,8 @@ DemoTime.Comments = Backbone.View.extend({
         'click .new_comment_button': 'post_new_comment',
         'click .comment_edit': 'comment_edit',
         'click .attachment-add': 'attachment_add',
-        'click .attachment-remove': 'attachment_remove'
+        'click .attachment-remove': 'attachment_remove',
+        'click .attachment-delete': 'attachment_delete'
     },
 
     initialize: function(options) {
@@ -25,10 +26,7 @@ DemoTime.Comments = Backbone.View.extend({
         var button = $(event.target),
             self = this,
             comment_parent = button.parents('.comment_parent'),
-            thread = comment_parent.data('thread'),
-            attachment_file = comment_parent.find('input[type="file"]'),
-            attachment_type = comment_parent.find('select[name="attachment_type"]').val(),
-            attachment_desc = comment_parent.find('input[name="description"]').val();
+            thread = comment_parent.data('thread');
 
         // Saving container as an option for global use
         this.options.comment_form_container = button.parents('.comment_form_container');
@@ -56,12 +54,21 @@ DemoTime.Comments = Backbone.View.extend({
                 formData.append('thread', thread);
             }
             formData.append('comment', self.options.comment);
-            if (attachment_file[0].files[0]) {
-                formData.append('attachment', attachment_file[0].files[0]);
-                formData.append('attachment_type', attachment_type);
-                formData.append('description', attachment_desc);
-                formData.append('sort_order', 1);
-            }
+
+            x = 0;
+            comment_parent.find('.ajaxy_attachment').each(function() {
+                var attachment_file = $(this).find('#id_' + x + '-attachment').get(0),
+                    attachment_desc = $(this).find('#id_' + x + '-description').val();
+
+                if (attachment_file) {
+                    if (attachment_file.files[0]) {
+                        formData.append(x + '-attachment', attachment_file.files[0]);
+                        formData.append(x + '-description', attachment_desc);
+                        formData.append('sort_order', x);
+                    }
+                }
+                x++
+            });
 
             var req = $.ajax({
                 url: self.options.comments_url,
@@ -150,25 +157,29 @@ DemoTime.Comments = Backbone.View.extend({
             html += '<div class="demobox-body">' + this.options.comment + '</div>'
             html += '</div>';
         }
-        if (data.comment.attachment_count && data.comment.attachments[0].attachment_type == 'image') {
-            html += '\
-                <div class="demobox attachment-card">\
-                    <div class="demobox-header">\
-                        <div class="icon icon-image">\
-                            Image';
-                            if (data.comment.attachments[0].description) {
-                                html += '<strong> - ' + data.comment.attachments[0].description + '</strong>'
-                            }
-               html += '</div>\
-                    </div>\
-                    <div class="demobox-body">\
-                        <a href="' + data.comment.attachments[0].static_url + '" class="lightbox_img">\
-                            <img src="' + data.comment.attachments[0].static_url + '" class="img-thumbnail">\
-                        </a>\
-                    </div>\
-                </div>';
-        } else if (data.comment.attachment_count) {
-            html += '<p><em>Your attachment was uploaded successfully.</em></p>';
+        if (data.comment.attachment_count && data.comment.attachments.length) {
+            for (var x = 0; x < data.comment.attachments.length; x++) {
+                if (data.comment.attachments[x].attachment_type == 'image') {
+                    html += '\
+                        <div class="demobox attachment-card">\
+                            <div class="demobox-header">\
+                                <div class="icon icon-image">\
+                                    Image';
+                                    if (data.comment.attachments[x].description) {
+                                        html += '<strong> - ' + data.comment.attachments[x].description + '</strong>'
+                                    }
+                       html += '</div>\
+                            </div>\
+                            <div class="demobox-body">\
+                                <a href="' + data.comment.attachments[x].static_url + '" class="lightbox_img">\
+                                    <img src="' + data.comment.attachments[x].static_url + '" class="img-thumbnail">\
+                                </a>\
+                            </div>\
+                        </div>';
+                } else if (data.comment.attachment_count) {
+                    html += '<p><em>Your attachment was uploaded successfully.</em></p>';
+                }
+            }
         }
 
         return html;
@@ -295,5 +306,27 @@ DemoTime.Comments = Backbone.View.extend({
                 attachment.find('.attachment-add').remove();
             }
         }
+    },
+
+    attachment_delete: function(event) {
+        var el = $(this);
+
+        event.preventDefault();
+
+        var del = $.ajax({
+            type: "DELETE",
+            url: el.data('url'),
+            data: {}
+        });
+
+        del.always(function() {
+            parent = el.parents('.demobox');
+            parent.slideUp(function() {
+                $(this).remove();
+                if (!$('.current_attachments .demobox').length) {
+                    $('.current_attachments .attachments').html('No attachments found');
+                }
+            });
+        });
     }
 });
