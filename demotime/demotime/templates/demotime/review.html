@@ -5,7 +5,7 @@
 {% block meta %}
 {{ block.super }}
 <!-- for Google -->
-<meta name="description" content="{{ object.description|safe|linebreaksbr }}" />
+{# <meta name="description" content="{{ object.description|safe|linebreaksbr }}" /> #}
 <meta name="author" content="{{ object.creator.userprofile }}" />
 <meta name="application-name" content="DemoTime" />
 
@@ -22,12 +22,12 @@
 {% else %}
 {% endif %}
 <meta property="og:url" content="https://{{ site_settings.SERVER_URL }}/DT-{{ object.pk }}" />
-<meta property="og:description" content="{{ object.description|safe|linebreaksbr }}" />
+{# <meta property="og:description" content="{{ object.description|safe|linebreaksbr }}" /> #}
 
 <!-- for Twitter -->
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="DT-{{ object.pk }}: {{ object.title }}" />
-<meta name="twitter:description" content="{{ object.description|safe|linebreaksbr }}" />
+{# <meta name="twitter:description" content="{{ object.description|safe|linebreaksbr }}" /> #}
 {% endblock %}
 
 {% block breadcrumbs %}
