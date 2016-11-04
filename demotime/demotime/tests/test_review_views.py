@@ -466,6 +466,31 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             0
         )
 
+    def test_get_update_draft_review(self):
+        reviewer = self.review.reviewer_set.all()[0]
+        follower = self.review.follower_set.all()[0]
+        reviewer.drop_reviewer(self.review.creator)
+        follower.drop_follower(self.review.creator)
+        response = self.client.get(
+            reverse('edit-review', args=[self.project.slug, self.review.pk])
+        )
+        self.assertStatusCode(response, 200)
+        review_inst = response.context['review_inst']
+        self.assertEqual(review_inst, self.review)
+        self.assertEqual(response.context['project'], self.review.project)
+        review_form = response.context['review_form']
+        self.assertEqual(review_form.instance, self.review)
+        self.assertEqual(self.review.reviewer_set.active().count(), 2)
+        self.assertEqual(self.review.follower_set.active().count(), 1)
+        self.assertEqual(
+            list(review_form.initial['reviewers']),
+            list(self.review.reviewer_set.active().values_list('reviewer__pk', flat=True))
+        )
+        self.assertEqual(
+            list(review_form.initial['followers']),
+            list(self.review.follower_set.active().values_list('user__pk', flat=True))
+        )
+
     def test_post_update_draft_review(self):
         title = 'Test Title Update Review POST'
         self.assertEqual(len(mail.outbox), 0)

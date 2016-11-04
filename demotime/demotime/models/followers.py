@@ -51,7 +51,9 @@ class Follower(BaseModel):
     @classmethod
     def create_follower(cls, review, user, creator,
                         skip_notifications=False, draft=False):
-        existing_reviewer = review.reviewer_set.filter(reviewer=user)
+        existing_reviewer = review.reviewer_set.active().filter(
+            reviewer=user
+        )
         if existing_reviewer.exists():
             return existing_reviewer.get()
 
@@ -59,6 +61,8 @@ class Follower(BaseModel):
             review=review,
             user=user
         )
+        obj.is_active = True
+        obj.save()
         if not draft:
             obj.create_follower_event(creator)
 

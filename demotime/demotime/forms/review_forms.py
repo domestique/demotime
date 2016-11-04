@@ -45,6 +45,12 @@ class ReviewForm(forms.ModelForm):
                 required=False,
                 widget=forms.HiddenInput,
             )
+            self.initial['reviewers'] = self.instance.reviewer_set.active().values_list(
+                'reviewer__pk', flat=True
+            )
+            self.initial['followers'] = self.instance.follower_set.active().values_list(
+                'user__pk', flat=True
+            )
 
     def clean(self):
         data = super().clean()
