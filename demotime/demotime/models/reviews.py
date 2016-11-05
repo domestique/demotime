@@ -439,7 +439,8 @@ class Review(BaseModel):
             self.creator
         )
         users = User.objects.filter(
-            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+            models.Q(reviewer__review=self, reviewer__is_active=True) |
+            models.Q(follower__review=self, follower__is_active=True),
         ).distinct()
         reviewers = self.reviewers.all()
         for user in users:
@@ -478,7 +479,8 @@ class Review(BaseModel):
             self.creator
         )
         users = User.objects.filter(
-            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+            models.Q(reviewer__review=self, reviewer__is_active=True) |
+            models.Q(follower__review=self, follower__is_active=True),
         ).distinct()
         reviewers = self.reviewers.all()
         for user in users:

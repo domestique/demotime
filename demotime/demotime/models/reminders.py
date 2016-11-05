@@ -67,7 +67,7 @@ class Reminder(BaseModel):
             user=review.creator,
             reminder_type=cls.CREATOR
         )
-        for reviewer in review.reviewer_set.all():
+        for reviewer in review.reviewer_set.active().all():
             cls.create_reminder(
                 review=review,
                 user=reviewer.reviewer,

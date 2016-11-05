@@ -512,6 +512,10 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
         self.assertEqual(len(mail.outbox), 5)
+        dropped_reviewer = obj.reviewer_set.all()[0]
+        dropped_follower = obj.follower_set.all()[0]
+        dropped_reviewer.drop_reviewer(obj.creator)
+        dropped_follower.drop_follower(obj.creator)
         mail.outbox = []
 
         models.UserReviewStatus.objects.update(read=True)
@@ -530,7 +534,7 @@ class TestReviewModels(BaseTestCase):
                 obj.title, models.reviews.CLOSED.capitalize()
             )
         )
-        self.assertEqual(msgs.count(), 5)
+        self.assertEqual(msgs.count(), 3)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -538,10 +542,10 @@ class TestReviewModels(BaseTestCase):
             ).exclude(user=self.user).count(),
             5
         )
-        self.assertEqual(len(mail.outbox), 5)
+        self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=False).count(),
-            4
+            3
         )
         self.assertEqual(
             self.hook_patch_run.call_args_list[0][0][0],
