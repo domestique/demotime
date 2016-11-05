@@ -545,15 +545,15 @@ class Review(BaseModel):
 
     @property
     def reviewing_count(self):
-        return self.reviewer_set.filter(status=REVIEWING).count()
+        return self.reviewer_set.active().filter(status=REVIEWING).count()
 
     @property
     def approved_count(self):
-        return self.reviewer_set.filter(status=APPROVED).count()
+        return self.reviewer_set.active().filter(status=APPROVED).count()
 
     @property
     def rejected_count(self):
-        return self.reviewer_set.filter(status=REJECTED).count()
+        return self.reviewer_set.active().filter(status=REJECTED).count()
 
 
 class ReviewRevision(BaseModel):

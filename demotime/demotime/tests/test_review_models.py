@@ -686,21 +686,43 @@ class TestReviewModels(BaseTestCase):
             constants.REOPENED,
         )
 
-    def test_reviewer_status_count_properties(self):
+    def test_reviewer_status_count_properties_reviewing(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         self.assertEqual(review.reviewing_count, 3)
         self.assertEqual(review.approved_count, 0)
         self.assertEqual(review.rejected_count, 0)
 
+    def test_reviewer_status_count_properties_approved(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
         review.reviewer_set.update(status=models.reviews.APPROVED)
         self.assertEqual(review.reviewing_count, 0)
         self.assertEqual(review.approved_count, 3)
         self.assertEqual(review.rejected_count, 0)
 
+    def test_reviewer_status_count_properties_rejected(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
         review.reviewer_set.update(status=models.reviews.REJECTED)
         self.assertEqual(review.reviewing_count, 0)
         self.assertEqual(review.approved_count, 0)
         self.assertEqual(review.rejected_count, 3)
+
+    def test_reviewer_status_count_properties_deleted(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        reviewer = review.reviewer_set.all()[0]
+        reviewer.drop_reviewer(review.creator)
+        self.assertEqual(review.reviewing_count, 2)
+        self.assertEqual(review.approved_count, 0)
+        self.assertEqual(review.rejected_count, 0)
+
+        review.reviewer_set.update(status=models.reviews.REJECTED)
+        self.assertEqual(review.reviewing_count, 0)
+        self.assertEqual(review.approved_count, 0)
+        self.assertEqual(review.rejected_count, 2)
+
+        review.reviewer_set.update(status=models.reviews.APPROVED)
+        self.assertEqual(review.reviewing_count, 0)
+        self.assertEqual(review.approved_count, 2)
+        self.assertEqual(review.rejected_count, 0)
 
     def test_review_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
@@ -760,7 +782,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['followers'], followers)
         self.assertEqual(len(review_json['reviewers']), 2)
         self.assertEqual(len(review_json['followers']), 1)
-        
+
     @patch('demotime.tasks.fire_webhook')
     def test_trigger_webhooks_fires(self, task_patch):
         review = models.Review.create_review(**self.default_review_kwargs)
