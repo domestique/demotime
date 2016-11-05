@@ -1201,6 +1201,16 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 0)
 
+    def test_revew_list_search_error(self):
+        response = self.client.get(reverse('review-list'), {
+            'state': 'notastate'
+        })
+        self.assertStatusCode(response, 200)
+        self.assertFormError(
+            response, 'form', 'state',
+            'Select a valid choice. notastate is not one of the available choices.'
+        )
+
     def test_review_list_all_the_filters(self):
         test_user = User.objects.get(username='test_user_0')
         response = self.client.get(reverse('review-list'), {

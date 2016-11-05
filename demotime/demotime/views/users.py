@@ -217,7 +217,8 @@ class UserAPI(JsonView):
 
         reviewer = models.Reviewer.objects.filter(
             review=self.review,
-            reviewer=user
+            reviewer=user,
+            is_active=True
         )
         if reviewer.exists() or self.review.creator == user:
             self.status = 400
@@ -229,10 +230,10 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User already on review'}
             }
         else:
-            count, _ = models.Follower.objects.filter(
+            count = models.Follower.objects.filter(
                 review=self.review,
                 user=user,
-            ).delete()
+            ).update(is_active=False)
             reviewer = models.Reviewer.create_reviewer(
                 review=self.review,
                 reviewer=user,

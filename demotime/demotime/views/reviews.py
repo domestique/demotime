@@ -296,7 +296,8 @@ class ReviewListView(ListView):
         context.update({
             'form': forms.ReviewFilterForm(
                 self.request.user.projects,
-                initial=initial
+                initial=initial,
+                data=self.request.GET
             )
         })
         return context

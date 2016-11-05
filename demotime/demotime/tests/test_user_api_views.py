@@ -216,8 +216,8 @@ class TestUserApiReviewers(BaseTestCase):
             review=self.review, reviewer=follower
         )
         self.assertEqual(reviewer.status, models.reviews.REVIEWING)
-        self.assertEqual(self.review.reviewers.count(), 3)
-        self.assertEqual(self.review.follower_set.count(), 1)
+        self.assertEqual(self.review.reviewer_set.active().count(), 3)
+        self.assertEqual(self.review.follower_set.active().count(), 1)
         self.assertEqual(data, {
             'reviewer_name': follower.userprofile.__str__(),
             'reviewer_user_pk': follower.pk,
@@ -233,11 +233,10 @@ class TestUserApiReviewers(BaseTestCase):
                 review=reviewer.review.revision,
             ).exists()
         )
-        self.assertFalse(
-            models.Follower.objects.filter(
-                user=follower, review=self.review
-            ).exists()
+        follower_obj = models.Follower.objects.get(
+            user=follower, review=self.review
         )
+        self.assertFalse(follower_obj.is_active)
         event = reviewer.events.get(
             event_type__code=models.EventType.REVIEWER_ADDED
         )
@@ -336,6 +335,11 @@ class TestUserApiReviewers(BaseTestCase):
 
     def test_delete_readd_reviewer(self):
         test_user_1 = User.objects.get(username='test_user_1')
+        reviewer = models.Reviewer.objects.get(
+            reviewer=test_user_1,
+            review=self.review,
+        )
+        self.assertTrue(reviewer.is_active)
         self.assertEqual(self.review.reviewers.count(), 2)
         response = self.client.post(reverse('user-api'), {
             'action': 'drop_reviewer',
@@ -343,6 +347,8 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk,
         })
         self.assertStatusCode(response, 200)
+        reviewer.refresh_from_db()
+        self.assertFalse(reviewer.is_active)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
             'success': True,
             'errors': {}
@@ -366,12 +372,17 @@ class TestUserApiReviewers(BaseTestCase):
             'review_pk': self.review.pk,
             'user_pk': test_user_1.pk
         })
+        self.assertStatusCode(response, 200)
+        reviewer.refresh_from_db()
+        self.assertTrue(reviewer.is_active)
         self.assertEqual(
-            self.review.reviewer_set.active().count(), 1
+            self.review.reviewer_set.active().count(), 2
         )
-        event = self.review.event_set.filter(
+        events = self.review.event_set.filter(
             event_type__code=models.EventType.REVIEWER_ADDED
-        ).latest('created')
+        )
+        self.assertEqual(events.count(), 3)
+        event = events.order_by('pk').last()
         self.assertEqual(
             event.event_type.code, models.EventType.REVIEWER_ADDED
         )
