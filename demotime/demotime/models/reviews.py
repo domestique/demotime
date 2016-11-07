@@ -8,6 +8,7 @@ from django.utils import timezone
 from demotime.models.base import BaseModel
 from demotime.models import (
     Attachment,
+    Comment,
     Event,
     EventType,
     Follower,
@@ -174,11 +175,13 @@ class Review(BaseModel):
             number=1,
         )
         for attachment in attachments:
-            Attachment.create_attachment(
+            Comment.create_comment(
+                commenter=creator,
+                comment=attachment['description'],
+                review=rev,
                 attachment=attachment['attachment'],
-                description=attachment['description'],
-                content_object=rev,
                 sort_order=attachment['sort_order'],
+                review_item=True
             )
 
         # Events

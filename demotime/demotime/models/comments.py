@@ -16,16 +16,31 @@ from demotime.models.base import BaseModel
 from demotime import constants
 
 
+class CommentThreadManager(models.Manager):
+
+    def review_threads(self):
+        return self.filter(review_item=True)
+
+    def comment_threads(self):
+        return self.filter(review_item=False)
+
+
 class CommentThread(BaseModel):
 
     review_revision = models.ForeignKey('ReviewRevision')
+    review_item = models.BooleanField(default=False)
+
+    objects = CommentThreadManager()
 
     def __str__(self):
         return 'Comment Thread for Review: {}'.format(self.review_revision)
 
     @classmethod
-    def create_comment_thread(cls, review_revision):
-        return cls.objects.create(review_revision=review_revision)
+    def create_comment_thread(cls, review_revision, review_item=False):
+        return cls.objects.create(
+            review_revision=review_revision,
+            review_item=review_item
+        )
 
     class Meta:
         get_latest_by = 'created'
@@ -78,9 +93,12 @@ class Comment(BaseModel):
     @classmethod
     def create_comment(cls, commenter, comment, review,
                        thread=None, attachment=None,
-                       description=None, sort_order=1):
+                       description=None, sort_order=1,
+                       review_item=False):
         if not thread:
-            thread = CommentThread.create_comment_thread(review)
+            thread = CommentThread.create_comment_thread(
+                review, review_item
+            )
 
         # Find Mentions
         starts_with_mention = False
@@ -111,7 +129,7 @@ class Comment(BaseModel):
                 sort_order=sort_order,
             )
 
-        if not review.review.state == constants.DRAFT:
+        if not review.review.state == constants.DRAFT and not review_item:
             Event.create_event(
                 project=review.review.project,
                 event_type_code=EventType.COMMENT_ADDED,
