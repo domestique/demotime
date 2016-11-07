@@ -169,11 +169,7 @@ class Reviewer(BaseModel):
         )
 
         # Send a message if this isn't the last person to approve/reject
-        all_statuses = self.review.reviewer_set.active().values_list(
-            'status', flat=True
-        )
-        consensus = all(x == APPROVED for x in all_statuses) or all(
-            x == REJECTED for x in all_statuses)
+        consensus, state = self.review.update_reviewer_state()
         if status != old_status and not consensus:
             status_display = '{} {}'.format(
                 'resumed' if status == REVIEWING else 'has',
@@ -197,7 +193,7 @@ class Reviewer(BaseModel):
                 self.review.creator,
                 revision=self.review.revision
             )
-        return self.review.update_reviewer_state()
+        return consensus, state
 
     def drop_reviewer(self, dropper, draft=False):  # pylint: disable=unused-argument
         review = self.review
