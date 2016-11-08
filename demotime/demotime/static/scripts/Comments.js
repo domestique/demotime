@@ -123,6 +123,7 @@ DemoTime.Comments = Backbone.View.extend({
                 });
 
                 // Clean up attachments
+                comment_parent.find('.attachments').slideUp();
                 comment_parent.find('.wysiwyg-editor').html('');
                 comment_parent.find('input[type="file"]').val('');
                 comment_parent.find('input[name="0-description"]').val('');
