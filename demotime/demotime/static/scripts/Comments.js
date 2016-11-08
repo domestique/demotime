@@ -263,6 +263,8 @@ DemoTime.Comments = Backbone.View.extend({
 
         this.options.trigger_link = $(event.target);
 
+        var comment_form_container = this.options.trigger_link.next('.comment_form_container');
+
         // Show new comment container
         this.options.trigger_link.next('.comment_form_container').slideDown(function() {
             comment_form_container.find('.wysiwyg-editor').focus();
