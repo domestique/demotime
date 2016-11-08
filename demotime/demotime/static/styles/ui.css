@@ -233,9 +233,6 @@ a.button-link:hover {
 .summary a {
     font-size: .8em;
 }
-.toggled_text {
-    display: none;
-}
 
 .attachments {
     overflow: hidden;

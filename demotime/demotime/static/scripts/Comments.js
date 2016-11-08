@@ -122,6 +122,18 @@ DemoTime.Comments = Backbone.View.extend({
                     target: "_blank"
                 });
 
+                // Clean up attachments
+                comment_parent.find('.wysiwyg-editor').html('');
+                comment_parent.find('input[type="file"]').val('');
+                comment_parent.find('input[name="0-description"]').val('');
+
+                // Remove all but the first attachment container
+                comment_parent.find('.ajaxy_attachment').each(function() {
+                    if ($(this).index() > 0) {
+                        $(this).remove();
+                    }
+                });
+
                 // If reply and approve, trigger button click, otherwise
                 // just scroll the new comment in to view.
                 if (also_approve) {
@@ -250,13 +262,6 @@ DemoTime.Comments = Backbone.View.extend({
         event.preventDefault();
 
         this.options.trigger_link = $(event.target);
-
-        // Grab and clean-up new comment_form_container
-        var comment_form_container = this.options.trigger_link.next('.comment_form_container');
-        comment_form_container.find('.wysiwyg-editor').html('');
-        comment_form_container.find('input[type="file"]').val('');
-        comment_form_container.find('select[name="attachment_type"]').val('');
-        comment_form_container.find('input[name="description"]').val('');
 
         // Show new comment container
         this.options.trigger_link.next('.comment_form_container').slideDown(function() {

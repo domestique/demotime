@@ -303,10 +303,10 @@
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
                             {{ comment_form.comment.errors }}
                             {{ comment_form.comment }}
-                            <div class="summary">
+                            <div class="toggle_sibling">
                                 <label class="icon icon-attach"><a href="#">Add optional {{ attachment_form.attachment.label }}</a></label>
                             </div>
-                            <div class="toggled_text attachments ajaxy_attachments">
+                            <div class="attachments ajaxy_attachments" style="display: none">
                                 <section class="ajaxy_attachment">
                                     <div class="attachment-container split~680 by:3 with-gap:3">
                                         <div class="attachment-file cel">
