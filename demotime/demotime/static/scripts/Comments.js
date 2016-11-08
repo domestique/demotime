@@ -176,6 +176,7 @@ DemoTime.Comments = Backbone.View.extend({
                     html += '\
                         <div class="demobox attachment-card">\
                             <div class="demobox-header">\
+                                <!--a href="#" class="attachment-delete" data-comment="' + data.comment.pk + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a-->\
                                 <div class="icon icon-image">\
                                     Image';
                                     if (data.comment.attachments[x].description) {
@@ -214,7 +215,7 @@ DemoTime.Comments = Backbone.View.extend({
         comment.find('.expand_reply_link, .icon-comment').remove();
 
         // Disable attachment editing (for now)
-        comment.find('.attachments, .summary').remove();
+        comment.find('.attachments, .toggle_sibling').remove();
 
         // Grab comment ID
         this.options.comment_pk = link.data('comment');
@@ -317,14 +318,22 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     attachment_delete: function(event) {
-        var el = $(this);
+        var el = $(this),
+            self = this;
 
         event.preventDefault();
 
+        var data = {
+            delete_attachments: el.data('attachment'),
+            comment_pk: el.data('comment'),
+            comment: self.options.comment
+        }
+
         var del = $.ajax({
-            type: "DELETE",
-            url: el.data('url'),
-            data: {}
+            url: self.options.comments_url,
+            method: 'PATCH',
+            dataType: 'json',
+            data: JSON.stringify(data)
         });
 
         del.always(function() {
