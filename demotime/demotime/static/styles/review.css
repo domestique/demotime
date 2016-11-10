@@ -115,6 +115,10 @@ li.open.state-highlight {
     padding: 3px;
 }
 
+.demobox .demobox {
+    box-shadow: none;
+}
+
 .review-attachments {
     overflow: hidden;
 }
@@ -145,12 +149,6 @@ li.open.state-highlight {
     float: none;
 }
 
-.comments .demobox + .demobox.attachment-card {
-    position: relative;
-    top: -12px;
-    border-top: 0;
-}
-
 .comment_parent + .comment_form_container {
     margin-top: 10px;
 }
@@ -163,24 +161,18 @@ li.open.state-highlight {
     max-height: 100px;
 }
 
-.comments-reply {
+.nested-reply {
     margin: 1em 0 0 3em;
 }
-
-/* Don't indent the only reply child */
-.comment_parent > .comment_parent:first-child.comments-reply {
+/* Brand new comment, post ajax, should not indent */
+.comment_parent.new_comment .nested-reply {
     margin-left: 0;
 }
+
 @media screen and (max-width:375px) {
-    .comments-reply {
+    .nested-reply {
         margin-left: 1em;
     }
-    .comments-reply_new {
-        margin-left: 0;
-    }
-}
-.comments-reply_new {
-    overflow: hidden;
 }
 
 .comments .collapser {
@@ -207,9 +199,6 @@ article {
 /* No need showing 'reply' label for new comments */
 .new_comment label.icon-comment {
     display: none;
-}
-.new_comment .comments-reply {
-    margin: 0;
 }
 
 .revision a {

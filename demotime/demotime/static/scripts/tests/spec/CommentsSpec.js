@@ -36,7 +36,7 @@ describe("Comments.js", function() {
                             <button class="new_comment_button"></button>\
                             <button class="reply_and_approve"></button>\
                         </div>\
-                        <div class="comments-reply">\
+                        <div class="nested-reply">\
                             <div class="demobox">\
                                 <div class="demobox-header">\
                                     <a href="#" class="comment_edit"></a>\
@@ -44,9 +44,9 @@ describe("Comments.js", function() {
                                 <div class="demobox-body">\
                                 Hi there\
                                 </div>\
-                            </div>\
-                            <div class="attachments">\
-                                <div class="summary">foo</div>\
+                                <div class="attachments">\
+                                    <div class="demobox"></div>\
+                                </div>\
                             </div>\
                         </div>\
                     </div>\
@@ -104,11 +104,11 @@ describe("Comments.js", function() {
     it("should be able to edit comments", function() {
         $('.new_comment_button').click();
         $(this.comments.options.comment_form_container).hide();
-        expect($('.comments-reply').is(':visible')).toBeTruthy();
-        expect($('.attachments .summary').length).toBeTruthy();
+        expect($('.nested-reply').is(':visible')).toBeTruthy();
+        expect($('.attachments .demobox').length).toBeTruthy();
         $('.comment_edit').click();
         expect($('.demobox-body').is(':visible')).toBeFalsy();
-        expect($('.attachments .summary').length).toBeFalsy();
+        expect($('.attachments .demobox').length).toBeFalsy();
         expect(this.comments.options.comment_form_container.data('editing')).toBe(true);
         expect(this.comments.options.comment_form_container.is(':visible')).toBeTruthy();
     });
@@ -137,7 +137,7 @@ describe("Comments.js", function() {
     it("should generate proper success html", function() {
         $('.new_comment_button').click();
         var html = this.comments.get_success_html({"comment": {"comment": "asdf", "thread": 426, "id": 801, "name": "Danny", "attachment_count": 1, "attachments": [{"static_url": "/file/496", "attachment_type": "image", "description": ""}]}, "errors": "", "status": "success"});
-        expect(html).toContain('comments-reply');
+        expect(html).toContain('nested-reply');
         expect(html).toContain('demobox');
         expect(html).toContain('attachment-card');
         expect(html).toContain('comment_edit');

@@ -293,9 +293,6 @@
                 <h3 class="icon icon-comment toggle_sibling">Feedback</h3>
                 <section class="comments">
                     {% macro attachments %}
-                        {% for attachment in comment.attachments.all %}
-                            {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment %}
-                        {% endfor %}
                     {% endmacro %}
 
                     {% macro comment button_text %}
@@ -343,7 +340,7 @@
                         <section id="{{ thread.pk }}" data-thread="{{ thread.pk }}" class="comment_parent">
                             {% for comment in thread.comment_set.all %}
                                 {% if not forloop.first %}
-                                    <div class="comments-reply">
+                                    <div class="nested-reply">
                                 {% endif %}
                                     <div class="demobox" id="{{ comment.pk }}">
                                         <div class="demobox-header">
@@ -355,22 +352,24 @@
                                                 {{ comment.created }}
                                             </a>
                                             {% if comment.commenter == request.user %}
-                                                (<a href="#" class="comment_edit" data-comment="{{ comment.id }}">edit this reply</a>)
+                                                (<a href="#" class="comment_edit" data-comment="{{ comment.id }}" {% if forloop.first %}data-top-level="true"{% endif %}>edit this reply</a>)
                                             {% endif %}
                                         </div>
-                                        {% if comment.comment %}
+                                        {% if comment.comment or comment.attachments.all %}
                                             <div class="demobox-body">
                                                 {{ comment.comment|safe|linebreaksbr }}
+                                                {% for attachment in comment.attachments.all %}
+                                                    {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment %}
+                                                {% endfor %}
                                             </div>
                                         {% endif %}
                                     </div>
-                                    {% use_macro attachments %}
                                 {% if not forloop.first %}
                                 </div>
                                 {% endif %}
                             {% endfor %}
                             {% if request.user.is_authenticated %}
-                                <div class="comments-reply_new" style="margin-top: 10px">
+                                <div style="margin-top: 10px">
                                     <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
                                     <div class="comment_form_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
                                         {% use_macro comment 'Reply' %}

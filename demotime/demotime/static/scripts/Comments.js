@@ -106,7 +106,9 @@ DemoTime.Comments = Backbone.View.extend({
                 var html = self.get_success_html(data);
 
                 // New comment DOM's a bit different than threaded DOM:
-                if (thread) {
+                if (self.options.top_level_comment) {
+                    self.options.comment_form_container.parents('.comment_parent').prepend(html);
+                } else if (thread) {
                     self.options.comment_form_container.parent().before(html);
                 } else {
                     self.options.comment_form_container.before(html);
@@ -140,15 +142,29 @@ DemoTime.Comments = Backbone.View.extend({
                 if (also_approve) {
                     $('a[data-type="approved"]').click();
                 } else {
-                    $('html, body').animate({
-                        scrollTop: comment_parent.find('.comments-reply').last().offset().top - 75
-                    }, 500);
+                    if (self.options.top_level_comment) {
+                        $('html, body').animate({
+                            scrollTop: comment_parent.offset().top - 75
+                        }, 500);
+                    } else {
+                        $('html, body').animate({
+                            scrollTop: comment_parent.find('.nested-reply').last().offset().top - 75
+                        }, 500);
+                    }
 
                     // Show 'new reply' link
                     if (self.options.trigger_link) {
                         self.options.trigger_link.show();
                     }
+                    if (self.options.attachment_adder) {
+                        self.options.attachment_adder.show();
+                    }
                 }
+
+                // Clean up options
+                self.options.comment_form_container.data('editing', false);
+                self.options.top_level_comment = null;
+                self.options.attachment_adder = null;
             }
         });
 
@@ -163,22 +179,24 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     get_success_html: function(data) {
-        var html = '<div class="comment_parent comments-reply">';
-        if (this.options.comment) {
-            html += '<div class="demobox" id="' + data.comment.id + '">'
-            html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
-            html += '<div class="demobox-body">' + this.options.comment + '</div>'
-            html += '</div>';
+        if (this.options.top_level_comment) {
+            var html = '<div class="comment_parent" style="margin-top: 10px">';
+        } else {
+            var html = '<div class="comment_parent nested-reply">';
         }
+        html += '<div class="demobox" id="' + data.comment.id + '">'
+        html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
+        html += '<div class="demobox-body">' + this.options.comment + '</div>'
+
         if (data.comment.attachment_count && data.comment.attachments.length) {
             for (var x = 0; x < data.comment.attachments.length; x++) {
                 html += '\
                     <div class="demobox attachment-card">\
                         <div class="demobox-header">';
                             if (data.comment.attachments[x].description) {
-                                html += '<strong> - ' + data.comment.attachments[x].description + '</strong>';
+                                html += '<strong>' + data.comment.attachments[x].description + '</strong>';
                             }
-                            html += '<a href="#" class="attachment-delete" data-comment="' + data.comment.pk + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a>\
+                            html += ' - <a href="#" class="attachment-delete" data-comment="' + data.comment.pk + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a>\
                         </div>\
                         <div class="demobox-body">';
                             if (data.comment.attachments[x].attachment_type == 'image') {
@@ -193,36 +211,47 @@ DemoTime.Comments = Backbone.View.extend({
             }
         }
 
+        html += '</div>';
+
         return html;
     },
 
     comment_edit: function(event) {
         var self = this,
             link = $(event.target),
-            comment = link.parents('.comment_parent');
+            comment_parent = link.parents('.comment_parent'),
+            comment = link.parents('.demobox');
 
-        // Grab edit html
-        var edit_html = link.parents('.demobox').find('.demobox-body').html();
+        // Remove existing comment html
+        comment.find('.attachment-card').remove();
+
+        // Grab comment html
+        var edit_html = comment.find('.demobox-body').html();
 
         event.preventDefault();
 
-        // Remove old comment and attachments
-        comment.find('.demobox').slideUp().remove();
+        // Grab the 'Reply' link to re-show later (then hide, to reduce confusion)
+        this.options.trigger_link = comment_parent.find('.expand_reply_link');
+        this.options.trigger_link.hide();
 
-        // Clean up conflicting DOM
-        comment.find('.expand_reply_link, .icon-comment').remove();
+        // Remove old comment and attachments
+        comment.slideUp().remove();
 
         // Rename the button
-        comment.find('button').html('Save');
+        comment_parent.find('button').html('Save');
 
         // Disable attachment editing (for now)
-        comment.find('.attachments, .toggle_sibling').remove();
+        this.options.attachments = comment_parent.find('.attachments').hide();
+        this.options.attachment_adder = comment_parent.find('.toggle_sibling');
+        this.options.attachment_adder.hide();
 
         // Grab comment ID
         this.options.comment_pk = link.data('comment');
+        // Determine if this is a top level comment (for indentation, scroll to)
+        this.options.top_level_comment = link.data('top-level');
 
         // Set the form container
-        this.options.comment_form_container = comment.find('.comment_form_container');
+        this.options.comment_form_container = comment_parent.find('.comment_form_container');
 
         // Enable 'editing' mode
         this.options.comment_form_container.data('editing', true);
