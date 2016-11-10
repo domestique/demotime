@@ -253,7 +253,8 @@ section.aggregated_dashboard-activity {
     max-width: 100%;
     height: auto;
 }
-section .events .demobox-body {
+section .events .demobox-body,
+.demobox .demobox .demobox-header {
     font-size: 11px;
     color: #888;
 }

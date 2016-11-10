@@ -115,10 +115,6 @@ li.open.state-highlight {
     padding: 3px;
 }
 
-.demobox .demobox {
-    box-shadow: none;
-}
-
 .review-attachments {
     overflow: hidden;
 }

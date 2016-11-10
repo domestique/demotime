@@ -135,6 +135,9 @@ section .demobox p:first-child {
     font-size: 14px;
     background: #fff;
 }
+.demobox .demobox {
+    box-shadow: none;
+}
 section section {
     background: #f7f7f7;
     box-shadow: none;

@@ -46,10 +46,33 @@
             <% if (moment.related_object.comment) { %>
                 <%= moment.related_object.comment %>
             <% } %>
-            <% if (moment.related_object.attachments.length && moment.related_object.attachments[0].attachment_type == 'image') { %>
-                <a href="<%= moment.related_object.attachments[0].static_url %>" class="lightbox_img">
-                    <img src="<%= moment.related_object.attachments[0].static_url %>">
-                </a>
+            <% if (moment.related_object.attachments.length) { %>
+                <% for (var x = 0; x < moment.related_object.attachments.length; x++) { %>
+                    <div class="demobox attachment-card" style="margin-top: 10px">
+                        <div class="demobox-header">
+                            <div class="heading icon icon-<%= moment.related_object.attachments[x].attachment_type %>">
+                                <%= moment.related_object.attachments[x].attachment_type %>
+                                <% if (moment.related_object.attachments[x].description) { %>
+                                    <strong>- <%= moment.related_object.attachments[x].description %></strong>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="demobox-body">
+                            <% if (moment.related_object.attachments[x].attachment_type == 'image') { %>
+                                <a href="<%= moment.related_object.attachments[x].static_url %>" class="lightbox_img">
+                                    <img src="<%= moment.related_object.attachments[x].static_url %>">
+                                </a>
+                            <% } else if (moment.related_object.attachments[x].attachment_type == 'movie') { %>
+                                <video src="<%= moment.related_object.attachments[x].static_url %>" controls="true"></video>
+                                <br><small><a href="<%= moment.related_object.attachments[x].static_url %>">download this</a></small>
+                            <% } else if (moment.related_object.attachments[x].attachment_type == 'audio') { %>
+                                <audio src="<%= moment.related_object.attachments[x].static_url %>" controls="true"></audio>
+                            <% } else { %>
+                                <a href="<%= moment.related_object.attachments[x].static_url %>" class="icon icon-attach">Download attachment</a>
+                            <% } %>
+                        </div>
+                    </div>
+                <% } %>
             <% } %>
         </blockquote>
         <div class="demobox-footer"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
