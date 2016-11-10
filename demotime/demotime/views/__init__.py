@@ -119,7 +119,8 @@ class IndexView(TemplateView):
 
         open_review_pks = models.Reviewer.objects.filter(
             reviewer=self.request.user,
-            review__state=constants.OPEN
+            review__state=constants.OPEN,
+            status=constants.REVIEWING,
         ).values_list('review__pk', flat=True)
 
         context['open_reviews'] = models.Review.objects.filter(

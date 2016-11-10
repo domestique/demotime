@@ -61,7 +61,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(models.Review.objects.count(), 4)
         self.assertEqual(len(response.context['message_bundles']), 2)
 
-    def test_index_does_not_hide_approved_reviews_from_open_reviews(self):
+    def test_index_does_hide_approved_reviews_from_open_reviews(self):
         review_one_kwargs = self.default_review_kwargs.copy()
         review_one_kwargs['creator'] = self.test_users[0]
         review_one_kwargs['reviewers'] = [self.user]
@@ -80,7 +80,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         open_reviews = response.context['open_reviews']
-        self.assertEqual(len(open_reviews), 2)
+        self.assertEqual(len(open_reviews), 1)
         # Newest review first
         self.assertEqual(open_reviews[0].pk, review_two.pk)
         self.assertEqual(open_reviews[1].pk, review_one.pk)
