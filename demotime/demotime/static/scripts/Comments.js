@@ -172,27 +172,24 @@ DemoTime.Comments = Backbone.View.extend({
         }
         if (data.comment.attachment_count && data.comment.attachments.length) {
             for (var x = 0; x < data.comment.attachments.length; x++) {
-                if (data.comment.attachments[x].attachment_type == 'image') {
-                    html += '\
-                        <div class="demobox attachment-card">\
-                            <div class="demobox-header">\
-                                <!--a href="#" class="attachment-delete" data-comment="' + data.comment.pk + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a-->\
-                                <div class="icon icon-image">\
-                                    Image';
-                                    if (data.comment.attachments[x].description) {
-                                        html += '<strong> - ' + data.comment.attachments[x].description + '</strong>'
-                                    }
-                       html += '</div>\
-                            </div>\
-                            <div class="demobox-body">\
-                                <a href="' + data.comment.attachments[x].static_url + '" class="lightbox_img">\
-                                    <img src="' + data.comment.attachments[x].static_url + '" class="img-thumbnail">\
-                                </a>\
-                            </div>\
-                        </div>';
-                } else if (data.comment.attachment_count) {
-                    html += '<p><em>Your attachment was uploaded successfully.</em></p>';
-                }
+                html += '\
+                    <div class="demobox attachment-card">\
+                        <div class="demobox-header">';
+                            if (data.comment.attachments[x].description) {
+                                html += '<strong> - ' + data.comment.attachments[x].description + '</strong>';
+                            }
+                            html += '<a href="#" class="attachment-delete" data-comment="' + data.comment.pk + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a>\
+                        </div>\
+                        <div class="demobox-body">';
+                            if (data.comment.attachments[x].attachment_type == 'image') {
+                                html += '<a href="' + data.comment.attachments[x].static_url + '" class="lightbox_img">\
+                                            <img src="' + data.comment.attachments[x].static_url + '" class="img-thumbnail">\
+                                         </a>';
+                            } else {
+                                html += '<em>Your <strong>' + data.comment.attachments[x].attachment_type + '</strong> was uploaded successfully.</em></p>';
+                            }
+                        html += '</div>\
+                    </div>';
             }
         }
 
@@ -209,10 +206,14 @@ DemoTime.Comments = Backbone.View.extend({
 
         event.preventDefault();
 
-        // Remove old comment
-        link.parents('.demobox').slideUp().remove();
+        // Remove old comment and attachments
+        comment.find('.demobox').slideUp().remove();
+
         // Clean up conflicting DOM
         comment.find('.expand_reply_link, .icon-comment').remove();
+
+        // Rename the button
+        comment.find('button').html('Save');
 
         // Disable attachment editing (for now)
         comment.find('.attachments, .toggle_sibling').remove();
