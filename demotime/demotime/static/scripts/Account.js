@@ -15,7 +15,7 @@ DemoTime.Account = Backbone.View.extend({
 
         this.$body = this.$el.parents('body');
 
-        this.$body.find('main').click(function() {
+        this.$body.find('main, .subnav').click(function() {
             self.$el.find('ul').slideUp();
         });
     },

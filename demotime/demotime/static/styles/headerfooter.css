@@ -83,15 +83,19 @@ body.bookmarklet h1 {
     padding: 2px 3px;
     top: -1px;
 }
-.navbar .manage_user:after {
+.navbar .manage_user-toggler {
+    position: relative;
+    padding-right: 15px;
+    display: inline-block;
+}
+.navbar .manage_user-toggler:after {
     font-family: Arial;
     content: 'v';
     font-size: 12px;
     font-weight: 400;
-    margin-left: 3px;
-    margin-right: 3px;
-    position: relative;
-    top: -1px;
+    position: absolute;
+    right: 0;
+    top: 0;
     color: #777777;
 }
 a.footer-blog.highlight {
