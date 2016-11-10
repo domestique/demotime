@@ -48,6 +48,7 @@ class Reviewer(BaseModel):
         return {
             'name': self.reviewer.userprofile.name,
             'user_pk': self.reviewer.pk,
+            'user_profile_url': self.reviewer.userprofile.get_absolute_url(),
             'reviewer_pk': self.pk,
             'reviewer_status': self.status,
             'review_pk': self.review.pk,

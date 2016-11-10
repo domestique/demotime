@@ -172,6 +172,10 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(follower_json['user_pk'], follower.user.pk)
         self.assertEqual(follower_json['follower_pk'], follower.pk)
         self.assertEqual(follower_json['review_pk'], follower.review.pk)
+        self.assertEqual(
+            follower_json['user_profile_url'],
+            follower.user.userprofile.get_absolute_url()
+        )
 
     def test_drop_follower(self):
         follower = self.followers[0]

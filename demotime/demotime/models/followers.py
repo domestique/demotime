@@ -34,6 +34,7 @@ class Follower(BaseModel):
         return {
             'name': self.user.userprofile.name,
             'user_pk': self.user.pk,
+            'user_profile_url': self.user.userprofile.get_absolute_url(),
             'follower_pk': self.pk,
             'review_pk': self.review.pk,
             'created': self.created.isoformat(),

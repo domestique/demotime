@@ -1265,6 +1265,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                     'follower_pk': follower.pk, 'review_pk': follower.review.pk,
                     'created': follower.created.isoformat(),
                     'modified': follower.modified.isoformat(),
+                    'user_profile_url': follower.user.userprofile.get_absolute_url(),
                 },
                 followers
             )
@@ -1279,6 +1280,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                     'is_active': reviewer.is_active,
                     'created': reviewer.created.isoformat(),
                     'modified': reviewer.modified.isoformat(),
+                    'user_profile_url': reviewer.reviewer.userprofile.get_absolute_url(),
                 },
                 reviewers
             )

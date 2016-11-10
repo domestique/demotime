@@ -326,3 +326,7 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(reviewer_json['user_pk'], reviewer.reviewer.pk)
         self.assertEqual(reviewer_json['reviewer_pk'], reviewer.pk)
         self.assertEqual(reviewer_json['review_pk'], reviewer.review.pk)
+        self.assertEqual(
+            reviewer_json['user_profile_url'],
+            reviewer.reviewer.userprofile.get_absolute_url()
+        )
