@@ -121,30 +121,21 @@ class IndexView(TemplateView):
             reviewer=self.request.user,
             review__state=constants.OPEN,
             status=constants.REVIEWING,
+            is_active=True
         ).values_list('review__pk', flat=True)
 
         context['open_reviews'] = models.Review.objects.filter(
             pk__in=open_review_pks
         )
 
-        approved_review_pks = models.Reviewer.objects.filter(
-            reviewer=self.request.user,
-            review__state=constants.OPEN,
-            status=constants.REVIEWING
-        ).values_list('review__pk', flat=True)
-        context['approved_reviews'] = models.Review.objects.filter(
-            pk__in=approved_review_pks
-        )
-
-        context['followed_demos'] = models.Review.objects.filter(
-            followers=self.request.user,
-            state=constants.OPEN,
-        )
-
-        updated_demos = models.UserReviewStatus.objects.filter(
+        open_follow_pks = models.Follower.objects.filter(
             user=self.request.user,
-        ).order_by('-modified')[:5]
-        context['updated_demos'] = updated_demos
+            review__state=constants.OPEN,
+            is_active=True,
+        ).values_list('review__pk', flat=True)
+        context['followed_demos'] = models.Review.objects.filter(
+            pk__in=open_follow_pks
+        )
 
         message_bundles = models.MessageBundle.objects.filter(
             owner=self.request.user,

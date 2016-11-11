@@ -68,7 +68,8 @@ class ReviewDetail(CanViewMixin, DetailView):
         try:
             reviewer = models.Reviewer.objects.get(
                 review=self.revision.review,
-                reviewer=self.user
+                reviewer=self.user,
+                is_active=True
             )
         except models.Reviewer.DoesNotExist:
             reviewer = None
@@ -79,17 +80,24 @@ class ReviewDetail(CanViewMixin, DetailView):
                     'review': reviewer.review
                 }
             )
+        if reviewer:
+            context['reviewer'] = reviewer
+
+        try:
+            follower = models.Follower.objects.get(
+                review=self.revision.review,
+                user=self.user,
+                is_active=True,
+            )
+        except models.Follower.DoesNotExist:
+            follower = None
+        context['follower_obj'] = follower
 
         if self.request.user == self.revision.review.creator:
             context['review_state_form'] = forms.ReviewStateForm(
                 self.request.user,
                 self.revision.review.pk,
                 initial={'review': self.revision.review}
-            )
-
-        if self.revision.review.reviewer_set.filter(reviewer=self.user).exists():
-            context['reviewer'] = self.revision.review.reviewer_set.get(
-                reviewer=self.user
             )
 
         models.UserReviewStatus.objects.filter(
@@ -288,7 +296,8 @@ class ReviewListView(ListView):
         context.update({
             'form': forms.ReviewFilterForm(
                 self.request.user.projects,
-                initial=initial
+                initial=initial,
+                data=self.request.GET
             )
         })
         return context

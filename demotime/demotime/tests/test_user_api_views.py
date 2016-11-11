@@ -216,8 +216,8 @@ class TestUserApiReviewers(BaseTestCase):
             review=self.review, reviewer=follower
         )
         self.assertEqual(reviewer.status, models.reviews.REVIEWING)
-        self.assertEqual(self.review.reviewers.count(), 3)
-        self.assertEqual(self.review.follower_set.count(), 1)
+        self.assertEqual(self.review.reviewer_set.active().count(), 3)
+        self.assertEqual(self.review.follower_set.active().count(), 1)
         self.assertEqual(data, {
             'reviewer_name': follower.userprofile.__str__(),
             'reviewer_user_pk': follower.pk,
@@ -233,11 +233,10 @@ class TestUserApiReviewers(BaseTestCase):
                 review=reviewer.review.revision,
             ).exists()
         )
-        self.assertFalse(
-            models.Follower.objects.filter(
-                user=follower, review=self.review
-            ).exists()
+        follower_obj = models.Follower.objects.get(
+            user=follower, review=self.review
         )
+        self.assertFalse(follower_obj.is_active)
         event = reviewer.events.get(
             event_type__code=models.EventType.REVIEWER_ADDED
         )
@@ -319,15 +318,75 @@ class TestUserApiReviewers(BaseTestCase):
             'success': True,
             'errors': {}
         })
-        self.assertEqual(self.review.reviewers.count(), 1)
+        self.assertEqual(
+            self.review.reviewer_set.active().count(), 1
+        )
         event = self.review.event_set.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
         self.assertEqual(
             event.event_type.code, models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, test_user_1)
-        self.assertEqual(event.related_object, self.review)
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(
+            event.related_object,
+            self.review.reviewer_set.get(is_active=False)
+        )
+
+    def test_delete_readd_reviewer(self):
+        test_user_1 = User.objects.get(username='test_user_1')
+        reviewer = models.Reviewer.objects.get(
+            reviewer=test_user_1,
+            review=self.review,
+        )
+        self.assertTrue(reviewer.is_active)
+        self.assertEqual(self.review.reviewers.count(), 2)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_reviewer',
+            'user_pk': test_user_1.pk,
+            'review_pk': self.review.pk,
+        })
+        self.assertStatusCode(response, 200)
+        reviewer.refresh_from_db()
+        self.assertFalse(reviewer.is_active)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'success': True,
+            'errors': {}
+        })
+        self.assertEqual(
+            self.review.reviewer_set.active().count(), 1
+        )
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_REMOVED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(
+            event.related_object,
+            self.review.reviewer_set.get(is_active=False)
+        )
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_reviewer',
+            'review_pk': self.review.pk,
+            'user_pk': test_user_1.pk
+        })
+        self.assertStatusCode(response, 200)
+        reviewer.refresh_from_db()
+        self.assertTrue(reviewer.is_active)
+        self.assertEqual(
+            self.review.reviewer_set.active().count(), 2
+        )
+        events = self.review.event_set.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(events.count(), 3)
+        event = events.order_by('pk').last()
+        self.assertEqual(
+            event.event_type.code, models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(event.related_object.reviewer, test_user_1)
 
     def test_delete_reviewer_updates_review_state(self):
         test_user_1 = User.objects.get(username='test_user_1')
@@ -347,7 +406,9 @@ class TestUserApiReviewers(BaseTestCase):
             'success': True,
             'errors': {}
         })
-        self.assertEqual(self.review.reviewers.count(), 1)
+        self.assertEqual(
+            self.review.reviewer_set.active().count(), 1
+        )
         self.assertEqual(self.review.reviewer_state, constants.APPROVED)
         event = self.review.event_set.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
@@ -355,8 +416,11 @@ class TestUserApiReviewers(BaseTestCase):
         self.assertEqual(
             event.event_type.code, models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, test_user_1)
-        self.assertEqual(event.related_object, self.review)
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(
+            event.related_object,
+            self.review.reviewer_set.get(is_active=False)
+        )
 
     def test_delete_reviewer_missing_reviewer(self):
         response = self.client.post(reverse('user-api'), {
@@ -443,7 +507,9 @@ class TestUserApiReviewers(BaseTestCase):
             'success': True,
             'errors': {}
         })
-        self.assertEqual(self.review.reviewers.count(), 1)
+        self.assertEqual(
+            self.review.reviewer_set.active().count(), 1
+        )
         event = self.review.event_set.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
@@ -451,7 +517,10 @@ class TestUserApiReviewers(BaseTestCase):
             event.event_type.code, models.EventType.REVIEWER_REMOVED
         )
         self.assertEqual(event.user, test_user_1)
-        self.assertEqual(event.related_object, self.review)
+        self.assertEqual(
+            event.related_object,
+            self.review.reviewer_set.get(is_active=False),
+        )
 
 
 class TestUserApiFollowers(BaseTestCase):
@@ -743,15 +812,69 @@ class TestUserApiFollowers(BaseTestCase):
             'success': True,
             'errors': {}
         })
-        self.assertEqual(self.review.follower_set.count(), 1)
+        self.assertEqual(
+            self.review.follower_set.active().count(), 1
+        )
         event = self.review.event_set.get(
             event_type__code=models.EventType.FOLLOWER_REMOVED
         )
         self.assertEqual(
             event.event_type.code, models.EventType.FOLLOWER_REMOVED
         )
-        self.assertEqual(event.user, follower_0)
-        self.assertEqual(event.related_object, self.review)
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(
+            event.related_object,
+            models.Follower.objects.get(user=follower_0, review=self.review),
+        )
+
+    def test_delete_readd_follower(self):
+        follower_0 = User.objects.get(username='follower_0')
+        self.assertEqual(self.review.reviewers.count(), 2)
+        response = self.client.post(reverse('user-api'), {
+            'action': 'drop_follower',
+            'user_pk': follower_0.pk,
+            'review_pk': self.review.pk,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'success': True,
+            'errors': {}
+        })
+        self.assertEqual(
+            self.review.follower_set.active().count(), 1
+        )
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.FOLLOWER_REMOVED
+        )
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_REMOVED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(
+            event.related_object,
+            models.Follower.objects.get(user=follower_0, review=self.review),
+        )
+
+        response = self.client.post(reverse('user-api'), {
+            'action': 'add_follower',
+            'user_pk': follower_0.pk,
+            'review_pk': self.review.pk,
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(
+            self.review.follower_set.active().count(), 2
+        )
+        event = self.review.event_set.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        ).last()
+        self.assertEqual(
+            event.event_type.code, models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(event.user, self.user)
+        self.assertEqual(
+            event.related_object,
+            models.Follower.objects.get(user=follower_0, review=self.review),
+        )
 
     def test_delete_follower_missing_follower(self):
         response = self.client.post(reverse('user-api'), {

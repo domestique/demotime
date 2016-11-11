@@ -15,6 +15,11 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(reviewer.status, constants.REVIEWING)
         self.assertEqual(reviewer.review.pk, obj.pk)
         self.assertEqual(reviewer.reviewer.pk, user.pk)
+        self.assertTrue(reviewer.is_active)
+        reminders = models.Reminder.objects.filter(
+            review=obj, user=user
+        )
+        self.assertEqual(reminders.count(), 1)
         event = reviewer.events.get(
             event_type__code=models.EventType.REVIEWER_ADDED
         )
@@ -23,6 +28,37 @@ class TestReviewerModels(BaseTestCase):
         )
         self.assertEqual(event.user, self.user)
         self.assertEqual(event.related_object, reviewer)
+
+    def test_deleting_and_creating_reviewer(self):
+        ''' Reminder should be created, reviewer flips back to active '''
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        obj.reviewer_set.all().delete()
+        user = User.objects.get(username='test_user_0')
+        reminders = models.Reminder.objects.filter(
+            review=obj, user=user
+        )
+        # Create
+        reviewer = models.Reviewer.create_reviewer(obj, user, self.user, True)
+        reminders = models.Reminder.objects.filter(
+            review=obj, user=user
+        )
+        self.assertTrue(reviewer.is_active)
+        self.assertEqual(reminders.count(), 1)
+        # Delete
+        reviewer.drop_reviewer(user, user)
+        reviewer.refresh_from_db()
+        reminders = models.Reminder.objects.filter(
+            review=obj, user=user
+        )
+        self.assertFalse(reviewer.is_active)
+        self.assertEqual(reminders.count(), 0)
+        # Recreate
+        reviewer = models.Reviewer.create_reviewer(obj, user, self.user, True)
+        reminders = models.Reminder.objects.filter(
+            review=obj, user=user
+        )
+        self.assertTrue(reviewer.is_active)
+        self.assertEqual(reminders.count(), 1)
 
     def test_create_reviewer_resets_state(self):
         test_user = User.objects.get(username='test_user_0')
@@ -45,6 +81,12 @@ class TestReviewerModels(BaseTestCase):
         models.MessageBundle.objects.all().delete()
         reviewer = obj.reviewer_set.last()
         reviewer.drop_reviewer(obj.creator)
+        reviewer.refresh_from_db()
+        reminders = models.Reminder.objects.filter(
+            review=obj, user=reviewer.reviewer
+        )
+        self.assertFalse(reviewer.is_active)
+        self.assertFalse(reminders.exists())
         self.assertEqual(models.MessageBundle.objects.count(), 1)
         self.assertEqual(
             models.Event.objects.filter(
@@ -55,14 +97,16 @@ class TestReviewerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, reviewer.reviewer)
-        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.related_object, reviewer)
 
     def test_drop_reviewer_draft(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         models.MessageBundle.objects.all().delete()
         reviewer = obj.reviewer_set.last()
         reviewer.drop_reviewer(obj.creator, draft=True)
+        reviewer.refresh_from_db()
+        self.assertFalse(reviewer.is_active)
         self.assertEqual(models.MessageBundle.objects.count(), 0)
         self.assertEqual(
             models.Event.objects.filter(
@@ -91,8 +135,8 @@ class TestReviewerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, reviewer.reviewer)
-        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.related_object, reviewer)
         self.assertEqual(obj.reviewer_state, constants.APPROVED)
 
     def test_drop_reviewer_updates_state_rejected(self):
@@ -115,8 +159,8 @@ class TestReviewerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, reviewer.reviewer)
-        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.related_object, reviewer)
         self.assertEqual(obj.reviewer_state, constants.REJECTED)
 
     def test_reviewer_set_status(self):
@@ -282,3 +326,7 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(reviewer_json['user_pk'], reviewer.reviewer.pk)
         self.assertEqual(reviewer_json['reviewer_pk'], reviewer.pk)
         self.assertEqual(reviewer_json['review_pk'], reviewer.review.pk)
+        self.assertEqual(
+            reviewer_json['user_profile_url'],
+            reviewer.reviewer.userprofile.get_absolute_url()
+        )

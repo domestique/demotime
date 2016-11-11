@@ -5,11 +5,20 @@ from demotime.models.base import BaseModel
 from demotime.models import Event, EventType, Message
 
 
+class FollowerManager(models.Manager):
+
+    def active(self):
+        return self.filter(is_active=True)
+
+
 class Follower(BaseModel):
 
     review = models.ForeignKey('Review')
     user = models.ForeignKey('auth.User')
     events = GenericRelation('Event')
+    is_active = models.BooleanField(default=True, db_index=True)
+
+    objects = FollowerManager()
 
     @property
     def display_name(self):
@@ -25,6 +34,7 @@ class Follower(BaseModel):
         return {
             'name': self.user.userprofile.name,
             'user_pk': self.user.pk,
+            'user_profile_url': self.user.userprofile.get_absolute_url(),
             'follower_pk': self.pk,
             'review_pk': self.review.pk,
             'created': self.created.isoformat(),
@@ -42,7 +52,9 @@ class Follower(BaseModel):
     @classmethod
     def create_follower(cls, review, user, creator,
                         skip_notifications=False, draft=False):
-        existing_reviewer = review.reviewer_set.filter(reviewer=user)
+        existing_reviewer = review.reviewer_set.active().filter(
+            reviewer=user
+        )
         if existing_reviewer.exists():
             return existing_reviewer.get()
 
@@ -50,6 +62,8 @@ class Follower(BaseModel):
             review=review,
             user=user
         )
+        obj.is_active = True
+        obj.save()
         if not draft:
             obj.create_follower_event(creator)
 
@@ -75,10 +89,11 @@ class Follower(BaseModel):
             Event.create_event(
                 project=self.review.project,
                 event_type_code=EventType.FOLLOWER_REMOVED,
-                related_object=self.review,
-                user=self.user
+                related_object=self,
+                user=dropper
             )
-            self.delete()
+        self.is_active = False
+        self.save()
 
     def _send_follower_message(self, notify_follower=False, notify_creator=False):
         if not notify_follower and not notify_creator:

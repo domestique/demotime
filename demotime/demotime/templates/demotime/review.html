@@ -118,19 +118,17 @@
             </div>
         {% endif %}
         {% if object.state != "closed" %}
-            {% for follower in object.follower_set.all %}
-                {% if follower.user == request.user %}
-                    <div class="your-status">
-                        You are following this demo
-                        <small class="person_deleter">
-                            [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
-                        </small>
-                        <span class="help" title="When you are assigned as a 'reviewer' you
-                        will need to either approve or reject a demo. A follower can simply follow
-                        the progress of a review without the ability or need to approve or reject."></span>
-                    </div>
-                {% endif %}
-            {% endfor %}
+            {% if follower_obj %}
+                <div class="your-status">
+                    You are following this demo
+                    <small class="person_deleter">
+                        [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
+                    </small>
+                    <span class="help" title="When you are assigned as a 'reviewer' you
+                    will need to either approve or reject a demo. A follower can simply follow
+                    the progress of a review without the ability or need to approve or reject."></span>
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 
@@ -193,7 +191,7 @@
                         the progress of a demo without the ability or need to approve or reject."></span>
                     </h4>
                     <ul class="reviewer_ul">
-                        {% for reviewer in object.reviewer_set.all %}
+                        {% for reviewer in object.reviewer_set.active %}
                             <li>
                                 <a class="icon icon-{{ reviewer.get_status_display }}"
                                    href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
@@ -210,7 +208,7 @@
                         {% endfor %}
                     </ul>
                     <ul class="follower_ul">
-                        {% for follower in object.follower_set.all %}
+                        {% for follower in object.follower_set.active %}
                             <li>
                                 <a href="{{ follower.user.userprofile.get_absolute_url }}">
                                     {{ follower.user.userprofile }}</a>

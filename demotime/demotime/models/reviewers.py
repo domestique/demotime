@@ -7,7 +7,16 @@ from demotime.constants import (
     APPROVED,
     REJECTED
 )
-from demotime.models import Event, EventType, Message, Reminder
+from demotime.models import (
+    Event, EventType, Message,
+    Reminder
+)
+
+
+class ReviewerManager(models.Manager):
+
+    def active(self):
+        return self.filter(is_active=True)
 
 
 class Reviewer(BaseModel):
@@ -25,6 +34,9 @@ class Reviewer(BaseModel):
         default='reviewing', db_index=True
     )
     events = GenericRelation('Event')
+    is_active = models.BooleanField(default=True, db_index=True)
+
+    objects = ReviewerManager()
 
     def __str__(self):
         return '{} Reviewer on {}'.format(
@@ -36,9 +48,11 @@ class Reviewer(BaseModel):
         return {
             'name': self.reviewer.userprofile.name,
             'user_pk': self.reviewer.pk,
+            'user_profile_url': self.reviewer.userprofile.get_absolute_url(),
             'reviewer_pk': self.pk,
             'reviewer_status': self.status,
             'review_pk': self.review.pk,
+            'is_active': self.is_active,
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
         }
@@ -58,13 +72,27 @@ class Reviewer(BaseModel):
     @classmethod
     def create_reviewer(cls, review, reviewer, creator,
                         skip_notifications=False, draft=False):
-        obj = cls.objects.create(
+        obj, _ = cls.objects.get_or_create(
             review=review,
             reviewer=reviewer,
             status=REVIEWING
         )
+        obj.is_active = True
+        obj.save()
         if not draft:
             obj.create_reviewer_event(creator)
+            reminder = Reminder.objects.filter(
+                user=obj.reviewer,
+                review=review,
+                reminder_type=Reminder.REVIEWER
+            )
+            if reminder.exists():
+                reminder = reminder.get()
+                Reminder.set_activity(review, obj.reviewer, active=True)
+            else:
+                Reminder.create_reminder(
+                    review, obj.reviewer, Reminder.REVIEWER
+                )
 
             if skip_notifications:
                 notify_reviewer = notify_creator = False
@@ -142,9 +170,7 @@ class Reviewer(BaseModel):
         )
 
         # Send a message if this isn't the last person to approve/reject
-        all_statuses = self.review.reviewer_set.values_list('status', flat=True)
-        consensus = all(x == APPROVED for x in all_statuses) or all(
-            x == REJECTED for x in all_statuses)
+        consensus, state = self.review.update_reviewer_state()
         if status != old_status and not consensus:
             status_display = '{} {}'.format(
                 'resumed' if status == REVIEWING else 'has',
@@ -168,7 +194,7 @@ class Reviewer(BaseModel):
                 self.review.creator,
                 revision=self.review.revision
             )
-        return self.review.update_reviewer_state()
+        return consensus, state
 
     def drop_reviewer(self, dropper, draft=False):  # pylint: disable=unused-argument
         review = self.review
@@ -179,8 +205,15 @@ class Reviewer(BaseModel):
             Event.create_event(
                 project=self.review.project,
                 event_type_code=EventType.REVIEWER_REMOVED,
-                related_object=self.review,
-                user=self.reviewer
+                related_object=self,
+                user=dropper
             )
-            self.delete()
-            review.update_reviewer_state()
+        review = self.review
+        self.is_active = False
+        self.status = REVIEWING
+        Reminder.objects.filter(
+            review=self.review,
+            user=self.reviewer
+        ).delete()
+        self.save()
+        review.update_reviewer_state()

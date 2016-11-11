@@ -25,6 +25,7 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(self.review.follower_set.count(), 1)
         self.assertEqual(follower_obj.review, self.review)
         self.assertEqual(follower_obj.user, follower)
+        self.assertTrue(follower_obj.is_active)
         self.assertEqual(
             follower_obj.__str__(),
             '{} Follower on {}'.format(follower_obj.display_name, self.review.title)
@@ -145,11 +146,23 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(self.review.reviewer_set.count(), 3)
         mail.outbox = []
         follower = self.test_users[0]
-        follower_obj = models.Follower.create_follower(self.review, follower, True)
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.review.creator, True
+        )
 
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(self.review.follower_set.count(), 0)
         self.assertTrue(isinstance(follower_obj, models.Reviewer))
+
+    def test_create_follower_with_inactive_reviewer(self):
+        self.assertEqual(self.review.follower_set.count(), 0)
+        follower = self.test_users[0]
+        reviewer = models.Reviewer.objects.get(review=self.review, reviewer=follower)
+        reviewer.drop_reviewer(self.review.creator)
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.review.creator, True
+        )
+        self.assertEqual(self.review.follower_set.count(), 1)
 
     def test_follower_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
@@ -159,6 +172,10 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(follower_json['user_pk'], follower.user.pk)
         self.assertEqual(follower_json['follower_pk'], follower.pk)
         self.assertEqual(follower_json['review_pk'], follower.review.pk)
+        self.assertEqual(
+            follower_json['user_profile_url'],
+            follower.user.userprofile.get_absolute_url()
+        )
 
     def test_drop_follower(self):
         follower = self.followers[0]
@@ -166,6 +183,8 @@ class TestFollowerModels(BaseTestCase):
             self.review, follower, self.user, True
         )
         follower_obj.drop_follower(self.review.creator)
+        follower_obj.refresh_from_db()
+        self.assertFalse(follower_obj.is_active)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.FOLLOWER_REMOVED
@@ -175,8 +194,23 @@ class TestFollowerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.FOLLOWER_REMOVED
         )
-        self.assertEqual(event.user, follower)
-        self.assertEqual(event.related_object, self.review)
+        self.assertEqual(event.user, self.review.creator)
+        self.assertEqual(event.related_object, follower_obj)
+
+    def test_readd_follower(self):
+        follower = self.followers[0]
+        follower_obj = models.Follower.create_follower(
+            self.review, follower, self.user, True
+        )
+        follower_obj.drop_follower(self.review.creator)
+        follower_obj.refresh_from_db()
+        self.assertFalse(follower_obj.is_active)
+
+        readded_follower = models.Follower.create_follower(
+            self.review, follower, self.user, True
+        )
+        self.assertEqual(follower_obj.pk, readded_follower.pk)
+        self.assertTrue(readded_follower.is_active)
 
     def test_drop_follower_draft(self):
         follower = self.followers[0]

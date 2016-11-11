@@ -115,7 +115,8 @@ class TestReviewModels(BaseTestCase):
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
         # Should still be the same, singular revision
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.reviewer_set.active().count(), 2)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(obj.revision.attachments.count(), 4)
@@ -257,9 +258,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
         self.assertEqual(new_obj.revision.number, 2)
         self.assertTrue(new_obj.revision.is_max_revision)
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.reviewer_set.active().count(), 2)
         self.assertEqual(obj.follower_set.count(), 2)
-        self.assertEqual(obj.reviewer_set.count(), 2)
         for reviewer in obj.reviewer_set.all():
             self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         self.assertEqual(second_review.reviewers.count(), 3)
@@ -315,7 +316,8 @@ class TestReviewModels(BaseTestCase):
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
         # Should still be the same, singular revision
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.reviewer_set.active().count(), 2)
         self.assertEqual(obj.revision.number, 2)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.revision.description, 'New Description')
@@ -360,9 +362,9 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_obj.reviewrevision_set.count(), 2)
         self.assertEqual(new_obj.revision.number, 2)
         self.assertTrue(new_obj.revision.is_max_revision)
-        self.assertEqual(obj.reviewers.count(), 2)
+        self.assertEqual(obj.reviewer_set.active().count(), 2)
+        self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.follower_set.count(), 2)
-        self.assertEqual(obj.reviewer_set.count(), 2)
         for reviewer in obj.reviewer_set.all():
             self.assertEqual(reviewer.status, models.reviews.REVIEWING)
         statuses = models.UserReviewStatus.objects.filter(review=obj)
@@ -510,6 +512,10 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
         self.assertEqual(len(mail.outbox), 5)
+        dropped_reviewer = obj.reviewer_set.all()[0]
+        dropped_follower = obj.follower_set.all()[0]
+        dropped_reviewer.drop_reviewer(obj.creator)
+        dropped_follower.drop_follower(obj.creator)
         mail.outbox = []
 
         models.UserReviewStatus.objects.update(read=True)
@@ -528,7 +534,7 @@ class TestReviewModels(BaseTestCase):
                 obj.title, models.reviews.CLOSED.capitalize()
             )
         )
-        self.assertEqual(msgs.count(), 5)
+        self.assertEqual(msgs.count(), 3)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -536,10 +542,10 @@ class TestReviewModels(BaseTestCase):
             ).exclude(user=self.user).count(),
             5
         )
-        self.assertEqual(len(mail.outbox), 5)
+        self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=False).count(),
-            4
+            3
         )
         self.assertEqual(
             self.hook_patch_run.call_args_list[0][0][0],
@@ -684,21 +690,43 @@ class TestReviewModels(BaseTestCase):
             constants.REOPENED,
         )
 
-    def test_reviewer_status_count_properties(self):
+    def test_reviewer_status_count_properties_reviewing(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         self.assertEqual(review.reviewing_count, 3)
         self.assertEqual(review.approved_count, 0)
         self.assertEqual(review.rejected_count, 0)
 
+    def test_reviewer_status_count_properties_approved(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
         review.reviewer_set.update(status=models.reviews.APPROVED)
         self.assertEqual(review.reviewing_count, 0)
         self.assertEqual(review.approved_count, 3)
         self.assertEqual(review.rejected_count, 0)
 
+    def test_reviewer_status_count_properties_rejected(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
         review.reviewer_set.update(status=models.reviews.REJECTED)
         self.assertEqual(review.reviewing_count, 0)
         self.assertEqual(review.approved_count, 0)
         self.assertEqual(review.rejected_count, 3)
+
+    def test_reviewer_status_count_properties_deleted(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        reviewer = review.reviewer_set.all()[0]
+        reviewer.drop_reviewer(review.creator)
+        self.assertEqual(review.reviewing_count, 2)
+        self.assertEqual(review.approved_count, 0)
+        self.assertEqual(review.rejected_count, 0)
+
+        review.reviewer_set.update(status=models.reviews.REJECTED)
+        self.assertEqual(review.reviewing_count, 0)
+        self.assertEqual(review.approved_count, 0)
+        self.assertEqual(review.rejected_count, 2)
+
+        review.reviewer_set.update(status=models.reviews.APPROVED)
+        self.assertEqual(review.reviewing_count, 0)
+        self.assertEqual(review.approved_count, 2)
+        self.assertEqual(review.rejected_count, 0)
 
     def test_review_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
@@ -706,11 +734,11 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['title'], review.title)
         self.assertEqual(review_json['creator'], review.creator.userprofile.name)
         reviewers = []
-        for reviewer in review.reviewer_set.all():
+        for reviewer in review.reviewer_set.active():
             reviewers.append(reviewer.to_json())
 
         followers = []
-        for follower in review.follower_set.all():
+        for follower in review.follower_set.active():
             followers.append(follower.to_json())
 
         self.assertEqual(review_json['reviewers'], reviewers)
@@ -729,6 +757,35 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['reviewing_count'], review.reviewing_count)
         self.assertEqual(review_json['approved_count'], review.approved_count)
         self.assertEqual(review_json['rejected_count'], review.rejected_count)
+
+    def test_review_to_json_hides_inactive_reviews_followers(self):
+        review = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(review.reviewer_set.count(), 3)
+        self.assertEqual(review.follower_set.count(), 2)
+        # Drop a reviewer and follower
+        reviewer = review.reviewer_set.all()[0]
+        follower = review.follower_set.all()[0]
+        reviewer.drop_reviewer(review.creator)
+        follower.drop_follower(review.creator)
+        # Verify things are as they should be
+        self.assertEqual(review.reviewer_set.count(), 3)
+        self.assertEqual(review.follower_set.count(), 2)
+        self.assertEqual(review.reviewer_set.active().count(), 2)
+        self.assertEqual(review.follower_set.active().count(), 1)
+
+        review_json = review.to_json()
+        reviewers = []
+        for reviewer in review.reviewer_set.active():
+            reviewers.append(reviewer.to_json())
+
+        followers = []
+        for follower in review.follower_set.active():
+            followers.append(follower.to_json())
+
+        self.assertEqual(review_json['reviewers'], reviewers)
+        self.assertEqual(review_json['followers'], followers)
+        self.assertEqual(len(review_json['reviewers']), 2)
+        self.assertEqual(len(review_json['followers']), 1)
 
     @patch('demotime.tasks.fire_webhook')
     def test_trigger_webhooks_fires(self, task_patch):
