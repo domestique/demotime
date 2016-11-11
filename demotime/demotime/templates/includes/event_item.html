@@ -36,9 +36,9 @@
     <% } else if (moment.event_type.code == 'reviewer-reset') { %>
         <%= moment.user.name %> resets an approval status
     <% } else if (moment.event_type.code == 'reviewer-removed') { %>
-        <%= moment.user.name %> was <strong>removed as a reviewer</strong>
+        <%= moment.related_object.name %> was <strong>removed as a reviewer</strong> by <%= moment.user.name %>
     <% } else if (moment.event_type.code == 'follower-removed') { %>
-        <%= moment.user.name %> was <strong>removed as a follower</strong>
+        <%= moment.related_object.name %> was <strong>removed as a follower</strong> by <%= moment.user.name %>
     <% } else if (moment.event_type.code == 'demo-updated') { %>
         A new revision was added. <a href="<%= moment.related_object.url %>">View it here</a>
     <% } else if (moment.event_type.code == 'comment-added') { %>

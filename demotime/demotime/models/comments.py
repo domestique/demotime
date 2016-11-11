@@ -132,9 +132,9 @@ class Comment(BaseModel):
                 users = User.objects.filter(
                     (
                         # Reviewers
-                        models.Q(reviewer__review=review.review) |
+                        models.Q(reviewer__review=review.review, reviewer__is_active=True) |
                         # Followers
-                        models.Q(follower__review=review.review) |
+                        models.Q(follower__review=review.review, follower__is_active=True) |
                         # Creator
                         models.Q(pk=review.review.creator.pk) |
                         # Mentions

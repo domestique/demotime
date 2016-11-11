@@ -33,6 +33,10 @@ class TestCommentModels(BaseTestCase):
 
     def test_create_comment(self):
         self.assertEqual(models.Message.objects.count(), 0)
+        dropped_reviewer = self.review.reviewer_set.all()[0]
+        dropped_follower = self.review.follower_set.all()[0]
+        dropped_reviewer.drop_reviewer(self.review.creator)
+        dropped_follower.drop_follower(self.review.creator)
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
         attachments = [
             {
@@ -74,15 +78,16 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(
             models.Message.objects.filter(title__contains='New Comment').count(),
-            5
+            3
         )
         self.assertFalse(
             models.Message.objects.filter(receipient=self.user).exists()
         )
         statuses = models.UserReviewStatus.objects.filter(review=self.review)
         self.assertEqual(statuses.count(), 6)
-        self.assertEqual(statuses.filter(read=True).count(), 1)
-        self.assertEqual(statuses.filter(read=False).count(), 5)
+        # Dropped people aren't updated
+        self.assertEqual(statuses.filter(read=True).count(), 3)
+        self.assertEqual(statuses.filter(read=False).count(), 3)
         self.assertEqual(
             comment.__str__(),
             'Comment by {} on Review: {}'.format(

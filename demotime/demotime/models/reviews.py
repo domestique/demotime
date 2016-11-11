@@ -82,10 +82,10 @@ class Review(BaseModel):
     def to_json(self):
         reviewers = []
         followers = []
-        for reviewer in self.reviewer_set.all():
+        for reviewer in self.reviewer_set.active():
             reviewers.append(reviewer.to_json())
 
-        for follower in self.follower_set.all():
+        for follower in self.follower_set.active():
             followers.append(follower.to_json())
 
         return {
@@ -120,9 +120,9 @@ class Review(BaseModel):
         if update:
             title = 'Update on Review: {}'.format(self.title)
 
-        for reviewer in self.reviewers.all():
+        for reviewer in self.reviewer_set.active():
             context = {
-                'receipient': reviewer,
+                'receipient': reviewer.reviewer,
                 'url': self.get_absolute_url(),
                 'update': update,
                 'title': self.title,
@@ -131,11 +131,11 @@ class Review(BaseModel):
                 title,
                 'demotime/messages/review.html',
                 context,
-                reviewer,
+                reviewer.reviewer,
                 revision=self.revision,
             )
 
-        for follower in self.follower_set.all():
+        for follower in self.follower_set.active():
             context = {
                 'receipient': follower.user,
                 'url': self.get_absolute_url(),
@@ -394,7 +394,9 @@ class Review(BaseModel):
             raise RuntimeError('Invalid Demo State')
 
     def update_reviewer_state(self):
-        statuses = self.reviewer_set.values_list('status', flat=True)
+        statuses = self.reviewer_set.active().values_list(
+            'status', flat=True
+        )
         approved = all(status == APPROVED for status in statuses)
         rejected = all(status == REJECTED for status in statuses)
         reviewing = not approved and not rejected
@@ -437,7 +439,8 @@ class Review(BaseModel):
             self.creator
         )
         users = User.objects.filter(
-            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+            models.Q(reviewer__review=self, reviewer__is_active=True) |
+            models.Q(follower__review=self, follower__is_active=True),
         ).distinct()
         reviewers = self.reviewers.all()
         for user in users:
@@ -476,7 +479,8 @@ class Review(BaseModel):
             self.creator
         )
         users = User.objects.filter(
-            models.Q(reviewer__review=self) | models.Q(follower__review=self),
+            models.Q(reviewer__review=self, reviewer__is_active=True) |
+            models.Q(follower__review=self, follower__is_active=True),
         ).distinct()
         reviewers = self.reviewers.all()
         for user in users:
@@ -543,15 +547,15 @@ class Review(BaseModel):
 
     @property
     def reviewing_count(self):
-        return self.reviewer_set.filter(status=REVIEWING).count()
+        return self.reviewer_set.active().filter(status=REVIEWING).count()
 
     @property
     def approved_count(self):
-        return self.reviewer_set.filter(status=APPROVED).count()
+        return self.reviewer_set.active().filter(status=APPROVED).count()
 
     @property
     def rejected_count(self):
-        return self.reviewer_set.filter(status=REJECTED).count()
+        return self.reviewer_set.active().filter(status=REJECTED).count()
 
 
 class ReviewRevision(BaseModel):

@@ -48,12 +48,17 @@ class Reminder(BaseModel):
     def create_reminder(cls, review, user, reminder_type, remind_at=None):
         if not remind_at:
             remind_at = get_reminder_days(review.project)
-        return cls.objects.create(
+        obj, _ = cls.objects.get_or_create(
             review=review,
             user=user,
-            reminder_type=reminder_type,
-            remind_at=remind_at,
+            defaults={
+                'reminder_type': reminder_type,
+                'remind_at': remind_at,
+            }
         )
+        obj.active = True
+        obj.save()
+        return obj
 
     @classmethod
     def create_reminders_for_review(cls, review):
@@ -62,7 +67,7 @@ class Reminder(BaseModel):
             user=review.creator,
             reminder_type=cls.CREATOR
         )
-        for reviewer in review.reviewer_set.all():
+        for reviewer in review.reviewer_set.active().all():
             cls.create_reminder(
                 review=review,
                 user=reviewer.reviewer,

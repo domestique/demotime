@@ -25,7 +25,7 @@ def determine_attachment_type(filename):
         suffix = 'unknown_format'
         
     for attachment_type, suffixes in constants.ATTACHMENT_MAP.items():
-        if suffix in suffixes:
+        if suffix.lower() in suffixes:
             return attachment_type
 
     return constants.OTHER
