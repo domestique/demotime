@@ -22,6 +22,13 @@ class TestAttachmentModel(BaseTestCase):
                 ),
                 constants.IMAGE
             )
+            # Prove case doesn't matter
+            self.assertEqual(
+                models.attachments.determine_attachment_type(
+                    filename_str.format(suffix.upper())
+                ),
+                constants.IMAGE
+            )
 
     def test_determine_attachment_type_movie(self):
         filename_str = 'test_file.{}'
@@ -30,6 +37,13 @@ class TestAttachmentModel(BaseTestCase):
             self.assertEqual(
                 models.attachments.determine_attachment_type(
                     filename_str.format(suffix)
+                ),
+                constants.MOVIE
+            )
+            # Prove case doesn't matter
+            self.assertEqual(
+                models.attachments.determine_attachment_type(
+                    filename_str.format(suffix.upper())
                 ),
                 constants.MOVIE
             )
@@ -44,6 +58,13 @@ class TestAttachmentModel(BaseTestCase):
                 ),
                 constants.AUDIO
             )
+            # Prove case doesn't matter
+            self.assertEqual(
+                models.attachments.determine_attachment_type(
+                    filename_str.format(suffix.upper())
+                ),
+                constants.AUDIO
+            )
 
     def test_determine_attachment_type_doc(self):
         filename_str = 'test_file.{}'
@@ -55,6 +76,13 @@ class TestAttachmentModel(BaseTestCase):
                 ),
                 constants.DOCUMENT
             )
+            # Prove case doesn't matter
+            self.assertEqual(
+                models.attachments.determine_attachment_type(
+                    filename_str.format(suffix.upper())
+                ),
+                constants.DOCUMENT
+            )
 
     def test_determine_attachment_type_other(self):
         filename_str = 'test_file.{}'
@@ -63,6 +91,13 @@ class TestAttachmentModel(BaseTestCase):
             self.assertEqual(
                 models.attachments.determine_attachment_type(
                     filename_str.format(suffix)
+                ),
+                constants.OTHER
+            )
+            # Prove case doesn't matter
+            self.assertEqual(
+                models.attachments.determine_attachment_type(
+                    filename_str.format(suffix.upper())
                 ),
                 constants.OTHER
             )
