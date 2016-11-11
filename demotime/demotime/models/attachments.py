@@ -21,7 +21,7 @@ def attachment_filename(instance, filename):
 def determine_attachment_type(filename):
     suffix = filename.split('.')[-1]
     for attachment_type, suffixes in constants.ATTACHMENT_MAP.items():
-        if suffix in suffixes:
+        if suffix.lower() in suffixes:
             return attachment_type
 
     return constants.OTHER
