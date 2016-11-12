@@ -166,6 +166,15 @@ class CommentJsonView(CanViewJsonView):
             thread=comment.thread, instance=comment,
             has_attachments=has_attachments
         )
+        if body.get('delete_attachments'):
+            for pk in body['delete_attachments']:
+                try:
+                    attachment = comment.attachments.get(pk=pk)
+                except models.Attachment.DoesNotExist:
+                    pass
+                else:
+                    attachment.delete()
+
         if comment_form.is_valid():
             data = comment_form.cleaned_data
             comment.comment = data['comment']
@@ -178,14 +187,6 @@ class CommentJsonView(CanViewJsonView):
                     sort_order=attachment.get('sort_order') or count
                 )
 
-            if body.get('delete_attachments'):
-                for pk in body['delete_attachments']:
-                    try:
-                        attachment = comment.attachments.get(pk=pk)
-                    except models.Attachment.DoesNotExist:
-                        pass
-                    else:
-                        attachment.delete()
             return {
                 'status': 'success',
                 'errors': '',
