@@ -348,15 +348,13 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     attachment_delete: function(event) {
-        var el = $(this),
+        var el = $(event.target),
             self = this;
 
         event.preventDefault();
-
         var data = {
-            delete_attachments: el.data('attachment'),
-            comment_pk: el.data('comment'),
-            comment: self.options.comment
+            delete_attachments: '[' + el.data('attachment') + ']',
+            comment_pk: el.data('comment')
         }
 
         var del = $.ajax({
@@ -366,9 +364,8 @@ DemoTime.Comments = Backbone.View.extend({
             data: JSON.stringify(data)
         });
 
-        del.always(function() {
-            parent = el.parents('.demobox');
-            parent.slideUp(function() {
+        del.success(function(msg) {
+            el.parents('.attachment-card').slideUp(function() {
                 $(this).remove();
                 if (!$('.current_attachments .demobox').length) {
                     $('.current_attachments .attachments').html('No attachments found');
