@@ -16,13 +16,13 @@ def control_docker_dev(ctx, cmd='up -d'):
 
 
 @task
-def run_tests(ctx, test_module='demotime', opts='', pty=True):
+def run_tests(ctx, module='demotime', opts='', pty=True):
     print("Cleaning out pycs")
     ctx.run('find . -type f -name \*.pyc -delete')
     with util.cd(os.path.join(LOCAL_ROOT, 'dt')):
         ctx.run(
             'TESTS=true coverage run --source=demotime manage.py test {} {}'.format(
-                test_module, opts
+                module, opts
             ),
             pty=pty
         )

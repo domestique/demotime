@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import Max
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.auth.models import User
 from django.utils import timezone
 
 from demotime.models.base import BaseModel
@@ -25,12 +24,11 @@ from demotime.constants import (
     OPEN,
     CLOSED,
     ABORTED,
-    REOPENED,
-    CREATED,
     UPDATED,
     DRAFT,
     CANCELLED,
 )
+from demotime.demo_machine import DemoMachine
 
 
 class Review(BaseModel):
@@ -115,7 +113,16 @@ class Review(BaseModel):
     def get_absolute_url(self):
         return self.revision.get_absolute_url()
 
-    def _send_revision_messages(self, update=False):
+    @property
+    def state_machine(self):
+        if getattr(self, '_state_machine', None) and self.pk:
+            return self._state_machine # pylint: disable=access-member-before-definition
+        else:
+            self._state_machine = DemoMachine(self) # pylint: disable=attribute-defined-outside-init
+
+        return self._state_machine
+
+    def send_revision_messages(self, update=False):
         title = 'New Review: {}'.format(self.title)
         if update:
             title = 'Update on Review: {}'.format(self.title)
@@ -163,11 +170,12 @@ class Review(BaseModel):
             title=title,
             description=description,
             case_link=case_link,
-            state=state,
+            state=DRAFT,
             reviewer_state=REVIEWING,
             project=project,
             is_public=is_public,
         )
+        obj.state_machine
         rev = ReviewRevision.objects.create(
             review=obj,
             description=obj.description,
@@ -179,15 +187,6 @@ class Review(BaseModel):
                 description=attachment['description'],
                 content_object=rev,
                 sort_order=attachment['sort_order'],
-            )
-
-        # Events
-        if state != DRAFT:
-            Event.create_event(
-                project,
-                EventType.DEMO_CREATED,
-                obj,
-                creator
             )
 
         for reviewer in reviewers:
@@ -212,11 +211,7 @@ class Review(BaseModel):
             obj, obj.creator, True
         )
 
-        if state == OPEN:
-            obj._send_revision_messages()  # pylint: disable=protected-access
-            Reminder.create_reminders_for_review(obj)
-            obj.trigger_webhooks(CREATED)
-
+        obj.update_state(state)
         return obj
 
     # pylint: disable=too-many-arguments
@@ -230,19 +225,17 @@ class Review(BaseModel):
         ''' Standard update review method '''
         # Figure out if we have a state transition
         obj = cls.objects.get(pk=review)
-        current_state = obj.state
         obj.title = title
         obj.case_link = case_link
         obj.project = project
         obj.is_public = is_public
         obj.save()
 
-        state_change = False
-        is_update = False
-        if current_state == DRAFT and state == OPEN:
-            state_change = True
+        is_or_was_draft = state == DRAFT or obj.state == DRAFT
+        state_change = obj.state != state
+        is_update = not is_or_was_draft
 
-        if state == DRAFT or state_change:
+        if is_or_was_draft:
             obj.description = description
             # We want the created time to represent when the user started the
             # Demo, not when they created the draft
@@ -253,8 +246,7 @@ class Review(BaseModel):
             rev.save()
             prev_revision = None
 
-        if state != DRAFT and not state_change:
-            is_update = True
+        if is_update:
             prev_revision = obj.revision
             rev_count = obj.reviewrevision_set.count()
             rev = ReviewRevision.objects.create(
@@ -262,28 +254,28 @@ class Review(BaseModel):
                 description=description,
                 number=rev_count + 1
             )
+
+            # No attachments, we'll copy them over
+            if not attachments:
+                for attachment in prev_revision.attachments.all():
+                    attachment.content_object = rev
+                    attachment.pk = None
+                    attachment.save()
+
+            # Events
+            Event.create_event(
+                project,
+                EventType.DEMO_UPDATED,
+                obj,
+                creator
+            )
+
         for attachment in attachments:
             Attachment.create_attachment(
                 attachment=attachment['attachment'],
                 description=attachment['description'],
                 content_object=rev,
                 sort_order=attachment['sort_order'],
-            )
-
-        # No attachments, we'll copy them over
-        if prev_revision and not attachments:
-            for attachment in prev_revision.attachments.all():
-                attachment.content_object = rev
-                attachment.pk = None
-                attachment.save()
-
-        # Events
-        if state == OPEN and not state_change:
-            Event.create_event(
-                project,
-                EventType.DEMO_UPDATED,
-                obj,
-                creator
             )
 
         for reviewer in reviewers:
@@ -295,9 +287,10 @@ class Review(BaseModel):
                 )
             else:
                 reviewer.status = REVIEWING
+                reviewer.is_active = True
                 reviewer.save()
                 obj.update_reviewer_state()
-                if state_change:
+                if state_change and state not in (DRAFT, CANCELLED):
                     reviewer.create_reviewer_event(creator)
 
         for follower in followers:
@@ -310,7 +303,9 @@ class Review(BaseModel):
                     draft=state == DRAFT
                 )
             else:
-                if state_change:
+                follower.is_active = True
+                follower.save()
+                if state_change and state not in (DRAFT, CANCELLED):
                     follower.create_follower_event(creator)
 
         # Update UserReviewStatuses
@@ -320,24 +315,24 @@ class Review(BaseModel):
 
         # Drop Reviewers no longer assigned
         reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
-        skip_drop_events = state == DRAFT or state_change
+        skip_drop_events = DRAFT in (
+            state, getattr(obj.state_machine.previous_state, 'name', '')
+        )
         for reviewer in reviewers:
             reviewer.drop_reviewer(obj.creator, draft=skip_drop_events)
         followers = obj.follower_set.exclude(review=obj, user__in=followers)
         for follower in followers:
             follower.drop_follower(obj.creator, draft=skip_drop_events)
 
+        obj.state_machine.change_state(state)
         if is_update:
-            # pylint: disable=protected-access
-            obj._send_revision_messages(update=True)
+            # This is down here so that messages get sent to the right users,
+            # such as if Reviewers/Followers were removed
+            obj.send_revision_messages(update=True)
             obj.trigger_webhooks(UPDATED)
             Reminder.update_reminders_for_review(obj)
             if obj.state in (CLOSED, ABORTED):
                 obj.update_state(OPEN)
-
-        if state_change:
-            obj.update_state(state)
-            obj._send_revision_messages() # pylint: disable=protected-access
 
         return obj
 
@@ -414,127 +409,8 @@ class Review(BaseModel):
 
         return False, ''
 
-    def _open_review(self, state):
-        self.state = state
-        self.save(update_fields=['state', 'modified'])
-        Event.create_event(
-            self.project,
-            EventType.DEMO_CREATED,
-            self,
-            self.creator
-        )
-        Reminder.create_reminders_for_review(self)
-        return True
-
-    def _reopen_review(self, state):
-        # We take a state because this can be closed or aborted, it's okay
-        # we don't judge
-        prev_state = self.get_state_display()
-        self.state = state
-        self.save(update_fields=['state', 'modified'])
-        Event.create_event(
-            self.project,
-            EventType.DEMO_OPENED,
-            self,
-            self.creator
-        )
-        users = User.objects.filter(
-            models.Q(reviewer__review=self, reviewer__is_active=True) |
-            models.Q(follower__review=self, follower__is_active=True),
-        ).distinct()
-        reviewers = self.reviewers.all()
-        for user in users:
-            is_reviewer = user in reviewers
-            Message.send_system_message(
-                '"{}" has been Reopened'.format(self.title),
-                'demotime/messages/reopened.html',
-                {
-                    'is_reviewer': is_reviewer,
-                    'review': self,
-                    'previous_state': prev_state,
-                    'user': user
-                },
-                user,
-                revision=self.revision,
-            )
-
-        Reminder.update_reminder_activity_for_review(self, True)
-
-        return True
-
-    def _close_review(self, state):
-        # We take a state because this can be closed or aborted, it's okay
-        # we don't judge
-        prev_state = self.get_state_display()
-        self.state = state
-        self.save(update_fields=['state', 'modified'])
-        if state == ABORTED:
-            event_type = EventType.DEMO_ABORTED
-        else:
-            event_type = EventType.DEMO_CLOSED
-        Event.create_event(
-            self.project,
-            event_type,
-            self,
-            self.creator
-        )
-        users = User.objects.filter(
-            models.Q(reviewer__review=self, reviewer__is_active=True) |
-            models.Q(follower__review=self, follower__is_active=True),
-        ).distinct()
-        reviewers = self.reviewers.all()
-        for user in users:
-            is_reviewer = user in reviewers
-            Message.send_system_message(
-                '"{}" has been {}'.format(self.title, state.capitalize()),
-                'demotime/messages/closed.html',
-                {
-                    'is_reviewer': is_reviewer,
-                    'review': self,
-                    'previous_state': prev_state,
-                    'user': user,
-                },
-                user,
-                revision=self.revision,
-            )
-
-        Reminder.update_reminder_activity_for_review(self)
-
-        return True
-
-    def _common_state_change(self):
-        ''' General purpose state change things '''
-        UserReviewStatus.objects.filter(
-            review=self
-        ).exclude(user=self.creator).update(
-            read=False
-        )
-
     def update_state(self, new_state):
-        state_changed = False
-        if self.state == DRAFT and new_state == OPEN:
-            state_changed = self._open_review(new_state)
-            self.trigger_webhooks(CREATED)
-        elif self.state == OPEN and new_state == CLOSED:
-            state_changed = self._close_review(new_state)
-            self.trigger_webhooks(CLOSED)
-        elif self.state == OPEN and new_state == ABORTED:
-            state_changed = self._close_review(new_state)
-            self.trigger_webhooks(ABORTED)
-        elif self.state == CLOSED and new_state == OPEN:
-            state_changed = self._reopen_review(new_state)
-            self.trigger_webhooks(REOPENED)
-        elif self.state == ABORTED and new_state == OPEN:
-            state_changed = self._reopen_review(new_state)
-            self.trigger_webhooks(REOPENED)
-        elif self.state == DRAFT and new_state == CLOSED:
-            self.state = CANCELLED
-            self.save()
-
-        if state_changed:
-            self._common_state_change()
-
-        return state_changed
+        return self.state_machine.change_state(new_state)
 
     def trigger_webhooks(self, trigger_event, additional_json=None):
         hooks = self.project.webhook_set.filter(trigger_event=trigger_event)
