@@ -265,6 +265,11 @@ section .events .demobox-body {
     position: relative;
     top: -2px;
 }
+@media screen and (max-width:720px) {
+    #expand_collapse {
+        display: none;
+    }
+}
 
 .events blockquote .jump_to_this {
     color: #bbb;
