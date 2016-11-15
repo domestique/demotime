@@ -137,6 +137,12 @@ DemoTime.Comments = Backbone.View.extend({
                     }
                 });
 
+                // Clean up
+                self.options.comment_form_container.data('editing', false);
+                self.options.top_level_comment = null;
+                self.options.attachment_adder = null;
+                $('.temporary-attachments-preview').remove();
+
                 // If reply and approve, trigger button click, otherwise
                 // just scroll the new comment in to view.
                 if (also_approve) {
@@ -160,11 +166,6 @@ DemoTime.Comments = Backbone.View.extend({
                         self.options.attachment_adder.show();
                     }
                 }
-
-                // Clean up options
-                self.options.comment_form_container.data('editing', false);
-                self.options.top_level_comment = null;
-                self.options.attachment_adder = null;
             }
         });
 
@@ -223,10 +224,10 @@ DemoTime.Comments = Backbone.View.extend({
             comment = link.parents('.demobox');
 
         // Remove existing comment html
-        comment.find('.attachment-card').remove();
 
         // Grab comment html
-        var edit_html = comment.find('.demobox-body').html();
+        var edit_html = comment.find('.demobox-body-contents').html(),
+            attachments = comment.find('.demobox-body-attachments').html();
 
         event.preventDefault();
 
@@ -259,6 +260,7 @@ DemoTime.Comments = Backbone.View.extend({
         // Re-show wysiwyg
         this.options.comment_form_container.slideDown(function() {
             self.options.comment_form_container.find('.wysiwyg-editor').html(edit_html);
+            self.options.comment_form_container.after('<div class="temporary-attachments-preview">' + attachments + '</div>');
             self.options.comment_form_container.find('.wysiwyg-editor').focus();
             if ($(window).width() > 720) {
                 $('html, body').animate({

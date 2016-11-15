@@ -355,10 +355,12 @@
                                         </div>
                                         {% if comment.comment or comment.attachments.all %}
                                             <div class="demobox-body">
-                                                {{ comment.comment|safe|linebreaksbr }}
-                                                {% for attachment in comment.attachments.all %}
-                                                    {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment %}
-                                                {% endfor %}
+                                                <div class="demobox-body-contents">{{ comment.comment|safe|linebreaksbr }}</div>
+                                                <div class="demobox-body-attachments">
+                                                    {% for attachment in comment.attachments.all %}
+                                                        {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment %}
+                                                    {% endfor %}
+                                                </div>
                                             </div>
                                         {% endif %}
                                     </div>
