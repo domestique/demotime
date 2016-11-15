@@ -1,6 +1,6 @@
 <div>
     <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
-        <a href="<%= moment.user.url %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
+        <a href="<%= moment.related_object.user_profile_url %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
     <% } else if (moment.event_type.code == 'demo-created') { %>
         This demo was <strong>created</strong>. Let the games begin
     <% } else if (moment.event_type.code == 'reviewer-approved') { %>
