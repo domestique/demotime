@@ -5,7 +5,8 @@ DemoTime.ReviewActivity = Backbone.View.extend({
         'click #activity_toggler': 'toggle_activity_pane',
         'click .comment_link': 'jump_to_comment',
         'change #events_filter': 'render',
-        'click #refresh_events': 'render'
+        'click #refresh_events': 'render',
+        'click #expand_collapse': 'expand_collapse'
     },
 
     jump_to_comment: function(event) {
@@ -99,6 +100,46 @@ DemoTime.ReviewActivity = Backbone.View.extend({
                 if ($('.events').length && $(window).width() > 720) {
                     $('.events').css('max-height', $('#dashboard_left').height() - 80 + 'px');
                 }
+            });
+        }
+    },
+
+    expand_collapse: function(event) {
+        event.preventDefault();
+
+        var link = $(event.target),
+            col_2 = link.parents('.cel'),
+            col_1 = col_2.prev(),
+            events = col_2.find('.events');
+
+        if (!col_2.hasClass('expanded')) {
+            col_2.addClass('expanded');
+            col_1.data('width', col_1.css('width'));
+            col_2.data('width', col_2.css('width'));
+            events.data('max-height', events.css('max-height'));
+            events.css('max-height', '100%');
+            col_1.animate({
+                width: '0'
+            }, 500, function() {
+                col_1.hide();
+            });
+            col_2.animate({
+                width: '100%'
+            }, 500, function() {
+                link.html('&gt;&gt;');
+            });
+        } else {
+            col_2.removeClass('expanded');
+            col_1.show();
+            col_1.animate({
+                width: col_1.data('width')
+            }, 500);
+            col_2.animate({
+                width: col_2.data('width')
+            }, 500, function() {
+                events.css('max-height', events.data('max-height'));
+                col_1.show();
+                link.html('&lt;&lt;');
             });
         }
     }
