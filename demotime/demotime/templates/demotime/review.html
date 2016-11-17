@@ -358,7 +358,7 @@
                                                 <div class="demobox-body-contents">{{ comment.comment|safe|linebreaksbr }}</div>
                                                 <div class="demobox-body-attachments">
                                                     {% for attachment in comment.attachments.all %}
-                                                        {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment %}
+                                                        {% include "includes/review_attachment.html" with project=object.project review_inst=object attachment=attachment comment=comment %}
                                                     {% endfor %}
                                                 </div>
                                             </div>
