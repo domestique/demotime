@@ -15,6 +15,7 @@ class State(object):
         """ Stub that children should populate, but is optional. If optional,
         the child should `pass`
         """
+        # TODO: Do I even need this on_exit method? I'm not convinced.
         raise NotImplementedError('on_exit not implemented')
 
     def _common_state_change(self, review, webhook_type=None):
@@ -228,3 +229,46 @@ class DemoMachine(StateMachine):
         constants.ABORTED: Aborted,
         constants.CANCELLED: Cancelled,
     }
+
+
+class Reviewing(State):
+
+    name = constants.REVIEWING
+
+    def on_enter(self, review, prev_state):
+        pass
+
+    def on_exit(self, review, next_state):
+        pass
+
+
+class Approved(State):
+
+    name = constants.APPROVED
+
+    def on_enter(self, review, prev_state):
+        pass
+
+    def on_exit(self, review, next_state):
+        pass
+
+
+class Rejected(State):
+
+    name = constants.REJECTED
+
+    def on_enter(self, review, prev_state):
+        pass
+
+    def on_exit(self, review, next_state):
+        pass
+
+
+class ReviewerMachine(StateMachine):
+
+    STATE_MAP = {
+        constants.REVIEWING: Reviewing,
+        constants.APPROVED: Approved,
+        constants.REJECTED: Rejected,
+    }
+    STATE_FIELD = 'reviewer_state'
