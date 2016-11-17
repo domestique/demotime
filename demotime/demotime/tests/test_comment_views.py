@@ -273,6 +273,24 @@ class TestCommentAPIViews(BaseTestCase):
             'comment': self.comment.to_json()
         })
 
+    def test_update_comment_delete_attachment(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'delete_attachments': [
+                self.comment.attachments.get().pk,
+                10000, # We'll just gracefully ignore this delete
+            ],
+        }))
+        self.assertStatusCode(response, 200)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.attachments.count(), 0)
+        self.assertEqual(self.comment.comment, 'Test Comment')
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': self.comment.to_json()
+        })
+
     """
     Not quite sure how to make this patch request with multiple files work with
     the Django test client. Going to see if we can get it working in a browser

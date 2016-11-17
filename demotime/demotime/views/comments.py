@@ -187,6 +187,7 @@ class CommentJsonView(CanViewJsonView):
                     sort_order=attachment.get('sort_order') or count
                 )
 
+        if 'comment' not in request.POST or comment_form.is_valid():
             return {
                 'status': 'success',
                 'errors': '',
