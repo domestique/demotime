@@ -136,8 +136,9 @@
                 {% include "includes/legend.html" %}
             </div>
             <div id="dashboard_right" class="cel">
-                <h3 class="icon icon-cloud">
-                    Demo feed
+                <h3>
+                    <a href="#" id="expand_collapse" title="Expand/Collapse Demo Feed">&lt;&lt;</a>
+                    Demo Feed
                     <select id="events_filter">
                         {% for project in available_projects %}
                             <option value={{ project.slug }}>{{ project.name }}</option>

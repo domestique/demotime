@@ -1,4 +1,4 @@
-describe("Comments.js", function() {
+describe("ReviewActivity.js", function() {
     var is_phantom = function() {
         return navigator.userAgent.toLowerCase().indexOf('phantom') > -1;
     }

@@ -23,7 +23,7 @@ h1 a:not(.normal_text),
 h2 a:not(.normal_text),
 h3 a:not(.normal_text) {
     font-size: 13px;
-    margin-left: 10px;
+    margin-left: 5px;
     vertical-align: middle;
 }
 ul {
