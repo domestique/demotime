@@ -476,7 +476,6 @@ class TestReviewModels(BaseTestCase):
         undecided_person.status = constants.REVIEWING
         undecided_person.save()
         models.UserReviewStatus.objects.update(read=True)
-        import ipdb; ipdb.set_trace()
         changed, new_state = obj.update_reviewer_state()
         obj.refresh_from_db()
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)

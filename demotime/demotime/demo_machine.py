@@ -11,13 +11,6 @@ class State(object):
         review.state = self.name
         review.save(update_fields=['state', 'modified'])
 
-    def on_exit(self, review, next_state):
-        """ Stub that children should populate, but is optional. If optional,
-        the child should `pass`
-        """
-        # TODO: Do I even need this on_exit method? I'm not convinced.
-        raise NotImplementedError('on_exit not implemented')
-
     def _common_state_change(self, review, webhook_type=None):
         models.UserReviewStatus.objects.filter(
             review=review
@@ -28,7 +21,7 @@ class State(object):
             review.trigger_webhooks(webhook_type)
 
     def __eq__(self, other):
-        return isinstance(self, type(other))
+        return self.__class__.__name__ == other.__class__.__name__
 
 
 class ReviewerState(State):
@@ -36,9 +29,6 @@ class ReviewerState(State):
     def on_enter(self, review, prev_state): # pylint: disable=unused-argument
         review.reviewer_state = self.name
         review.save(update_fields=['reviewer_state', 'modified'])
-
-    def on_exit(self, review, next_state):
-        raise NotImplementedError('on_exit not implemented')
 
     def _common_state_change(self, review, webhook_type=None):
         models.UserReviewStatus.objects.filter(
@@ -56,9 +46,6 @@ class Draft(State):
     name = constants.DRAFT
 
     def on_enter(self, review, prev_state):
-        pass
-
-    def on_exit(self, review, next_state):
         pass
 
 
@@ -119,9 +106,6 @@ class Open(State):
 
         self._common_state_change(review, webhook_type)
 
-    def on_exit(self, review, next_state):
-        pass
-
 
 class Closed(State):
 
@@ -157,9 +141,6 @@ class Closed(State):
 
         models.Reminder.update_reminder_activity_for_review(review)
         self._common_state_change(review, self.name)
-
-    def on_exit(self, review, next_state):
-        pass
 
 
 class Aborted(State):
@@ -197,18 +178,12 @@ class Aborted(State):
         models.Reminder.update_reminder_activity_for_review(review)
         self._common_state_change(review, self.name)
 
-    def on_exit(self, review, next_state):
-        pass
-
 
 class Cancelled(State):
 
     name = constants.CANCELLED
 
     def on_enter(self, review, prev_state):
-        pass
-
-    def on_exit(self, review, next_state):
         pass
 
 
@@ -232,7 +207,6 @@ class StateMachine(object):
         new_state_cls = self.STATE_MAP[new_state]
         new_state = new_state_cls()
         if self.state != new_state:
-            self.state.on_exit(self.review, new_state)
             new_state.on_enter(self.review, self.state)
             self.previous_state = self.state
             self.state = new_state
@@ -273,9 +247,6 @@ class Reviewing(ReviewerState):
         review.trigger_webhooks(constants.REVIEWING)
         self._common_state_change(review)
 
-    def on_exit(self, review, next_state):
-        pass
-
 
 class Approved(ReviewerState):
 
@@ -299,9 +270,6 @@ class Approved(ReviewerState):
         review.trigger_webhooks(constants.APPROVED)
         self._common_state_change(review)
 
-    def on_exit(self, review, next_state):
-        pass
-
 
 class Rejected(ReviewerState):
 
@@ -324,9 +292,6 @@ class Rejected(ReviewerState):
         )
         review.trigger_webhooks(constants.REJECTED)
         self._common_state_change(review)
-
-    def on_exit(self, review, next_state):
-        pass
 
 
 class ReviewerMachine(StateMachine):

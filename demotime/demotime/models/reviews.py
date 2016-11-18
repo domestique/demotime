@@ -350,7 +350,7 @@ class Review(BaseModel):
         try:
             status = self.reviewer_set.active().values_list(
                 'status', flat=True).distinct().get()
-        except Reviewer.MultipleObjectsReturned:
+        except (Reviewer.MultipleObjectsReturned, Reviewer.DoesNotExist):
             status = REVIEWING
 
         changed = self.reviewer_state_machine.change_state(status)
