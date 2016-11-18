@@ -137,10 +137,6 @@ DemoTime.Comments = Backbone.View.extend({
                     }
                 });
 
-                // Clean up
-                self.options.comment_form_container.data('editing', false);
-                self.options.top_level_comment = null;
-                self.options.attachment_adder = null;
                 $('.temporary-attachments-preview').remove();
 
                 // If reply and approve, trigger button click, otherwise
@@ -166,6 +162,11 @@ DemoTime.Comments = Backbone.View.extend({
                         self.options.attachment_adder.show();
                     }
                 }
+
+                // Clean up
+                self.options.comment_form_container.data('editing', false);
+                self.options.top_level_comment = null;
+                self.options.attachment_adder = null;
             }
         });
 
@@ -197,9 +198,9 @@ DemoTime.Comments = Backbone.View.extend({
                         <div class="demobox attachment-card">\
                             <div class="demobox-header">';
                                 if (data.comment.attachments[x].description) {
-                                    html += '<strong>' + data.comment.attachments[x].description + '</strong>';
+                                    html += '<strong>' + data.comment.attachments[x].description + '</strong> - ';
                                 }
-                                html += ' - <a href="#" class="attachment-delete" data-comment="' + data.comment.pk + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a>\
+                                html += '<a href="#" class="attachment-delete" data-comment="' + data.comment.id + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a>\
                             </div>\
                             <div class="demobox-body">';
                                 if (data.comment.attachments[x].attachment_type == 'image') {
