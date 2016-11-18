@@ -470,12 +470,15 @@ class TestReviewModels(BaseTestCase):
         obj.reviewer_set.update(status=constants.REJECTED)
         obj.reviewer_state = constants.REJECTED
         obj.save(update_fields=['reviewer_state'])
+        # We're mocking a state change, so let's purge the state machine
+        obj._reviewer_state_machine = None
         undecided_person = obj.reviewer_set.all()[0]
         undecided_person.status = constants.REVIEWING
         undecided_person.save()
         models.UserReviewStatus.objects.update(read=True)
+        import ipdb; ipdb.set_trace()
         changed, new_state = obj.update_reviewer_state()
-        obj = models.Review.objects.get(pk=obj.pk)
+        obj.refresh_from_db()
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
         msg = models.Message.objects.get(
             review=obj.reviewrevision_set.latest(), receipient=obj.creator

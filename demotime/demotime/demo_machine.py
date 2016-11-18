@@ -31,6 +31,26 @@ class State(object):
         return isinstance(self, type(other))
 
 
+class ReviewerState(State):
+
+    def on_enter(self, review, prev_state): # pylint: disable=unused-argument
+        review.reviewer_state = self.name
+        review.save(update_fields=['reviewer_state', 'modified'])
+
+    def on_exit(self, review, next_state):
+        raise NotImplementedError('on_exit not implemented')
+
+    def _common_state_change(self, review, webhook_type=None):
+        models.UserReviewStatus.objects.filter(
+            review=review,
+            user=review.creator,
+        ).update(
+            read=False
+        )
+        if webhook_type:
+            review.trigger_webhooks(webhook_type)
+
+
 class Draft(State):
 
     name = constants.DRAFT
@@ -231,34 +251,79 @@ class DemoMachine(StateMachine):
     }
 
 
-class Reviewing(State):
+class Reviewing(ReviewerState):
 
     name = constants.REVIEWING
 
     def on_enter(self, review, prev_state):
-        pass
+        super().on_enter(review, prev_state)
+        models.Message.send_system_message(
+            '"{}" is back Under Review'.format(review.title),
+            'demotime/messages/reviewing.html',
+            {'review': review, 'previous_state': prev_state.name.title()},
+            review.creator,
+            revision=review.revision,
+        )
+        models.Event.create_event(
+            review.project,
+            models.EventType.DEMO_REVIEWING,
+            review,
+            review.creator
+        )
+        review.trigger_webhooks(constants.REVIEWING)
+        self._common_state_change(review)
 
     def on_exit(self, review, next_state):
         pass
 
 
-class Approved(State):
+class Approved(ReviewerState):
 
     name = constants.APPROVED
 
     def on_enter(self, review, prev_state):
-        pass
+        super().on_enter(review, prev_state)
+        models.Message.send_system_message(
+            '"{}" has been Approved!'.format(review.title),
+            'demotime/messages/approved.html',
+            {'review': review},
+            review.creator,
+            revision=review.revision,
+        )
+        models.Event.create_event(
+            review.project,
+            models.EventType.DEMO_APPROVED,
+            review,
+            review.creator
+        )
+        review.trigger_webhooks(constants.APPROVED)
+        self._common_state_change(review)
 
     def on_exit(self, review, next_state):
         pass
 
 
-class Rejected(State):
+class Rejected(ReviewerState):
 
     name = constants.REJECTED
 
     def on_enter(self, review, prev_state):
-        pass
+        super().on_enter(review, prev_state)
+        models.Message.send_system_message(
+            '"{}" has been Rejected'.format(review.title),
+            'demotime/messages/rejected.html',
+            {'review': review},
+            review.creator,
+            revision=review.revision,
+        )
+        models.Event.create_event(
+            review.project,
+            models.EventType.DEMO_REJECTED,
+            review,
+            review.creator
+        )
+        review.trigger_webhooks(constants.REJECTED)
+        self._common_state_change(review)
 
     def on_exit(self, review, next_state):
         pass

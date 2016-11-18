@@ -28,7 +28,7 @@ from demotime.constants import (
     DRAFT,
     CANCELLED,
 )
-from demotime.demo_machine import DemoMachine
+from demotime.demo_machine import DemoMachine, ReviewerMachine
 
 
 class Review(BaseModel):
@@ -121,6 +121,15 @@ class Review(BaseModel):
             self._state_machine = DemoMachine(self) # pylint: disable=attribute-defined-outside-init
 
         return self._state_machine
+
+    @property
+    def reviewer_state_machine(self):
+        if getattr(self, '_reviewer_state_machine', None) and self.pk:
+            return self._reviewer_state_machine
+        else:
+            self._reviewer_state_machine = ReviewerMachine(self)
+
+        return self._reviewer_state_machine
 
     def send_revision_messages(self, update=False):
         title = 'New Review: {}'.format(self.title)
@@ -289,7 +298,6 @@ class Review(BaseModel):
                 reviewer.status = REVIEWING
                 reviewer.is_active = True
                 reviewer.save()
-                obj.update_reviewer_state()
                 if state_change and state not in (DRAFT, CANCELLED):
                     reviewer.create_reviewer_event(creator)
 
@@ -325,6 +333,8 @@ class Review(BaseModel):
             follower.drop_follower(obj.creator, draft=skip_drop_events)
 
         obj.state_machine.change_state(state)
+        # Reviewer situation may have changed, update it
+        obj.update_reviewer_state()
         if is_update:
             # This is down here so that messages get sent to the right users,
             # such as if Reviewers/Followers were removed
@@ -336,78 +346,15 @@ class Review(BaseModel):
 
         return obj
 
-    def _change_reviewer_state(self, state):
-        previous_state = self.get_reviewer_state_display()
-        self.reviewer_state = state
-        self.save(update_fields=['reviewer_state'])
-        UserReviewStatus.objects.filter(review=self, user=self.creator).update(
-            read=False
-        )
-        if state == APPROVED:
-            Message.send_system_message(
-                '"{}" has been Approved!'.format(self.title),
-                'demotime/messages/approved.html',
-                {'review': self},
-                self.creator,
-                revision=self.revision,
-            )
-            Event.create_event(
-                self.project,
-                EventType.DEMO_APPROVED,
-                self,
-                self.creator
-            )
-        elif state == REJECTED:
-            Message.send_system_message(
-                '"{}" has been Rejected'.format(self.title),
-                'demotime/messages/rejected.html',
-                {'review': self},
-                self.creator,
-                revision=self.revision,
-            )
-            Event.create_event(
-                self.project,
-                EventType.DEMO_REJECTED,
-                self,
-                self.creator
-            )
-        elif state == REVIEWING:
-            Message.send_system_message(
-                '"{}" is back Under Review'.format(self.title),
-                'demotime/messages/reviewing.html',
-                {'review': self, 'previous_state': previous_state},
-                self.creator,
-                revision=self.revision,
-            )
-            Event.create_event(
-                self.project,
-                EventType.DEMO_REVIEWING,
-                self,
-                self.creator
-            )
-        else:
-            raise RuntimeError('Invalid Demo State')
-
     def update_reviewer_state(self):
-        statuses = self.reviewer_set.active().values_list(
-            'status', flat=True
-        )
-        approved = all(status == APPROVED for status in statuses)
-        rejected = all(status == REJECTED for status in statuses)
-        reviewing = not approved and not rejected
-        if approved and self.reviewer_state != APPROVED:
-            self._change_reviewer_state(APPROVED)
-            self.trigger_webhooks(APPROVED)
-            return True, APPROVED
-        elif rejected and self.reviewer_state != REJECTED:
-            self._change_reviewer_state(REJECTED)
-            self.trigger_webhooks(REJECTED)
-            return True, REJECTED
-        elif reviewing and self.reviewer_state != REVIEWING:
-            self._change_reviewer_state(REVIEWING)
-            return True, REVIEWING
+        try:
+            status = self.reviewer_set.active().values_list(
+                'status', flat=True).distinct().get()
+        except Reviewer.MultipleObjectsReturned:
+            status = REVIEWING
 
-        return False, ''
+        changed = self.reviewer_state_machine.change_state(status)
+        return changed, status if changed else ''
 
     def update_state(self, new_state):
         return self.state_machine.change_state(new_state)
