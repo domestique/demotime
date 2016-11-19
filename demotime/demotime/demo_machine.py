@@ -45,9 +45,6 @@ class Draft(State):
 
     name = constants.DRAFT
 
-    def on_enter(self, review, prev_state):
-        pass
-
 
 class Open(State):
 
@@ -183,8 +180,71 @@ class Cancelled(State):
 
     name = constants.CANCELLED
 
+
+class Reviewing(ReviewerState):
+
+    name = constants.REVIEWING
+
     def on_enter(self, review, prev_state):
-        pass
+        super().on_enter(review, prev_state)
+        models.Message.send_system_message(
+            '"{}" is back Under Review'.format(review.title),
+            'demotime/messages/reviewing.html',
+            {'review': review, 'previous_state': prev_state.name.title()},
+            review.creator,
+            revision=review.revision,
+        )
+        models.Event.create_event(
+            review.project,
+            models.EventType.DEMO_REVIEWING,
+            review,
+            review.creator
+        )
+        self._common_state_change(review, constants.REVIEWING)
+
+
+class Approved(ReviewerState):
+
+    name = constants.APPROVED
+
+    def on_enter(self, review, prev_state):
+        super().on_enter(review, prev_state)
+        models.Message.send_system_message(
+            '"{}" has been Approved!'.format(review.title),
+            'demotime/messages/approved.html',
+            {'review': review},
+            review.creator,
+            revision=review.revision,
+        )
+        models.Event.create_event(
+            review.project,
+            models.EventType.DEMO_APPROVED,
+            review,
+            review.creator
+        )
+        self._common_state_change(review, constants.APPROVED)
+
+
+class Rejected(ReviewerState):
+
+    name = constants.REJECTED
+
+    def on_enter(self, review, prev_state):
+        super().on_enter(review, prev_state)
+        models.Message.send_system_message(
+            '"{}" has been Rejected'.format(review.title),
+            'demotime/messages/rejected.html',
+            {'review': review},
+            review.creator,
+            revision=review.revision,
+        )
+        models.Event.create_event(
+            review.project,
+            models.EventType.DEMO_REJECTED,
+            review,
+            review.creator
+        )
+        self._common_state_change(review, constants.REJECTED)
 
 
 class StateMachine(object):
@@ -223,75 +283,6 @@ class DemoMachine(StateMachine):
         constants.ABORTED: Aborted,
         constants.CANCELLED: Cancelled,
     }
-
-
-class Reviewing(ReviewerState):
-
-    name = constants.REVIEWING
-
-    def on_enter(self, review, prev_state):
-        super().on_enter(review, prev_state)
-        models.Message.send_system_message(
-            '"{}" is back Under Review'.format(review.title),
-            'demotime/messages/reviewing.html',
-            {'review': review, 'previous_state': prev_state.name.title()},
-            review.creator,
-            revision=review.revision,
-        )
-        models.Event.create_event(
-            review.project,
-            models.EventType.DEMO_REVIEWING,
-            review,
-            review.creator
-        )
-        review.trigger_webhooks(constants.REVIEWING)
-        self._common_state_change(review)
-
-
-class Approved(ReviewerState):
-
-    name = constants.APPROVED
-
-    def on_enter(self, review, prev_state):
-        super().on_enter(review, prev_state)
-        models.Message.send_system_message(
-            '"{}" has been Approved!'.format(review.title),
-            'demotime/messages/approved.html',
-            {'review': review},
-            review.creator,
-            revision=review.revision,
-        )
-        models.Event.create_event(
-            review.project,
-            models.EventType.DEMO_APPROVED,
-            review,
-            review.creator
-        )
-        review.trigger_webhooks(constants.APPROVED)
-        self._common_state_change(review)
-
-
-class Rejected(ReviewerState):
-
-    name = constants.REJECTED
-
-    def on_enter(self, review, prev_state):
-        super().on_enter(review, prev_state)
-        models.Message.send_system_message(
-            '"{}" has been Rejected'.format(review.title),
-            'demotime/messages/rejected.html',
-            {'review': review},
-            review.creator,
-            revision=review.revision,
-        )
-        models.Event.create_event(
-            review.project,
-            models.EventType.DEMO_REJECTED,
-            review,
-            review.creator
-        )
-        review.trigger_webhooks(constants.REJECTED)
-        self._common_state_change(review)
 
 
 class ReviewerMachine(StateMachine):
