@@ -19,6 +19,7 @@ before_install:
   - docker volume create --name dt_pg_data
   - docker volume create --name dt_static_data
   - docker volume create --name dt_rmq_data
+  - pip install coveralls
 script:
     - npm test
     - rm -rf node_modules
@@ -35,6 +36,7 @@ after_success:
         docker tag domestique/demotime:latest domestique/demotime:${TRAVIS_BRANCH};
         docker push domestique/demotime:${TRAVIS_BRANCH};
       fi
+    - coveralls
 notifications:
   email:
     recipients:
