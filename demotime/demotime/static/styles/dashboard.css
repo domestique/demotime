@@ -249,8 +249,12 @@ section.aggregated_dashboard-activity {
 .events {
     overflow: auto;
 }
-.events img {
+.events img,
+.events audio {
     max-width: 100%;
+    height: auto;
+}
+.events audio {
     height: auto;
 }
 .events .lightbox_img:before {
