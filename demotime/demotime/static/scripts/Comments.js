@@ -187,13 +187,12 @@ DemoTime.Comments = Backbone.View.extend({
             var html = '<div class="comment_parent nested-reply">';
         }
         html += '<div class="demobox" id="' + data.comment.id + '">'
-        html += '<div class="demobox-header">Your comment <a href="#" class="comment_edit" data-comment="' + data.comment.id + '">edit this reply</a></div>'
+        html += '<div class="demobox-header">Your comment (<a href="#" class="comment_edit" data-top-level="' + this.options.top_level_comment + '" data-comment="' + data.comment.id + '">edit this reply</a>)</div>'
         html += '<div class="demobox-body"><div class="demobox-body-contents">' + this.options.comment + '</div></div>'
 
         if (data.comment.attachment_count && data.comment.attachments.length) {
             html += '<div class="demobox-body-attachments">';
                 for (var x = 0; x < data.comment.attachments.length; x++) {
-                    console.log(data.comment);
                     html += '\
                         <div class="demobox attachment-card">\
                             <div class="demobox-header">';
@@ -369,8 +368,6 @@ DemoTime.Comments = Backbone.View.extend({
             delete_attachments: attachments,
             comment_pk: el.data('comment')
         };
-
-        console.log(data);
 
         var del = $.ajax({
             url: self.options.comments_url,
