@@ -1,0 +1,69 @@
+<nav id="menu" class="panel" role="navigation">
+    <div class="dashboard">
+        <section>
+            <h3 class="heading">Created</h3>
+            {% for demo in open_demos %}
+                {% include "includes/demo.html" %}
+            {% endfor %}
+            <h3 class="heading">Reviewing</h3>
+            {% for demo in open_reviews %}
+                {% include "includes/demo.html" %}
+            {% endfor %}
+            <h3 class="heading">Drafts</h3>
+            {% for demo in drafts %}
+                {% include "includes/demo.html" with draft=True %}
+            {% endfor %}
+        </section>
+    </div>
+</nav>
+<script src="/static/scripts/library/slideout.min.js"></script>
+
+<style>
+.panel {
+    position: fixed;
+    z-index: 1000;
+    background: #2a9c86;
+    left: -400px; /*left or right and the width of your navigation panel*/
+    width: 400px; /*should match the above value*/
+    /*box-shadow: 1px 2px 8px #888;*/
+}
+.panel > div {
+    padding: 5px 10px;
+}
+.panel ul {
+    list-style: none;
+    margin: 0;
+}
+.panel section {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    border: 0;
+}
+.panel .demobox {
+    box-shadow: none;
+}
+.panel .heading {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin: 30px 0 5px;
+}
+.panel .heading:first-child {
+    margin-top: 0;
+}
+.push {
+    position: relative;
+}
+</style>
+
+<script>
+$('.sidenav-toggle').bigSlide({
+    'menuWidth': '400'
+});
+$('.sidenav-toggle').click(function() {
+    if ($(this).is(':visible')) {
+        $('.push').css('left', '200px');
+    }
+});
+</script>
