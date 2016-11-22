@@ -203,6 +203,12 @@
 
         {# Logged-in user scripts #}
         {% if request.user.is_authenticated %}
+            {# Customer support #}
+            <script src="https://cdn.smooch.io/smooch.min.js"></script>
+            <script>
+                Smooch.init({appToken: 'eqtzjuwbtcvv7meh85ruz6cgw'});
+            </script>
+
             {# DT-XX Info boxes #}
             <script src="/static/scripts/Info.js?{{ site_settings.CACHE_BUSTER }}"></script>
             <script>
@@ -270,12 +276,12 @@
                 }
             </script>
 
-            <div id="feedbacker">
+            <!--div id="feedbacker">
                 <a href="https://domestiquestudios.typeform.com/to/RDJWGc" target="blank">How are we doing?</a>
                 <span class="close">x</span>
-            </div>
+            </div-->
             <script>
-                if (Cookies.get('gave_feedback')) {
+                /*if (Cookies.get('gave_feedback')) {
                     $('#feedbacker').hide();
                 } else {
                     $('#feedbacker a').click(function() {
@@ -285,7 +291,7 @@
                         Cookies.set('gave_feedback', true, { expires: 7 });
                         $('#feedbacker').fadeOut();
                     })
-                }
+                }*/
             </script>
         {% endif %}
 
