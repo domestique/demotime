@@ -25,7 +25,7 @@ script:
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml build
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml up -d
     - docker exec -it demotime_demotime_1 /bin/bash -c "cd ../ && invoke run_tests"
-    - cd dt && bash <(curl -s https://codecov.io/bash)
+    - cd dt && bash <(curl -s https://codecov.io/bash) && cd ../
     - docker-compose -f docker-compose.yml -f docker-compose.build.yml down
 after_success:
     - docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
