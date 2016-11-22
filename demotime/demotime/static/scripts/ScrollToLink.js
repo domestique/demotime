@@ -74,10 +74,5 @@ DemoTime.ScrollToLink = Backbone.View.extend({
                 }, 500);
             }, 500);
         }
-        // Sometimes we travel to a 'collapsed' element. if we do,
-        // expand it.
-        if (target.first().hasClass('collapsed')) {
-            target.find('[data-ui-toggle-handle]').trigger('click');
-        }
     }
 });

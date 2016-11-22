@@ -75,7 +75,7 @@
                 <% } %>
             <% } %>
         </blockquote>
-        <div class="demobox-footer"><a href="<%= moment.related_object.url %>" class="comment_link">go to this comment</a></div>
+        <div class="demobox-footer"><a href="<%= moment.related_object.url %>" data-comment-id="<%= moment.related_object.id %>" class="comment_link">go to this comment</a></div>
     <% } else { %>
         <strong><%= moment.event_type.name %></strong>
     <% } %>

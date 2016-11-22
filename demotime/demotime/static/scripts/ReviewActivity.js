@@ -10,11 +10,16 @@ DemoTime.ReviewActivity = Backbone.View.extend({
     },
 
     jump_to_comment: function(event) {
+        var self = this;
         this.hide_pane();
+        setTimeout(function() {
+            self.scroller.jump_to_link($(event.target).data('comment-id'));
+        }, 250);
     },
 
     initialize: function(options) {
         this.options = options;
+        this.scroller = new DemoTime.ScrollToLink();
         // If there's no toggler, just launch onload (dashboard)
         if (!$('#activity_toggler').length) {
             this.render();
@@ -26,7 +31,7 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
         if ($('#events').is(':visible')) {
             this.hide_pane();
-            new DemoTime.ScrollToLink().jump_to_link('review');
+            this.scroller.jump_to_link('review');
         } else {
             this.show_pane();
         }
@@ -69,7 +74,6 @@ DemoTime.ReviewActivity = Backbone.View.extend({
         if ($('#events_filter').length) {
             self.options.project_slug = $('#events_filter').val();
         }
-
 
         if (self.options) {
             self.options.exclusion_list = self.options.exclusion_list || '';

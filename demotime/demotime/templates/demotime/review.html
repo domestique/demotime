@@ -335,7 +335,7 @@
                     {% endmacro %}
 
                     {% for thread in revision.commentthread_set.all %}
-                        <section id="{{ thread.pk }}" data-thread="{{ thread.pk }}" class="comment_parent">
+                        <section data-thread="{{ thread.pk }}" class="comment_parent">
                             {% for comment in thread.comment_set.all %}
                                 {% if not forloop.first %}
                                     <div class="nested-reply">
