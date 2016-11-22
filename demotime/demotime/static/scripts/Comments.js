@@ -181,43 +181,45 @@ DemoTime.Comments = Backbone.View.extend({
     },
 
     get_success_html: function(data) {
-        if (this.options.top_level_comment) {
-            var html = '<div class="comment_parent" style="margin-top: 10px">';
-        } else {
-            var html = '<div class="comment_parent nested-reply">';
-        }
-        html += '<div class="demobox" id="' + data.comment.id + '">'
-        html += '<div class="demobox-header">Your comment (<a href="#" class="comment_edit" data-top-level="' + this.options.top_level_comment + '" data-comment="' + data.comment.id + '">edit this reply</a>)</div>'
-        html += '<div class="demobox-body"><div class="demobox-body-contents">' + this.options.comment + '</div></div>'
+        if (data) {
+            if (this.options.top_level_comment) {
+                var html = '<div class="comment_parent" style="margin-top: 10px">';
+            } else {
+                var html = '<div class="comment_parent nested-reply">';
+            }
+            html += '<div class="demobox" id="' + data.comment.id + '">'
+            html += '<div class="demobox-header">Your comment (<a href="#" class="comment_edit" data-top-level="' + this.options.top_level_comment + '" data-comment="' + data.comment.id + '">edit this reply</a>)</div>'
+            html += '<div class="demobox-body"><div class="demobox-body-contents">' + this.options.comment + '</div></div>'
 
-        if (data.comment.attachment_count && data.comment.attachments.length) {
-            html += '<div class="demobox-body-attachments">';
-                for (var x = 0; x < data.comment.attachments.length; x++) {
-                    html += '\
-                        <div class="demobox attachment-card">\
-                            <div class="demobox-header">';
-                                if (data.comment.attachments[x].description) {
-                                    html += '<strong>' + data.comment.attachments[x].description + '</strong> - ';
-                                }
-                                html += '<a href="#" class="attachment-delete" data-comment="' + data.comment.id + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a>\
-                            </div>\
-                            <div class="demobox-body">';
-                                if (data.comment.attachments[x].attachment_type == 'image') {
-                                    html += '<a href="' + data.comment.attachments[x].static_url + '" class="lightbox_img">\
-                                                <img src="' + data.comment.attachments[x].static_url + '" class="img-thumbnail">\
-                                             </a>';
-                                } else {
-                                    html += '<em>Your <strong>' + data.comment.attachments[x].attachment_type + '</strong> was uploaded successfully.</em></p>';
-                                }
-                            html += '</div>\
-                        </div>';
-                }
+            if (data.comment.attachment_count && data.comment.attachments.length) {
+                html += '<div class="demobox-body-attachments">';
+                    for (var x = 0; x < data.comment.attachments.length; x++) {
+                        html += '\
+                            <div class="demobox attachment-card">\
+                                <div class="demobox-header">';
+                                    if (data.comment.attachments[x].description) {
+                                        html += '<strong>' + data.comment.attachments[x].description + '</strong> - ';
+                                    }
+                                    html += '<a href="#" class="attachment-delete" data-comment="' + data.comment.id + '" data-attachment="' + data.comment.attachments[x].pk + '">delete</a>\
+                                </div>\
+                                <div class="demobox-body">';
+                                    if (data.comment.attachments[x].attachment_type == 'image') {
+                                        html += '<a href="' + data.comment.attachments[x].static_url + '" class="lightbox_img">\
+                                                    <img src="' + data.comment.attachments[x].static_url + '" class="img-thumbnail">\
+                                                 </a>';
+                                    } else {
+                                        html += '<em>Your <strong>' + data.comment.attachments[x].attachment_type + '</strong> was uploaded successfully.</em></p>';
+                                    }
+                                html += '</div>\
+                            </div>';
+                    }
+                html += '</div>';
+            }
+
             html += '</div>';
+
+            return html;
         }
-
-        html += '</div>';
-
-        return html;
     },
 
     comment_edit: function(event) {
