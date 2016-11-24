@@ -5,6 +5,9 @@
             {% if attachment.description %}
                 - <strong class="attachment-description">{{ attachment.description }}</strong>
             {% endif %}
+            {% if comment and request.user = comment.commenter %}
+                <a href="#" class="attachment-delete" data-comment="{{ comment.pk }}" data-attachment="{{ attachment.pk }}">delete</a>
+            {% endif %}
             {% if review_inst.state == "draft" %}
                 - <a href="#"
                      class="attachment_delete"

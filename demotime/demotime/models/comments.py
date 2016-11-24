@@ -77,8 +77,7 @@ class Comment(BaseModel):
 
     @classmethod
     def create_comment(cls, commenter, comment, review,
-                       thread=None, attachment=None,
-                       description=None, sort_order=1):
+                       thread=None, attachments=None):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
 
@@ -103,12 +102,15 @@ class Comment(BaseModel):
             comment=comment,
             thread=thread
         )
-        if attachment:
+        if not attachments:
+            attachments = []
+
+        for count, attachment in enumerate(attachments):
             Attachment.create_attachment(
-                attachment=attachment,
-                description=description,
+                attachment=attachment['attachment'],
+                description=attachment.get('description', ''),
                 content_object=obj,
-                sort_order=sort_order,
+                sort_order=attachment.get('sort_order') or count
             )
 
         if not review.review.state == constants.DRAFT:

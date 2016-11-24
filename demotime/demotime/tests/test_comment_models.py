@@ -38,12 +38,21 @@ class TestCommentModels(BaseTestCase):
         dropped_reviewer.drop_reviewer(self.review.creator)
         dropped_follower.drop_follower(self.review.creator)
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
+        attachments = [
+            {
+                'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+                'description': 'Image 1',
+            },
+            {
+                'attachment': File(BytesIO(b'test_file_2'), name='test_file_2.jpg'),
+                'description': 'Image 2',
+            },
+        ]
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            description='Test Description',
+            attachments=attachments,
         )
         self.assertEqual(
             comment.get_absolute_url(),
@@ -53,15 +62,18 @@ class TestCommentModels(BaseTestCase):
                     'pk': self.review.pk,
                     'rev_num': self.review.revision.number,
                 }),
-                comment.thread.pk
+                comment.pk
             )
         )
         self.assertEqual(comment.thread.review_revision, self.review.revision)
-        self.assertEqual(comment.attachments.count(), 1)
-        attachment = comment.attachments.get()
-        self.assertEqual(attachment.description, 'Test Description')
-        self.assertEqual(attachment.attachment_type, 'image')
-        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(comment.attachments.count(), 2)
+        attachment_one, attachment_two = comment.attachments.all()
+        self.assertEqual(attachment_one.description, 'Image 1')
+        self.assertEqual(attachment_one.attachment_type, 'image')
+        self.assertEqual(attachment_one.sort_order, 0)
+        self.assertEqual(attachment_two.description, 'Image 2')
+        self.assertEqual(attachment_two.attachment_type, 'image')
+        self.assertEqual(attachment_two.sort_order, 1)
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(
@@ -102,8 +114,12 @@ class TestCommentModels(BaseTestCase):
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            description='Test Description',
+            attachments=[
+                {
+                    'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+                    'description': 'Image 1',
+                },
+            ]
         )
         self.assertEqual(
             comment.get_absolute_url(),
@@ -119,9 +135,9 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(comment.thread.review_revision, self.review.revision)
         self.assertEqual(comment.attachments.count(), 1)
         attachment = comment.attachments.get()
-        self.assertEqual(attachment.description, 'Test Description')
+        self.assertEqual(attachment.description, 'Image 1')
         self.assertEqual(attachment.attachment_type, 'image')
-        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(attachment.sort_order, 0)
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
         self.assertEqual(
@@ -146,12 +162,16 @@ class TestCommentModels(BaseTestCase):
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
         models.UserReviewStatus.objects.filter(review=review).update(read=True)
+        attachments = [{
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            'sort_order': 1,
+            'description': 'Test Description'
+        }]
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            description='Test Description',
+            attachments=attachments,
             thread=thread,
         )
         self.assertEqual(comment.thread, thread)
@@ -343,12 +363,17 @@ class TestCommentModels(BaseTestCase):
         models.Message.objects.all().delete()
         self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        attachments = [{
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            'sort_order': 1,
+            'description': 'Test Description'
+        }]
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="test comment",
             thread=thread,
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            attachments=attachments,
         )
         self.assertEqual(comment.to_json(), {
             'id': comment.pk,

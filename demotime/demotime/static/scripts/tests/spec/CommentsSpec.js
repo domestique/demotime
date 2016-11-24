@@ -10,16 +10,33 @@ describe("Comments.js", function() {
                     <div class="comment_parent collapser_parent">\
                         <label class="icon collapser icon-minus-squared-alt"></label>\
                         <a href="#" class="icon icon-comment expand_reply_link"></a>\
-                        <div class="comment_form_container collapseable">\
+                        <div class="comment_form_container" style="display:none">\
                             <textarea class="form-control">Things</textarea>\
                             <div class="wysiwyg-editor">Stuff</div>\
-                            <input type="file"></input>\
-                            <select name="attachment_type"><option value="image">Image</option></select>\
-                            <input name="attachment_description"></input>\
+                            <div class="attachments ajaxy_attachments">\
+                                <section class="ajaxy_attachment">\
+                                    <div class="attachment-container split~680 by:3 with-gap:3">\
+                                        <div class="attachment-file cel">\
+                                            <label>Attach your file:</label>\
+                                            <input class="form-control" id="id_0-attachment" name="0-attachment" type="file">\
+                                        </div>\
+                                        <div class="attachment-desc cel">\
+                                            <label>Short description:</label>\
+                                            <input class="form-control" id="id_0-description" maxlength="2048" name="0-description" type="text">\
+                                        </div>\
+                                        <div class="cel">\
+                                            <label>&nbsp;</label>\
+                                            <a href="#" class="attachment-add icon icon-plus-circled">add another</a>\
+                                            <a href="#" class="attachment-remove icon icon-cancel-circled">remove</a>\
+                                        </div>\
+                                    </div>\
+                                </section>\
+                                <input id="id_thread" name="thread" value="" type="hidden">\
+                            </div>\
                             <button class="new_comment_button"></button>\
                             <button class="reply_and_approve"></button>\
                         </div>\
-                        <div class="comments-reply">\
+                        <div class="nested-reply">\
                             <div class="demobox">\
                                 <div class="demobox-header">\
                                     <a href="#" class="comment_edit"></a>\
@@ -27,9 +44,9 @@ describe("Comments.js", function() {
                                 <div class="demobox-body">\
                                 Hi there\
                                 </div>\
-                            </div>\
-                            <div class="attachments">\
-                                <div class="summary">foo</div>\
+                                <div class="attachments">\
+                                    <div class="demobox"></div>\
+                                </div>\
                             </div>\
                         </div>\
                     </div>\
@@ -73,10 +90,8 @@ describe("Comments.js", function() {
 
     it("should be able to expand a new reply", function() {
         $('.comment_form_container').hide();
-        expect($('.wysiwyg-editor').html()).toBeTruthy();
         $('.expand_reply_link').click();
         expect($('.comment_form_container').is(':visible')).toBeTruthy();
-        expect($('.wysiwyg-editor').html()).toBeFalsy();
         expect($('.expand_reply_link').is(':visible')).toBeFalsy();
     });
 
@@ -89,19 +104,40 @@ describe("Comments.js", function() {
     it("should be able to edit comments", function() {
         $('.new_comment_button').click();
         $(this.comments.options.comment_form_container).hide();
-        expect($('.comments-reply').is(':visible')).toBeTruthy();
-        expect($('.attachments .summary').length).toBeTruthy();
+        expect($('.nested-reply').is(':visible')).toBeTruthy();
+        expect($('.attachments .demobox').length).toBeTruthy();
         $('.comment_edit').click();
         expect($('.demobox-body').is(':visible')).toBeFalsy();
-        expect($('.attachments .summary').length).toBeFalsy();
+        expect($('.attachments .demobox').length).toBeFalsy();
         expect(this.comments.options.comment_form_container.data('editing')).toBe(true);
         expect(this.comments.options.comment_form_container.is(':visible')).toBeTruthy();
+    });
+
+    it("should allow for additional attachments", function() {
+        $('.attachment-add').click();
+        expect($('.ajaxy_attachment').length > 1).toBeTruthy();
+        $('.attachment-add').click();
+        expect($('.ajaxy_attachment').length > 2).toBeTruthy();
+    });
+
+    it("should increment new attachments", function() {
+        $('.attachment-add').click();
+        expect($('input[name="1-description"]').length).toBeTruthy();
+        $('.attachment-add').click();
+        expect($('input[name="2-description"]').length).toBeTruthy();
+    });
+
+    it("should be able to remove new attachments", function() {
+        $('.attachment-add').click();
+        expect($('.ajaxy_attachment').length > 1).toBeTruthy();
+        $('.attachment-remove').click();
+        expect($('.ajaxy_attachment').length > 1).toBeFalsy();
     });
 
     it("should generate proper success html", function() {
         $('.new_comment_button').click();
         var html = this.comments.get_success_html({"comment": {"comment": "asdf", "thread": 426, "id": 801, "name": "Danny", "attachment_count": 1, "attachments": [{"static_url": "/file/496", "attachment_type": "image", "description": ""}]}, "errors": "", "status": "success"});
-        expect(html).toContain('comments-reply');
+        expect(html).toContain('nested-reply');
         expect(html).toContain('demobox');
         expect(html).toContain('attachment-card');
         expect(html).toContain('comment_edit');

@@ -19,7 +19,11 @@ def attachment_filename(instance, filename):
     return os.path.join('reviews', folder, filename)
 
 def determine_attachment_type(filename):
-    suffix = filename.split('.')[-1]
+    try:
+        suffix = filename.split('.')[-1]
+    except AttributeError:
+        suffix = 'unknown_format'
+
     for attachment_type, suffixes in constants.ATTACHMENT_MAP.items():
         if suffix.lower() in suffixes:
             return attachment_type
@@ -52,6 +56,7 @@ class Attachment(BaseModel):
 
     def to_json(self):
         return {
+            'pk': self.pk,
             'static_url': reverse('user-media', args=[self.pk]),
             'attachment_type': self.attachment_type,
             'description': self.description,

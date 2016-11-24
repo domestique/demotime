@@ -19,7 +19,8 @@ describe("ReviewActivity.js", function() {
 
         jQuery.fx.off = true;
         this.activity = new DemoTime.ReviewActivity();
-        ScrollToLink = new DemoTime.ScrollToLink();
+        this.activity.scroller = new DemoTime.ScrollToLink();
+
         link = $('#activity_toggler');
         events = $('#events');
     });

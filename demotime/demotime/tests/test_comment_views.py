@@ -4,7 +4,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import BytesIO, File
 
-from demotime import constants, models
+from demotime import models
 from demotime.tests import BaseTestCase
 
 
@@ -18,154 +18,21 @@ class TestCommentViews(BaseTestCase):
         )
         # Sample review
         self.review = models.Review.create_review(**self.default_review_kwargs)
+        attachments = [{
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            'description': 'Test Description',
+        }]
         self.comment = models.Comment.create_comment(
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            description='Test Description',
+            attachments=attachments,
         )
         # Reset out mail queue
         mail.outbox = []
 
-    def test_comment_on_review(self):
-        self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(
-            reverse('review-detail', args=[self.project.slug, self.review.pk]),
-            {
-                'comment': "Oh nice demo!",
-                'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-                'description': 'Test Description',
-                'sort_order': 1,
-            }
-        )
-        self.assertStatusCode(response, 302)
-        rev = self.review.revision
-        self.assertEqual(rev.commentthread_set.count(), 2)
-        self.assertEqual(
-            rev.commentthread_set.latest().comment_set.count(),
-            1
-        )
-        comment = rev.commentthread_set.latest().comment_set.get()
-        self.assertEqual(comment.commenter, self.user)
-        self.assertEqual(comment.comment, 'Oh nice demo!')
-        self.assertEqual(comment.attachments.count(), 1)
-        attachment = comment.attachments.get()
-        self.assertEqual(attachment.attachment_type, constants.IMAGE)
-        self.assertEqual(attachment.description, 'Test Description')
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='New Comment').count(),
-            10
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
-        self.assertEqual(len(mail.outbox), 5)
-        event = comment.events.get()
-        self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
-        self.assertEqual(event.related_object, comment)
-        self.assertEqual(event.user, comment.commenter)
-
-    def test_reply_to_comment(self):
-        self.assertEqual(len(mail.outbox), 0)
-        response = self.client.post(
-            reverse('review-detail', args=[self.project.slug, self.review.pk]),
-            {'comment': "Oh nice demo!"},
-        )
-        rev = self.review.revision
-        self.assertStatusCode(response, 302)
-        self.assertEqual(rev.commentthread_set.count(), 2)
-        self.assertEqual(len(mail.outbox), 5)
-
-        thread = rev.commentthread_set.latest()
-        response = self.client.post(
-            reverse('review-detail', args=[self.project.slug, self.review.pk]),
-            {'comment': "Reply!", 'thread': thread.pk}
-        )
-        self.assertStatusCode(response, 302)
-        # Still just 1 thread
-        self.assertEqual(rev.commentthread_set.count(), 2)
-        self.assertEqual(thread.comment_set.count(), 2)
-        self.assertTrue(thread.comment_set.filter(comment='Reply!').exists())
-        self.assertEqual(len(mail.outbox), 10)
-        self.assertEqual(
-            models.Event.objects.filter(
-                event_type__code=models.EventType.COMMENT_ADDED
-            ).count(),
-            3
-        )
-
-    def test_create_second_thread(self):
-        response = self.client.post(
-            reverse('review-detail', args=[self.project.slug, self.review.pk]),
-            {'comment': "Oh nice demo!"},
-        )
-        rev = self.review.revision
-        self.assertStatusCode(response, 302)
-        self.assertEqual(rev.commentthread_set.count(), 2)
-
-        thread = rev.commentthread_set.latest()
-        response = self.client.post(
-            reverse('review-detail', args=[self.project.slug, self.review.pk]),
-            {'comment': "New Comment!"},
-        )
-        self.assertStatusCode(response, 302)
-        self.assertEqual(rev.commentthread_set.count(), 3)
-        self.assertEqual(thread.comment_set.count(), 1)
-        self.assertFalse(
-            thread.comment_set.filter(comment='New Comment!').exists()
-        )
-
-        new_thread = rev.commentthread_set.latest()
-        self.assertTrue(
-            new_thread.comment_set.filter(comment='New Comment!').exists()
-        )
-        self.assertEqual(
-            models.Event.objects.filter(
-                event_type__code=models.EventType.COMMENT_ADDED
-            ).count(),
-            3
-        )
-
-    def test_get_update_comment_view(self):
-        response = self.client.get(reverse('update-comment', kwargs={'pk': self.comment.pk}))
-        self.assertStatusCode(response, 200)
-        self.assertIn('form', response.context)
-
-    def test_update_comment(self):
-        response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
-            'comment': 'This is an update'
-        })
-        self.assertStatusCode(response, 302)
-        comment = models.Comment.objects.get(pk=self.comment.pk)
-        self.assertEqual(comment.comment, 'This is an update')
-
-    def test_update_comment_with_attachment(self):
-        self.assertEqual(self.comment.attachments.count(), 1)
-        response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
-            'comment': 'This is an attachment update',
-            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            'description': 'Test Comment Edit Description',
-            'sort_order': 1,
-        })
-        self.assertStatusCode(response, 302)
-        comment = models.Comment.objects.get(pk=self.comment.pk)
-        self.assertEqual(comment.comment, 'This is an attachment update')
-        self.assertEqual(self.comment.attachments.count(), 2)
-        attachment = self.comment.attachments.latest()
-        self.assertEqual(attachment.description, 'Test Comment Edit Description')
-
-    def test_update_comment_with_attachment_without_sort_order(self):
-        self.assertEqual(self.comment.attachments.count(), 1)
-        response = self.client.post(reverse('update-comment', kwargs={'pk': self.comment.pk}), {
-            'comment': 'This is an attachment update',
-            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            'description': 'Test Comment Edit Description',
-        })
-        self.assertStatusCode(response, 200)
-        self.assertFormError(response, 'form', 'sort_order',
-                             'Attachments require a sort_order')
-
+    # TODO: Attachments API - Move these tests to go with that, y'know, when
+    # you actually do that someday.
     def test_delete_comment_attachment(self):
         attachment = self.comment.attachments.get()
         url = reverse('update-comment-attachment', kwargs={
@@ -204,12 +71,15 @@ class TestCommentAPIViews(BaseTestCase):
         )
         # Sample review
         self.review = models.Review.create_review(**self.default_review_kwargs)
+        attachments = [{
+            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            'description': 'Test Description',
+        }]
         self.comment = models.Comment.create_comment(
             commenter=self.user,
             review=self.review.revision,
             comment='Test Comment',
-            attachment=File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            description='Test Description',
+            attachments=attachments,
         )
         self.api_url = reverse('comments-api', kwargs={
             'review_pk': self.review.pk,
@@ -251,9 +121,8 @@ class TestCommentAPIViews(BaseTestCase):
     def test_comment_json_create_comment_thread(self):
         response = self.client.post(self.api_url, {
             'comment': "test_comment_json_create_comment_thread",
-            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            'description': 'Test Description',
-            'sort_order': 1,
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            '0-description': 'Test Description',
         })
         self.assertStatusCode(response, 200)
         comment = models.Comment.objects.latest('created')
@@ -275,9 +144,8 @@ class TestCommentAPIViews(BaseTestCase):
     def test_comment_creation_without_comment(self):
         response = self.client.post(self.api_url, {
             'comment': "",
-            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            'description': 'Test Description',
-            'sort_order': 1,
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            '0-description': 'Test Description',
         })
         self.assertStatusCode(response, 200)
         comment = models.Comment.objects.latest('created')
@@ -287,15 +155,52 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(comment.comment, '')
         self.assertEqual(comment.attachments.count(), 1)
 
+    def test_comment_with_multiple_attachments(self):
+        response = self.client.post(self.api_url, {
+            'comment': 'Test comment with multiple attachments',
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            '0-description': 'Image Attachment',
+            '1-attachment': File(BytesIO(b'test_file_2'), name='test_file_2.mov'),
+            '1-description': 'Movie Attachment',
+            '2-attachment': File(BytesIO(b'test_file_3'), name='test_file_3.wav'),
+            '2-description': 'Audio Attachment',
+        })
+        self.assertStatusCode(response, 200)
+        comment = models.Comment.objects.latest('created')
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
+        self.assertEqual(
+            comment.comment,
+            'Test comment with multiple attachments'
+        )
+        self.assertEqual(comment.attachments.count(), 3)
+        attachment_one, attachment_two, attachment_three = comment.attachments.all().order_by('sort_order')
+        # One
+        self.assertEqual(attachment_one.attachment.file.read(), b'test_file_1')
+        self.assertEqual(attachment_one.attachment_type, 'image')
+        self.assertEqual(attachment_one.description, 'Image Attachment')
+        self.assertEqual(attachment_one.sort_order, 0)
+
+        # Two
+        self.assertEqual(attachment_two.attachment.file.read(), b'test_file_2')
+        self.assertEqual(attachment_two.attachment_type, 'movie')
+        self.assertEqual(attachment_two.description, 'Movie Attachment')
+        self.assertEqual(attachment_two.sort_order, 1)
+
+        # Three
+        self.assertEqual(attachment_three.attachment.file.read(), b'test_file_3')
+        self.assertEqual(attachment_three.attachment_type, 'audio')
+        self.assertEqual(attachment_three.description, 'Audio Attachment')
+        self.assertEqual(attachment_three.sort_order, 2)
+
     def test_comment_json_create_comment_error(self):
         response = self.client.post(self.api_url, {})
         self.assertStatusCode(response, 200)
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'failure',
             'errors': {
-                'comment': [
-                    'Comment is required if an attachment is not provided'
-                ]
+                'comment': ['This field is required.']
             },
             'comment': {}
         })
@@ -304,9 +209,9 @@ class TestCommentAPIViews(BaseTestCase):
         thread = self.review.revision.commentthread_set.latest()
         response = self.client.post(self.api_url, {
             'comment': "test_comment_json_reply_comment",
-            'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
-            'description': 'Test Description',
-            'sort_order': 1,
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            '0-description': 'Test Description',
+            '0-sort_order': 1,
             'thread': thread.pk
         })
         self.assertStatusCode(response, 200)
@@ -367,6 +272,55 @@ class TestCommentAPIViews(BaseTestCase):
             'errors': '',
             'comment': self.comment.to_json()
         })
+
+    def test_update_comment_delete_attachment(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'delete_attachments': [
+                self.comment.attachments.get().pk,
+                10000, # We'll just gracefully ignore this delete
+            ],
+        }))
+        self.assertStatusCode(response, 200)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.attachments.count(), 0)
+        self.assertEqual(self.comment.comment, 'Test Comment')
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': self.comment.to_json()
+        })
+
+    """
+    Not quite sure how to make this patch request with multiple files work with
+    the Django test client. Going to see if we can get it working in a browser
+    and then reassess. Maybe this is just the wrong way to do this. Maybe an
+    Attachment API makes more sense?
+    def test_update_comment_with_multiple_files(self):
+        self.comment.attachments.all().delete()
+        self.assertFalse(self.comment.attachments.exists())
+        response = self.client.patch(
+            self.api_url,
+            data={
+                'data': json.dumps({
+                    'comment_pk': self.comment.pk,
+                    'comment': 'multiple attachments',
+                    '0-attachment_type': 'image',
+                    '0-description': 'image attachment',
+                    '1-attachment_type': 'movie',
+                    '1-description': 'movie attachment',
+                }),
+                'files': {
+                    '0-attachment': File(BytesIO(b'test_file_1')),
+                    '1-attachment': File(BytesIO(b'test_file_2')),
+                }
+            },
+            content_type='multipart/form-data',
+        )
+        self.assertStatusCode(response, 200)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.attachments.count(), 2)
+    """
 
     def test_update_comment_without_delete(self):
         response = self.client.patch(self.api_url, json.dumps({

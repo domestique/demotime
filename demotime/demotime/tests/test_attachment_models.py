@@ -116,6 +116,7 @@ class TestAttachmentModel(BaseTestCase):
 
     def test_attachment_to_json(self):
         self.assertEqual(self.attachment.to_json(), {
+            'pk': self.attachment.pk,
             'static_url': '/file/{}'.format(self.attachment.pk),
             'attachment_type': constants.IMAGE,
             'description': 'Testing',
