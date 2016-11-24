@@ -57,6 +57,11 @@ body.bookmarklet h1 {
 .navbar li:last-child {
     padding-right: 0;
 }
+@media screen and (max-width:720px) {
+    .navbar .avatar-notice {
+        display: none;
+    }
+}
 .navbar .read_notification a {
     background: #777777;
     color: white;
@@ -176,6 +181,9 @@ nav.subnav {
 }
 @media screen and (max-width: 680px) {
     .subnav a.subnav-item {
+        padding: 3px;
+    }
+    .subnav a.subnav-item.icon {
         padding: 3px 10px 3px 3px;
     }
 }
@@ -254,4 +262,15 @@ nav.subnav {
 }
 .breadcrumbs a {
     font-weight: 700;
+}
+
+.sidenav-toggle span {
+    display: inline-block !important;
+    width: 25px;
+    height: 25px;
+    background: url(../images/hamburger.png) 0 0 no-repeat;
+    background-size: cover;
+    position: relative;
+    top: 7px;
+    margin-right: 5px;
 }
