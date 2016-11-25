@@ -923,14 +923,14 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         response = self.client.post(url, {
             'review': self.review.pk,
             'reviewer': reviewer.pk,
-            'status': models.reviews.APPROVED
+            'status': constants.APPROVED
         })
         self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': False,
             'new_state': '',
-            'reviewer_status': models.reviews.APPROVED,
+            'reviewer_status': constants.APPROVED,
             'success': True,
             'errors': {},
         })
@@ -969,7 +969,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
     def test_update_reviewer_status_state_change(self):
         self.assertEqual(len(mail.outbox), 0)
-        self.review.reviewer_set.update(status=models.reviews.APPROVED)
+        self.review.reviewer_set.update(status=constants.APPROVED)
         user = User.objects.get(username='test_user_0')
         self.client.logout()
         self.client.login(username=user.username, password='testing')
@@ -977,11 +977,11 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             review=self.review,
             reviewer=user,
         )
-        reviewer.status = models.reviews.REVIEWING
+        reviewer.status = constants.REVIEWING
         reviewer.save(update_fields=['status'])
         reviewer = models.Reviewer.objects.get(pk=reviewer.pk)
-        self.assertEqual(self.review.reviewer_state, models.reviews.REVIEWING)
-        self.assertEqual(reviewer.status, models.reviews.REVIEWING)
+        self.assertEqual(self.review.reviewer_state, constants.REVIEWING)
+        self.assertEqual(reviewer.status, constants.REVIEWING)
         url = reverse('update-reviewer-status', kwargs={
             'proj_slug': self.project.slug,
             'review_pk': self.review.pk,
@@ -990,14 +990,14 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         response = self.client.post(url, {
             'review': self.review.pk,
             'reviewer': reviewer.pk,
-            'status': models.reviews.APPROVED
+            'status': constants.APPROVED
         })
         self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'reviewer_state_changed': True,
-            'new_state': models.reviews.APPROVED,
-            'reviewer_status': models.reviews.APPROVED,
+            'new_state': constants.APPROVED,
+            'reviewer_status': constants.APPROVED,
             'success': True,
             'errors': {},
         })
@@ -1019,16 +1019,88 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         })
         self.assertStatusCode(response, 404)
 
+    def test_update_review_state_draft_to_open(self):
+        draft_kwargs = self.default_review_kwargs
+        draft_kwargs['state'] = constants.DRAFT
+        draft_kwargs['title'] = 'Draft Open'
+        draft_review = models.Review.create_review(**draft_kwargs)
+        orig_created = draft_review.created
+        url = reverse('update-review-state', args=[self.project.slug, draft_review.pk])
+        response = self.client.post(url, {
+            'review': draft_review.pk,
+            'state': constants.OPEN
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'state': constants.OPEN,
+            'state_changed': True,
+            'success': True,
+            'errors': {},
+        })
+        draft_review.refresh_from_db()
+        self.assertEqual(draft_review.state, constants.OPEN)
+        title = 'New Review: Draft Open'
+        self.assertEqual(
+            models.Message.objects.filter(title=title).count(),
+            5
+        )
+        self.assertEqual(len(mail.outbox), 5)
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertEqual(event.related_object, self.review)
+        self.assertNotEqual(orig_created, draft_review.created)
+
+    def test_update_review_state_draft_to_open_no_reviewers(self):
+        draft_kwargs = self.default_review_kwargs
+        draft_kwargs['state'] = constants.DRAFT
+        draft_kwargs['reviewers'] = []
+        draft_review = models.Review.create_review(**draft_kwargs)
+        url = reverse('update-review-state', args=[self.project.slug, draft_review.pk])
+        response = self.client.post(url, {
+            'review': draft_review.pk,
+            'state': constants.OPEN
+        })
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'state': constants.DRAFT,
+            'state_changed': False,
+            'success': False,
+            'errors': {'review': ['Demo must have Reviewers to be opened']},
+        })
+        draft_review.refresh_from_db()
+        self.assertEqual(draft_review.state, constants.DRAFT)
+
+    def test_update_review_state_draft_to_open_no_description(self):
+        draft_kwargs = self.default_review_kwargs
+        draft_kwargs['state'] = constants.DRAFT
+        draft_kwargs['description'] = ''
+        draft_review = models.Review.create_review(**draft_kwargs)
+        url = reverse('update-review-state', args=[self.project.slug, draft_review.pk])
+        response = self.client.post(url, {
+            'review': draft_review.pk,
+            'state': constants.OPEN
+        })
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'state': constants.DRAFT,
+            'state_changed': False,
+            'success': False,
+            'errors': {'review': ['Demo must contain a description']},
+        })
+        draft_review.refresh_from_db()
+        self.assertEqual(draft_review.state, constants.DRAFT)
+
     def test_update_review_state_closed(self):
         self.assertEqual(len(mail.outbox), 0)
         url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
-            'state': models.reviews.CLOSED
+            'state': constants.CLOSED
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-            'state': models.reviews.CLOSED,
+            'state': constants.CLOSED,
             'state_changed': True,
             'success': True,
             'errors': {},
@@ -1048,11 +1120,11 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
-            'state': models.reviews.ABORTED
+            'state': constants.ABORTED
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-            'state': models.reviews.ABORTED,
+            'state': constants.ABORTED,
             'state_changed': True,
             'success': True,
             'errors': {},
@@ -1068,16 +1140,16 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(event.related_object, self.review)
 
     def test_update_review_state_reopened(self):
-        self.review.state = models.reviews.CLOSED
+        self.review.state = constants.CLOSED
         self.review.save(update_fields=['state'])
         url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
-            'state': models.reviews.OPEN,
+            'state': constants.OPEN,
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
-            'state': models.reviews.OPEN,
+            'state': constants.OPEN,
             'state_changed': True,
             'success': True,
             'errors': {},
@@ -1098,7 +1170,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
-            'state': models.reviews.OPEN,
+            'state': constants.OPEN,
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
@@ -1177,17 +1249,17 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
     def test_review_list_filter_by_state(self):
         response = self.client.get(reverse('review-list'), {
-            'state': models.reviews.OPEN,
+            'state': constants.OPEN,
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 1)
         self.assertIn('form', response.context)
         obj = response.context['object_list'][0]
-        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.state, constants.OPEN)
 
         # Let's show that filtering works the other way too
         response = self.client.get(reverse('review-list'), {
-            'state': models.reviews.CLOSED,
+            'state': constants.CLOSED,
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 0)
@@ -1195,17 +1267,17 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
     def test_review_list_filter_by_reviewer_state(self):
         response = self.client.get(reverse('review-list'), {
-            'reviewer_state': models.reviews.REVIEWING,
+            'reviewer_state': constants.REVIEWING,
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 1)
         self.assertIn('form', response.context)
         obj = response.context['object_list'][0]
-        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.state, constants.OPEN)
 
         # Let's show that filtering works the other way too
         response = self.client.get(reverse('review-list'), {
-            'reviewer_state': models.reviews.APPROVED,
+            'reviewer_state': constants.APPROVED,
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 0)
@@ -1261,17 +1333,17 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         response = self.client.get(reverse('review-list'), {
             'reviewer': test_user.pk,
             'creator': self.user.pk,
-            'state': models.reviews.OPEN,
-            'reviewer_state': models.reviews.REVIEWING,
+            'state': constants.OPEN,
+            'reviewer_state': constants.REVIEWING,
             'title': 'test',
         })
         self.assertStatusCode(response, 200)
         self.assertEqual(len(response.context['object_list']), 1)
         self.assertIn('form', response.context)
         obj = response.context['object_list'][0]
-        self.assertEqual(obj.state, models.reviews.OPEN)
+        self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.creator, self.user)
-        self.assertEqual(obj.reviewer_state, models.reviews.REVIEWING)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
         self.assertIn(test_user, obj.reviewers.all())
         self.assertEqual(obj.title, 'Test Title')
 
@@ -1320,7 +1392,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                     'user_pk': reviewer.reviewer.pk,
                     'reviewer_pk': reviewer.pk,
                     'name': reviewer.reviewer.userprofile.name,
-                    'reviewer_status': models.reviews.REVIEWING,
+                    'reviewer_status': constants.REVIEWING,
                     'review_pk': reviewer.review.pk,
                     'is_active': reviewer.is_active,
                     'created': reviewer.created.isoformat(),
@@ -1337,8 +1409,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             {
                 'reviewer': test_user.pk,
                 'creator': self.user.pk,
-                'state': models.reviews.OPEN,
-                'reviewer_state': models.reviews.REVIEWING,
+                'state': constants.OPEN,
+                'reviewer_state': constants.REVIEWING,
                 'title': 'test',
             }
         )
@@ -1349,8 +1421,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         review_obj = models.Review.objects.get(pk=review['pk'])
         self.assertEqual(review['title'], 'Test Title')
         self.assertEqual(review['creator'], self.user.userprofile.name)
-        self.assertEqual(review['state'], models.reviews.OPEN)
-        self.assertEqual(review['reviewer_state'], models.reviews.REVIEWING)
+        self.assertEqual(review['state'], constants.OPEN)
+        self.assertEqual(review['reviewer_state'], constants.REVIEWING)
         self.assertEqual(review['url'], review_obj.get_absolute_url())
         reviewers = review['reviewers']
         self.assertIn(test_user.pk, [x['user_pk'] for x in reviewers])

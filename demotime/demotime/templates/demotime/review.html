@@ -56,7 +56,10 @@
         {% if object.state == 'closed' %}
             <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
         {% else %}
-            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close</a></li>
+            {% if object.state == "draft" %}
+                <li class="published"><a data-type="open" href="#" class="subnav-item review-changer icon icon-ok">Publish</a></li>
+            {% endif %}
+            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-trash">Close</a></li>
         {% endif %}
     {% else %}
         {% if reviewer and object.state != "closed" %}

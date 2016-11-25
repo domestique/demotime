@@ -1,6 +1,7 @@
 """ Finite State Machine Controller """
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from demotime import constants, models
 
@@ -62,6 +63,14 @@ class Open(State):
         )
         review.send_revision_messages()
         models.Reminder.create_reminders_for_review(review)
+        review.created = timezone.now()
+        review.save(update_fields=['created', 'modified'])
+        review.reviewer_set.update(
+            created=timezone.now(), modified=timezone.now()
+        )
+        review.follower_set.update(
+            created=timezone.now(), modified=timezone.now()
+        )
 
     def _reopen(self, review, prev_state):
         models.Event.create_event(
