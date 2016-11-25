@@ -2,6 +2,7 @@ from mock import patch
 
 from django.core import mail
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import constants, models
 from demotime.tests import BaseTestCase
@@ -240,6 +241,7 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'delete_attachments': obj.revision.attachments.all(),
         })
         new_obj = models.Review.update_review(**review_kwargs)
         event = new_obj.event_set.get(
@@ -295,6 +297,44 @@ class TestReviewModels(BaseTestCase):
             constants.UPDATED,
         )
 
+    def test_update_review_keep_some_attachments(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        first_attachment, second_attachment = obj.revision.attachments.all()
+
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'delete_attachments': [first_attachment],
+            'attachments': [
+                {
+                    'attachment': File(BytesIO(b'new_file'), name='new_file.jpeg'),
+                    'description': 'Testing',
+                    'sort_order': 0,
+                },
+            ],
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        second_attach_content = second_attachment.attachment.file.read()
+        updated_attach_content = obj.revision.attachments.all()[0].attachment.file.read()
+        self.assertEqual(second_attach_content, updated_attach_content)
+        new_first = obj.revision.attachments.first()
+        new_last = obj.revision.attachments.last()
+        self.assertEqual(new_first.sort_order, 0)
+        self.assertEqual(new_last.sort_order, 1)
+        self.assertEqual(new_last.attachment.file.read(), b'new_file')
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+
     def test_update_closed_review(self):
         ''' Updating a closed review should reopen it '''
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -313,6 +353,7 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'delete_attachments': obj.revision.attachments.all(),
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
         # Should still be the same, singular revision
@@ -350,6 +391,7 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'delete_attachments': obj.revision.attachments.all(),
         })
         new_obj = models.Review.update_review(**review_kwargs)
         second_rev = new_obj.revision

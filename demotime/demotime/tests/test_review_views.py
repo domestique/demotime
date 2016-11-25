@@ -780,6 +780,9 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                 'followers': [],
                 'project': self.project.pk,
                 'state': constants.OPEN,
+                'delete_attachments': self.review.revision.attachments.values_list(
+                    'pk', flat=True
+                ),
                 'form-TOTAL_FORMS': 4,
                 'form-INITIAL_FORMS': 0,
                 'form-MIN_NUM_FORMS': 0,
@@ -848,6 +851,49 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.title, title)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.revision.number, 2)
+
+    def test_post_update_review_keep_one_attachment(self):
+        """ Test for asserting that a Creator can bring Attachments over from
+        the previous revision into the next revision
+        """
+        title = 'Test Title Update Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        first_attachment, second_attachment = self.review.revision.attachments.all()
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            {
+                'creator': self.user,
+                'title': title,
+                'description': 'Updated Description',
+                'case_link': 'http://www.example.org/1/',
+                'reviewers': self.test_users.values_list('pk', flat=True),
+                'followers': [],
+                'project': self.project.pk,
+                'state': constants.OPEN,
+                'delete_attachments': models.Attachment.objects.filter(
+                    pk=first_attachment.pk
+                ).values_list('pk', flat=True),
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+                'form-0-attachment': File(BytesIO(b'added_file'), name='added_file.png'),
+                'form-0-description': 'Test Description',
+                'form-0-sort_order': 1,
+            }
+        )
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_UPDATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.title, title)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        second_attach_content = second_attachment.attachment.file.read()
+        updated_attach_content = obj.revision.attachments.all()[0].attachment.file.read()
+        self.assertEqual(second_attach_content, updated_attach_content)
+        self.assertEqual(obj.revision.number, 2)
+
 
     def test_post_create_review_with_errors(self):
         response = self.client.post(reverse('create-review', args=[self.project.slug]), {

@@ -229,7 +229,8 @@ class Review(BaseModel):
     def update_review(
             cls, review, creator, title, description,
             case_link, reviewers, project, state=OPEN,
-            is_public=False, followers=None, attachments=None
+            is_public=False, followers=None, attachments=None,
+            delete_attachments=None,
         ):
         ''' Standard update review method '''
         # Figure out if we have a state transition
@@ -243,6 +244,8 @@ class Review(BaseModel):
         is_or_was_draft = state == DRAFT or obj.state == DRAFT
         state_change = obj.state != state
         is_update = not is_or_was_draft
+        attachment_offset = 0
+        delete_attachments = delete_attachments if delete_attachments else []
 
         if is_or_was_draft:
             obj.description = description
@@ -254,6 +257,9 @@ class Review(BaseModel):
             rev.description = description
             rev.save()
             prev_revision = None
+            attachment_offset = rev.attachments.aggregate(
+                Max('sort_order')
+            )['sort_order__max']
 
         if is_update:
             prev_revision = obj.revision
@@ -264,12 +270,14 @@ class Review(BaseModel):
                 number=rev_count + 1
             )
 
-            # No attachments, we'll copy them over
-            if not attachments:
-                for attachment in prev_revision.attachments.all():
+            # Copy over attachments that weren't removed
+            for count, attachment in enumerate(prev_revision.attachments.all()):
+                if attachment not in delete_attachments:
                     attachment.content_object = rev
                     attachment.pk = None
+                    attachment.sort_order = attachment_offset
                     attachment.save()
+                    attachment_offset += 1
 
             # Events
             Event.create_event(
@@ -284,7 +292,7 @@ class Review(BaseModel):
                 attachment=attachment['attachment'],
                 description=attachment['description'],
                 content_object=rev,
-                sort_order=attachment['sort_order'],
+                sort_order=int(attachment['sort_order']) + attachment_offset,
             )
 
         for reviewer in reviewers:
