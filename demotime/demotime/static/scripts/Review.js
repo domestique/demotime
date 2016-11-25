@@ -51,7 +51,7 @@ DemoTime.Review = Backbone.View.extend({
             }
         });
 
-        req.always(function(msg) {
+        req.success(function(msg) {
             if (msg.success) {
                 window.location.hash = 'state_change';
                 if (action == 'reload') {
@@ -93,6 +93,28 @@ DemoTime.Review = Backbone.View.extend({
             if (msg.success) {
                 window.location.hash = 'state_change';
                 window.location.reload();
+            }
+        });
+
+        // Particularly for showing errors related to publishing a demo draft
+        // with missing fields.
+        req.error(function(err) {
+            if (err.responseJSON) {
+                self.$el.find('.error_messaging').remove();
+
+                var err_html = '';
+                err_html += '<div class="error_messaging"><ul class="errorlist">';
+
+                for (var x = 0; x < err.responseJSON.errors.review.length; x++) {
+                    err_html += '<li>' + err.responseJSON.errors.review[x] + '</li>';
+                }
+
+                err_html += '</ul></div>';
+
+                self.$el.find('.container.content').prepend(err_html);
+                $('html, body').animate({
+                    scrollTop: self.$el.find('.container.content')
+                }, 500);
             }
         });
     },

@@ -154,14 +154,16 @@ select[multiple='multiple']:focus {
     border: 2px solid red;
     background: #fafafa url(/static/images/emoji/cry.png) 6px 6px no-repeat;
     background-size: 20px;
+    border-radius: 2px;
 }
 .errorlist li {
     list-style: none;
     padding: 5px;
-    color: red;
+    color: #777;
     width: 100%;
-    font-weight: 700;
+    font-weight: 400;
     box-sizing: border-box;
+    line-height: initial;
 }
 
 .dd-container,
