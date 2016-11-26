@@ -22,6 +22,7 @@ from demotime.constants import (
     REJECTED,
     APPROVED,
     OPEN,
+    PAUSED,
     CLOSED,
     ABORTED,
     UPDATED,
@@ -39,6 +40,7 @@ class Review(BaseModel):
         (CLOSED, CLOSED.capitalize()),
         (ABORTED, ABORTED.capitalize()),
         (CANCELLED, CANCELLED.capitalize()),
+        (PAUSED, PAUSED.capitalize()),
     )
 
     REVIEWER_STATE_CHOICES = (
