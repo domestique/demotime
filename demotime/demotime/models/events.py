@@ -15,6 +15,7 @@ class EventType(BaseModel):
     DEMO_APPROVED = 'demo-approved'
     DEMO_REJECTED = 'demo-rejected'
     DEMO_REVIEWING = 'demo-reviewing'
+    DEMO_PAUSED = 'demo-paused'
     COMMENT_ADDED = 'comment-added'
     REVIEWER_APPROVED = 'reviewer-approved'
     REVIEWER_REJECTED = 'reviewer-rejected'

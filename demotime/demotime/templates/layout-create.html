@@ -81,6 +81,7 @@ h1 em {
                             {% for attachment in review_inst.revision.attachments.all %}
                                 {% include "includes/review_attachment.html" with project=project review_inst=review_inst attachment=attachment %}
                             {% endfor %}
+                            {{ review_form.delete_attachments.label }}{{ review_form.delete_attachments }}
                         </section>
                     </article>
                 {% endif %}

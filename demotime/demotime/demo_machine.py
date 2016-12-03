@@ -106,11 +106,47 @@ class Open(State):
         if prev_state.name == constants.DRAFT:
             self._open_draft(review)
             webhook_type = constants.CREATED
-        elif prev_state.name in (constants.CLOSED, constants.ABORTED):
+        elif prev_state.name in (constants.CLOSED, constants.ABORTED, constants.PAUSED):
             self._reopen(review, prev_state.name)
             webhook_type = constants.REOPENED
 
         self._common_state_change(review, webhook_type)
+
+
+class Paused(State):
+
+    name = constants.PAUSED
+
+    def on_enter(self, review, prev_state):
+        super().on_enter(review, prev_state)
+        models.Event.create_event(
+            review.project,
+            models.EventType.DEMO_PAUSED,
+            review,
+            review.creator,
+        )
+        users = User.objects.filter(
+            Q(reviewer__review=review, reviewer__is_active=True) |
+            Q(follower__review=review, follower__is_active=True),
+        ).distinct()
+        reviewers = review.reviewers.all()
+        for user in users:
+            is_reviewer = user in reviewers
+            models.Message.send_system_message(
+                '"{}" has been Paused'.format(review.title),
+                'demotime/messages/paused.html',
+                {
+                    'is_reviewer': is_reviewer,
+                    'review': review,
+                    'previous_state': prev_state.name.title(),
+                    'user': user,
+                },
+                user,
+                revision=review.revision,
+            )
+
+        models.Reminder.update_reminder_activity_for_review(review)
+        self._common_state_change(review, self.name)
 
 
 class Closed(State):
@@ -291,6 +327,7 @@ class DemoMachine(StateMachine):
         constants.CLOSED: Closed,
         constants.ABORTED: Aborted,
         constants.CANCELLED: Cancelled,
+        constants.PAUSED: Paused,
     }
 
 

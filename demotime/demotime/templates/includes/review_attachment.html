@@ -14,6 +14,8 @@
                      data-url="{% url 'delete-review-attachment' project.slug review_inst.pk attachment.pk %}">
                      delete
                   </a>
+            {% else %}
+                - <a href="#" onclick="$('input[name=delete_attachments]').each(function(){ if($(this).val() == {{ attachment.pk }}){ $(this.click());}}); return false;">delete</a>
             {% endif %}
         </div>
     </div>

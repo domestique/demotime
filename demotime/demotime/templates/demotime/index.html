@@ -111,6 +111,18 @@
                         </div>
                     </section>
                 {% endif %}
+                {% if paused_demos %}
+                    <h3 class="icon icon-pencil">
+                        Your <strong>paused</strong> demos
+                    </h3>
+                    <section class="aggregated_dashboard-section aggregated_dashboard-drafts">
+                        <div>
+                            {% for demo in paused_demos %}
+                                {% include "includes/demo.html" %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
                 <h3>
                     <strong>Projects</strong> you're a member of
                     <span class="help" title="A Project consists of one or more demos.

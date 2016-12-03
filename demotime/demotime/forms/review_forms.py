@@ -26,6 +26,11 @@ class ReviewForm(forms.ModelForm):
         ),
         widget=forms.HiddenInput()
     )
+    delete_attachments = forms.ModelMultipleChoiceField(
+        queryset=models.Attachment.objects.none(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
 
     def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
@@ -51,6 +56,9 @@ class ReviewForm(forms.ModelForm):
             self.initial['followers'] = self.instance.follower_set.active().values_list(
                 'user__pk', flat=True
             )
+            self.fields['delete_attachments'].queryset = self.instance.revision.attachments.all()
+        else:
+            del self.fields['delete_attachments']
 
     def clean(self):
         data = super().clean()

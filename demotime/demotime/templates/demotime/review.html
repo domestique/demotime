@@ -53,12 +53,13 @@
                {% endif %}
             </a>
         </li>
-        {% if object.state == 'closed' %}
+        {% if object.state == 'closed' or object.state == 'aborted' or object.state == 'paused' %}
             <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
         {% else %}
             {% if object.state == "draft" %}
                 <li class="published"><a data-type="open" href="#" class="subnav-item review-changer icon icon-ok">Publish</a></li>
             {% endif %}
+            <li class="paused"><a data-type="paused" href="#" class="subnav-item review-changer icon icon-pause">Pause</a></li>
             <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-trash">Close</a></li>
         {% endif %}
     {% else %}
