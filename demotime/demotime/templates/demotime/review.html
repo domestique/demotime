@@ -54,7 +54,11 @@
             </a>
         </li>
         {% if object.state == 'closed' or object.state == 'aborted' or object.state == 'paused' %}
-            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
+            {% if object.state == 'paused' %}
+                <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-play">Resume</a></li>
+            {% else %}
+                <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
+            {% endif %}
         {% else %}
             {% if object.state == "draft" %}
                 <li class="published"><a data-type="open" href="#" class="subnav-item review-changer icon icon-ok">Publish</a></li>
