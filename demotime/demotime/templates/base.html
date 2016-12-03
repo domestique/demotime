@@ -157,12 +157,6 @@
         {# notifications #}
         <script src="/static/scripts/library/jquery.noty.packaged.min.js"></script>
 
-        {# clipboard #}
-        <script src="/static/scripts/library/clipboard.min.js"></script>
-        <script>
-            new Clipboard('.copy_link');
-        </script>
-
         {# linkify plain urls #}
         <script src="/static/scripts/library/linkify.min.js"></script>
         <script src="/static/scripts/library/linkify-jquery.min.js"></script>
@@ -206,7 +200,12 @@
             {# Customer support #}
             <script src="https://cdn.smooch.io/smooch.min.js"></script>
             <script>
-                Smooch.init({appToken: 'eqtzjuwbtcvv7meh85ruz6cgw'});
+                Smooch.init({
+                    appToken: 'eqtzjuwbtcvv7meh85ruz6cgw'
+                    {% if request.user.userprofile.display_name %}
+                        , givenName: '{{ request.user.userprofile.display_name }}'
+                    {% endif %}
+                });
             </script>
 
             {# DT-XX Info boxes #}
@@ -268,7 +267,7 @@
                 });
 
                 // Update this date to trigger new blog post notifications
-                var blog_update = '20161031';
+                var blog_update = '20161203';
 
                 if (!Cookies.get('blog_entry') || Cookies.get('blog_entry') != blog_update) {
                     Cookies.set('blog_entry', blog_update);
