@@ -137,7 +137,7 @@
 
     <div class="main-content">
         <h1 class="heading">
-            <strong class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ object.pk }}">DT-{{ object.pk }}</strong>: {{ object.title }}
+            <strong>DT-{{ object.pk }}</strong>: {{ object.title }}
                 <small class="alert">
                 {% if not revision.is_max_revision %}
                     Rev {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
