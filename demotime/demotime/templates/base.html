@@ -206,7 +206,12 @@
             {# Customer support #}
             <script src="https://cdn.smooch.io/smooch.min.js"></script>
             <script>
-                Smooch.init({appToken: 'eqtzjuwbtcvv7meh85ruz6cgw'});
+                Smooch.init({
+                    appToken: 'eqtzjuwbtcvv7meh85ruz6cgw'
+                    {% if request.user.userprofile.display_name %}
+                        , givenName: '{{ request.user.userprofile.display_name }}'
+                    {% endif %}
+                });
             </script>
 
             {# DT-XX Info boxes #}
