@@ -102,6 +102,9 @@
                 {% if drafts %}
                     <h3 class="icon icon-pencil">
                         Your demo <strong>drafts</strong>
+                        <span class="help" title="These are demos you're a part of creating but
+                        have not published yet. Start a demo now and perhaps finish it later if you
+                        like. It's really up to you."></span>
                     </h3>
                     <section class="aggregated_dashboard-section aggregated_dashboard-drafts">
                         <div>
@@ -112,10 +115,14 @@
                     </section>
                 {% endif %}
                 {% if paused_demos %}
-                    <h3 class="icon icon-pencil">
+                    <h3 class="icon icon-pause">
                         Your <strong>paused</strong> demos
+                        <span class="help" title="Pausing can be used to signal a number of
+                        different things to reviewers of your demo. It's often good to accompany
+                        a state-change like this with a comment to your reviewers to give them
+                        some context on why your demo might be paused."></span>
                     </h3>
-                    <section class="aggregated_dashboard-section aggregated_dashboard-drafts">
+                    <section class="aggregated_dashboard-section aggregated_dashboard-paused">
                         <div>
                             {% for demo in paused_demos %}
                                 {% include "includes/demo.html" %}
