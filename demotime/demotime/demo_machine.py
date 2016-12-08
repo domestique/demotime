@@ -15,7 +15,7 @@ class State(object):
     def _common_state_change(self, review, webhook_type=None):
         models.UserReviewStatus.objects.filter(
             review=review
-        ).exclude(user=review.creator).update(
+        ).exclude(user=review.last_action_by).update(
             read=False
         )
         if webhook_type:
@@ -34,7 +34,7 @@ class ReviewerState(State):
     def _common_state_change(self, review, webhook_type=None):
         models.UserReviewStatus.objects.filter(
             review=review,
-            user=review.creator,
+            user=review.last_action_by,
         ).update(
             read=False
         )
@@ -56,10 +56,10 @@ class Open(State):
             review.project,
             models.EventType.DEMO_CREATED,
             review,
-            review.creator
+            review.last_action_by
         )
         models.UserReviewStatus.create_user_review_status(
-            review, review.creator, True
+            review, review.last_action_by, True
         )
         review.send_revision_messages()
         models.Reminder.create_reminders_for_review(review)
@@ -77,7 +77,7 @@ class Open(State):
             review.project,
             models.EventType.DEMO_OPENED,
             review,
-            review.creator
+            review.last_action_by
         )
         users = User.objects.filter(
             Q(reviewer__review=review, reviewer__is_active=True) |
@@ -123,7 +123,7 @@ class Paused(State):
             review.project,
             models.EventType.DEMO_PAUSED,
             review,
-            review.creator,
+            review.last_action_by,
         )
         users = User.objects.filter(
             Q(reviewer__review=review, reviewer__is_active=True) |
@@ -159,7 +159,7 @@ class Closed(State):
             review.project,
             models.EventType.DEMO_CLOSED,
             review,
-            review.creator,
+            review.last_action_by,
         )
         users = User.objects.filter(
             Q(reviewer__review=review, reviewer__is_active=True) |
@@ -195,7 +195,7 @@ class Aborted(State):
             review.project,
             models.EventType.DEMO_ABORTED,
             review,
-            review.creator,
+            review.last_action_by,
         )
         users = User.objects.filter(
             Q(reviewer__review=review, reviewer__is_active=True) |
@@ -236,14 +236,14 @@ class Reviewing(ReviewerState):
             '"{}" is back Under Review'.format(review.title),
             'demotime/messages/reviewing.html',
             {'review': review, 'previous_state': prev_state.name.title()},
-            review.creator,
+            review.last_action_by,
             revision=review.revision,
         )
         models.Event.create_event(
             review.project,
             models.EventType.DEMO_REVIEWING,
             review,
-            review.creator
+            review.last_action_by
         )
         self._common_state_change(review, constants.REVIEWING)
 
@@ -258,14 +258,14 @@ class Approved(ReviewerState):
             '"{}" has been Approved!'.format(review.title),
             'demotime/messages/approved.html',
             {'review': review},
-            review.creator,
+            review.last_action_by,
             revision=review.revision,
         )
         models.Event.create_event(
             review.project,
             models.EventType.DEMO_APPROVED,
             review,
-            review.creator
+            review.last_action_by
         )
         self._common_state_change(review, constants.APPROVED)
 
@@ -280,14 +280,14 @@ class Rejected(ReviewerState):
             '"{}" has been Rejected'.format(review.title),
             'demotime/messages/rejected.html',
             {'review': review},
-            review.creator,
+            review.last_action_by,
             revision=review.revision,
         )
         models.Event.create_event(
             review.project,
             models.EventType.DEMO_REJECTED,
             review,
-            review.creator
+            review.last_action_by
         )
         self._common_state_change(review, constants.REJECTED)
 

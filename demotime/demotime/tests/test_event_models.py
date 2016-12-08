@@ -35,7 +35,7 @@ class TestEventModels(BaseTestCase):
             review.project,
             models.EventType.DEMO_CREATED,
             review,
-            review.creator
+            review.creator_set.active().get().user
         )
         self.assertEqual(event.event_type.code, models.EventType.DEMO_CREATED)
         self.assertEqual(event.related_type, models.Event.REVIEW)
@@ -88,7 +88,7 @@ class TestEventModels(BaseTestCase):
             review.project,
             models.EventType.DEMO_CREATED,
             review,
-            review.creator
+            review.creator_set.active().get().user
         )
         self.assertEqual(event.to_json(), {
             'project': {

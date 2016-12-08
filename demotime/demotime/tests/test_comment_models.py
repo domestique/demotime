@@ -35,8 +35,8 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(models.Message.objects.count(), 0)
         dropped_reviewer = self.review.reviewer_set.all()[0]
         dropped_follower = self.review.follower_set.all()[0]
-        dropped_reviewer.drop_reviewer(self.review.creator)
-        dropped_follower.drop_follower(self.review.creator)
+        dropped_reviewer.drop_reviewer(self.review.creator_set.active().get().user)
+        dropped_follower.drop_follower(self.review.creator_set.active().get().user)
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
         attachments = [
             {

@@ -24,6 +24,8 @@ class EventType(BaseModel):
     REVIEWER_REMOVED = 'reviewer-removed'
     FOLLOWER_ADDED = 'follower-added'
     FOLLOWER_REMOVED = 'follower-removed'
+    OWNER_ADDED = 'owner-added'
+    OWNER_REMOVED = 'owner-removed'
 
     name = models.CharField(max_length=128)
     code = models.SlugField(unique=True)

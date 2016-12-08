@@ -20,7 +20,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
         assert obj.revision
-        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.creator_set.get().user, self.user)
         self.assertEqual(obj.title, 'Test Title')
         self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://example.org/')
@@ -52,14 +52,14 @@ class TestReviewModels(BaseTestCase):
         )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.get().user)
 
     def test_create_draft_review(self):
         self.assertEqual(len(mail.outbox), 0)
         self.default_review_kwargs['state'] = constants.DRAFT
         obj = models.Review.create_review(**self.default_review_kwargs)
         assert obj.revision
-        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.creator_set.get().user, self.user)
         self.assertEqual(obj.title, 'Test Title')
         self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://example.org/')
@@ -190,7 +190,7 @@ class TestReviewModels(BaseTestCase):
         review_kwargs['followers'] = User.objects.filter(pk__in=user_pks)
         obj = models.Review.create_review(**review_kwargs)
         assert obj.revision
-        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.creator_set.get().user, self.user)
         self.assertEqual(obj.title, 'Test Title')
         self.assertEqual(obj.description, 'Test Description')
         self.assertEqual(obj.case_link, 'http://example.org/')
@@ -556,7 +556,8 @@ class TestReviewModels(BaseTestCase):
         obj.refresh_from_db()
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
         msg = models.Message.objects.get(
-            review=obj.reviewrevision_set.latest(), receipient=obj.creator
+            review=obj.reviewrevision_set.latest(),
+            receipient=obj.creator_set.active().get().user
         )
         self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
         self.assertTrue(changed)
@@ -566,7 +567,7 @@ class TestReviewModels(BaseTestCase):
         )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_REVIEWING)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         self.assertTrue(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -592,8 +593,8 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(len(mail.outbox), 5)
         dropped_reviewer = obj.reviewer_set.all()[0]
         dropped_follower = obj.follower_set.all()[0]
-        dropped_reviewer.drop_reviewer(obj.creator)
-        dropped_follower.drop_follower(obj.creator)
+        dropped_reviewer.drop_reviewer(obj.creator_set.active().get().user)
+        dropped_follower.drop_follower(obj.creator_set.active().get().user)
         mail.outbox = []
 
         models.UserReviewStatus.objects.update(read=True)
@@ -605,7 +606,7 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_PAUSED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_PAUSED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
             title='"{}" has been {}'.format(
@@ -640,8 +641,8 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(len(mail.outbox), 5)
         dropped_reviewer = obj.reviewer_set.all()[0]
         dropped_follower = obj.follower_set.all()[0]
-        dropped_reviewer.drop_reviewer(obj.creator)
-        dropped_follower.drop_follower(obj.creator)
+        dropped_reviewer.drop_reviewer(obj.creator_set.active().get().user)
+        dropped_follower.drop_follower(obj.creator_set.active().get().user)
         mail.outbox = []
 
         models.UserReviewStatus.objects.update(read=True)
@@ -653,7 +654,7 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_CLOSED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CLOSED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.get().user)
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
             title='"{}" has been {}'.format(
@@ -696,7 +697,7 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_ABORTED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_ABORTED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.get().user)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -745,7 +746,7 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.get().user)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -796,7 +797,7 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.get().user)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -846,7 +847,7 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.get().user)
         msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
         msgs = models.Message.objects.filter(
             review=obj.reviewrevision_set.latest(),
@@ -901,7 +902,7 @@ class TestReviewModels(BaseTestCase):
     def test_reviewer_status_count_properties_deleted(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         reviewer = review.reviewer_set.all()[0]
-        reviewer.drop_reviewer(review.creator)
+        reviewer.drop_reviewer(review.creator_set.get().user)
         self.assertEqual(review.reviewing_count, 2)
         self.assertEqual(review.approved_count, 0)
         self.assertEqual(review.rejected_count, 0)
@@ -920,7 +921,10 @@ class TestReviewModels(BaseTestCase):
         review = models.Review.create_review(**self.default_review_kwargs)
         review_json = review.to_json()
         self.assertEqual(review_json['title'], review.title)
-        self.assertEqual(review_json['creator'], review.creator.userprofile.name)
+        self.assertEqual(
+            review_json['creator'],
+            review.creator_set.get().user.userprofile.name
+        )
         reviewers = []
         for reviewer in review.reviewer_set.active():
             reviewers.append(reviewer.to_json())
@@ -953,8 +957,8 @@ class TestReviewModels(BaseTestCase):
         # Drop a reviewer and follower
         reviewer = review.reviewer_set.all()[0]
         follower = review.follower_set.all()[0]
-        reviewer.drop_reviewer(review.creator)
-        follower.drop_follower(review.creator)
+        reviewer.drop_reviewer(review.creator_set.get().user)
+        follower.drop_follower(review.creator_set.get().user)
         # Verify things are as they should be
         self.assertEqual(review.reviewer_set.count(), 3)
         self.assertEqual(review.follower_set.count(), 2)

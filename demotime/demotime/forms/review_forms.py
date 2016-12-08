@@ -31,6 +31,11 @@ class ReviewForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+    creators = forms.ModelChoiceField(
+        label='Co-Owner',
+        queryset=User.objects.none(),
+        required=False
+    )
 
     def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
@@ -40,6 +45,7 @@ class ReviewForm(forms.ModelForm):
         self.fields['reviewers'].required = False
         self.fields['followers'].queryset = user_queryset
         self.fields['followers'].required = False
+        self.fields['creators'].queryset = user_queryset
 
         for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
@@ -81,7 +87,8 @@ class ReviewForm(forms.ModelForm):
         model = models.Review
         fields = (
             'reviewers', 'description', 'title',
-            'case_link', 'followers', 'is_public'
+            'case_link', 'followers', 'is_public',
+            'creators',
         )
 
 
@@ -170,7 +177,7 @@ class ReviewFilterForm(forms.Form):
             qs = qs.filter(follower__user=data['follower'])
 
         if data.get('creator'):
-            qs = qs.filter(creator=data['creator'])
+            qs = qs.filter(creator__user=data['creator'])
 
         if data.get('state'):
             qs = qs.filter(state=data['state'])

@@ -294,7 +294,7 @@ class TestUserApiReviewers(BaseTestCase):
         response = self.client.post(reverse('user-api'), {
             'action': 'add_reviewer',
             'review_pk': self.review.pk,
-            'user_pk': self.review.creator.pk
+            'user_pk': self.review.creator_set.active().get().pk
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
@@ -461,7 +461,7 @@ class TestUserApiReviewers(BaseTestCase):
         response = self.client.post(reverse('user-api'), {
             'action': 'drop_reviewer',
             'review_pk': self.review.pk,
-            'user_pk': self.review.creator.pk,
+            'user_pk': self.review.creator_set.active().get().pk,
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
@@ -544,7 +544,7 @@ class TestUserApiFollowers(BaseTestCase):
     def test_find_follower_excludes_creator_and_reviewers(self):
         response = self.client.post(reverse('user-api'), {
             'action': 'find_follower',
-            'name': self.review.creator,
+            'name': self.review.creator_set.get().user.userprofile.name,
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)

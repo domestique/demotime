@@ -71,7 +71,9 @@ class Follower(BaseModel):
                 notify_follower = notify_creator = False
             else:
                 notify_follower = creator != user
-                notify_creator = creator != review.creator
+                notify_creator = creator != review.creator_set.active().filter(
+                    user=creator
+                ).exists()
             if notify_follower:
                 # pylint: disable=protected-access
                 obj._send_follower_message(notify_follower=True)
@@ -106,29 +108,32 @@ class Follower(BaseModel):
             self.review.title
         )
 
-        receipient = self.review.creator
+        receipients = [
+            creator.user for creator in self.review.creator_set.active()
+        ]
         if notify_follower:
-            receipient = self.user
+            receipients = [self.user]
             title = title_template.format(
                 'You',
                 'are',
                 self.review.title
             )
 
-        context = {
-            'receipient': receipient,
-            'url': self.review.get_absolute_url(),
-            'title': self.review.title,
-            'follower': self,
-            'is_follower': notify_follower,
-        }
-        Message.send_system_message(
-            title,
-            'demotime/messages/follower.html',
-            context,
-            receipient,
-            revision=self.review.revision,
-        )
+        for receipient in receipients:
+            context = {
+                'receipient': receipient,
+                'url': self.review.get_absolute_url(),
+                'title': self.review.title,
+                'follower': self,
+                'is_follower': notify_follower,
+            }
+            Message.send_system_message(
+                title,
+                'demotime/messages/follower.html',
+                context,
+                receipient,
+                revision=self.review.revision,
+            )
 
     class Meta:
         unique_together = (

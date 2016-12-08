@@ -7,6 +7,7 @@ from django.utils import timezone
 from demotime.models.base import BaseModel
 from demotime.models import (
     Attachment,
+    Creator,
     Event,
     EventType,
     Follower,
@@ -49,7 +50,11 @@ class Review(BaseModel):
         (REJECTED, REJECTED.capitalize()),
     )
 
-    creator = models.ForeignKey('auth.User', related_name='creator')
+    creators = models.ManyToManyField(
+        'auth.User',
+        related_name='creators',
+        through='Creator',
+    )
     reviewers = models.ManyToManyField(
         'auth.User',
         related_name='reviewers',
@@ -73,23 +78,28 @@ class Review(BaseModel):
     )
     is_public = models.BooleanField(default=False)
     project = models.ForeignKey('Project')
+    last_action_by = models.ForeignKey('auth.User')
 
     def __str__(self):
-        return 'Review: {} by {}'.format(
-            self.title, self.creator.username
+        return 'Review: {}'.format(
+            self.title
         )
 
     def to_json(self):
         reviewers = []
         followers = []
+        creators = []
         for reviewer in self.reviewer_set.active():
             reviewers.append(reviewer.to_json())
 
         for follower in self.follower_set.active():
             followers.append(follower.to_json())
 
+        for creator in self.creator_set.active():
+            creators.append(creator.to_json())
+
         return {
-            'creator': self.creator.userprofile.name,
+            'creators': creators,
             'reviewers': reviewers,
             'followers': followers,
             'title': self.title,
@@ -172,12 +182,12 @@ class Review(BaseModel):
     # pylint: disable=too-many-arguments
     @classmethod
     def create_review(
-            cls, creator, title, description,
+            cls, creators, title, description,
             case_link, reviewers, project, state=OPEN,
             is_public=False, followers=None, attachments=None):
         ''' Standard review creation method '''
+        owner = creators[0]
         obj = cls.objects.create(
-            creator=creator,
             title=title,
             description=description,
             case_link=case_link,
@@ -185,6 +195,7 @@ class Review(BaseModel):
             reviewer_state=REVIEWING,
             project=project,
             is_public=is_public,
+            last_action_by=owner
         )
         obj.state_machine
         rev = ReviewRevision.objects.create(
@@ -200,9 +211,18 @@ class Review(BaseModel):
                 sort_order=attachment['sort_order'],
             )
 
+        Creator.create_creator(
+            user=owner, review=obj
+        )
+        if len(creators) > 1:
+            co_owner = creators[1]
+            Creator.create_creator(
+                user=co_owner, review=obj, notify=True, adding_user=owner
+            )
+
         for reviewer in reviewers:
             Reviewer.create_reviewer(
-                obj, reviewer, creator, True, draft=state == DRAFT
+                obj, reviewer, owner, True, draft=state == DRAFT
             )
             UserReviewStatus.create_user_review_status(
                 obj, reviewer,
@@ -210,7 +230,7 @@ class Review(BaseModel):
 
         for follower in followers:
             Follower.create_follower(
-                obj, follower, creator, True, draft=state == DRAFT
+                obj, follower, owner, True, draft=state == DRAFT
             )
             UserReviewStatus.create_user_review_status(
                 obj, follower,
@@ -219,7 +239,7 @@ class Review(BaseModel):
         # Creator UserReviewStatus, set read to True, cuz they just created it
         # so I'm assuming they read it
         UserReviewStatus.create_user_review_status(
-            obj, obj.creator, True
+            obj, owner, True
         )
 
         obj.update_state(state)
@@ -229,14 +249,16 @@ class Review(BaseModel):
     # pylint: disable=too-many-locals
     @classmethod
     def update_review(
-            cls, review, creator, title, description,
+            cls, review, creators, title, description,
             case_link, reviewers, project, state=OPEN,
             is_public=False, followers=None, attachments=None,
             delete_attachments=None,
         ):
         ''' Standard update review method '''
         # Figure out if we have a state transition
+        owner = creators[0]
         obj = cls.objects.get(pk=review)
+        obj.last_action_by = owner
         obj.title = title
         obj.case_link = case_link
         obj.project = project
@@ -248,6 +270,15 @@ class Review(BaseModel):
         is_update = not is_or_was_draft
         attachment_offset = 0
         delete_attachments = delete_attachments if delete_attachments else []
+
+        Creator.create_creator(
+            user=owner, review=obj
+        )
+        if len(creators) > 1:
+            co_owner = creators[1]
+            Creator.create_creator(
+                user=co_owner, review=obj, notify=True, adding_user=owner
+            )
 
         if is_or_was_draft:
             obj.description = description
@@ -273,7 +304,7 @@ class Review(BaseModel):
             )
 
             # Copy over attachments that weren't removed
-            for count, attachment in enumerate(prev_revision.attachments.all()):
+            for attachment in prev_revision.attachments.all():
                 if attachment not in delete_attachments:
                     attachment.content_object = rev
                     attachment.pk = None
@@ -286,7 +317,7 @@ class Review(BaseModel):
                 project,
                 EventType.DEMO_UPDATED,
                 obj,
-                creator
+                owner
             )
 
         for attachment in attachments:
@@ -302,14 +333,14 @@ class Review(BaseModel):
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
                 reviewer = Reviewer.create_reviewer(
-                    obj, reviewer, creator, True, draft=state == DRAFT
+                    obj, reviewer, owner, True, draft=state == DRAFT
                 )
             else:
                 reviewer.status = REVIEWING
                 reviewer.is_active = True
                 reviewer.save()
                 if state_change and state not in (DRAFT, CANCELLED):
-                    reviewer.create_reviewer_event(creator)
+                    reviewer.create_reviewer_event(owner)
 
         for follower in followers:
             try:
@@ -317,30 +348,33 @@ class Review(BaseModel):
             except Follower.DoesNotExist:
                 Follower.create_follower(
                     review=obj, user=follower,
-                    creator=creator, skip_notifications=True,
+                    creator=owner, skip_notifications=True,
                     draft=state == DRAFT
                 )
             else:
                 follower.is_active = True
                 follower.save()
                 if state_change and state not in (DRAFT, CANCELLED):
-                    follower.create_follower_event(creator)
+                    follower.create_follower_event(owner)
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
-            user=creator
+            user=owner
         ).update(read=False)
 
-        # Drop Reviewers no longer assigned
+        # Drop Reviewers/Followers/Creators no longer assigned
         reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
         skip_drop_events = DRAFT in (
             state, getattr(obj.state_machine.previous_state, 'name', '')
         )
         for reviewer in reviewers:
-            reviewer.drop_reviewer(obj.creator, draft=skip_drop_events)
+            reviewer.drop_reviewer(owner, draft=skip_drop_events)
         followers = obj.follower_set.exclude(review=obj, user__in=followers)
         for follower in followers:
-            follower.drop_follower(obj.creator, draft=skip_drop_events)
+            follower.drop_follower(owner, draft=skip_drop_events)
+        dropped_creators = obj.creator_set.exclude(review=obj, user__in=creators)
+        for dropped_creator in dropped_creators:
+            dropped_creator.drop_creator(owner)
 
         obj.state_machine.change_state(state)
         # Reviewer situation may have changed, update it

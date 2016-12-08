@@ -28,7 +28,9 @@ class CanViewMixin(UserPassesTestMixin):
 
         if (getattr(self, 'review', None)
                 and self.review.state == constants.DRAFT
-                and self.request.user != self.review.creator):
+                and not self.review.creator_set.filter(
+                    user=self.request.user, active=True
+                ).exists()):
             return False
 
         if (not self.require_admin_privileges) and (

@@ -95,7 +95,7 @@ class UserAPI(JsonView):
             reviewer=user,
             is_active=True,
         ).exists()
-        if follower.exists() or is_reviewer or self.review.creator == user:
+        if follower.exists() or is_reviewer or self.review.creator_set.active().filter(user=user).exists():
             self.status = 400
             return {
                 'follower_name': '',
@@ -129,10 +129,10 @@ class UserAPI(JsonView):
         followers = self.review.follower_set.active().values_list(
             'user__pk', flat=True
         )
-        reviewers = self.review.reviewer_set.active().values_list(
-            'reviewer__pk', flat=True
+        creators = self.review.creator_set.active().values_list(
+            'user__pk', flat=True
         )
-        excluded_pks = tuple(followers) + tuple(reviewers) + (self.review.creator.pk,)
+        excluded_pks =  tuple(followers) + tuple(creators)
         users = self.default_user_list.exclude(
             pk__in=excluded_pks
         ).filter(
@@ -161,7 +161,8 @@ class UserAPI(JsonView):
                 'errors': {'user_pk': 'User not found'}
             }
 
-        if self.request.user != self.review.creator and self.request.user != user:
+        if (not self.review.creator_set.active().filter(user=self.request.user).exists() and
+                self.request.user != user):
             self.status = 403
             return {
                 'success': False,
@@ -220,7 +221,7 @@ class UserAPI(JsonView):
             reviewer=user,
             is_active=True
         )
-        if reviewer.exists() or self.review.creator == user:
+        if reviewer.exists() or self.review.creator_set.active().filter(user=user).exists():
             self.status = 400
             return {
                 'reviewer_name': '',
@@ -259,9 +260,12 @@ class UserAPI(JsonView):
             )
 
         reviewers = self.review.reviewer_set.active().values_list(
-            'reviewer', flat=True
+            'reviewer__pk', flat=True
         )
-        excluded_pks =  tuple(reviewers) + (self.review.creator.pk,)
+        creators = self.review.creator_set.active().values_list(
+            'user__pk', flat=True
+        )
+        excluded_pks =  tuple(reviewers) + tuple(creators)
         users = self.default_user_list.exclude(
             pk__in=excluded_pks
         ).filter(
@@ -304,7 +308,7 @@ class UserAPI(JsonView):
             }
 
         if (
-                self.request.user != self.review.creator and
+                not self.review.creator_set.active().filter(user=self.request.user).exists() and
                 self.request.user != reviewer.reviewer
             ):
             self.status = 400
