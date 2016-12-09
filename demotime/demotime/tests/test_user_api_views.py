@@ -578,17 +578,19 @@ class TestUserApiFollowers(BaseTestCase):
         )
         user_list = []
         for user in users:
-            user_list.append({
+            user_json = {
                 'pk': user.pk,
                 'name': user.userprofile.name,
                 'username': user.username,
                 'url': user.userprofile.get_absolute_url(),
-            })
-        self.assertEqual(data, {
-            'users': user_list,
-            'success': True,
-            'errors': {}
-        })
+            }
+            user_list.append(user_json)
+            self.assertIn(user_json, data['users'])
+
+        self.assertEqual(len(user_list), 2)
+        self.assertEqual(len(data['users']), 2)
+        self.assertEqual(data['errors'], {})
+        self.assertTrue(data['success'])
 
     def test_find_follower_not_in_project(self):
         # Drop all members/groups from the project
