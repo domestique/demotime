@@ -32,7 +32,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         paused_review.refresh_from_db()
 
         followed_kwargs = self.default_review_kwargs.copy()
-        followed_kwargs['creator'] = self.test_users[0]
+        followed_kwargs['creators'] = [self.test_users[0]]
         followed_kwargs['reviewers'] = self.test_users.exclude(
             pk=self.test_users[0].pk
         )
@@ -40,7 +40,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         followed_review = models.Review.create_review(**followed_kwargs)
 
         reviewer_kwargs = self.default_review_kwargs.copy()
-        reviewer_kwargs['creator'] = self.test_users[0]
+        reviewer_kwargs['creators'] = [self.test_users[0]]
         reviewer_kwargs['followers'] = self.test_users.exclude(
             pk=self.test_users[0].pk
         )
@@ -49,21 +49,25 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
         deleted_reviewer_kwargs = self.default_review_kwargs.copy()
         deleted_reviewer_kwargs['reviewers'] = [self.user]
-        deleted_reviewer_kwargs['creator'] = self.test_users[0]
+        deleted_reviewer_kwargs['creators'] = [self.test_users[0]]
         deleted_reviewer_review = models.Review.create_review(
             **deleted_reviewer_kwargs
         )
         deleted_reviewer = deleted_reviewer_review.reviewer_set.active()[0]
-        deleted_reviewer.drop_reviewer(deleted_reviewer_review.creator)
+        deleted_reviewer.drop_reviewer(
+            deleted_reviewer_review.creator_set.active().get().user
+        )
 
         deleted_follower_kwargs = self.default_review_kwargs.copy()
         deleted_follower_kwargs['followers'] = [self.user]
-        deleted_follower_kwargs['creator'] = self.followers[0]
+        deleted_follower_kwargs['creators'] = [self.followers[0]]
         deleted_follower_review = models.Review.create_review(
             **deleted_follower_kwargs
         )
         deleted_follower = deleted_follower_review.follower_set.active()[0]
-        deleted_follower.drop_follower(deleted_follower_review.creator)
+        deleted_follower.drop_follower(
+            deleted_follower_review.creator_set.active().get().user
+        )
 
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
@@ -84,12 +88,12 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
     def test_index_does_hide_approved_reviews_from_open_reviews(self):
         review_one_kwargs = self.default_review_kwargs.copy()
-        review_one_kwargs['creator'] = self.test_users[0]
+        review_one_kwargs['creators'] = [self.test_users[0]]
         review_one_kwargs['reviewers'] = [self.user]
         review_one = models.Review.create_review(**review_one_kwargs)
 
         review_two_kwargs = self.default_review_kwargs.copy()
-        review_two_kwargs['creator'] = self.test_users[0]
+        review_two_kwargs['creators'] = [self.test_users[0]]
         review_two_kwargs['reviewers'] = [self.user]
         review_two = models.Review.create_review(**review_two_kwargs)
 
@@ -155,8 +159,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
     def test_review_detail_hides_inactive_reviewer_followers(self):
         reviewer = self.review.reviewer_set.active()[0]
         follower = self.review.follower_set.active()[0]
-        reviewer.drop_reviewer(self.review.creator)
-        follower.drop_follower(self.review.creator)
+        reviewer.drop_reviewer(self.review.creator_set.active().get().user)
+        follower.drop_follower(self.review.creator_set.active().get().user)
         response = self.client.get(reverse(
             'review-detail',
             args=[self.project.slug, self.review.pk]
@@ -1418,7 +1422,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertIn('form', response.context)
         obj = response.context['object_list'][0]
         self.assertEqual(obj.state, constants.OPEN)
-        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.creator_set.active().get().user, self.user)
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
         self.assertIn(test_user, obj.reviewers.all())
         self.assertEqual(obj.title, 'Test Title')

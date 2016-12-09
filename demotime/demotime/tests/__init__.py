@@ -12,10 +12,15 @@ class BaseTestCase(TestCase):
         self.user.set_password('testing')
         self.user.email = 'test_user@example.com'
         self.user.save()
+        self.co_owner = User.objects.create_user(username='co_owner')
+        self.co_owner.set_password('testing')
+        self.co_owner.email = 'co_owner@example.com'
+        self.co_owner.save()
         self.system_user = User.objects.get(username='demotime_sys')
         self.group = models.Group.objects.get(slug='default-group')
         self.project = models.Project.objects.get(slug='default-project')
         models.GroupMember.objects.create(user=self.user, group=self.group)
+        models.GroupMember.objects.create(user=self.co_owner, group=self.group)
         for count in range(0, 3):
             u = User.objects.create_user(username='test_user_{}'.format(count))
             u.set_password('testing')

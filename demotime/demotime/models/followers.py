@@ -71,7 +71,7 @@ class Follower(BaseModel):
                 notify_follower = notify_creator = False
             else:
                 notify_follower = creator != user
-                notify_creator = creator != review.creator_set.active().filter(
+                notify_creator = not review.creator_set.active().filter(
                     user=creator
                 ).exists()
             if notify_follower:

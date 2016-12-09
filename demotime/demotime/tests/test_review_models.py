@@ -249,7 +249,7 @@ class TestReviewModels(BaseTestCase):
         )
         self.assertEqual(event.event_type.code, event.event_type.DEMO_UPDATED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         second_rev = new_obj.revision
         self.assertEqual(obj.pk, new_obj.pk)
         self.assertEqual(new_obj.title, 'New Title')
@@ -472,7 +472,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.reviewer_state, constants.APPROVED)
         msg = models.Message.objects.get(
             review=obj.reviewrevision_set.latest(),
-            receipient=obj.creator
+            receipient=obj.creator_set.active().get().user
         )
         self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
         self.assertTrue(changed)
@@ -480,7 +480,7 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_APPROVED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_APPROVED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         self.assertTrue(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -512,10 +512,10 @@ class TestReviewModels(BaseTestCase):
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_REJECTED)
         self.assertEqual(event.event_type.code, event.event_type.DEMO_REJECTED)
         self.assertEqual(event.related_object, obj)
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         msg = models.Message.objects.get(
             review=obj.reviewrevision_set.latest(),
-            receipient=obj.creator
+            receipient=obj.creator_set.active().get().user
         )
         self.assertEqual(msg.title, '"{}" has been Rejected'.format(obj.title))
         self.assertTrue(changed)
@@ -922,8 +922,8 @@ class TestReviewModels(BaseTestCase):
         review_json = review.to_json()
         self.assertEqual(review_json['title'], review.title)
         self.assertEqual(
-            review_json['creator'],
-            review.creator_set.get().user.userprofile.name
+            review_json['creators'],
+            [review.creator_set.get().to_json()]
         )
         reviewers = []
         for reviewer in review.reviewer_set.active():

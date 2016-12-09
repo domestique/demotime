@@ -95,6 +95,16 @@ h1 em {
                         </section>
                     {% endfor %}
                 </div>
+                <div class="creators">
+                    <h3>
+                        CoOwner
+                        <span class="help" title="Co Owner Content"</span>
+                    </h3>
+                    <section>
+                        {{ review_form.creators.errors }}
+                        {{ review_form.creators }}
+                    </section>
+                </div>
                 <h3>
                     Reviewers and Followers
                     <span class="help" title="When you assign someone as a 'reviewer' they

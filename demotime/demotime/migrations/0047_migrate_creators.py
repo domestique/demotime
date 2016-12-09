@@ -17,6 +17,17 @@ def migrate_creators(apps, _):
         review.last_action_by = review.creator
         review.save(update_fields=['last_action_by'])
 
+def create_owner_event_types(apps, _):
+    EventType = apps.get_model('demotime', 'EventType')
+    EventType.objects.create(
+        name='Owner Added',
+        code='owner-added'
+    )
+    EventType.objects.create(
+        name='Owner Removed',
+        code='owner-removed'
+    )
+
 
 class Migration(migrations.Migration):
 
@@ -25,5 +36,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_creators)
+        migrations.RunPython(migrate_creators),
+        migrations.RunPython(create_owner_event_types)
     ]

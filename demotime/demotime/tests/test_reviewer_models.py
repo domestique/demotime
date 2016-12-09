@@ -80,7 +80,7 @@ class TestReviewerModels(BaseTestCase):
         obj = models.Review.create_review(**self.default_review_kwargs)
         models.MessageBundle.objects.all().delete()
         reviewer = obj.reviewer_set.last()
-        reviewer.drop_reviewer(obj.creator)
+        reviewer.drop_reviewer(obj.creator_set.active().get().user)
         reviewer.refresh_from_db()
         reminders = models.Reminder.objects.filter(
             review=obj, user=reviewer.reviewer
@@ -97,14 +97,14 @@ class TestReviewerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         self.assertEqual(event.related_object, reviewer)
 
     def test_drop_reviewer_draft(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
         models.MessageBundle.objects.all().delete()
         reviewer = obj.reviewer_set.last()
-        reviewer.drop_reviewer(obj.creator, draft=True)
+        reviewer.drop_reviewer(obj.creator_set.active().get().user, draft=True)
         reviewer.refresh_from_db()
         self.assertFalse(reviewer.is_active)
         self.assertEqual(models.MessageBundle.objects.count(), 0)
@@ -123,7 +123,7 @@ class TestReviewerModels(BaseTestCase):
         )
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
         reviewer = models.Reviewer.objects.get(reviewer=test_user_1)
-        reviewer.drop_reviewer(obj.creator)
+        reviewer.drop_reviewer(obj.creator_set.active().get().user)
         obj.refresh_from_db()
         self.assertEqual(models.MessageBundle.objects.count(), 6)
         self.assertEqual(
@@ -135,7 +135,7 @@ class TestReviewerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         self.assertEqual(event.related_object, reviewer)
         self.assertEqual(obj.reviewer_state, constants.APPROVED)
 
@@ -147,7 +147,7 @@ class TestReviewerModels(BaseTestCase):
         )
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
         reviewer = models.Reviewer.objects.get(reviewer=test_user_1)
-        reviewer.drop_reviewer(obj.creator)
+        reviewer.drop_reviewer(obj.creator_set.active().get().user)
         obj.refresh_from_db()
         self.assertEqual(models.MessageBundle.objects.count(), 6)
         self.assertEqual(
@@ -159,7 +159,7 @@ class TestReviewerModels(BaseTestCase):
         event = models.Event.objects.get(
             event_type__code=models.EventType.REVIEWER_REMOVED
         )
-        self.assertEqual(event.user, obj.creator)
+        self.assertEqual(event.user, obj.creator_set.active().get().user)
         self.assertEqual(event.related_object, reviewer)
         self.assertEqual(obj.reviewer_state, constants.REJECTED)
 
@@ -183,7 +183,7 @@ class TestReviewerModels(BaseTestCase):
         )
         msg_bundle = models.MessageBundle.objects.get(
             review=obj,
-            owner=obj.creator
+            owner=obj.creator_set.active().get().user
         )
         self.assertEqual(
             msg_bundle.message_set.first().title,
@@ -267,8 +267,9 @@ class TestReviewerModels(BaseTestCase):
                 read=False,
             ).exists()
         )
+        creator = review.creator_set.active().get().user
         self.assertFalse(
-            review.creator.messagebundle_set.filter(
+            creator.messagebundle_set.filter(
                 review=review,
                 message__title='{} has been added as a reviewer on: {}'.format(
                     reviewer_obj.reviewer_display_name,
@@ -307,8 +308,9 @@ class TestReviewerModels(BaseTestCase):
                 read=False,
             ).exists()
         )
+        creator = review.creator_set.active().get().user
         self.assertTrue(
-            review.creator.messagebundle_set.filter(
+            creator.messagebundle_set.filter(
                 review=review,
                 message__title='{} has been added as a reviewer on: {}'.format(
                     reviewer_obj.reviewer_display_name,

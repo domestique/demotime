@@ -54,8 +54,8 @@ class Creator(BaseModel):
         if removed:
             event_type = EventType.OWNER_REMOVED
         else:
-            event_type = EventType.OWNED_ADDED
-        Event.create_event(
+            event_type = EventType.OWNER_ADDED
+        return Event.create_event(
             self.review.project,
             event_type,
             self,
@@ -69,14 +69,16 @@ class Creator(BaseModel):
             review=review,
             defaults={'active': True}
         )
-        if created and obj.active:
+        if not created and obj.active:
             # Already an active creator
-            return
+            return obj
 
         if notify:
+            # pylint: disable=protected-access
             obj._send_creator_message()
             obj._create_creator_event(adding_user)
-            obj.update_state(constants.PAUSED)
+            if not obj.review.state == constants.DRAFT:
+                obj.review.update_state(constants.PAUSED)
 
         if not obj.active:
             obj.active = True
@@ -89,6 +91,10 @@ class Creator(BaseModel):
         self.save(update_fields=['active', 'modified'])
         self._send_creator_message(removed=True)
         self._create_creator_event(dropping_user, removed=True)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super().save(*args, **kwargs)
 
     def clean(self):
         if self.review.creator_set.active().count() >= 2:

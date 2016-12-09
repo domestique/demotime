@@ -111,15 +111,18 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['open_demos'] = models.Review.objects.filter(
-            creator=self.request.user,
+            creator__user=self.request.user,
+            creator__active=True,
             state=constants.OPEN,
         )
         context['drafts'] = models.Review.objects.filter(
-            creator=self.request.user,
+            creator__user=self.request.user,
+            creator__active=True,
             state=constants.DRAFT
         )
         context['paused_demos'] = models.Review.objects.filter(
-            creator=self.request.user,
+            creator__user=self.request.user,
+            creator__active=True,
             state=constants.PAUSED,
         )
 

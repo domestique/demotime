@@ -98,7 +98,7 @@ class Reviewer(BaseModel):
                 notify_reviewer = notify_creator = False
             else:
                 notify_reviewer = creator != reviewer
-                notify_creator = review.creator_set.active().filter(
+                notify_creator = not review.creator_set.active().filter(
                     user=creator
                 ).exists()
             if notify_reviewer:

@@ -48,7 +48,7 @@ class TestUserApiReviewers(BaseTestCase):
     def test_find_reviewer_excludes_creator(self):
         response = self.client.post(reverse('user-api'), {
             'action': 'find_reviewer',
-            'name': self.review.creator,
+            'name': self.review.creator_set.active().get().user,
             'review_pk': self.review.pk
         })
         self.assertStatusCode(response, 200)
@@ -76,7 +76,7 @@ class TestUserApiReviewers(BaseTestCase):
         ).exclude(
             username='demotime_sys'
         ).exclude(
-            pk=self.review.creator.pk
+            pk=self.review.creator_set.active().get().user.pk
         )
         user_list = []
         for user in users:
@@ -294,7 +294,7 @@ class TestUserApiReviewers(BaseTestCase):
         response = self.client.post(reverse('user-api'), {
             'action': 'add_reviewer',
             'review_pk': self.review.pk,
-            'user_pk': self.review.creator_set.active().get().pk
+            'user_pk': self.review.creator_set.active().get().user.pk
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
@@ -461,7 +461,7 @@ class TestUserApiReviewers(BaseTestCase):
         response = self.client.post(reverse('user-api'), {
             'action': 'drop_reviewer',
             'review_pk': self.review.pk,
-            'user_pk': self.review.creator_set.active().get().pk,
+            'user_pk': self.review.creator_set.active().get().user.pk,
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
@@ -574,7 +574,7 @@ class TestUserApiFollowers(BaseTestCase):
         ).exclude(
             follower__review=self.review
         ).exclude(
-            pk=self.review.creator.pk
+            pk=self.review.creator_set.active().get().user.pk
         )
         user_list = []
         for user in users:
@@ -731,7 +731,7 @@ class TestUserApiFollowers(BaseTestCase):
                     self.test_user_2.userprofile.name,
                     self.review.title
                 ),
-                receipient=self.review.creator,
+                receipient=self.review.creator_set.active().get().user,
                 review=follower.review.revision,
             ).exists()
         )
@@ -789,7 +789,7 @@ class TestUserApiFollowers(BaseTestCase):
         response = self.client.post(reverse('user-api'), {
             'action': 'add_follower',
             'review_pk': self.review.pk,
-            'user_pk': self.review.creator.pk
+            'user_pk': self.review.creator_set.active().get().user.pk
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
@@ -915,7 +915,7 @@ class TestUserApiFollowers(BaseTestCase):
         response = self.client.post(reverse('user-api'), {
             'action': 'drop_follower',
             'review_pk': self.review.pk,
-            'user_pk': self.review.creator.pk,
+            'user_pk': self.review.creator_set.active().get().user.pk,
         })
         self.assertStatusCode(response, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
