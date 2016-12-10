@@ -8,61 +8,7 @@ from demotime import constants, models
 from demotime.views import JsonView
 
 
-class UserAPI(JsonView):
-
-    status = 200
-    ACTIONS = (
-        'search_users', 'add_follower', 'find_follower', 'drop_follower',
-        'add_reviewer', 'find_reviewer', 'drop_reviewer'
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.review = None
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        self.review = None
-        return super(UserAPI, self).dispatch(*args, **kwargs)
-
-    @property
-    def default_user_list(self):
-        sys_user = User.objects.get(username='demotime_sys')
-        return User.objects.exclude(
-            pk=sys_user.pk
-        )
-
-    # pylint: disable=no-self-use
-    def _build_json(self, users, errors, success=True):
-        json_dict = {
-            'errors': errors,
-            'users': [],
-            'success': success
-        }
-        for user in users:
-            json_dict['users'].append({
-                'name': user.userprofile.name,
-                'username': user.username,
-                'pk': user.pk,
-                'url': user.userprofile.get_absolute_url(),
-            })
-
-        return json_dict
-
-    # pylint: disable=no-self-use
-    def _filter_users_by_name(self, users, name):
-        return users.filter(
-            Q(username__icontains=name) |
-            Q(userprofile__display_name__icontains=name)
-        )
-
-    def _search_users(self, post_data):
-        name = post_data.get('name')
-        users = self._filter_users_by_name(
-            self.default_user_list.exclude(pk=self.request.user.pk),
-            name
-        )
-        return self._build_json(users, {})
+class FollowerAPIMixin(object):
 
     def _add_follower(self, post_data):
         if 'user_pk' not in post_data:
@@ -195,6 +141,9 @@ class UserAPI(JsonView):
                 'success': True,
                 'errors': {},
             }
+
+
+class ReviewerAPIMixin(object):
 
     def _add_reviewer(self, post_data):
         if 'user_pk' not in post_data:
@@ -330,6 +279,198 @@ class UserAPI(JsonView):
             'success': True,
             'errors': {},
         }
+
+
+class CreatorAPIMixin(object):
+
+    def _add_creator(self, post_data):
+        if 'user_pk' not in post_data:
+            self.status = 400
+            return {
+                'creator_name': '',
+                'creator_user_pk': '',
+                'success': False,
+                'errors': {'user_pk': 'User identifier missing'}
+            }
+
+        try:
+            user = User.objects.get(pk=post_data['user_pk'])
+        except User.DoesNotExist:
+            self.status = 400
+            return {
+                'creator_name': '',
+                'creator_user_pk': '',
+                'success': False,
+                'errors': {'user_pk': 'User not found'}
+            }
+
+        reviewer = models.Reviewer.objects.filter(
+            review=self.review,
+            reviewer=user,
+            is_active=True
+        )
+        creator = models.Creator.objects.filter(
+            user=user,
+            review=self.review,
+            active=True
+        )
+        if creator.exists() or self.review.creator_set.active().filter(user=user).exists():
+            self.status = 400
+            return {
+                'creator_name': '',
+                'creator_user_pk': '',
+                'success': False,
+                'errors': {'user_pk': 'User already on review'}
+            }
+        else:
+            follower_count = models.Follower.objects.filter(
+                review=self.review,
+                user=user,
+            ).update(is_active=False)
+            reviewer_count = models.Reviewer.objects.filter(
+                review=self.review,
+                reviewer=user,
+            ).update(is_active=False)
+            creator = models.Creator.create_creator(
+                user, self.review, notify=True, adding_user=self.request.user
+            )
+            return {
+                'creator_name': creator.user.userprofile.name,
+                'creator_user_pk': creator.user.pk,
+                'removed_follower': follower_count > 0,
+                'removed_reviewer': reviewer_count > 0,
+                'success': True,
+                'errors': {},
+            }
+
+    def _find_creator(self, post_data):
+        if not self.review:
+            self.status = 400
+            return self._build_json(
+                users=[],
+                errors={'review': 'Find creator requires a Review PK'},
+                success=False
+            )
+
+        excluded_pks = self.review.creator_set.active().values_list(
+            'user__pk', flat=True
+        )
+        users = self.default_user_list.exclude(
+            pk__in=excluded_pks
+        ).filter(
+            Q(projectmember__project=self.review.project) |
+            Q(groupmember__group__project=self.review.project)
+        )
+        if post_data.get('name'):
+            users = self._filter_users_by_name(users, post_data['name'])
+        return self._build_json(users, {})
+
+    def _drop_creator(self, post_data):
+        post_data = self.request.POST.copy()
+        if 'user_pk' not in post_data:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {'user_pk': 'User identifier missing'}
+            }
+
+        try:
+            user = User.objects.get(pk=post_data['user_pk'])
+        except User.DoesNotExist:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {'user_pk': 'User not found'}
+            }
+
+        try:
+            creator = models.Creator.objects.get(
+                review=self.review,
+                user=user,
+                active=True
+            )
+        except models.Reviewer.DoesNotExist:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {'user_pk': 'User not currently on review'}
+            }
+
+        if (
+                not self.review.creator_set.active().filter(user=self.request.user).exists() and
+                self.request.user != creator.user
+            ):
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {
+                    'user_pk': "Can not remove creators from reviews you don't own"
+                }
+            }
+
+        creator.drop_creator(self.request.user)
+        return {
+            'success': True,
+            'errors': {},
+        }
+
+
+class UserAPI(JsonView, FollowerAPIMixin, CreatorAPIMixin, ReviewerAPIMixin):
+
+    status = 200
+    ACTIONS = (
+        'search_users', 'add_follower', 'find_follower', 'drop_follower',
+        'add_reviewer', 'find_reviewer', 'drop_reviewer',
+        'add_creator', 'find_creator', 'drop_creator',
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.review = None
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.review = None
+        return super(UserAPI, self).dispatch(*args, **kwargs)
+
+    @property
+    def default_user_list(self):
+        sys_user = User.objects.get(username='demotime_sys')
+        return User.objects.exclude(
+            pk=sys_user.pk
+        )
+
+    # pylint: disable=no-self-use
+    def _build_json(self, users, errors, success=True):
+        json_dict = {
+            'errors': errors,
+            'users': [],
+            'success': success
+        }
+        for user in users:
+            json_dict['users'].append({
+                'name': user.userprofile.name,
+                'username': user.username,
+                'pk': user.pk,
+                'url': user.userprofile.get_absolute_url(),
+            })
+
+        return json_dict
+
+    # pylint: disable=no-self-use
+    def _filter_users_by_name(self, users, name):
+        return users.filter(
+            Q(username__icontains=name) |
+            Q(userprofile__display_name__icontains=name)
+        )
+
+    def _search_users(self, post_data):
+        name = post_data.get('name')
+        users = self._filter_users_by_name(
+            self.default_user_list.exclude(pk=self.request.user.pk),
+            name
+        )
+        return self._build_json(users, {})
 
     # pylint: disable=unused-argument
     def post(self, *args, **kwargs):

@@ -18,9 +18,10 @@ class TestCreatorModels(BaseTestCase):
         mail.outbox = []
 
     def test_create_creator_no_notify(self):
-        creator = models.Creator.create_creator(
+        creator, created = models.Creator.create_creator(
             user=self.user, review=self.review, notify=False
         )
+        self.assertTrue(created)
         self.assertEqual(creator.user, self.user)
         self.assertEqual(creator.review, self.review)
         self.assertTrue(creator.active)
@@ -34,13 +35,13 @@ class TestCreatorModels(BaseTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_create_creator_no_notify_inactive(self):
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review, notify=False
         )
         creator.active = False
         creator.save()
 
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review, notify=False
         )
         self.assertTrue(creator.active)
@@ -50,7 +51,7 @@ class TestCreatorModels(BaseTestCase):
     def test_create_creator_notify_draft(self):
         self.review.state = constants.DRAFT
         self.review.save()
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review,
             notify=True, adding_user=self.user
         )
@@ -71,7 +72,7 @@ class TestCreatorModels(BaseTestCase):
         self.assertEqual(message.receipient, self.user)
 
     def test_create_creator_notify(self):
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review,
             notify=True, adding_user=self.user
         )
@@ -95,7 +96,7 @@ class TestCreatorModels(BaseTestCase):
         self.assertEqual(self.review.state, constants.PAUSED)
 
     def test_create_creator_event_added(self):
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review, notify=False
         )
         # pylint: disable=protected-access
@@ -105,7 +106,7 @@ class TestCreatorModels(BaseTestCase):
         self.assertEqual(event.related_object, creator)
 
     def test_create_creator_event_removed(self):
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review, notify=False
         )
         # pylint: disable=protected-access
@@ -115,7 +116,7 @@ class TestCreatorModels(BaseTestCase):
         self.assertEqual(event.related_object, creator)
 
     def test_drop_creator(self):
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review, notify=False
         )
         creator.drop_creator(self.co_owner)
@@ -158,14 +159,15 @@ class TestCreatorModels(BaseTestCase):
         )
         # Now we do it again, but we'll set notify to True and prove nothing
         # ends up happening
-        models.Creator.create_creator(
+        _, created = models.Creator.create_creator(
             user=self.user, review=self.review, notify=True
         )
+        self.assertFalse(created)
         self.assertFalse(models.Event.objects.exists())
         self.assertEqual(len(mail.outbox), 0)
 
     def test_to_json(self):
-        creator = models.Creator.create_creator(
+        creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review, notify=False
         )
         self.assertEqual(creator.to_json(), {

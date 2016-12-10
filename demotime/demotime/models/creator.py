@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from demotime import constants
 from demotime.models.base import BaseModel
-from demotime.models import Event, EventType, Message
+from demotime.models import Event, EventType, Message, UserReviewStatus
 
 
 class CreatorManager(models.Manager):
@@ -77,6 +77,9 @@ class Creator(BaseModel):
             # pylint: disable=protected-access
             obj._send_creator_message()
             obj._create_creator_event(adding_user)
+            UserReviewStatus.create_user_review_status(
+                review, user,
+            )
             if not obj.review.state == constants.DRAFT:
                 obj.review.update_state(constants.PAUSED)
 
@@ -84,18 +87,22 @@ class Creator(BaseModel):
             obj.active = True
             obj.save(update_fields=['active', 'modified'])
 
-        return obj
+        return obj, created
 
     def drop_creator(self, dropping_user):
         self.active = False
         self.save(update_fields=['active', 'modified'])
         self._send_creator_message(removed=True)
         self._create_creator_event(dropping_user, removed=True)
+        UserReviewStatus.objects.filter(
+            user=self.user,
+            review=self.review
+        ).delete()
 
     def save(self, *args, **kwargs):
         self.clean()
         return super().save(*args, **kwargs)
 
     def clean(self):
-        if self.review.creator_set.active().count() >= 2:
+        if self.review.creator_set.active().exclude(user=self.user).count() >= 2:
             raise ValidationError('Demos may have a maximum of 2 Owners')

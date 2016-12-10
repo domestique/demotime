@@ -54,6 +54,47 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.get().user)
 
+    def test_create_review_with_review(self):
+        self.assertEqual(len(mail.outbox), 0)
+        self.default_review_kwargs['creators'] = [self.user, self.co_owner]
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        assert obj.revision
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertTrue(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(obj.title, 'Test Title')
+        self.assertEqual(obj.description, 'Test Description')
+        self.assertEqual(obj.case_link, 'http://example.org/')
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.follower_set.count(), 2)
+        attachment = obj.revision.attachments.all()[0]
+        attachment.attachment.name = 'test/test_file'
+        self.assertEqual(attachment.pretty_name, 'test_file')
+        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        statuses = models.UserReviewStatus.objects.filter(review=obj)
+        self.assertEqual(statuses.count(), 7)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 6)
+        self.assertEqual(len(mail.outbox), 6)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            5
+        )
+        self.hook_patch_run.assert_called_once_with(
+            constants.CREATED
+        )
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, self.user)
+
     def test_create_draft_review(self):
         self.assertEqual(len(mail.outbox), 0)
         self.default_review_kwargs['state'] = constants.DRAFT
@@ -79,6 +120,54 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(statuses.filter(read=True).count(), 1)
         self.assertEqual(statuses.filter(read=False).count(), 5)
         self.assertEqual(len(mail.outbox), 0)
+        self.assertFalse(
+            models.Reminder.objects.filter(review=obj, active=True).exists()
+        )
+        self.hook_patch_run.assert_not_called()
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.DEMO_CREATED
+            ).exists()
+        )
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.REVIEWER_ADDED
+            ).exists()
+        )
+        self.assertFalse(
+            obj.event_set.filter(
+                event_type__code=models.EventType.FOLLOWER_ADDED
+            ).exists()
+        )
+
+    def test_post_create_draft_review_with_coowner(self):
+        self.assertEqual(len(mail.outbox), 0)
+        self.default_review_kwargs['state'] = constants.DRAFT
+        self.default_review_kwargs['creators'] = [self.user, self.co_owner]
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        assert obj.revision
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertTrue(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(obj.title, 'Test Title')
+        self.assertEqual(obj.description, 'Test Description')
+        self.assertEqual(obj.case_link, 'http://example.org/')
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.follower_set.count(), 2)
+        attachment = obj.revision.attachments.all()[0]
+        attachment.attachment.name = 'test/test_file'
+        self.assertEqual(attachment.pretty_name, 'test_file')
+        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.DRAFT)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        statuses = models.UserReviewStatus.objects.filter(review=obj)
+        self.assertEqual(statuses.count(), 7)
+        self.assertEqual(statuses.filter(read=True).count(), 1)
+        self.assertEqual(statuses.filter(read=False).count(), 6)
+        self.assertEqual(len(mail.outbox), 1)
         self.assertFalse(
             models.Reminder.objects.filter(review=obj, active=True).exists()
         )
@@ -334,6 +423,142 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_last.attachment.file.read(), b'new_file')
         self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+
+    def test_update_review_add_coowner(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'creators': [self.user, self.co_owner],
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 4)
+        self.assertEqual(obj.state, constants.PAUSED)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertTrue(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(
+            models.Message.objects.filter(
+                receipient=self.co_owner,
+                title__contains='added'
+            ).count(),
+            1
+        )
+        self.assertEqual(
+            models.Event.objects.filter(
+                user=self.user,
+                event_type__code=models.EventType.OWNER_ADDED
+            ).count(),
+            1
+        )
+
+    def test_update_review_remove_coowner(self):
+        self.default_review_kwargs['creators'] = [self.user, self.co_owner]
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.creator_set.active().count(), 2)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'creators': [self.user]
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 4)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        creators = obj.creator_set.active()
+        self.assertEqual(creators.count(), 1)
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertFalse(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(
+            models.Message.objects.filter(
+                receipient=self.co_owner,
+                title__contains='removed'
+            ).count(),
+            1
+        )
+        self.assertEqual(
+            models.Event.objects.filter(
+                user=self.user,
+                event_type__code=models.EventType.OWNER_REMOVED
+            ).count(),
+            1
+        )
+
+    def test_update_review_change_coowner(self):
+        self.default_review_kwargs['creators'] = [self.user, self.co_owner]
+        self.default_review_kwargs['followers'] = []
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.creator_set.active().count(), 2)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'creators': [self.user, self.followers[0]]
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 4)
+        self.assertEqual(obj.state, constants.PAUSED)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        creators = obj.creator_set.active()
+        self.assertEqual(creators.count(), 2)
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertTrue(creators.filter(user=self.followers[0]).exists())
+        self.assertFalse(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(
+            models.Message.objects.filter(
+                receipient=self.co_owner,
+                title__contains='removed'
+            ).count(),
+            1
+        )
+        self.assertEqual(
+            models.Event.objects.filter(
+                user=self.user,
+                event_type__code=models.EventType.OWNER_REMOVED
+            ).count(),
+            1
+        )
+        self.assertEqual(
+            models.Message.objects.filter(
+                receipient=self.followers[0],
+                title__contains='added'
+            ).count(),
+            1
+        )
+        self.assertEqual(
+            models.Event.objects.filter(
+                user=self.user,
+                event_type__code=models.EventType.OWNER_ADDED,
+            ).count(),
+            2
+        )
 
     def test_update_paused_review(self):
         ''' Updating a paused review should reopen it '''

@@ -355,6 +355,65 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             4
         )
 
+    def test_post_create_review_with_coowner(self):
+        title = 'Test Title CoOwner Create Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
+            'title': title,
+            'description': 'Test Description',
+            'case_link': 'http://www.example.org',
+            'reviewers': self.test_users.values_list('pk', flat=True),
+            'followers': self.followers.values_list('pk', flat=True),
+            'project': self.project.pk,
+            'state': constants.OPEN,
+            'creators': self.co_owner.pk,
+            'form-TOTAL_FORMS': 4,
+            'form-INITIAL_FORMS': 0,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 5,
+            'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            'form-0-description': 'Test Description',
+            'form-0-sort_order': 1,
+        })
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_CREATED)
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertTrue(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(obj.title, title)
+        self.assertEqual(obj.description, 'Test Description')
+        self.assertEqual(obj.case_link, 'http://www.example.org')
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.followers.count(), 2)
+        self.assertEqual(obj.revision.attachments.count(), 1)
+        attachment = obj.revision.attachments.get()
+        self.assertEqual(attachment.attachment_type, 'image')
+        self.assertEqual(attachment.description, 'Test Description')
+        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(
+            models.Message.objects.filter(title__contains='POST').count(),
+            6
+        )
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            6
+        )
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user).exists()
+        )
+        self.assertEqual(len(mail.outbox), 6)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            5
+        )
+
     def test_post_create_draft_review(self):
         title = 'Test Title Create Review POST'
         self.assertEqual(len(mail.outbox), 0)
@@ -411,6 +470,73 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             models.Message.objects.filter(receipient=self.user).exists()
         )
         self.assertEqual(len(mail.outbox), 0)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            0
+        )
+
+    def test_post_create_draft_review_with_coowner(self):
+        title = 'Test Title CoOwner Create Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        response = self.client.post(reverse('create-review', args=[self.project.slug]), {
+            'title': title,
+            'description': 'Test Description',
+            'case_link': 'http://www.example.org',
+            'reviewers': self.test_users.values_list('pk', flat=True),
+            'followers': self.followers.values_list('pk', flat=True),
+            'project': self.project.pk,
+            'state': constants.DRAFT,
+            'creators': self.co_owner.pk,
+            'form-TOTAL_FORMS': 4,
+            'form-INITIAL_FORMS': 0,
+            'form-MIN_NUM_FORMS': 0,
+            'form-MAX_NUM_FORMS': 5,
+            'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            'form-0-description': 'Test Description',
+            'form-0-sort_order': 1,
+        })
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertFalse(event.exists())
+        event = obj.event_set.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertFalse(event.exists())
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertTrue(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(obj.state, constants.DRAFT)
+        self.assertEqual(obj.title, title)
+        self.assertEqual(obj.description, 'Test Description')
+        self.assertEqual(obj.case_link, 'http://www.example.org')
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.followers.count(), 2)
+        self.assertEqual(obj.revision.attachments.count(), 1)
+        self.assertEqual(
+            models.Message.objects.filter(title__contains='POST').count(),
+            1
+        )
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            6
+        )
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user).exists()
+        )
+        self.assertTrue(
+            models.Message.objects.filter(receipient=self.co_owner).exists()
+        )
+        self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
             0
@@ -489,6 +615,33 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(review_form.instance, self.review)
         self.assertEqual(self.review.reviewer_set.active().count(), 2)
         self.assertEqual(self.review.follower_set.active().count(), 1)
+        self.assertEqual(
+            list(review_form.initial['reviewers']),
+            list(self.review.reviewer_set.active().values_list('reviewer__pk', flat=True))
+        )
+        self.assertEqual(
+            list(review_form.initial['followers']),
+            list(self.review.follower_set.active().values_list('user__pk', flat=True))
+        )
+
+    def test_get_update_draft_review_with_coowner(self):
+        reviewer = self.review.reviewer_set.all()[0]
+        follower = self.review.follower_set.all()[0]
+        models.Creator.create_creator(self.co_owner, self.review)
+        reviewer.drop_reviewer(self.user)
+        follower.drop_follower(self.user)
+        response = self.client.get(
+            reverse('edit-review', args=[self.project.slug, self.review.pk])
+        )
+        self.assertStatusCode(response, 200)
+        review_inst = response.context['review_inst']
+        self.assertEqual(review_inst, self.review)
+        self.assertEqual(response.context['project'], self.review.project)
+        review_form = response.context['review_form']
+        self.assertEqual(review_form.instance, self.review)
+        self.assertEqual(self.review.reviewer_set.active().count(), 2)
+        self.assertEqual(self.review.follower_set.active().count(), 1)
+        self.assertEqual(review_form.initial['creators'], self.co_owner.pk)
         self.assertEqual(
             list(review_form.initial['reviewers']),
             list(self.review.reviewer_set.active().values_list('reviewer__pk', flat=True))

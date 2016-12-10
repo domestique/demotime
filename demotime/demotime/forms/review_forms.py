@@ -63,6 +63,11 @@ class ReviewForm(forms.ModelForm):
                 'user__pk', flat=True
             )
             self.fields['delete_attachments'].queryset = self.instance.revision.attachments.all()
+            co_owner = self.instance.creator_set.active().exclude(
+                user=user
+            ).values_list('user__pk', flat=True)
+            if co_owner.exists():
+                self.initial['creators'] = co_owner.get()
         else:
             del self.fields['delete_attachments']
 

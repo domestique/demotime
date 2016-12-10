@@ -219,6 +219,9 @@ class Review(BaseModel):
             Creator.create_creator(
                 user=co_owner, review=obj, notify=True, adding_user=owner
             )
+            UserReviewStatus.create_user_review_status(
+                obj, co_owner,
+            )
 
         for reviewer in reviewers:
             Reviewer.create_reviewer(
@@ -271,14 +274,22 @@ class Review(BaseModel):
         attachment_offset = 0
         delete_attachments = delete_attachments if delete_attachments else []
 
+        dropped_creators = obj.creator_set.exclude(review=obj, user__in=creators)
+        for dropped_creator in dropped_creators:
+            dropped_creator.drop_creator(owner)
+
         Creator.create_creator(
             user=owner, review=obj
         )
         if len(creators) > 1:
             co_owner = creators[1]
-            Creator.create_creator(
+            _, created = Creator.create_creator(
                 user=co_owner, review=obj, notify=True, adding_user=owner
             )
+            # Let's flip to Paused if this demo isn't a draft and we have a
+            # new creator
+            if created and state != DRAFT:
+                state = PAUSED
 
         if is_or_was_draft:
             obj.description = description
@@ -372,9 +383,6 @@ class Review(BaseModel):
         followers = obj.follower_set.exclude(review=obj, user__in=followers)
         for follower in followers:
             follower.drop_follower(owner, draft=skip_drop_events)
-        dropped_creators = obj.creator_set.exclude(review=obj, user__in=creators)
-        for dropped_creator in dropped_creators:
-            dropped_creator.drop_creator(owner)
 
         obj.state_machine.change_state(state)
         # Reviewer situation may have changed, update it
