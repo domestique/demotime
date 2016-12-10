@@ -85,8 +85,17 @@ class ReviewDetail(CanViewMixin, DetailView):
             follower = None
         context['follower_obj'] = follower
 
-        if self.revision.review.creator_set.active().filter(
-                user=self.request.user).exists():
+        try:
+            creator = models.Creator.objects.get(
+                review=self.revision.review,
+                user=self.user,
+                active=True
+            )
+        except models.Creator.DoesNotExist:
+            creator = None
+        context['creator_obj'] = creator
+
+        if creator:
             context['review_state_form'] = forms.ReviewStateForm(
                 self.request.user,
                 self.revision.review.pk,

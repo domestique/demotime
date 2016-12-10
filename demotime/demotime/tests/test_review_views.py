@@ -140,6 +140,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertNotIn('reviewer', response.context)
         self.assertNotIn('reviewer_status_form', response.context)
         self.assertIn('review_state_form', response.context)
+        self.assertEqual(response.context['creator_obj'].user, self.user)
         review_state_form = response.context['review_state_form']
         self.assertEqual(review_state_form.initial['review'], self.review)
         user_review_status = models.UserReviewStatus.objects.get(
@@ -226,6 +227,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         # We're the reviewer
         self.assertIn('reviewer', response.context)
         self.assertIn('reviewer_status_form', response.context)
+        self.assertIsNone(response.context['creator_obj'])
         reviewer_form = response.context['reviewer_status_form']
         self.assertTrue(reviewer_form.fields['reviewer'].queryset.filter(
             reviewer__username='test_user_0'
