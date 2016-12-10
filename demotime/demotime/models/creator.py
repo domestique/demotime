@@ -71,7 +71,7 @@ class Creator(BaseModel):
         )
         if not created and obj.active:
             # Already an active creator
-            return obj
+            return obj, created
 
         if notify:
             # pylint: disable=protected-access
