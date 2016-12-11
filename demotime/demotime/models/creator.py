@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.contenttypes.fields import GenericRelation
 
 from demotime import constants
 from demotime.models.base import BaseModel
@@ -17,6 +18,7 @@ class Creator(BaseModel):
     user = models.ForeignKey('auth.User')
     review = models.ForeignKey('Review')
     active = models.BooleanField(default=True)
+    events = GenericRelation('Event')
 
     objects = CreatorManager()
 
@@ -76,16 +78,33 @@ class Creator(BaseModel):
         if notify:
             # pylint: disable=protected-access
             obj._send_creator_message()
-            obj._create_creator_event(adding_user)
             UserReviewStatus.create_user_review_status(
                 review, user,
             )
             if not obj.review.state == constants.DRAFT:
+                obj._create_creator_event(adding_user)
                 obj.review.update_state(constants.PAUSED)
 
         if not obj.active:
             obj.active = True
             obj.save(update_fields=['active', 'modified'])
+
+        existing_reviewer = obj.review.reviewer_set.active().filter(
+            reviewer=user
+        )
+        existing_follower = obj.review.follower_set.active().filter(
+            user=user
+        )
+        if existing_reviewer.exists():
+            existing_reviewer.get().drop_reviewer(
+                adding_user if adding_user else user,
+                draft=obj.review.state == constants.DRAFT
+            )
+        if existing_follower.exists():
+            existing_follower.get().drop_follower(
+                adding_user if adding_user else user,
+                draft=obj.review.state == constants.DRAFT
+            )
 
         return obj, created
 

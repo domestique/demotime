@@ -48,23 +48,76 @@ class TestCreatorModels(BaseTestCase):
         self.assertFalse(models.Event.objects.exists())
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_create_creator_convert_reviewer(self):
+        creator, created = models.Creator.create_creator(
+            user=self.test_users[0], review=self.review, notify=False
+        )
+        self.assertTrue(creator.active)
+        self.assertTrue(created)
+        reviewer = self.review.reviewer_set.get(reviewer=self.test_users[0])
+        self.assertFalse(reviewer.is_active)
+        self.assertTrue(
+            models.Event.objects.filter(
+                user=reviewer.reviewer,
+                event_type__code=models.EventType.REVIEWER_REMOVED
+            ).exists()
+        )
+
+    def test_create_creator_convert_reviewer_adding_user(self):
+        creator, created = models.Creator.create_creator(
+            user=self.test_users[0], review=self.review, notify=False,
+            adding_user=self.user
+        )
+        self.assertTrue(creator.active)
+        self.assertTrue(created)
+        reviewer = self.review.reviewer_set.get(reviewer=self.test_users[0])
+        self.assertFalse(reviewer.is_active)
+        self.assertTrue(
+            models.Event.objects.filter(
+                user=self.user,
+                event_type__code=models.EventType.REVIEWER_REMOVED
+            ).exists()
+        )
+
+    def test_create_creator_convert_follower(self):
+        creator, created = models.Creator.create_creator(
+            user=self.followers[0], review=self.review, notify=False
+        )
+        self.assertTrue(creator.active)
+        self.assertTrue(created)
+        follower = self.review.follower_set.get(user=self.followers[0])
+        self.assertFalse(follower.is_active)
+        self.assertTrue(
+            models.Event.objects.filter(
+                user=follower.user,
+                event_type__code=models.EventType.FOLLOWER_REMOVED
+            ).exists()
+        )
+
+    def test_create_creator_convert_follower_adding_user(self):
+        creator, created = models.Creator.create_creator(
+            user=self.followers[0], review=self.review, notify=False,
+            adding_user=self.user
+        )
+        self.assertTrue(creator.active)
+        self.assertTrue(created)
+        follower = self.review.follower_set.get(user=self.followers[0])
+        self.assertFalse(follower.is_active)
+        self.assertTrue(
+            models.Event.objects.filter(
+                user=self.user,
+                event_type__code=models.EventType.FOLLOWER_REMOVED
+            ).exists()
+        )
+
     def test_create_creator_notify_draft(self):
         self.review.state = constants.DRAFT
         self.review.save()
-        creator, _ = models.Creator.create_creator(
+        models.Creator.create_creator(
             user=self.user, review=self.review,
             notify=True, adding_user=self.user
         )
-        event = models.Event.objects.get()
-        self.assertEqual(
-            event.event_type.code, models.EventType.OWNER_ADDED
-        )
-        self.assertEqual(
-            event.user, self.user
-        )
-        self.assertEqual(
-            event.related_object, creator
-        )
+        self.assertFalse(models.Event.objects.exists())
         self.assertEqual(len(mail.outbox), 1)
         message = models.Message.objects.get(
             title='You have been added as an owner of {}'.format(self.review.title)

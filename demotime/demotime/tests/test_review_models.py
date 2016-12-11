@@ -507,12 +507,19 @@ class TestReviewModels(BaseTestCase):
         self.default_review_kwargs['creators'] = [self.user, self.co_owner]
         self.default_review_kwargs['followers'] = []
         obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        self.assertEqual(
+            models.Event.objects.filter(
+                user=self.user,
+                event_type__code=models.EventType.OWNER_ADDED,
+            ).count(),
+            0
+        )
         self.assertEqual(obj.creator_set.active().count(), 2)
         self.assertEqual(obj.reviewer_set.active().count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.revision.number, 1)
-        self.assertEqual(obj.state, constants.OPEN)
-        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
         self.default_review_kwargs.update({
             'review': obj.pk,
             'title': 'New Title',
@@ -548,16 +555,17 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(
             models.Message.objects.filter(
                 receipient=self.followers[0],
-                title__contains='added'
+                title__contains='added as an owner'
             ).count(),
             1
         )
+        #import ipdb; ipdb.set_trace()
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
                 event_type__code=models.EventType.OWNER_ADDED,
             ).count(),
-            2
+            1
         )
 
     def test_update_paused_review(self):

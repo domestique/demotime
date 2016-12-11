@@ -283,7 +283,28 @@ class ReviewerAPIMixin(object):
 
 class CreatorAPIMixin(object):
 
+    def _validate_creator(self):
+        creator = models.Creator.objects.filter(
+            review=self.review,
+            user=self.request.user,
+            active=True
+        )
+        if not creator or not self.review:
+            self.status = 403
+            return {
+                'success': False,
+                'errors': {
+                    'creator': 'Can not modify creators unless you are a creator'
+                }
+            }
+
+        return None
+
     def _add_creator(self, post_data):
+        invalid_creator_resp = self._validate_creator()
+        if invalid_creator_resp:
+            return invalid_creator_resp
+
         if 'user_pk' not in post_data:
             self.status = 400
             return {
@@ -304,11 +325,6 @@ class CreatorAPIMixin(object):
                 'errors': {'user_pk': 'User not found'}
             }
 
-        reviewer = models.Reviewer.objects.filter(
-            review=self.review,
-            reviewer=user,
-            is_active=True
-        )
         creator = models.Creator.objects.filter(
             user=user,
             review=self.review,
@@ -326,12 +342,12 @@ class CreatorAPIMixin(object):
             follower_count = models.Follower.objects.filter(
                 review=self.review,
                 user=user,
-            ).update(is_active=False)
+            ).count()
             reviewer_count = models.Reviewer.objects.filter(
                 review=self.review,
                 reviewer=user,
-            ).update(is_active=False)
-            creator = models.Creator.create_creator(
+            ).count()
+            creator, _ = models.Creator.create_creator(
                 user, self.review, notify=True, adding_user=self.request.user
             )
             return {
@@ -344,6 +360,10 @@ class CreatorAPIMixin(object):
             }
 
     def _find_creator(self, post_data):
+        invalid_creator_resp = self._validate_creator()
+        if invalid_creator_resp:
+            return invalid_creator_resp
+
         if not self.review:
             self.status = 400
             return self._build_json(
@@ -366,6 +386,10 @@ class CreatorAPIMixin(object):
         return self._build_json(users, {})
 
     def _drop_creator(self, post_data):
+        invalid_creator_resp = self._validate_creator()
+        if invalid_creator_resp:
+            return invalid_creator_resp
+
         post_data = self.request.POST.copy()
         if 'user_pk' not in post_data:
             self.status = 400
@@ -389,7 +413,7 @@ class CreatorAPIMixin(object):
                 user=user,
                 active=True
             )
-        except models.Reviewer.DoesNotExist:
+        except models.Creator.DoesNotExist:
             self.status = 400
             return {
                 'success': False,
@@ -405,6 +429,15 @@ class CreatorAPIMixin(object):
                 'success': False,
                 'errors': {
                     'user_pk': "Can not remove creators from reviews you don't own"
+                }
+            }
+
+        if self.review.creator_set.active().count() == 1:
+            self.status = 400
+            return {
+                'success': False,
+                'errors': {
+                    'creator': 'Can not remove last creator'
                 }
             }
 
