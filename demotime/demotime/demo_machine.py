@@ -83,7 +83,7 @@ class Open(State):
             Q(reviewer__review=review, reviewer__is_active=True) |
             Q(follower__review=review, follower__is_active=True),
         ).distinct()
-        reviewers = review.reviewers.all()
+        reviewers = review.reviewer_set.active()
         for user in users:
             is_reviewer = user in reviewers
             models.Message.send_system_message(
@@ -99,6 +99,9 @@ class Open(State):
                 revision=review.revision,
             )
 
+        reviewers.update(status=constants.REVIEWING)
+        review.reviewer_state = constants.REVIEWING
+        review.save(update_fields=['reviewer_state'])
         models.Reminder.update_reminder_activity_for_review(review, True)
 
     def on_enter(self, review, prev_state):

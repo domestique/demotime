@@ -28,6 +28,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.follower_set.count(), 2)
+        self.assertEqual(obj.last_action_by, self.user)
         attachment = obj.revision.attachments.all()[0]
         attachment.attachment.name = 'test/test_file'
         self.assertEqual(attachment.pretty_name, 'test_file')
@@ -108,6 +109,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.follower_set.count(), 2)
+        self.assertEqual(obj.last_action_by, self.user)
         attachment = obj.revision.attachments.all()[0]
         attachment.attachment.name = 'test/test_file'
         self.assertEqual(attachment.pretty_name, 'test_file')
@@ -156,6 +158,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.follower_set.count(), 2)
+        self.assertEqual(obj.last_action_by, self.user)
         attachment = obj.revision.attachments.all()[0]
         attachment.attachment.name = 'test/test_file'
         self.assertEqual(attachment.pretty_name, 'test_file')
@@ -212,6 +215,7 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.revision.attachments.count(), 4)
         self.assertEqual(obj.description, 'New Description')
         self.assertEqual(obj.case_link, 'http://badexample.org')
+        self.assertEqual(obj.last_action_by, self.user)
         self.assertFalse(
             models.Reminder.objects.filter(review=obj, active=True).exists()
         )
@@ -423,6 +427,46 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(new_last.attachment.file.read(), b'new_file')
         self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        self.assertEqual(obj.last_action_by, self.user)
+
+    def test_update_review_with_existing_coowner(self):
+        self.default_review_kwargs['creators'] = [self.user, self.co_owner]
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.creator_set.active().count(), 2)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        self.assertEqual(
+            len(mail.outbox),
+            6 # 3 reviewers, 2 followers, 1 co-owner
+        )
+        mail.outbox = []
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample1.org',
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 4)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        self.assertEqual(
+            len(mail.outbox),
+            6 # 3 reviewers, 2 followers, 1 co-owner
+        )
+        self.assertEqual(
+            models.Message.objects.filter(
+                receipient=self.co_owner,
+                review__in=obj.reviewrevision_set.all()
+            ).count(),
+            2 # 1 for creation, 1 for update
+        )
+        self.assertEqual(obj.last_action_by, self.user)
 
     def test_update_review_add_coowner(self):
         obj = models.Review.create_review(**self.default_review_kwargs)

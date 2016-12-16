@@ -1328,6 +1328,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
 
     def test_update_review_state_closed(self):
         self.assertEqual(len(mail.outbox), 0)
+        self.review.last_action_by = self.co_owner
+        self.review.save(update_fields=['last_action_by'])
         url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
         response = self.client.post(url, {
             'review': self.review.pk,
@@ -1340,6 +1342,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'success': True,
             'errors': {},
         })
+        self.review.refresh_from_db()
         title = '"{}" has been Closed'.format(self.review.title)
         self.assertEqual(
             models.Message.objects.filter(title=title).count(),
@@ -1350,6 +1353,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             event_type__code=models.EventType.DEMO_CLOSED
         )
         self.assertEqual(event.related_object, self.review)
+        # last_action_by reset
+        self.assertEqual(self.review.last_action_by, self.user)
 
     def test_update_review_state_aborted(self):
         url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
@@ -1783,6 +1788,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'review-json',
             kwargs={'proj_slug': self.project.slug, 'pk': self.review.pk}
         )
+        self.review.last_action_by = self.co_owner
+        self.review.save()
         self.review.reviewer_state = constants.APPROVED
         response = self.client.post(url, {
             'title': 'test_review_detail_quick_edit',
@@ -1804,6 +1811,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(self.review.state, constants.CLOSED)
         self.assertTrue(data['is_public'])
         self.assertTrue(self.review.is_public)
+        self.assertEqual(self.review.last_action_by, self.user)
 
     def test_review_detail_quick_edit_errors(self):
         url = reverse(

@@ -339,6 +339,9 @@ class ReviewStateView(CanViewJsonView):
         )
         if form.is_valid():
             changed = self.review.update_state(form.cleaned_data['state'])
+            if changed:
+                self.review.last_action_by = self.request.user
+                self.review.save(update_fields=['last_action_by'])
             return {
                 'state': self.review.state,
                 'state_changed': changed,
@@ -387,7 +390,8 @@ class ReviewJsonView(CanViewJsonView):
         json_dict = {'errors': []}
         if form.is_valid():
             data = form.cleaned_data
-            update_fields = ['modified']
+            self.review.last_action_by = request.user
+            update_fields = ['modified', 'last_action_by']
             for key, value in data.items():
                 if value:
                     setattr(self.review, key, value)

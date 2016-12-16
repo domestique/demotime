@@ -148,12 +148,30 @@ class Review(BaseModel):
         if update:
             title = 'Update on Review: {}'.format(self.title)
 
+            for creator in self.creator_set.active().exclude(
+                    user=self.last_action_by):
+                context = {
+                    'receipient': creator.user,
+                    'url': self.get_absolute_url(),
+                    'update': update,
+                    'title': self.title,
+                    'is_creator': True,
+                }
+                Message.send_system_message(
+                    title,
+                    'demotime/messages/review.html',
+                    context,
+                    creator.user,
+                    revision=self.revision,
+                )
+
         for reviewer in self.reviewer_set.active():
             context = {
                 'receipient': reviewer.reviewer,
                 'url': self.get_absolute_url(),
                 'update': update,
                 'title': self.title,
+                'is_reviewer': True
             }
             Message.send_system_message(
                 title,
