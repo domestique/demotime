@@ -79,10 +79,10 @@ h1 em {
                         <h3 class="icon icon-attach">Current Attachments</h3>
                         <section class="attachments">
                             {% for attachment in review_inst.revision.attachments.all %}
-                                {% include "includes/review_attachment.html" with project=project review_inst=review_inst attachment=attachment %}
+                                {% include "includes/review_attachment.html" with project=project review_inst=review_inst attachment=attachment show_delete=True %}
                             {% endfor %}
-                            {{ review_form.delete_attachments.label }}{{ review_form.delete_attachments }}
                         </section>
+                        <div style="display: none">{{ review_form.delete_attachments.label }}{{ review_form.delete_attachments }}</div>
                     </article>
                 {% endif %}
                 <div class="attachments">

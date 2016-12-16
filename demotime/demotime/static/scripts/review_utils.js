@@ -3,17 +3,11 @@ $('body').on('click', '.toggle_sibling', function(event) {
     $(this).next().slideToggle();
 });
 $('body').on('click', 'a.attachment_delete', function(event) {
-    var el = $(this);
-
     event.preventDefault();
 
-    var del = $.ajax({
-        type: "DELETE",
-        url: el.data('url'),
-        data: {}
-    });
+    var el = $(this);
 
-    del.always(function() {
+    function slide_up_attachment() {
         parent = el.parents('.demobox');
         parent.slideUp(function() {
             $(this).remove();
@@ -21,7 +15,25 @@ $('body').on('click', 'a.attachment_delete', function(event) {
                 $('.current_attachments .attachments').html('No attachments found');
             }
         });
-    });
+    }
+
+    // We're either removing an attachment async (comments)
+    // or we're removing them from a revision (ticking a box
+    // for form post)
+    if (el.data('url')) {
+        var del = $.ajax({
+            type: "DELETE",
+            url: el.data('url'),
+            data: {}
+        });
+
+        del.always(function() {
+            slide_up_attachment();
+        });
+    } else if (el.data('pk')) {
+        $('input[value=' + el.data('pk') + ']').prop('checked', true);
+        slide_up_attachment();
+    }
 });
 
 $(document).ready(function() {
