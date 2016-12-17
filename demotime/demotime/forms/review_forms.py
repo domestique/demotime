@@ -177,13 +177,22 @@ class ReviewFilterForm(forms.Form):
         )
         data = self.cleaned_data
         if data.get('reviewer'):
-            qs = qs.filter(reviewer__reviewer=data['reviewer'])
+            qs = qs.filter(
+                reviewer__reviewer=data['reviewer'],
+                reviewer__is_active=True,
+            )
 
         if data.get('follower'):
-            qs = qs.filter(follower__user=data['follower'])
+            qs = qs.filter(
+                follower__user=data['follower'],
+                follower__is_active=True
+            )
 
         if data.get('creator'):
-            qs = qs.filter(creator__user=data['creator'])
+            qs = qs.filter(
+                creator__user=data['creator'],
+                creator__active=True,
+            )
 
         if data.get('state'):
             qs = qs.filter(state=data['state'])

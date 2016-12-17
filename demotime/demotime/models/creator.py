@@ -47,7 +47,12 @@ class Creator(BaseModel):
         Message.send_system_message(
             subject,
             'demotime/messages/creator.html',
-            {'review': self.review, 'removed': removed},
+            {
+                'review': self.review,
+                'removed': removed,
+                'title': self.review.title,
+                'url': self.review.get_absolute_url(),
+            },
             self.user,
             revision=self.review.revision
         )
