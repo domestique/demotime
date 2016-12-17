@@ -321,7 +321,7 @@ class Review(BaseModel):
             prev_revision = None
             attachment_offset = rev.attachments.aggregate(
                 Max('sort_order')
-            )['sort_order__max']
+            )['sort_order__max'] or 0
 
         if is_update:
             prev_revision = obj.revision

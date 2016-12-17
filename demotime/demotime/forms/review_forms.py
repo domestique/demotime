@@ -103,6 +103,7 @@ class ReviewFilterForm(forms.Form):
         ('', '-----------'),
         (constants.OPEN, constants.OPEN.capitalize()),
         (constants.CLOSED, constants.CLOSED.capitalize()),
+        (constants.PAUSED, constants.PAUSED.capitalize()),
         (constants.ABORTED, constants.ABORTED.capitalize()),
     )
 
