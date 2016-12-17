@@ -253,6 +253,22 @@ a.button-link:hover {
     position: relative;
     top: -4px;
 }
+.attachments .attachment-card.image {
+    width: 48%;
+    display: inline-block;
+    margin: 5px;
+    vertical-align: top;
+}
+@media screen and (max-width:480px) {
+    .attachments .attachment-card.image {
+        width: 100%;
+        margin: 5px 0;
+        display: block;
+    }
+}
+.attachments .attachment-card.image .demobox {
+    margin-top: 0;
+}
 
 .help {
     display: inline-block;
