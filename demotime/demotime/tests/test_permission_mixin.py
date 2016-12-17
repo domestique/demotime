@@ -1,5 +1,7 @@
 from mock import Mock
 
+from django.contrib.auth.models import AnonymousUser
+
 from demotime.views import CanViewMixin
 from demotime import models
 from demotime.tests import BaseTestCase
@@ -23,7 +25,7 @@ class TestPermissionMixin(BaseTestCase):
     def test_non_public_project_requires_auth(self):
         self.project.is_public = False
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=False)
+        self.user = AnonymousUser()
         self.mixin.project = self.project
         self.mixin.review = self.review
         self.mixin.request = self.request
@@ -32,7 +34,6 @@ class TestPermissionMixin(BaseTestCase):
     def test_user_directly_in_project(self):
         self.project.is_public = False
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=True)
         self.mixin.project = self.project
         self.mixin.review = self.review
         self.mixin.request = self.request
@@ -47,7 +48,6 @@ class TestPermissionMixin(BaseTestCase):
     def test_user_in_group_in_project(self):
         self.project.is_public = False
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=True)
         self.mixin.project = self.project
         self.mixin.review = self.review
         self.mixin.request = self.request
@@ -62,7 +62,6 @@ class TestPermissionMixin(BaseTestCase):
     def test_user_not_in_group_or_project(self):
         self.project.is_public = False
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=True)
         self.mixin.project = self.project
         self.mixin.review = self.review
         self.mixin.request = self.request
@@ -73,7 +72,6 @@ class TestPermissionMixin(BaseTestCase):
     def test_require_admin_privileges(self):
         self.project.is_public = False
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=True)
         self.mixin.project = self.project
         self.mixin.review = self.review
         self.mixin.request = self.request
@@ -93,7 +91,6 @@ class TestPermissionMixin(BaseTestCase):
     def test_require_admin_privileges_overrides_is_public(self):
         self.project.is_public = True
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=True)
         self.mixin.project = self.project
         self.mixin.review = self.review
         self.mixin.request = self.request
@@ -113,7 +110,6 @@ class TestPermissionMixin(BaseTestCase):
     def test_require_superuser_privileges(self):
         self.user.is_superuser = True
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=True)
         self.mixin.project = None
         self.mixin.review = None
         self.mixin.request = self.request
@@ -123,7 +119,6 @@ class TestPermissionMixin(BaseTestCase):
     def test_require_superuser_privileges_without_superuser(self):
         self.user.is_superuser = False
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=True)
         self.mixin.project = None
         self.mixin.review = None
         self.mixin.request = self.request
@@ -133,7 +128,7 @@ class TestPermissionMixin(BaseTestCase):
     def test_require_superuser_privileges_unauthed(self):
         self.user.is_superuser = True
         self.request.user = self.user
-        self.user.is_authenticated = Mock(return_value=False)
+        self.user = AnonymousUser()
         self.mixin.project = None
         self.mixin.review = None
         self.mixin.request = self.request
