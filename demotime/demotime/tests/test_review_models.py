@@ -101,9 +101,11 @@ class TestReviewModels(BaseTestCase):
 
     def test_update_draft_review(self):
         self.default_review_kwargs['state'] = constants.DRAFT
+        attachments = self.default_review_kwargs['attachments']
+        self.default_review_kwargs['attachments'] = []
         obj = models.Review.create_review(**self.default_review_kwargs)
         self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.attachments.count(), 0)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(len(mail.outbox), 0)
         models.UserReviewStatus.objects.filter(review=obj).update(read=True)
@@ -113,14 +115,16 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'attachments': attachments,
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.state, constants.DRAFT)
         # Should still be the same, singular revision
         self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.reviewer_set.active().count(), 2)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(len(mail.outbox), 0)
-        self.assertEqual(obj.revision.attachments.count(), 4)
+        self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.description, 'New Description')
         self.assertEqual(obj.case_link, 'http://badexample.org')
         self.assertFalse(
