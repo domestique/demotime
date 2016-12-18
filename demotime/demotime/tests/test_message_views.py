@@ -1,6 +1,6 @@
 import json
-from datetime import datetime
 
+from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
@@ -255,7 +255,7 @@ class TestMessagesAPI(BaseTestCase):
         last_bundle.read = False
         last_bundle.save()
         msg = last_bundle.message_set.last()
-        msg.created = datetime.now()
+        msg.created = timezone.now()
         msg.save()
         response = self.client.get(
             reverse('messages-json', kwargs={'review_pk': self.review.pk})
@@ -287,7 +287,7 @@ class TestMessagesAPI(BaseTestCase):
         last_bundle.read = False
         last_bundle.save()
         msg = last_bundle.message_set.last()
-        msg.created = datetime.now()
+        msg.created = timezone.now()
         msg.save()
         response = self.client.get(reverse('messages-json'))
         self.assertEqual(json.loads(response.content.decode('utf-8')), {
