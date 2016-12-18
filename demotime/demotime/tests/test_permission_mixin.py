@@ -24,8 +24,8 @@ class TestPermissionMixin(BaseTestCase):
 
     def test_non_public_project_requires_auth(self):
         self.project.is_public = False
-        self.request.user = self.user
         self.user = AnonymousUser()
+        self.request.user = self.user
         self.mixin.project = self.project
         self.mixin.review = self.review
         self.mixin.request = self.request
@@ -127,8 +127,8 @@ class TestPermissionMixin(BaseTestCase):
 
     def test_require_superuser_privileges_unauthed(self):
         self.user.is_superuser = True
-        self.request.user = self.user
         self.user = AnonymousUser()
+        self.request.user = self.user
         self.mixin.project = None
         self.mixin.review = None
         self.mixin.request = self.request
