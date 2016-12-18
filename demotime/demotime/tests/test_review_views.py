@@ -27,6 +27,10 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         draft_kwargs['state'] = constants.DRAFT
         draft_review = models.Review.create_review(**draft_kwargs)
 
+        paused_review = models.Review.create_review(**self.default_review_kwargs)
+        paused_review.update_state(constants.PAUSED)
+        paused_review.refresh_from_db()
+
         followed_kwargs = self.default_review_kwargs.copy()
         followed_kwargs['creator'] = self.test_users[0]
         followed_kwargs['reviewers'] = self.test_users.exclude(
@@ -64,7 +68,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         self.assertTemplateUsed(response, 'demotime/index.html')
-        for key in ['open_demos', 'open_reviews', 'drafts',
+        for key in ['open_demos', 'paused_demos', 'open_reviews', 'drafts',
                     'message_bundles', 'followed_demos']:
             self.assertIn(key, response.context)
 
@@ -74,7 +78,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertIn(reviewer_review, response.context['open_reviews'])
         self.assertNotIn(deleted_reviewer_review, response.context['open_reviews'])
         self.assertIn(draft_review, response.context['drafts'])
-        self.assertEqual(models.Review.objects.count(), 6)
+        self.assertIn(paused_review, response.context['paused_demos'])
+        self.assertEqual(models.Review.objects.count(), 7)
         self.assertEqual(len(response.context['message_bundles']), 4)
 
     def test_index_does_hide_approved_reviews_from_open_reviews(self):
@@ -780,6 +785,9 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                 'followers': [],
                 'project': self.project.pk,
                 'state': constants.OPEN,
+                'delete_attachments': self.review.revision.attachments.values_list(
+                    'pk', flat=True
+                ),
                 'form-TOTAL_FORMS': 4,
                 'form-INITIAL_FORMS': 0,
                 'form-MIN_NUM_FORMS': 0,
@@ -819,6 +827,64 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             4
         )
 
+    def test_post_update_review_reopen(self):
+        title = 'Test Title Update Review POST'
+        self.review.update_state(constants.CLOSED)
+        mail.outbox = []
+        self.assertEqual(len(mail.outbox), 0)
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            {
+                'creator': self.user,
+                'title': title,
+                'description': 'Updated Description',
+                'case_link': 'http://www.example.org/1/',
+                'reviewers': self.test_users.values_list('pk', flat=True),
+                'followers': [],
+                'project': self.project.pk,
+                'state': constants.OPEN,
+                'delete_attachments': self.review.revision.attachments.values_list(
+                    'pk', flat=True
+                ),
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+                'form-0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+                'form-0-description': 'Test Description',
+                'form-0-sort_order': 1,
+            }
+        )
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_UPDATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.title, title)
+        self.assertEqual(obj.description, 'Test Description')
+        self.assertEqual(obj.revision.description, 'Updated Description')
+        self.assertEqual(obj.case_link, 'http://www.example.org/1/')
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.follower_set.active().count(), 0)
+        self.assertEqual(obj.revision.attachments.count(), 1)
+        attachment = obj.revision.attachments.get()
+        self.assertEqual(attachment.attachment_type, 'image')
+        self.assertEqual(attachment.description, 'Test Description')
+        self.assertEqual(attachment.sort_order, 1)
+        self.assertEqual(obj.reviewrevision_set.count(), 2)
+        self.assertEqual(
+            models.Message.objects.filter(title__contains='Update Review POST').count(),
+            6
+        )
+        self.assertFalse(
+            models.Message.objects.filter(receipient=self.user).exists()
+        )
+        self.assertEqual(len(mail.outbox), 6)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            4
+        )
+
     def test_post_update_review_no_attachments(self):
         ''' Attachments from the previous revision should be copied over '''
         title = 'Test Title Update Review POST'
@@ -848,6 +914,49 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.title, title)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.revision.number, 2)
+
+    def test_post_update_review_keep_one_attachment(self):
+        """ Test for asserting that a Creator can bring Attachments over from
+        the previous revision into the next revision
+        """
+        title = 'Test Title Update Review POST'
+        self.assertEqual(len(mail.outbox), 0)
+        first_attachment, second_attachment = self.review.revision.attachments.all()
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, self.review.pk]),
+            {
+                'creator': self.user,
+                'title': title,
+                'description': 'Updated Description',
+                'case_link': 'http://www.example.org/1/',
+                'reviewers': self.test_users.values_list('pk', flat=True),
+                'followers': [],
+                'project': self.project.pk,
+                'state': constants.OPEN,
+                'delete_attachments': models.Attachment.objects.filter(
+                    pk=first_attachment.pk
+                ).values_list('pk', flat=True),
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+                'form-0-attachment': File(BytesIO(b'added_file'), name='added_file.png'),
+                'form-0-description': 'Test Description',
+                'form-0-sort_order': 1,
+            }
+        )
+        self.assertStatusCode(response, 302)
+        obj = models.Review.objects.get(title=title)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_UPDATED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(obj.creator, self.user)
+        self.assertEqual(obj.title, title)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        second_attach_content = second_attachment.attachment.file.read()
+        updated_attach_content = obj.revision.attachments.all()[0].attachment.file.read()
+        self.assertEqual(second_attach_content, updated_attach_content)
+        self.assertEqual(obj.revision.number, 2)
+
 
     def test_post_create_review_with_errors(self):
         response = self.client.post(reverse('create-review', args=[self.project.slug]), {
@@ -1044,6 +1153,31 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         })
         draft_review.refresh_from_db()
         self.assertEqual(draft_review.state, constants.DRAFT)
+
+    def test_update_review_state_paused(self):
+        self.assertEqual(len(mail.outbox), 0)
+        url = reverse('update-review-state', args=[self.project.slug, self.review.pk])
+        response = self.client.post(url, {
+            'review': self.review.pk,
+            'state': constants.PAUSED
+        })
+        self.assertStatusCode(response, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'state': constants.PAUSED,
+            'state_changed': True,
+            'success': True,
+            'errors': {},
+        })
+        title = '"{}" has been Paused'.format(self.review.title)
+        self.assertEqual(
+            models.Message.objects.filter(title=title).count(),
+            5
+        )
+        self.assertEqual(len(mail.outbox), 5)
+        event = self.review.event_set.get(
+            event_type__code=models.EventType.DEMO_PAUSED
+        )
+        self.assertEqual(event.related_object, self.review)
 
     def test_update_review_state_closed(self):
         self.assertEqual(len(mail.outbox), 0)

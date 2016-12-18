@@ -116,6 +116,10 @@ class IndexView(TemplateView):
             creator=self.request.user,
             state=constants.DRAFT
         )
+        context['paused_demos'] = models.Review.objects.filter(
+            creator=self.request.user,
+            state=constants.PAUSED,
+        )
 
         open_review_pks = models.Reviewer.objects.filter(
             reviewer=self.request.user,
