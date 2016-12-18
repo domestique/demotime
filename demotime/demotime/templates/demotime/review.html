@@ -63,7 +63,9 @@
             {% if object.state == "draft" %}
                 <li class="published"><a data-type="open" href="#" class="subnav-item review-changer icon icon-ok">Publish</a></li>
             {% endif %}
-            <li class="paused"><a data-type="paused" href="#" class="subnav-item review-changer icon icon-pause">Pause</a></li>
+            {% if object.state != "draft" %}
+                <li class="paused"><a data-type="paused" href="#" class="subnav-item review-changer icon icon-pause">Pause</a></li>
+            {% endif %}
             <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-trash">Close</a></li>
         {% endif %}
     {% else %}
