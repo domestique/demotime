@@ -1,3 +1,4 @@
+.clock { display: none; }
 body.bookmarklet nav,
 body.bookmarklet footer {
     display: none;
