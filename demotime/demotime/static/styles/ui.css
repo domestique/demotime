@@ -229,7 +229,7 @@ a.button-link:hover {
     color: #ffffff;
 }
 .subnav a.subnav-item.confirm {
-    background-color: #ffd94b;
+    background-color: #fff68e;
     color: #555555;
 }
 
@@ -252,6 +252,22 @@ a.button-link:hover {
     font-size: 12px;
     position: relative;
     top: -4px;
+}
+.attachments .attachment-card.image {
+    width: 48%;
+    display: inline-block;
+    margin: 5px;
+    vertical-align: top;
+}
+@media screen and (max-width:480px) {
+    .attachments .attachment-card.image {
+        width: 100%;
+        margin: 5px 0;
+        display: block;
+    }
+}
+.attachments .attachment-card.image .demobox {
+    margin-top: 0;
 }
 
 .help {

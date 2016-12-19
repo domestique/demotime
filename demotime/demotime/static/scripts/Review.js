@@ -88,7 +88,6 @@ DemoTime.Review = Backbone.View.extend({
                 state: type
             }
         });
-
         req.success(function(msg) {
             if (msg.success) {
                 window.location.hash = 'state_change';

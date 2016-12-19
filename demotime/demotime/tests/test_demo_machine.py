@@ -180,7 +180,7 @@ class TestOpenState(BaseDemoMachineCase):
             self.review, constants.CREATED
         )
 
-    def test_on_enter_reopen(self):
+    def test_on_enter_reopen_closed(self):
         # pylint: disable=protected-access
         self.state._reopen = Mock()
         self.state._common_state_change = Mock()
@@ -195,6 +195,85 @@ class TestOpenState(BaseDemoMachineCase):
             self.review, previous_state.name)
         self.state._common_state_change.assert_called_once_with(
             self.review, constants.REOPENED
+        )
+
+    def test_on_enter_reopen_aborted(self):
+        # pylint: disable=protected-access
+        self.state._reopen = Mock()
+        self.state._common_state_change = Mock()
+        self.review.state = 'notastate'
+        self.review.save(update_fields=['state'])
+        previous_state = demo_machine.Aborted()
+
+        self.state.on_enter(self.review, previous_state)
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.state, constants.OPEN)
+        self.state._reopen.assert_called_once_with(
+            self.review, previous_state.name)
+        self.state._common_state_change.assert_called_once_with(
+            self.review, constants.REOPENED
+        )
+
+    def test_on_enter_reopen_paused(self):
+        # pylint: disable=protected-access
+        self.state._reopen = Mock()
+        self.state._common_state_change = Mock()
+        self.review.state = 'notastate'
+        self.review.save(update_fields=['state'])
+        previous_state = demo_machine.Paused()
+
+        self.state.on_enter(self.review, previous_state)
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.state, constants.OPEN)
+        self.state._reopen.assert_called_once_with(
+            self.review, previous_state.name)
+        self.state._common_state_change.assert_called_once_with(
+            self.review, constants.REOPENED
+        )
+
+
+class TestPausedState(BaseDemoMachineCase):
+
+    def setUp(self):
+        super(TestPausedState, self).setUp()
+        self.state = demo_machine.Paused()
+
+    def test_name(self):
+        self.assertEqual(self.state.name, constants.PAUSED)
+
+    def test_on_enter(self):
+        models.Event.objects.all().delete()
+        models.Message.objects.all().delete()
+        models.UserReviewStatus.objects.filter(
+            review=self.review
+        ).delete()
+        models.Reminder.objects.all().update(active=True)
+        self.review.state = 'notastate'
+        self.review.save(update_fields=['state'])
+        mail.outbox = []
+
+        self.state.on_enter(self.review, demo_machine.Open())
+        self.review.refresh_from_db()
+        self.assertEqual(self.review.state, constants.PAUSED)
+        event = models.Event.objects.get()
+        self.assertEqual(event.event_type.code, models.EventType.DEMO_PAUSED)
+        self.assertEqual(event.user, self.review.creator)
+
+        reminders = models.Reminder.objects.filter(
+            review=self.review, active=False
+        )
+        # 3 reviewers, 1 creator
+        self.assertEqual(reminders.count(), 4)
+
+        messages = models.Message.objects.filter(
+            title__contains='Paused',
+            review=self.review.revision
+        )
+        # 2 followers, 3 reviewers
+        self.assertEqual(messages.count(), 5)
+        self.assertEqual(len(mail.outbox), 5)
+        self.hook_patch_run.assert_called_once_with(
+            constants.PAUSED
         )
 
 
