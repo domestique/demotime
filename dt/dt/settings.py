@@ -53,7 +53,7 @@ DEBUG = parser.get('demotime', 'debug').lower() == 'true'
 if parser.get('demotime', 'allowed_hosts'):
     ALLOWED_HOSTS = parser.get('demotime', 'allowed_hosts').split(',')
 else:
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['local.demotime.com',]
 
 ADMINS = (
     ('Domestique Support', 'support@domestiquestudios.com'),
@@ -136,12 +136,12 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
-                'django.core.context_processors.debug',
-                'django.core.context_processors.i18n',
-                'django.core.context_processors.media',
-                'django.core.context_processors.static',
-                'django.core.context_processors.tz',
-                'django.core.context_processors.request',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'demotime.context_processors.has_unread_messages',
                 'demotime.context_processors.unread_message_count',

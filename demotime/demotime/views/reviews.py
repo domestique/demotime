@@ -47,7 +47,7 @@ class ReviewDetail(CanViewMixin, DetailView):
             self.revision = self.get_object().revision
 
         self.review = self.revision.review
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             models.MessageBundle.objects.filter(
                 owner=request.user,
                 review=self.revision.review
