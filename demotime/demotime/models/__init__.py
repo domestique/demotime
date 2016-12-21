@@ -14,6 +14,7 @@ from .projects import Project, ProjectGroup, ProjectMember
 from .webhooks import WebHook
 from .users import UserProfile, UserReviewStatus, UserProxy
 from .comments import Comment, CommentThread
+from .creator import Creator
 from .reviews import Review, ReviewRevision
 
 

@@ -42,7 +42,7 @@
 
 {% block sub_nav_actions %}
 <ul class="subnav-item">
-    {% if request.user == object.creator %}
+    {% if creator_obj %}
         <li class="updated">
             <a href="{% url 'edit-review' object.project.slug object.pk %}"
                class="subnav-item icon icon-pencil">
@@ -95,7 +95,7 @@
 
 <div class="review" id="review">
     <div class="review-top">
-        {% if request.user == object.creator %}
+        {% if creator_obj %}
             <div class="your-status">
                 <h3>
                     Demo State:
@@ -164,8 +164,10 @@
 
         <section class="review-meta with-gap:5">
             <div class="cel">
-                <h4 class="heading">Owner:</h4>
-                <a href="{{ object.creator.userprofile.get_absolute_url }}">{{ object.creator.userprofile }}</a><br><br>
+                <h4 class="heading">Owner(s):</h4>
+                {% for creator in object.creator_set.active %}
+                    <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a><br><br>
+                {% endfor %}
                 {% if object.state != "closed" %}
                     <h4 class="heading">
                         Reviewer State:
@@ -243,6 +245,11 @@
                                     <div class="cel">
                                         <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
                                     </div>
+                                    {% if creator_obj %}
+                                        <div class="cel">
+                                            <input type="text" class="find_person" data-action="find_creator" placeholder="add creator" maxlength="3">
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </li>
                         {% endif %}
@@ -485,14 +492,14 @@ var review = new DemoTime.Review({
         is_reviewer: false
     {% endif %}
     , reviewer_state: '{{ review.reviewer_state }}'
-    {% if request.user == object.creator %}
+    {% if creator_obj %}
         , is_creator: true
         , review_url: '{% url "update-review-state" revision.review.project.slug revision.review.pk %}'
     {% else %}
         , is_creator: false
     {% endif %}
     , review_pk: {{ revision.review.pk }}
-    , creator_pk: {{ object.creator.pk }}
+    , creator_pk: [{% for creator in object.creator_set.active %}{{ creator.pk }}{% if not forloop.last %},{% endif %}{% endfor %}]
 });
 
 var review_activity = new DemoTime.ReviewActivity({

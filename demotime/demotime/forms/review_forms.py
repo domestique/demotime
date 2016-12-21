@@ -31,6 +31,11 @@ class ReviewForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+    creators = forms.ModelChoiceField(
+        label='Co-Owner',
+        queryset=User.objects.none(),
+        required=False
+    )
 
     def __init__(self, user, project, *args, **kwargs):
         super(ReviewForm, self).__init__(*args, **kwargs)
@@ -40,6 +45,7 @@ class ReviewForm(forms.ModelForm):
         self.fields['reviewers'].required = False
         self.fields['followers'].queryset = user_queryset
         self.fields['followers'].required = False
+        self.fields['creators'].queryset = user_queryset
 
         for key, _ in self.fields.items():
             self.fields[key].widget.attrs['class'] = 'form-control'
@@ -57,6 +63,11 @@ class ReviewForm(forms.ModelForm):
                 'user__pk', flat=True
             )
             self.fields['delete_attachments'].queryset = self.instance.revision.attachments.all()
+            co_owner = self.instance.creator_set.active().exclude(
+                user=user
+            ).values_list('user__pk', flat=True)
+            if co_owner.exists():
+                self.initial['creators'] = co_owner.get()
         else:
             del self.fields['delete_attachments']
 
@@ -81,7 +92,8 @@ class ReviewForm(forms.ModelForm):
         model = models.Review
         fields = (
             'reviewers', 'description', 'title',
-            'case_link', 'followers', 'is_public'
+            'case_link', 'followers', 'is_public',
+            'creators',
         )
 
 
@@ -165,13 +177,22 @@ class ReviewFilterForm(forms.Form):
         )
         data = self.cleaned_data
         if data.get('reviewer'):
-            qs = qs.filter(reviewer__reviewer=data['reviewer'])
+            qs = qs.filter(
+                reviewer__reviewer=data['reviewer'],
+                reviewer__is_active=True,
+            )
 
         if data.get('follower'):
-            qs = qs.filter(follower__user=data['follower'])
+            qs = qs.filter(
+                follower__user=data['follower'],
+                follower__is_active=True
+            )
 
         if data.get('creator'):
-            qs = qs.filter(creator=data['creator'])
+            qs = qs.filter(
+                creator__user=data['creator'],
+                creator__active=True,
+            )
 
         if data.get('state'):
             qs = qs.filter(state=data['state'])

@@ -94,7 +94,7 @@ class TestGroupManageViews(BaseTestCase):
 
     def test_edit_group(self):
         self.group.groupmember_set.filter(user__in=self.test_users).delete()
-        self.assertEqual(self.group.groupmember_set.count(), 3)
+        self.assertEqual(self.group.groupmember_set.count(), 4)
         self.group.groupmember_set.update(is_admin=True)
         response = self.client.post(reverse('group-manage', args=[self.group.slug]), {
             'name': 'Swansons',
@@ -126,7 +126,7 @@ class TestGroupManageViews(BaseTestCase):
             ).count(),
             3
         )
-        self.assertEqual(self.group.groupmember_set.count(), 6)
+        self.assertEqual(self.group.groupmember_set.count(), 7)
         self.assertEqual(self.group.name, 'Swansons')
         self.assertEqual(self.group.slug, 'swansons')
         self.assertEqual(self.group.description, 'this will be no fun at all')

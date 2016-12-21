@@ -33,7 +33,8 @@ class ReviewStateForm(forms.Form):
     def __init__(self, user, review_pk, *args, **kwargs):
         super(ReviewStateForm, self).__init__(*args, **kwargs)
         self.fields['review'].queryset = models.Review.objects.filter(
-            creator=user,
+            creator__user=user,
+            creator__active=True,
             pk=review_pk
         )
 

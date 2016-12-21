@@ -75,10 +75,10 @@ class TestMessageModels(BaseTestCase):
         review = models.Review.create_review(**self.default_review_kwargs)
         bundle = models.MessageBundle.create_message_bundle(
             review=review,
-            owner=review.creator
+            owner=review.creator_set.active().get().user
         )
         self.assertEqual(bundle.review, review)
-        self.assertEqual(bundle.owner, review.creator)
+        self.assertEqual(bundle.owner, review.creator_set.active().get().user)
         self.assertFalse(bundle.read)
         self.assertFalse(bundle.deleted)
 
@@ -102,7 +102,7 @@ class TestMessageModels(BaseTestCase):
         review = models.Review.create_review(**self.default_review_kwargs)
         bundle = models.MessageBundle.create_message_bundle(
             review=review,
-            owner=review.creator
+            owner=review.creator_set.active().get().user
         )
         self.assertFalse(bundle.read)
         self.assertFalse(bundle.deleted)
@@ -112,7 +112,7 @@ class TestMessageModels(BaseTestCase):
 
         bundle = models.MessageBundle.create_message_bundle(
             review=review,
-            owner=review.creator
+            owner=review.creator_set.active().get().user
         )
         self.assertFalse(bundle.read)
         self.assertFalse(bundle.deleted)
@@ -121,7 +121,7 @@ class TestMessageModels(BaseTestCase):
         review = models.Review.create_review(**self.default_review_kwargs)
         bundle = models.MessageBundle.create_message_bundle(
             review=review,
-            owner=review.creator
+            owner=review.creator_set.active().get().user
         )
         self.assertFalse(bundle.read)
         self.assertFalse(bundle.deleted)
@@ -130,7 +130,7 @@ class TestMessageModels(BaseTestCase):
         # No save, because no changes
         new_bundle = models.MessageBundle.create_message_bundle(
             review=review,
-            owner=review.creator
+            owner=review.creator_set.active().get().user
         )
         self.assertEqual(bundle.pk, new_bundle.pk)
         self.assertEqual(modified_time, new_bundle.modified)
@@ -143,7 +143,7 @@ class TestMessageModels(BaseTestCase):
         # Updates modified time again, for the flip on read
         saved_bundle = models.MessageBundle.create_message_bundle(
             review=review,
-            owner=review.creator
+            owner=review.creator_set.active().get().user
         )
         self.assertEqual(saved_bundle.pk, bundle.pk)
         self.assertFalse(saved_bundle.read)

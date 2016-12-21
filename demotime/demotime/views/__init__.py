@@ -28,7 +28,9 @@ class CanViewMixin(UserPassesTestMixin):
 
         if (getattr(self, 'review', None)
                 and self.review.state == constants.DRAFT
-                and self.request.user != self.review.creator):
+                and not self.review.creator_set.filter(
+                    user=self.request.user, active=True
+                ).exists()):
             return False
 
         if (not self.require_admin_privileges) and (
@@ -109,15 +111,18 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context['open_demos'] = models.Review.objects.filter(
-            creator=self.request.user,
+            creator__user=self.request.user,
+            creator__active=True,
             state=constants.OPEN,
         )
         context['drafts'] = models.Review.objects.filter(
-            creator=self.request.user,
+            creator__user=self.request.user,
+            creator__active=True,
             state=constants.DRAFT
         )
         context['paused_demos'] = models.Review.objects.filter(
-            creator=self.request.user,
+            creator__user=self.request.user,
+            creator__active=True,
             state=constants.PAUSED,
         )
 

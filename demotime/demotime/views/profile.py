@@ -103,7 +103,8 @@ class ProfileView(DetailView):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
         obj = self.get_object()
         context['open_demos'] = models.Review.objects.filter(
-            creator=obj.user,
+            creator__user=obj.user,
+            creator__active=True,
             state=models.reviews.OPEN,
         )
         context['open_reviews'] = models.Review.objects.filter(

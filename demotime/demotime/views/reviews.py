@@ -85,7 +85,17 @@ class ReviewDetail(CanViewMixin, DetailView):
             follower = None
         context['follower_obj'] = follower
 
-        if self.request.user == self.revision.review.creator:
+        try:
+            creator = models.Creator.objects.get(
+                review=self.revision.review,
+                user=self.user,
+                active=True
+            )
+        except models.Creator.DoesNotExist:
+            creator = None
+        context['creator_obj'] = creator
+
+        if creator:
             context['review_state_form'] = forms.ReviewStateForm(
                 self.request.user,
                 self.revision.review.pk,
@@ -127,7 +137,6 @@ class CreateReviewView(TemplateView):
             self.template_name = 'demotime/edit_review.html'
         else:
             self.review_inst = models.Review(
-                creator=self.request.user,
                 project=self.project,
             )
         return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
@@ -160,7 +169,11 @@ class CreateReviewView(TemplateView):
                         'You can not delete a Demo that has been opened'
                     )
 
-            data['creator'] = request.user
+            co_owner = data.get('creators')
+            co_owners = [request.user]
+            if co_owner:
+                co_owners.append(co_owner)
+            data['creators'] = co_owners
             data['project'] = self.project
             data['attachments'] = []
             for form in self.attachment_forms.forms:
@@ -197,7 +210,7 @@ class CreateReviewView(TemplateView):
                 if self.review_inst.state == constants.DRAFT:
                     description = self.review_inst.description
             else:
-                self.review_inst = models.Review(creator=self.request.user)
+                self.review_inst = models.Review()
             self.review_form = forms.ReviewForm(
                 user=self.request.user,
                 instance=self.review_inst,
@@ -326,6 +339,9 @@ class ReviewStateView(CanViewJsonView):
         )
         if form.is_valid():
             changed = self.review.update_state(form.cleaned_data['state'])
+            if changed:
+                self.review.last_action_by = self.request.user
+                self.review.save(update_fields=['last_action_by'])
             return {
                 'state': self.review.state,
                 'state_changed': changed,
@@ -363,10 +379,10 @@ class ReviewJsonView(CanViewJsonView):
         return self.review.to_json()
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
-        if self.review.creator != request.user:
+        if not self.review.creator_set.active().filter(user=request.user).exists():
             self.status = 403
             return {
-                'errors': ['Only the creator of a Demo can edit it'],
+                'errors': ['Only the owners of a Demo can edit it'],
                 'review': self.review.to_json()
             }
 
@@ -374,7 +390,8 @@ class ReviewJsonView(CanViewJsonView):
         json_dict = {'errors': []}
         if form.is_valid():
             data = form.cleaned_data
-            update_fields = ['modified']
+            self.review.last_action_by = request.user
+            update_fields = ['modified', 'last_action_by']
             for key, value in data.items():
                 if value:
                     setattr(self.review, key, value)
@@ -400,7 +417,9 @@ class DeleteReviewAttachmentView(CanViewJsonView):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.review = get_object_or_404(
-            models.Review, pk=kwargs['review_pk'], creator=request.user,
+            models.Review, pk=kwargs['review_pk'],
+            creator__user=request.user,
+            creator__active=True,
             state=constants.DRAFT
         )
         self.project = self.review.project

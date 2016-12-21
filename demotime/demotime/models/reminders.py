@@ -62,12 +62,13 @@ class Reminder(BaseModel):
 
     @classmethod
     def create_reminders_for_review(cls, review):
-        cls.create_reminder(
-            review=review,
-            user=review.creator,
-            reminder_type=cls.CREATOR
-        )
-        for reviewer in review.reviewer_set.active().all():
+        for creator in review.creator_set.active():
+            cls.create_reminder(
+                review=review,
+                user=creator.user,
+                reminder_type=cls.CREATOR
+            )
+        for reviewer in review.reviewer_set.active():
             cls.create_reminder(
                 review=review,
                 user=reviewer.reviewer,
@@ -77,24 +78,20 @@ class Reminder(BaseModel):
     @classmethod
     def update_reminders_for_review(cls, review):
         remind_at = get_reminder_days(review.project)
-
-        # Creator Reminder
-        try:
-            creator_reminder = cls.objects.get(review=review, user=review.creator)
-        except cls.DoesNotExist:
-            creator_reminder = cls(review=review, user=review.creator, reminder_type=cls.CREATOR)
-        creator_reminder.remind_at = remind_at
-        creator_reminder.active = True
-        creator_reminder.save()
-
-        # Reviewer Reminders
-        cls.objects.exclude(user__in=review.reviewers.all()).exclude(
-            user=review.creator).delete()
-        cls.objects.filter(user__in=review.reviewers.all()).update(
-            remind_at=remind_at
+        reviewer_pks = review.reviewer_set.active().values_list(
+            'reviewer__pk', flat=True)
+        creator_pks = review.creator_set.active().values_list(
+            'user__pk', flat=True)
+        reminder_user_pks = tuple(reviewer_pks) + tuple(creator_pks)
+        cls.objects.filter(
+            review=review, user__pk__in=reminder_user_pks
+        ).update(
+            remind_at=remind_at,
+            active=True
         )
-
-        cls.objects.filter(review=review).update(active=True)
+        cls.objects.filter(review=review).exclude(
+            user__pk__in=reminder_user_pks
+        ).delete()
 
     @classmethod
     def update_reminder_activity_for_review(cls, review, active=False):

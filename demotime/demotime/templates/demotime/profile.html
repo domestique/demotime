@@ -73,7 +73,7 @@
             {% if owner_viewing %}
                 <a href="{% url 'edit-profile' object.user.username %}">edit</a>
             {% else %}
-                <a href="{% url 'review-list' %}?creator={{ object.pk }}">View this user's demos</a>
+                <a href="{% url 'review-list' %}?creator={{ object.user.pk }}">View this user's demos</a>
             {% endif %}
         </small>
     </h1>

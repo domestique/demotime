@@ -127,12 +127,18 @@ class TestOpenState(BaseDemoMachineCase):
         self.state._open_draft(self.review) # pylint: disable=protected-access
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_CREATED)
-        self.assertEqual(event.user, self.review.creator)
+        self.assertEqual(
+            event.user,
+            self.review.creator_set.active().get().user
+        )
 
         statuses = models.UserReviewStatus.objects.filter(review=self.review)
         # We just make the creator's here
         self.assertEqual(statuses.count(), 1)
-        self.assertEqual(statuses.get().user, self.review.creator)
+        self.assertEqual(
+            statuses.get().user,
+            self.review.creator_set.active().get().user
+        )
 
         reminders = models.Reminder.objects.filter(review=self.review)
         # 3 reviewers, 1 creator
@@ -151,11 +157,21 @@ class TestOpenState(BaseDemoMachineCase):
         ).delete()
         models.Reminder.objects.all().update(active=False)
         mail.outbox = []
+        self.review.state = constants.CLOSED
+        self.review.reviewer_state = constants.APPROVED
+        self.review.save(update_fields=['state', 'reviewer_state'])
 
         self.state._reopen(self.review, 'PREVIOUS') # pylint: disable=protected-access
+        self.review.refresh_from_db()
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_OPENED)
-        self.assertEqual(event.user, self.review.creator)
+        self.assertEqual(
+            event.user,
+            self.review.creator_set.active().get().user
+        )
+        self.assertEqual(self.review.reviewer_state, constants.REVIEWING)
+        for reviewer in self.review.reviewer_set.active():
+            self.assertEqual(reviewer.status, constants.REVIEWING)
 
         reminders = models.Reminder.objects.filter(
             review=self.review, active=True
@@ -257,7 +273,10 @@ class TestPausedState(BaseDemoMachineCase):
         self.assertEqual(self.review.state, constants.PAUSED)
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_PAUSED)
-        self.assertEqual(event.user, self.review.creator)
+        self.assertEqual(
+            event.user,
+            self.review.creator_set.active().get().user
+        )
 
         reminders = models.Reminder.objects.filter(
             review=self.review, active=False
@@ -302,7 +321,10 @@ class TestClosedState(BaseDemoMachineCase):
         self.assertEqual(self.review.state, constants.CLOSED)
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_CLOSED)
-        self.assertEqual(event.user, self.review.creator)
+        self.assertEqual(
+            event.user,
+            self.review.creator_set.active().get().user
+        )
 
         reminders = models.Reminder.objects.filter(
             review=self.review, active=False
@@ -347,7 +369,10 @@ class TestAbortedState(BaseDemoMachineCase):
         self.assertEqual(self.review.state, constants.ABORTED)
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_ABORTED)
-        self.assertEqual(event.user, self.review.creator)
+        self.assertEqual(
+            event.user,
+            self.review.creator_set.active().get().user
+        )
 
         reminders = models.Reminder.objects.filter(
             review=self.review, active=False

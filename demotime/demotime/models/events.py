@@ -24,6 +24,8 @@ class EventType(BaseModel):
     REVIEWER_REMOVED = 'reviewer-removed'
     FOLLOWER_ADDED = 'follower-added'
     FOLLOWER_REMOVED = 'follower-removed'
+    OWNER_ADDED = 'owner-added'
+    OWNER_REMOVED = 'owner-removed'
 
     name = models.CharField(max_length=128)
     code = models.SlugField(unique=True)
@@ -53,9 +55,10 @@ class Event(BaseModel):
     REVIEW = 'review'
     REVIEWER = 'reviewer'
     REVISION = 'revision'
+    CREATOR = 'creator'
 
     RELATED_TYPES = [
-        COMMENT, FOLLOWER, REVIEW, REVIEWER, REVISION
+        COMMENT, FOLLOWER, REVIEW, REVIEWER, REVISION, CREATOR
     ]
 
     RELATED_TYPE_CHOICES = (
@@ -63,7 +66,8 @@ class Event(BaseModel):
         (FOLLOWER, 'Follower'),
         (REVIEW, 'Review'),
         (REVIEWER, 'Reviewer'),
-        (REVISION, 'Revision')
+        (REVISION, 'Revision'),
+        (CREATOR, 'Creator')
     )
 
     project = models.ForeignKey('Project')
@@ -87,6 +91,8 @@ class Event(BaseModel):
         elif related_type == cls.FOLLOWER:
             return related_object.review
         elif related_type == cls.REVIEWER:
+            return related_object.review
+        elif related_type == cls.CREATOR:
             return related_object.review
         elif related_type == cls.REVISION:
             return related_object.review

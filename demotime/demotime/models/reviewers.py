@@ -98,7 +98,9 @@ class Reviewer(BaseModel):
                 notify_reviewer = notify_creator = False
             else:
                 notify_reviewer = creator != reviewer
-                notify_creator = creator != review.creator
+                notify_creator = not review.creator_set.active().filter(
+                    user=creator
+                ).exists()
             if notify_reviewer:
                 # pylint: disable=protected-access
                 obj._send_reviewer_message(
@@ -117,36 +119,39 @@ class Reviewer(BaseModel):
     def _send_reviewer_message(self, deleted=False, notify_reviewer=False, notify_creator=False):
         if deleted:
             title = 'Deleted as reviewer on: {}'.format(self.review.title)
-            receipient = self.reviewer
+            receipients = [self.reviewer]
         elif notify_reviewer:
             title = 'You have been added as a reviewer on: {}'.format(
                 self.review.title
             )
-            receipient = self.reviewer
+            receipients = [self.reviewer]
         elif notify_creator:
             title = '{} has been added as a reviewer on: {}'.format(
                 self.reviewer_display_name,
                 self.review.title
             )
-            receipient = self.review.creator
+            receipients = [
+                creator.user for creator in self.review.creator_set.active()
+            ]
         else:
             raise Exception('No receipient for message in reviewer message')
 
-        context = {
-            'receipient': receipient,
-            'url': self.review.get_absolute_url(),
-            'title': self.review.title,
-            'deleted': deleted,
-            'creator': notify_creator,
-            'reviewer': self,
-        }
-        Message.send_system_message(
-            title,
-            'demotime/messages/reviewer.html',
-            context,
-            receipient,
-            revision=self.review.revision,
-        )
+        for receipient in receipients:
+            context = {
+                'receipient': receipient,
+                'url': self.review.get_absolute_url(),
+                'title': self.review.title,
+                'deleted': deleted,
+                'creator': notify_creator,
+                'reviewer': self,
+            }
+            Message.send_system_message(
+                title,
+                'demotime/messages/reviewer.html',
+                context,
+                receipient,
+                revision=self.review.revision,
+            )
 
     def set_status(self, status):
         old_status = self.status
@@ -183,17 +188,17 @@ class Reviewer(BaseModel):
             )
             context = {
                 'reviewer': self,
-                'creator': self.review.creator,
                 'url': self.review.get_absolute_url(),
                 'title': self.review.title,
             }
-            Message.send_system_message(
-                title,
-                'demotime/messages/reviewer_status_change.html',
-                context,
-                self.review.creator,
-                revision=self.review.revision
-            )
+            for creator in self.review.creator_set.active():
+                Message.send_system_message(
+                    title,
+                    'demotime/messages/reviewer_status_change.html',
+                    context,
+                    creator.user,
+                    revision=self.review.revision
+                )
         return consensus, state
 
     def drop_reviewer(self, dropper, draft=False):  # pylint: disable=unused-argument

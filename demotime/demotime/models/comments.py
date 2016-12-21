@@ -136,7 +136,7 @@ class Comment(BaseModel):
                         # Followers
                         models.Q(follower__review=review.review, follower__is_active=True) |
                         # Creator
-                        models.Q(pk=review.review.creator.pk) |
+                        models.Q(creator__review=review.review, creator__active=True) |
                         # Mentions
                         models.Q(pk__in=mentioned_users)
                     )

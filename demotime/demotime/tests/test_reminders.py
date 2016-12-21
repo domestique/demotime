@@ -22,10 +22,10 @@ class TestReminderModel(BaseTestCase):
     def test_create_reminder(self):
         reminder = models.Reminder.create_reminder(
             self.review,
-            self.review.creator,
+            self.review.creator_set.active().get().user,
             models.Reminder.CREATOR
         )
-        self.assertEqual(reminder.user, self.review.creator)
+        self.assertEqual(reminder.user, self.review.creator_set.active().get().user)
         self.assertEqual(reminder.review, self.review)
         self.assertEqual(reminder.reminder_type, models.Reminder.CREATOR)
         self.assertEqual(
@@ -38,11 +38,11 @@ class TestReminderModel(BaseTestCase):
         remind_dt = timezone.make_aware(datetime(2014, 12, 25), pytz.utc)
         reminder = models.Reminder.create_reminder(
             self.review,
-            self.review.creator,
+            self.review.creator_set.active().get().user,
             models.Reminder.CREATOR,
             remind_at=remind_dt,
         )
-        self.assertEqual(reminder.user, self.review.creator)
+        self.assertEqual(reminder.user, self.review.creator_set.active().get().user)
         self.assertEqual(reminder.review, self.review)
         self.assertEqual(reminder.reminder_type, models.Reminder.CREATOR)
         self.assertEqual(
@@ -113,9 +113,10 @@ class TestReminderModel(BaseTestCase):
         models.Reminder.create_reminders_for_review(self.review)
         models.Reminder.objects.filter(review=self.review).update(active=False)
 
-        models.Reminder.set_activity(self.review, self.review.creator, True)
+        models.Reminder.set_activity(
+            self.review, self.review.creator_set.active().get().user, True)
         reminder = models.Reminder.objects.get(
-            review=self.review, user=self.review.creator
+            review=self.review, user=self.review.creator_set.active().get().user
         )
         self.assertTrue(reminder.active)
         self.assertEqual(
@@ -123,9 +124,10 @@ class TestReminderModel(BaseTestCase):
             timezone.make_aware(datetime(2014, 12, 3), pytz.utc)
         )
 
-        models.Reminder.set_activity(self.review, self.review.creator, False)
+        models.Reminder.set_activity(
+            self.review, self.review.creator_set.active().get().user, False)
         reminder = models.Reminder.objects.get(
-            review=self.review, user=self.review.creator
+            review=self.review, user=self.review.creator_set.active().get().user
         )
         self.assertFalse(reminder.active)
 
