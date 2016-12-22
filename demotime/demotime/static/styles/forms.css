@@ -123,7 +123,7 @@ select[multiple='multiple'] {
     font-size: 1.4em;
     border: 1px solid #eeeeee;
     box-shadow: 4px 4px 0 #ddd;
-    min-height: 300px;
+    min-height: 500px;
     width: 100%;
     border-radius: 2px;
 }
@@ -131,6 +131,7 @@ select[multiple='multiple'] option {
     color: #666666;
     background: #fafafa;
     margin: 5px 0;
+    padding: 10px;
 }
 select[multiple='multiple']:focus {
     outline: none;
@@ -160,6 +161,7 @@ select[multiple='multiple']:focus {
     list-style: none;
     padding: 5px;
     color: #777;
+    font-size: 16px;
     width: 100%;
     font-weight: 400;
     box-sizing: border-box;

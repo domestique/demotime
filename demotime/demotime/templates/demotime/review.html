@@ -6,7 +6,10 @@
 {{ block.super }}
 <!-- for Google -->
 {# <meta name="description" content="{{ object.description|safe|linebreaksbr }}" /> #}
-<meta name="author" content="{{ object.creator.userprofile }}" />
+{% for creator in object.creator_set.active %}
+    <meta name="author" content="{{ creator.user.userprofile }}" />
+{% endfor %}
+
 <meta name="application-name" content="DemoTime" />
 
 <!-- for Facebook -->
@@ -166,8 +169,8 @@
             <div class="cel">
                 <h4 class="heading">Owner(s):</h4>
                 {% for creator in object.creator_set.active %}
-                    <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a><br><br>
-                {% endfor %}
+                    <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a><br>
+                {% endfor %}<br>
                 {% if object.state != "closed" %}
                     <h4 class="heading">
                         Reviewer State:

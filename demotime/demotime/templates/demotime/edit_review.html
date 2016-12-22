@@ -8,10 +8,18 @@
         Update demo
     {% endif %}
 {% endblock %}
-{% block description_leader %}{% if review_inst.state != "draft" %}Revision {% endif %}{% endblock %}
-{% block description_follower %}{% if review_inst.state != "draft" %}<small>Give your revision some context</small>{% endif %}{% endblock %}
+{% block description %}
+    {% if review_inst.state != "draft" %}
+        Revision description
+        <small>Give your revision some context</small>
+    {% else %}
+        Demo description
+        <small>A general description of what the demo is about &mdash; this gives your attachments some context</small>
+    {% endif %}
+{% endblock %}
 {% block form_warning %}
 <section>
+    {{ review_inst.reviewrevision_set.all.count }}
     <strong>Heads up!</strong> Adding a revision to your demo will
     reset everyone's approval status back to 'Reviewing'
 </section>

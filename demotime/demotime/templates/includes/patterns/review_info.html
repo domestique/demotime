@@ -4,43 +4,52 @@
         <span class="title">
             <strong>
                 DT-<%= review.pk %>
-            </strong>:
-            <a href="<%= review.url %>"><%= review.title %></a>
+                <a href="<%= review.url %>"><%= review.title %>:</a>
+            </strong>
         </span>
-        <p>Created by <strong><%= review.creator %></strong>
+        <p>
+            <strong>Owner(s):</strong>
+            <% _.each(review.creators, function(creator, Index) { %>
+                <%= creator.name %><% if (!Index) { %>, <% } %>
+            <% }); %>
+        </p>
         <% if (review.project) { %>
-            <p>Project: <strong><%= review.project.name %></strong>
+            <p><strong>Project:</strong> <%= review.project.name %></p>
         <% } %>
-        <p>Reviewer State:
+        <p>
+            <strong>Reviewer State:</strong>
             <% if (review.reviewer_state == "approved") { %>
-            <strong class="icon-<%= review.reviewer_state %>"><%= review.reviewer_state %></strong>
+                <span class="icon-<%= review.reviewer_state %>"><%= review.reviewer_state %></span>
             <% } else { %>
-                <strong><%= review.reviewer_state %></strong>
+                <%= review.reviewer_state %>
             <% } %>
         </p>
-        <p>Demo State: <strong><%= review.state %></strong>
-        <ul>
-            <% _.each(review.reviewers, function(reviewer) { %>
-                <li>
-                    <span class="icon icon-<%= reviewer.reviewer_status %>">
-                        <%= reviewer.name %>
-                        <small>
-                            <%= reviewer.reviewer_status %>
-                        </small>
-                    </span>
-                </li>
-            <% }) %>
-            <% _.each(review.followers, function(reviewer) { %>
-                <li>
-                    <span>
-                        <%= reviewer.name %>
-                        <small>
-                            following
-                        </small>
-                    </span>
-                </li>
-            <% }) %>
-        </ul>
+        <p>
+            <strong>Demo State:</strong>
+            <%= review.state %>
+            <ul>
+                <% _.each(review.reviewers, function(reviewer) { %>
+                    <li>
+                        <span class="icon icon-<%= reviewer.reviewer_status %>">
+                            <%= reviewer.name %>
+                            <small>
+                                <%= reviewer.reviewer_status %>
+                            </small>
+                        </span>
+                    </li>
+                <% }) %>
+                <% _.each(review.followers, function(reviewer) { %>
+                    <li>
+                        <span>
+                            <%= reviewer.name %>
+                            <small>
+                                following
+                            </small>
+                        </span>
+                    </li>
+                <% }) %>
+            </ul>
+        </p>
     </section>
 </article>
 </script>

@@ -15,8 +15,8 @@
                      delete
                   </a>
             {% else %}
-                {% if show_delete %}
-                    - <a href="#" class="attachment_delete" data-pk="{{ attachment.pk }}">delete</a>
+                {% if show_remove %}
+                    - <a href="#" class="attachment_delete" data-pk="{{ attachment.pk }}">remove</a>
                 {% endif %}
             {% endif %}
         </div>

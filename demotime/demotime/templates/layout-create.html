@@ -15,6 +15,9 @@
 {% block styles %}
 {{ block.super }}
 <style>
+.review {
+    font-size: 12px;
+}
 a.error {
     transition:5s;
 }
@@ -31,9 +34,6 @@ h1 em {
 .review select {
     margin-bottom:2em;
 }
-.review {
-    font-size: 12px;
-}
 .form-group.first {
     margin-top: 0;
 }
@@ -49,6 +49,9 @@ h1 em {
         font-size: 11px;
     }
 }
+.form-buttons {
+    margin-top: 60px;
+}
 </style>
 {% endblock %}
 
@@ -57,95 +60,114 @@ h1 em {
 <article>
     <section>
         <div class="review">
-            <form action="" method="post" enctype="multipart/form-data" id="submit_review">
+            <form action="" method="post" enctype="multipart/form-data" id="submit_review" novalidate>
                 {% csrf_token %}
                 <div class="form-group" style="margin-top: 0">
-                    <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>
+                    <h3 class="icon icon-lightbulb">
+                        {{ review_form.title.label }}
+                        <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small>
+                    </h3>
                     {{ review_form.title.errors }}
                     {{ review_form.title }}
                 </div>
                 <div class="form-group">
-                    <h3 class="icon icon-link-ext">{{ review_form.case_link.label }} <small>ex. https://someproject.tpondemand.com/entity/1234</small></h3>
+                    <h3 class="icon icon-link-ext">
+                        {{ review_form.case_link.label }}
+                        <small>ex. https://someproject.taskmanager.com/entity/1234</small>
+                    </h3>
                     {{ review_form.case_link.errors }}
                     {{ review_form.case_link }}
                 </div>
                 <div class="form-group">
-                    <h3 class="icon icon-pencil">{% block description_leader %}{% endblock %}{{ review_form.description.label }}{% block description_follower %}{% endblock %}</h3>
-                    {{ review_form.description }}
+                    <h3 class="icon icon-pencil">
+                        {% block description %}{% endblock %}
+                    </h3>
                     {{ review_form.description.errors }}
+                    {{ review_form.description }}
                 </div>
-                {% if review_inst.revision.attachments.exists %}
-                    <article class="current_attachments">
-                        <h3 class="icon icon-attach">Current Attachments</h3>
-                        <span class="help" title="By default, your existing attachments
-                        carry over to your new revision. If you'd like to remove one or more
-                        attachments from your demo, you can click the small 'delete' link next
-                        to the appropriate demo below."></span>
-                        <section class="attachments">
+                <article>
+                    {% if review_inst.revision.attachments.exists %}
+                        <h3 class="icon icon-attach">
+                            Current attachments
+                            <span class="help" title="By default, your existing attachments
+                            carry over to your new revision. If you'd like to remove one or more
+                            attachments from your demo, you can click the small 'delete' link next
+                            to the appropriate demo below."></span>
+                            <small>Remove attachments you would prefer not appear in the next revision</small>
+                        </h3>
+                        <section class="attachments" style="margin-bottom: 40px">
                             {% for attachment in review_inst.revision.attachments.all %}
-                                {% include "includes/review_attachment.html" with project=project review_inst=review_inst attachment=attachment show_delete=True %}
+                                {% include "includes/review_attachment.html" with project=project review_inst=review_inst attachment=attachment show_remove=True %}
                             {% endfor %}
                         </section>
                         <div style="display: none">{{ review_form.delete_attachments.label }}{{ review_form.delete_attachments }}</div>
-                    </article>
-                {% endif %}
-                <div class="attachments">
-                    <h3 class="icon icon-attach">Attachments <small>Optionally present with screenshots, screencasts, documents, etc</small></h3>
-                    {{ attachment_forms.management_form }}
-                    {% for form in attachment_forms %}
-                        <section {% if forloop.counter > 1 %}style="display:none"{% endif %}>
-                            {% include "includes/attachments_form.html" with form=form %}
-                            {{ form.attachment.errors }}
+                    {% endif %}
+                    <div class="attachments">
+                        <h3 class="icon icon-attach">Add attachments <small>Document your demo with screenshots, videos, documents &mdash; anything</small></h3>
+                        {{ attachment_forms.management_form }}
+                        {% for form in attachment_forms %}
+                            <section{% if forloop.counter > 1 %} style="display:none"{% endif %}>
+                                {% include "includes/attachments_form.html" with form=form %}
+                                {{ form.attachment.errors }}
+                            </section>
+                        {% endfor %}
+                    </div>
+                </article>
+                <div class="form-group">
+                    <div class="creators">
+                        <h3 class="icon icon-pencil">
+                            Demo co-owner
+                            <span class="help" title="Sometimes you might want to team-up on a demo with a fellow
+                            colleague. Adding a co-owner essentially makes that person an administrator of the demo.
+                            They will be notified that they have been added to the demo as a co-owner and can then also
+                            add attachments, create revisions and so forth."></span>
+                            <small>optional</small>
+                        </h3>
+                        <section>
+                            {{ review_form.creators.errors }}
+                            {{ review_form.creators }}
                         </section>
-                    {% endfor %}
+                    </div>
                 </div>
-                <div class="creators">
-                    <h3>
-                        CoOwner
-                        <span class="help" title="Co Owner Content"</span>
+                <div class="form-group" style="margin-top: 60px">
+                    <h3 class="icon icon-user">
+                        Reviewers and Followers
+                        <span class="help" title="When you assign someone as a 'reviewer' they
+                        will need to either approve or reject a demo. A follower can simply follow
+                        the progress of a demo without the ability or need to approve or reject."></span>
+                        <small>Hold down 'cmd' to select multiple people</small>
                     </h3>
+                    <div class="split~680 by:2 with-gap:3">
+                        <div class="cel">
+                            <div class="form-group">
+                                <h3>{{ review_form.reviewers.label }}</h3>
+                                {{ review_form.reviewers.errors }}
+                                {{ review_form.reviewers }}
+                            </div>
+                        </div>
+                        <div class="cel">
+                            <div class="form-group">
+                                <h3>{{ review_form.followers.label }}</h3>
+                                {{ review_form.followers.errors }}
+                                {{ review_form.followers }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
                     <section>
-                        {{ review_form.creators.errors }}
-                        {{ review_form.creators }}
-                    </section>
-                </div>
-                <h3>
-                    Reviewers and Followers
-                    <span class="help" title="When you assign someone as a 'reviewer' they
-                    will need to either approve or reject a demo. A follower can simply follow
-                    the progress of a demo without the ability or need to approve or reject."></span>
-                    <small>Hold down 'cmd' to select multiple people</small>
-                </h3>
-                <div class="split~680 by:2 with-gap:3">
-                    <div class="cel">
-                        <div class="form-group">
-                            <h3 class="icon icon-user">{{ review_form.reviewers.label }}</h3>
-                            {{ review_form.reviewers.errors }}
-                            {{ review_form.reviewers }}
-                        </div>
-                    </div>
-                    <div class="cel">
-                        <div class="form-group">
-                            <h3 class="icon icon-user">{{ review_form.followers.label }}</h3>
-                            {{ review_form.followers.errors }}
-                            {{ review_form.followers }}
-                        </div>
-                    </div>
-                </div>
-                <section>
-                    <div class="form-group">
                         <label>
                             {{ review_form.is_public }} Make demo <strong>public</strong>
                             <span class="help" title="Public demos can be viewed by anyone outside of
                             DemoTime."></span>
                         </label>
                         <div>{{ review_form.is_public.errors }}</div>
-                    </div>
-                </section>
+                    </section>
+                </div>
                 {{ review_form.state }}
                 {{ review_form.trash }}
                 {% block form_warning %}{% endblock %}
-                <div class="form-group">
+                <div class="form-group form-buttons">
                     <div class="split by:2">
                         <div class="cel">
                             <button id="create-demo"

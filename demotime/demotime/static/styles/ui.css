@@ -31,10 +31,10 @@ ul {
 }
 .container {
     margin: 0 auto;
-    max-width: 1000px;
+    max-width: 1060px;
     width: 100%;
 }
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 1060px) {
     .cradle {
         margin: 0 auto;
         padding-left: 15px;

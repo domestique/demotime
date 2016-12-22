@@ -18,7 +18,14 @@
         <ul>
         <% if (reviews.length) { %>
             <% _.each(reviews, function(review) { %>
-                <li><a href="<%= review.url %>"><%= review.title %></a>, by <%= review.creator %></li>
+                <% console.log(review) %>
+                <li>
+                    <a href="<%= review.url %>"><%= review.title %></a>
+                    Owner(s):
+                    <% _.each(review.creators, function(creator, Index) { %>
+                        <%= creator.name %><% if (!Index) { %>, <% } %>
+                    <% }); %>
+                </li>
             <% }) %>
         <% } else { %>
             <li>No matching demos found</li>

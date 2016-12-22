@@ -65,7 +65,8 @@
                         </td>
                         <td>{{ demo.title }}</td>
                         <td>
-                            <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ demo.creator.userprofile }}</a>
+                            {% for creator in object.creator_set.active %}
+                                {% if not forloop.first %}, {% endif %}<a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a>
                         </td>
                         <td width="100">
                             <span class="icon icon-{{ demo.reviewer_state }}">{{ demo.reviewer_state }}</span>
