@@ -19,15 +19,15 @@ body.bookmarklet h1 {
 }
 .navbar .navbar-logo {
     background: url(../images/logo.png) 0 0 no-repeat;
-    background-size: cover;
+    background-size: 100%;
     display: inline-block;
     width: 265px;
     height: 46px;
 }
 @media screen and (max-width:420px) {
     .navbar .navbar-logo {
-        width: 176px;
-        height: 31px;
+        width: 170px;
+        height: 30px;
     }
 }
 .navbar .navbar-brand {
@@ -50,12 +50,6 @@ body.bookmarklet h1 {
     margin: 0;
     padding: 0;
     display: inline-block;
-}
-@media screen and (min-width: 721px) {
-    .navbar-top ul {
-        position: relative;
-        top: -5px;
-    }
 }
 .navbar li {
     padding: 5px;
