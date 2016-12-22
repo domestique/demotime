@@ -164,27 +164,26 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
         if (code == 13) {
             event.preventDefault();
-            this.search_giphy(input.val());
+            this.search_giphy(input);
             input.val('');
         }
     },
 
     giphy_button_click: function(event) {
         var panel = $(event.target).parents('.giphy_input_panel');
-        this.search_giphy(panel.find('.giphy_input').val());
+        this.search_giphy(panel.find('.giphy_input'));
     },
 
     // Giphy click-to-add event
-    search_giphy: function(term) {
-        var self = this;
-
-            self.$el.find('.giphy_results').html('<img src="/static/images/loading.gif" class="giphy_loading">').slideDown();
+    search_giphy: function(panel) {
+        var self = this,
+            results_container = panel.parents('.wysiwyg-container').find('.giphy_results');
 
         var req = $.ajax({
             url: self.options.giphy_url,
             method: 'get',
             data: {
-                'q': term.replace(' ', '+')
+                'q': panel.val().replace(' ', '+')
             }
         });
         req.success(function(data) {
@@ -196,9 +195,9 @@ DemoTime.Wysiwyg = Backbone.View.extend({
                     template = _.template(html);
                 template = template ({ gif: giphy_model.attributes });
 
-                self.$el.find('.giphy_results').html(template);
+                results_container.html(template);
             } else {
-                self.$el.find('.giphy_results').html('<div style="margin: 10px 0">Sorry, there were no matching GIFs for "' + term + '"</div>');
+                results_container.html('<div style="margin: 10px 0">Sorry, there were no matching GIFs for "' + panel.val() + '"</div>');
             }
         });
     },
