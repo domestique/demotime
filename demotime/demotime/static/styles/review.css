@@ -143,7 +143,7 @@ li.open.state-highlight {
 }
 
 .nested-reply {
-    margin: 1em 0 0 3em;
+    margin: 1em 0 0 1.5em;
 }
 /* Brand new comment, post ajax, should not indent */
 .comment_parent.new_comment .nested-reply {
