@@ -20,6 +20,18 @@ def reviewer_status(review, user):
     return status
 
 
+@register.simple_tag(takes_context=True)
+def creator_for_user(context, review_pk):
+    user = context['request'].user
+    try:
+        return models.Creator.objects.get(
+            user=user,
+            review__pk=review_pk,
+            active=True
+        )
+    except (ValueError, models.Creator.DoesNotExist):
+        return None
+
 @register.assignment_tag
 def setting_value(project, setting_key):
     return models.Setting.objects.get_value(project, setting_key)

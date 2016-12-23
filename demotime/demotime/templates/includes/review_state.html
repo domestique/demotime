@@ -4,10 +4,11 @@
     {% elif demo.reviewer_state == "approved" %}
         <small>
             Fully {{ demo.reviewer_state }}!
-            {% if demo.state == "open" and request.user == demo.creator %}
+            {% creator_for_user demo.pk as creator_obj %}
+            {% if demo.state == "open" and request.user == creator_obj.user %}
             <span style="margin-left: 3px;">please
                 <a class="demo-changer"
-                   data-creator="{{ demo.creator.pk }}"
+                   data-creator="{{ creator_obj.pk }}"
                    data-pk="{{ demo.pk }}"
                    data-state="closed"
                    data-url="{% url "update-review-state" demo.project.slug demo.pk %}"

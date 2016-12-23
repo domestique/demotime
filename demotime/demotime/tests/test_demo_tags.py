@@ -1,3 +1,5 @@
+from mock import Mock
+
 from django.contrib.auth.models import User
 from django.template import Context, Template
 
@@ -68,3 +70,51 @@ class TestDemoTags(BaseTestCase):
         )
         with self.assertRaises(TypeError):
             template.render(Context({'project': None}))
+
+    def test_creator_for_user(self):
+        request = Mock()
+        request.user = self.review.creator_set.active().get().user
+        template = Template(
+            "{% load demo_tags %}{% creator_for_user review.pk as creator %}{{ creator.review.pk }}"
+        )
+        content = template.render(Context(
+            {'request': request, 'review': self.review}
+        ))
+        self.assertEqual(content, str(self.review.pk))
+
+    def test_creator_for_user_not_creator(self):
+        request = Mock()
+        request.user = self.user
+        template = Template(
+            "{% load demo_tags %}{% creator_for_user review.pk as creator %}{{ creator.review.pk }}"
+        )
+        content = template.render(Context(
+            {'request': request, 'review': self.review}
+        ))
+        self.assertEqual(content, '')
+
+    def test_creator_for_user_invalid_pk(self):
+        request = Mock()
+        request.user = self.review.creator_set.active().get().user
+        template = Template(
+            "{% load demo_tags %}{% creator_for_user 'foob4r' as creator %}{{ creator.review.pk }}"
+        )
+        content = template.render(Context(
+            {'request': request, 'review': self.review}
+        ))
+        self.assertEqual(content, '')
+
+    def test_creator_for_user_inactive_creator(self):
+        user = User.objects.get(username='test_user')
+        models.Creator.objects.filter(
+            user=user
+        ).update(active=False)
+        request = Mock()
+        request.user = user
+        template = Template(
+            "{% load demo_tags %}{% creator_for_user review.pk as creator %}{{ creator.review.pk }}"
+        )
+        content = template.render(Context(
+            {'request': request, 'review': self.review}
+        ))
+        self.assertEqual(content, '')
