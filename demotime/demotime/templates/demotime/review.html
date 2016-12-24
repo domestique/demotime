@@ -248,11 +248,13 @@
                                     <div class="cel">
                                         <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
                                     </div>
+                                    {% comment %}
                                     {% if creator_obj %}
                                         <div class="cel">
                                             <input type="text" class="find_person" data-action="find_creator" placeholder="add creator" maxlength="3">
                                         </div>
                                     {% endif %}
+                                    {% endcomment %}
                                 </div>
                             </li>
                         {% endif %}
