@@ -33,16 +33,16 @@ ul {
     margin: 0 auto;
     max-width: 1060px;
     width: 100%;
+    box-sizing: border-box;
 }
 @media screen and (max-width: 1060px) {
-    .cradle {
-        margin: 0 auto;
+    .container {
         padding-left: 15px;
         padding-right: 15px;
     }
 }
 @media screen and (max-width: 480px) {
-    .cradle {
+    .container {
         padding-left: 10px;
         padding-right: 10px;
     }
@@ -556,4 +556,10 @@ h3 small {
     height: auto;
     max-height: 240px;
     margin: 0 auto;
+}
+
+@media screen and (max-width:720px) {
+    .min720 {
+        display: none !important;
+    }
 }

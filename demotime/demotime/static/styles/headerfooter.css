@@ -8,7 +8,7 @@ body.bookmarklet h1 {
 }
 .navbar {
     color: #ffffff;
-    background: #303030;
+    background: #1f8470;
     box-shadow: 0 2px 5px #cccccc;
     padding: 5px 0 0;
     margin-bottom: 20px;
@@ -18,13 +18,17 @@ body.bookmarklet h1 {
     text-decoration: none;
 }
 .navbar .navbar-logo {
-    background-size: 80px;
-    letter-spacing: 2px;
-    line-height: 65px;
-    vertical-align: middle;
-    text-transform: uppercase;
-    font-size: .8em;
+    background: url(../images/logo.png) 0 0 no-repeat;
+    background-size: 100%;
     display: inline-block;
+    width: 265px;
+    height: 46px;
+}
+@media screen and (max-width:420px) {
+    .navbar .navbar-logo {
+        width: 170px;
+        height: 30px;
+    }
 }
 .navbar .navbar-brand {
     padding: 5px 0;
@@ -46,9 +50,6 @@ body.bookmarklet h1 {
     margin: 0;
     padding: 0;
     display: inline-block;
-}
-.navbar ul.navbar-nav {
-    line-height: 71px;
 }
 .navbar li {
     padding: 5px;
@@ -79,7 +80,7 @@ body.bookmarklet h1 {
 
 .navbar .manage_user {
     position: relative;
-    border: 1px solid #777777;
+    border: 1px solid #fff;
     border-radius: 2px;
     padding: 2px 3px;
     top: -1px;
@@ -97,7 +98,7 @@ body.bookmarklet h1 {
     position: absolute;
     right: 0;
     top: 0;
-    color: #777777;
+    color: #fff;
 }
 a.footer-blog.highlight {
     font-weight: 700;
@@ -159,12 +160,6 @@ nav.subnav {
     background: #2a9c86;
     margin-top: 0;
     padding: 8px 0;
-}
-@media screen and (max-width: 940px) {
-    nav.subnav {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
 }
 .subnav a.subnav-item {
     background: #ffffff;
@@ -241,7 +236,7 @@ nav.subnav {
     background: #1f8470;
     padding: 10px 0;
 }
-@media screen and (max-width:375px) {
+@media screen and (max-width:1020) {
     .breadcrumbs {
         padding: 10px;
     }
