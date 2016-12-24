@@ -1,5 +1,5 @@
 {% extends 'layout-user.html' %}
-{% load macros %}
+{% load macros demo_tags %}
 {% block title %}DT-{{ object.pk }}: {{ object.title }}{% endblock %}
 
 {% block meta %}
@@ -214,7 +214,7 @@
                                 <small>
                                     {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                                 </small>
-                                {% if review.creator == request.user or reviewer.reviewer == request.user %}
+                                {% if creator_obj.user == request.user or reviewer.reviewer == request.user %}
                                     <small class="person_deleter" style="display:none">
                                         [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
                                     </small>
@@ -230,7 +230,7 @@
                                 <small>
                                     following
                                 </small>
-                                {% if review.creator == request.user or follower.user == request.user %}
+                                {% if creator_obj.user == request.user or follower.user == request.user %}
                                     <small class="person_deleter" style="display:none">
                                         [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
                                     </small>
@@ -347,8 +347,8 @@
                             </div>
                             <div class="form-group">
                                 <button type="button" class="new_comment_button">{% if button_text %}{{ button_text }}{% else %}Post{% endif %}</button>
-                                {% if reviewer and request.user != object.creator and review.state == 'open' and reviewer.status != 'approved' %}
-                                    <button class="button-bright reply_and_approve" data-type="approved" type="button">Reply and Approve</button>
+                                {% if reviewer and request.user != creator_obj.user and review.state == 'open' and reviewer.status != 'approved' %}
+                                    <button class="button-bright reply_and_approve" data-type="approved" type="button">Reply &amp; approve</button>
                                 {% endif %}
                             </div>
                         </form>

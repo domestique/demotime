@@ -1,7 +1,8 @@
 {% load demo_tags %}
 
+{% creator_for_user demo.pk as creator_obj %}
 <div class="demobox
-        {% if request.user == demo.creator %}
+        {% if request.user == creator_obj.user %}
             owner
         {% endif %}
         {% reviewer_status demo user %}

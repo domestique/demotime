@@ -52,38 +52,6 @@
                         </div>
                     </section>
                 {% endif %}
-                {% comment %}
-                {% if message_bundles %}
-                    <h3 class="icon icon-inbox">
-                        Unread messages
-                        <small>
-                            <a href="{% url 'inbox' %}" class="normal_text">view all</a> |
-                            <a href="#" id="archive_all" class="normal_text">archive all</a>
-                        </small>
-                    </h3>
-                    <section class="emph_med aggregated_dashboard-messages">
-                        <div>
-                            <div class="messages-list">
-                                <ul>
-                                    {% for message in message_bundles %}
-                                        <li class="message_li {% if message.read %}de-emphasize{% endif %}">
-                                            {% if message.review %}
-                                                {% if message.review.creator != request.user %}
-                                                    <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" title="Your approval status" class="has_bubble dt_link icon-{% reviewer_status message.review request.user %}" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
-                                                {% else %}
-                                                    <a data-prj="{{ message.review.project.pk }}" data-pk="{{ message.review.pk }}" class="has_bubble dt_link" href="{{ message.review.get_absolute_url }}">DT-{{ message.review.pk }}</a>:
-                                                {% endif %}
-                                            {% endif %}
-                                            <a class="{{ message.read }} icon icon-mail iframe lightbox_url" href="{{ message.get_absolute_url }}?display_state=hide_header">{{ message.title|truncatechars:45 }}</a>
-                                            {% include "includes/review_state.html" with demo=message.review %}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
-                {% endif %}
-                {% endcomment %}
                 {% if open_demos %}
                     <h3 class="icon icon-pencil">
                         Open demos you've <strong>created</strong>
