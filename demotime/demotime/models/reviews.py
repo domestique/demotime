@@ -202,7 +202,7 @@ class Review(BaseModel):
 
         for reviewer in reviewers:
             Reviewer.create_reviewer(
-                obj, reviewer, creator, True, draft=state == DRAFT
+                obj, reviewer, creator, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, reviewer,
@@ -210,7 +210,7 @@ class Review(BaseModel):
 
         for follower in followers:
             Follower.create_follower(
-                obj, follower, creator, True, draft=state == DRAFT
+                obj, follower, creator, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, follower,
