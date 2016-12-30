@@ -149,7 +149,7 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
     add_gif: function(event) {
         this.options.wysiwyg = $(event.target).parents('.wysiwyg-container');
-        var giphy_search_panel = this.options.wysiwyg.find('.giphy_input_panel');
+        var giphy_search_panel = this.options.wysiwyg.find('.giphy_panel');
 
         giphy_search_panel.slideToggle(function() {
             if ($(this).is(':visible')) {
@@ -164,41 +164,48 @@ DemoTime.Wysiwyg = Backbone.View.extend({
 
         if (code == 13) {
             event.preventDefault();
-            this.search_giphy(input.val());
+            this.search_giphy(input);
             input.val('');
         }
     },
 
     giphy_button_click: function(event) {
-        var panel = $(event.target).parents('.giphy_input_panel');
-        this.search_giphy(panel.find('.giphy_input').val());
+        var panel = $(event.target).parents('.giphy_panel');
+        this.search_giphy(panel.find('.giphy_input'));
     },
 
     // Giphy click-to-add event
-    search_giphy: function(term) {
-        var self = this;
-
-            self.$el.find('.giphy_results').html('<img src="/static/images/loading.gif" class="giphy_loading">').slideDown();
+    search_giphy: function(panel) {
+        var self = this,
+            results_container = panel.parents('.wysiwyg-container').find('.giphy_results');
 
         var req = $.ajax({
             url: self.options.giphy_url,
             method: 'get',
             data: {
-                'q': term.replace(' ', '+')
+                'q': panel.val().replace(' ', '+')
             }
         });
         req.success(function(data) {
             var giphy_model = new GiphyModel(data.data);
 
-            if (data.data.length) {
+            if (data.data) {
                 // Grab the container template
                 var html = $('#giphy_results').html(),
                     template = _.template(html);
                 template = template ({ gif: giphy_model.attributes });
 
-                self.$el.find('.giphy_results').html(template);
+                results_container.html(template);
             } else {
-                self.$el.find('.giphy_results').html('<div style="margin: 10px 0">Sorry, there were no matching GIFs for "' + term + '"</div>');
+                var err_html = '<div style="margin: 10px 0">';
+                if (panel.val()) {
+                    err_html += 'Sorry, there were no matching GIFs for "' + panel.val() + '"';
+                } else {
+                    err_html += 'You do actually need to search for something';
+                }
+                err_html += '</div>';
+
+                results_container.html(err_html);
             }
         });
     },
@@ -216,6 +223,6 @@ DemoTime.Wysiwyg = Backbone.View.extend({
         // Trigger wysiwyg key-up to send contents to form control
         wysiwyg.find('.wysiwyg-editor').trigger('keypress');
         // Slide up wysiwyg panel
-        wysiwyg.find('.giphy_results, .giphy_input_panel').slideUp();
+        wysiwyg.find('.giphy_panel').slideUp();
     }
 });

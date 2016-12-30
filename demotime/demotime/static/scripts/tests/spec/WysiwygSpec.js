@@ -23,10 +23,10 @@ describe("Wysiwyg.js", function() {
                         <img src="https://demoti.me/static/images/emoji/beers.png" class="add_emoji emoji">\
                     </div>\
                 </div>\
-                <div class="giphy_input_panel" style="display: none">\
+                <div class="giphy_panel" style="display: none">\
                     <input type="text" placeholder="Enter a keyword here" class="giphy_input">\
+                    <div class="giphy_results"></div>\
                 </div>\
-                <div class="giphy_results"></div>\
                 <div class="giphy_branding">\
                     <img src="https://demoti.me/static/images/giphy.png" class="giphy_logo">\
                 </div>\
@@ -90,6 +90,6 @@ describe("Wysiwyg.js", function() {
     it("should be able to type a gif keyword", function() {
         jasmine.clock().tick(1500)
         this.wysiwyg.$el.find('.add_gif').click();
-        expect(this.wysiwyg.$el.find('.giphy_input_panel').is(':visible')).toBeTruthy();
+        expect(this.wysiwyg.$el.find('.giphy_panel').is(':visible')).toBeTruthy();
     });
 });
