@@ -320,6 +320,7 @@
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
                             {{ comment_form.comment.errors }}
                             {{ comment_form.comment }}
+                            <label>Mark as Issue: </label>{{ comment_form.is_issue }}
                             <div class="toggle_sibling">
                                 <label class="icon icon-attach"><a href="#">Add optional attachments</a></label>
                             </div>

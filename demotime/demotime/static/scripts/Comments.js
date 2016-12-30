@@ -54,6 +54,7 @@ DemoTime.Comments = Backbone.View.extend({
                 formData.append('thread', thread);
             }
             formData.append('comment', self.options.comment);
+            formData.append('is_issue', true);
 
             x = 0;
             comment_parent.find('.ajaxy_attachment').each(function() {

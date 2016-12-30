@@ -10,6 +10,7 @@ from demotime.models import (
     Creator,
     Event,
     EventType,
+    Issue,
     Follower,
     Message,
     Reminder,
@@ -89,14 +90,28 @@ class Review(BaseModel):
         reviewers = []
         followers = []
         creators = []
+        reviewing_count = approved_count = rejected_count = 0
         for reviewer in self.reviewer_set.active():
             reviewers.append(reviewer.to_json())
+            if reviewer.status == APPROVED:
+                approved_count += 1
+            elif reviewer.status == REJECTED:
+                rejected_count += 1
+            else:
+                reviewing_count += 1
 
         for follower in self.follower_set.active():
             followers.append(follower.to_json())
 
         for creator in self.creator_set.active():
             creators.append(creator.to_json())
+
+        active_issues_count = Issue.objects.filter(
+            review=self, resolved_by=None
+        ).count()
+        resolved_issues_count = Issue.objects.filter(
+            review=self, resolved_by__isnull=False
+        ).count()
 
         return {
             'creators': creators,
@@ -113,9 +128,11 @@ class Review(BaseModel):
                 'slug': self.project.slug,
                 'name': self.project.name,
             },
-            'reviewing_count': self.reviewing_count,
-            'approved_count': self.approved_count,
-            'rejected_count': self.rejected_count,
+            'reviewing_count': reviewing_count,
+            'approved_count': approved_count,
+            'rejected_count': rejected_count,
+            'active_issues_count': active_issues_count,
+            'resolved_issues_count': resolved_issues_count,
             'url': self.get_absolute_url(),
             'pk': self.pk,
             'created': self.created.isoformat(),

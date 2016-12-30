@@ -15,8 +15,8 @@ from .webhooks import WebHook
 from .users import UserProfile, UserReviewStatus, UserProxy
 from .comments import Comment, CommentThread
 from .creator import Creator
-from .reviews import Review, ReviewRevision
 from .issues import Issue
+from .reviews import Review, ReviewRevision
 
 
 def create_profile(sender, instance, created, raw, **kwargs):

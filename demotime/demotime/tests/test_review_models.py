@@ -1230,6 +1230,8 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(review_json['reviewing_count'], review.reviewing_count)
         self.assertEqual(review_json['approved_count'], review.approved_count)
         self.assertEqual(review_json['rejected_count'], review.rejected_count)
+        self.assertEqual(review_json['active_issues_count'], 0)
+        self.assertEqual(review_json['resolved_issues_count'], 0)
 
     def test_review_to_json_hides_inactive_reviews_followers(self):
         review = models.Review.create_review(**self.default_review_kwargs)
