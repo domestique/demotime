@@ -26,6 +26,8 @@ class EventType(BaseModel):
     FOLLOWER_REMOVED = 'follower-removed'
     OWNER_ADDED = 'owner-added'
     OWNER_REMOVED = 'owner-removed'
+    ISSUE_CREATED = 'issue-created'
+    ISSUE_RESOLVED = 'issue-resolved'
 
     name = models.CharField(max_length=128)
     code = models.SlugField(unique=True)
@@ -56,9 +58,10 @@ class Event(BaseModel):
     REVIEWER = 'reviewer'
     REVISION = 'revision'
     CREATOR = 'creator'
+    ISSUE = 'issue'
 
     RELATED_TYPES = [
-        COMMENT, FOLLOWER, REVIEW, REVIEWER, REVISION, CREATOR
+        COMMENT, FOLLOWER, REVIEW, REVIEWER, REVISION, CREATOR, ISSUE
     ]
 
     RELATED_TYPE_CHOICES = (
@@ -67,7 +70,8 @@ class Event(BaseModel):
         (REVIEW, 'Review'),
         (REVIEWER, 'Reviewer'),
         (REVISION, 'Revision'),
-        (CREATOR, 'Creator')
+        (CREATOR, 'Creator'),
+        (ISSUE, 'Issue'),
     )
 
     project = models.ForeignKey('Project')
@@ -84,6 +88,7 @@ class Event(BaseModel):
 
     @classmethod
     def _get_review(cls, related_object, related_type):
+        # TODO: We have an FK to Review... do we need all this really?
         if related_type == cls.REVIEW:
             return related_object
         elif related_type == cls.COMMENT:
@@ -95,6 +100,8 @@ class Event(BaseModel):
         elif related_type == cls.CREATOR:
             return related_object.review
         elif related_type == cls.REVISION:
+            return related_object.review
+        elif related_type == cls.ISSUE:
             return related_object.review
         else:
             raise RuntimeError('Invalid related_type')

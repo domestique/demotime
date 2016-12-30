@@ -16,6 +16,7 @@ from .users import UserProfile, UserReviewStatus, UserProxy
 from .comments import Comment, CommentThread
 from .creator import Creator
 from .reviews import Review, ReviewRevision
+from .issues import Issue
 
 
 def create_profile(sender, instance, created, raw, **kwargs):
