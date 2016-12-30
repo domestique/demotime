@@ -36,7 +36,9 @@ class EventView(CanViewJsonView):
         }
         events = models.Event.objects.filter(
             project=self.project,
-        )
+        ).select_related(
+            'review', 'project', 'event_type', 'user', 'user__userprofile'
+        ).prefetch_related('related_object')
         form = forms.EventFilterForm(project=self.project, data=request.GET)
         if form.is_valid():
             data = form.cleaned_data
@@ -55,12 +57,6 @@ class EventView(CanViewJsonView):
             json_data['errors'] = form.errors
             return json_data
 
-        events = events.select_related(
-            'project', 'review', 'user',
-            'user__userprofile',
-        ).prefetch_related(
-            'related_object',
-        )
         paginator = Paginator(events, self.paginate_by)
         page = request.GET.get('page')
         try:

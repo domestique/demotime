@@ -82,10 +82,19 @@ class Review(BaseModel):
     def to_json(self):
         reviewers = []
         followers = []
-        for reviewer in self.reviewer_set.active():
+        approved_count = rejected_count = reviewing_count = 0
+        for reviewer in self.reviewer_set.active().select_related(
+                'reviewer', 'reviewer__userprofile'):
             reviewers.append(reviewer.to_json())
+            if reviewer.status == APPROVED:
+                approved_count += 1
+            elif reviewer.status == REJECTED:
+                rejected_count += 1
+            else:
+                reviewing_count += 1
 
-        for follower in self.follower_set.active():
+        for follower in self.follower_set.active().select_related(
+                'user', 'user__userprofile'):
             followers.append(follower.to_json())
 
         return {
@@ -103,9 +112,9 @@ class Review(BaseModel):
                 'slug': self.project.slug,
                 'name': self.project.name,
             },
-            'reviewing_count': self.reviewing_count,
-            'approved_count': self.approved_count,
-            'rejected_count': self.rejected_count,
+            'reviewing_count': reviewing_count,
+            'approved_count': approved_count,
+            'rejected_count': rejected_count,
             'url': self.get_absolute_url(),
             'pk': self.pk,
             'created': self.created.isoformat(),
