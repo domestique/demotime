@@ -55,6 +55,41 @@ class TestIssueModels(BaseTestCase):
             )
         )
 
+    def test_issue_to_json(self):
+        issue = models.Issue.create_issue(
+            self.review, self.comment, self.test_user
+        )
+        self.assertEqual(issue.to_json(), {
+            'id': issue.pk,
+            'review_pk': issue.review.pk,
+            'review_title': issue.review.title,
+            'comment_pk': issue.comment.pk,
+            'created_by_name': issue.created_by.userprofile.name,
+            'created_by_pk': issue.created_by.pk,
+            'created_by_profile_url': issue.created_by.userprofile.get_absolute_url(),
+            'resolved_by_name': None,
+            'resolved_by_pk': None,
+            'resolved_by_profile_url': None,
+        })
+
+    def test_resolved_issue_to_json(self):
+        issue = models.Issue.create_issue(
+            self.review, self.comment, self.test_user
+        )
+        issue.resolve(self.user)
+        self.assertEqual(issue.to_json(), {
+            'id': issue.pk,
+            'review_pk': issue.review.pk,
+            'review_title': issue.review.title,
+            'comment_pk': issue.comment.pk,
+            'created_by_name': issue.created_by.userprofile.name,
+            'created_by_pk': issue.created_by.pk,
+            'created_by_profile_url': issue.created_by.userprofile.get_absolute_url(),
+            'resolved_by_name': issue.resolved_by.userprofile.name,
+            'resolved_by_pk': issue.resolved_by.pk,
+            'resolved_by_profile_url': issue.resolved_by.userprofile.get_absolute_url()
+        })
+
     def test_resolve_issue(self):
         issue = models.Issue.create_issue(
             self.review, self.comment, self.test_user

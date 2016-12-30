@@ -21,6 +21,28 @@ class Issue(BaseModel):
             self.pk, self.review.pk, self.created_by.username
         )
 
+    def to_json(self):
+        issue_dict = {
+            'id': self.pk,
+            'review_pk': self.review.pk,
+            'review_title': self.review.title,
+            'comment_pk': self.comment.pk,
+            'created_by_name': self.created_by.userprofile.name,
+            'created_by_pk': self.created_by.pk,
+            'created_by_profile_url': self.created_by.userprofile.get_absolute_url(),
+            'resolved_by_name': None,
+            'resolved_by_pk': None,
+            'resolved_by_profile_url': None,
+        }
+        if self.resolved_by:
+            issue_dict.update({
+                'resolved_by_name': self.resolved_by.userprofile.name,
+                'resolved_by_pk': self.resolved_by.pk,
+                'resolved_by_profile_url': self.resolved_by.userprofile.get_absolute_url()
+            })
+
+        return issue_dict
+
     def create_issue_event(self, resolved_by=None):
         if resolved_by:
             event = Event.create_event(

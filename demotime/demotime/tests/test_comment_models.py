@@ -384,6 +384,7 @@ class TestCommentModels(BaseTestCase):
             'attachments': [comment.attachments.get().to_json()],
             'url': comment.get_absolute_url(),
             'thread_url': comment.get_absolute_thread_url(),
+            'issue': {},
             'created': comment.created.isoformat(),
             'modified': comment.modified.isoformat(),
         })

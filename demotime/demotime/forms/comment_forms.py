@@ -10,6 +10,7 @@ class CommentForm(forms.ModelForm):
         widget=forms.widgets.HiddenInput(),
         required=False
     )
+    is_issue = forms.BooleanField(required=False)
 
     def __init__(self, thread=None, has_attachments=False, *args, **kwargs):
         super(CommentForm, self).__init__(*args, **kwargs)

@@ -47,7 +47,19 @@ class Comment(BaseModel):
             self.commenter.username, self.thread.review_revision.review.title
         )
 
+    def issue(self):
+        issues = self.issue_set.filter(resolved_by=None)
+        if issues.exists():
+            return issues.get()
+
+        return None
+
     def to_json(self):
+        issue = self.issue()
+        if issue:
+            issue_json = issue.to_json()
+        else:
+            issue_json = {}
         comment_json = {
             'id': self.pk,
             'name': self.commenter.userprofile.name,
@@ -57,6 +69,7 @@ class Comment(BaseModel):
             'attachments': [],
             'url': self.get_absolute_url(),
             'thread_url': self.get_absolute_thread_url(),
+            'issue': issue_json,
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
         }

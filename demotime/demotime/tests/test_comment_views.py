@@ -141,6 +141,31 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(comment.comment, 'test_comment_json_create_comment_thread')
         self.assertEqual(comment.attachments.count(), 1)
 
+    def test_comment_json_create_comment_thread_issue(self):
+        response = self.client.post(self.api_url, {
+            'comment': "test_comment_json_create_comment_thread",
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            '0-description': 'Test Description',
+            'is_issue': True,
+        })
+        self.assertStatusCode(response, 200)
+        comment = models.Comment.objects.latest('created')
+        self.assertIsNotNone(comment.issue())
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': comment.to_json()
+        })
+        comment = self.review.revision.commentthread_set.latest().comment_set.get()
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
+        self.assertEqual(comment.comment, 'test_comment_json_create_comment_thread')
+        self.assertEqual(comment.attachments.count(), 1)
+
     def test_comment_creation_without_comment(self):
         response = self.client.post(self.api_url, {
             'comment': "",
@@ -228,6 +253,31 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertEqual(comment.thread, thread)
         self.assertEqual(comment.attachments.count(), 1)
 
+    def test_comment_json_reply_comment_as_issue(self):
+        thread = self.review.revision.commentthread_set.latest()
+        response = self.client.post(self.api_url, {
+            'comment': "test_comment_json_reply_comment",
+            '0-attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
+            '0-description': 'Test Description',
+            '0-sort_order': 1,
+            'thread': thread.pk,
+            'is_issue': True
+        })
+        self.assertStatusCode(response, 200)
+        comment = models.Comment.objects.latest('created')
+        self.assertIsNotNone(comment.issue())
+        self.assertTrue(comment.events.filter(
+            event_type__code=models.EventType.COMMENT_ADDED
+        ).exists())
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': comment.to_json()
+        })
+        self.assertEqual(comment.comment, 'test_comment_json_reply_comment')
+        self.assertEqual(comment.thread, thread)
+        self.assertEqual(comment.attachments.count(), 1)
+
     def test_comment_json_reply_invalid_thread(self):
         response = self.client.post(self.api_url, {
             'comment': "Oh nice comment!",
@@ -271,6 +321,84 @@ class TestCommentAPIViews(BaseTestCase):
             'status': 'success',
             'errors': '',
             'comment': self.comment.to_json()
+        })
+
+    def test_mark_comment_as_issue(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'issue': {'create': True}
+        }))
+        self.assertStatusCode(response, 200)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.attachments.count(), 1)
+        self.assertEqual(self.comment.comment, 'Test Comment')
+        self.assertIsNotNone(self.comment.issue())
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': self.comment.to_json()
+        })
+
+    def test_resolve_issue(self):
+        models.Issue.create_issue(
+            self.review, self.comment, self.user
+        )
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'issue': {'resolve': True}
+        }))
+        self.assertStatusCode(response, 200)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.attachments.count(), 1)
+        self.assertEqual(self.comment.comment, 'Test Comment')
+        self.assertIsNone(self.comment.issue())
+        issue = models.Issue.objects.get()
+        self.assertEqual(issue.resolved_by, self.user)
+        self.assertEqual(json.loads(response.content.decode('utf8')), {
+            'status': 'success',
+            'errors': '',
+            'comment': self.comment.to_json()
+        })
+
+    def test_create_and_resolve_issue_failure(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'issue': {'create': True, 'resolve': True}
+        }))
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'errors': "Can't both create and resolve an issue",
+            'status': 'failure',
+            'comment': self.comment.to_json()
+        })
+
+    def test_create_issue_existing_issue(self):
+        models.Issue.create_issue(
+            self.review, self.comment, self.user
+        )
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'issue': {'create': True}
+        }))
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'errors': 'Issue already exists for Comment {}'.format(
+                self.comment.pk
+            ),
+            'status': 'failure',
+            'comment': {},
+        })
+
+    def test_resolve_missing_issue(self):
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'issue': {'resolve': True}
+        }))
+        self.assertStatusCode(response, 400)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'errors': 'Can not resolve an issue that does not exist',
+            'status': 'failure',
+            'comment': {},
         })
 
     def test_update_comment_delete_attachment(self):

@@ -125,6 +125,10 @@ class CommentJsonView(CanViewJsonView):
                 thread=thread,
                 attachments=attachments,
             )
+            if data.get('is_issue'):
+                models.Issue.create_issue(
+                    self.review, comment, request.user
+                )
             return {
                 'errors': '',
                 'status': 'success',
@@ -174,6 +178,53 @@ class CommentJsonView(CanViewJsonView):
                     pass
                 else:
                     attachment.delete()
+
+        if isinstance(body.get('issue'), dict):
+            issue_dict = body['issue']
+            create = issue_dict.get('create') is True
+            resolve = issue_dict.get('resolve') is True
+            existing_issues = models.Issue.objects.filter(
+                review=self.review,
+                comment=comment,
+            )
+            if create and resolve:
+                self.status = 400
+                return {
+                    'errors': "Can't both create and resolve an issue",
+                    'status': 'failure',
+                    'comment': comment.to_json()
+                }
+            elif create and existing_issues.exists():
+                self.status = 400
+                return {
+                    'errors': 'Issue already exists for Comment {}'.format(
+                        comment.pk
+                    ),
+                    'status': 'failure',
+                    'comment': {}
+                }
+            elif create:
+                models.Issue.create_issue(self.review, comment, request.user)
+                return {
+                    'status': 'success',
+                    'errors': '',
+                    'comment': comment.to_json()
+                }
+            elif resolve and not existing_issues.exists():
+                self.status = 400
+                return {
+                    'errors': 'Can not resolve an issue that does not exist',
+                    'status': 'failure',
+                    'comment': {},
+                }
+            elif resolve:
+                issue = existing_issues.filter(resolved_by=None).get()
+                issue.resolve(request.user)
+                return {
+                    'status': 'success',
+                    'errors': '',
+                    'comment': comment.to_json()
+                }
 
         if comment_form.is_valid():
             data = comment_form.cleaned_data
