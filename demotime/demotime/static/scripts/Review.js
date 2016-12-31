@@ -65,7 +65,7 @@ DemoTime.Review = Backbone.View.extend({
 
     // Changing demo state
     change_demo_state: function(type, link) {
-        if (type == 'closed' && link.data('draft')) {
+        if (type == 'cancelled' && link.data('draft')) {
             // Warn users when deleting a draft
             this.warn_before_closing_draft(type);
         } else if ((type == 'closed' || type == 'aborted') && this.options.reviewer_state == 'reviewing') {
@@ -124,7 +124,7 @@ DemoTime.Review = Backbone.View.extend({
 
         swal({
             title: "Are you sure?",
-            text: "Be mindful that if this demo has co-owners, this will remove their draft as well. Don't worry though, you can search for and re-open aborted drafts.",
+            text: "Be mindful that if this demo has co-owners, this will remove their draft as well.",
             type: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
