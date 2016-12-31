@@ -211,7 +211,7 @@ class Review(BaseModel):
 
         for reviewer in reviewers:
             Reviewer.create_reviewer(
-                obj, reviewer, creator, True, draft=state == DRAFT
+                obj, reviewer, creator, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, reviewer,
@@ -219,7 +219,7 @@ class Review(BaseModel):
 
         for follower in followers:
             Follower.create_follower(
-                obj, follower, creator, True, draft=state == DRAFT
+                obj, follower, creator, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, follower,
@@ -311,13 +311,13 @@ class Review(BaseModel):
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
                 reviewer = Reviewer.create_reviewer(
-                    obj, reviewer, creator, True, draft=state == DRAFT
+                    obj, reviewer, creator, True, draft=is_or_was_draft
                 )
             else:
                 reviewer.status = REVIEWING
                 reviewer.is_active = True
                 reviewer.save()
-                if state_change and state not in (DRAFT, CANCELLED):
+                if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
                     reviewer.create_reviewer_event(creator)
 
         for follower in followers:
@@ -327,12 +327,12 @@ class Review(BaseModel):
                 Follower.create_follower(
                     review=obj, user=follower,
                     creator=creator, skip_notifications=True,
-                    draft=state == DRAFT
+                    draft=is_or_was_draft
                 )
             else:
                 follower.is_active = True
                 follower.save()
-                if state_change and state not in (DRAFT, CANCELLED):
+                if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
                     follower.create_follower_event(creator)
 
         # Update UserReviewStatuses
@@ -341,15 +341,12 @@ class Review(BaseModel):
         ).update(read=False)
 
         # Drop Reviewers no longer assigned
-        reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
-        skip_drop_events = DRAFT in (
-            state, getattr(obj.state_machine.previous_state, 'name', '')
-        )
+        reviewers = obj.reviewer_set.active().exclude(review=obj, reviewer__in=reviewers)
         for reviewer in reviewers:
-            reviewer.drop_reviewer(obj.creator, draft=skip_drop_events)
-        followers = obj.follower_set.exclude(review=obj, user__in=followers)
+            reviewer.drop_reviewer(obj.creator, draft=is_or_was_draft)
+        followers = obj.follower_set.active().exclude(review=obj, user__in=followers)
         for follower in followers:
-            follower.drop_follower(obj.creator, draft=skip_drop_events)
+            follower.drop_follower(obj.creator, draft=is_or_was_draft)
 
         obj.state_machine.change_state(state)
         # Reviewer situation may have changed, update it

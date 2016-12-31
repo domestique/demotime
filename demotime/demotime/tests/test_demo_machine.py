@@ -125,9 +125,23 @@ class TestOpenState(BaseDemoMachineCase):
         mail.outbox = []
 
         self.state._open_draft(self.review) # pylint: disable=protected-access
-        event = models.Event.objects.get()
+        event = models.Event.objects.get(
+            event_type__code=models.EventType.DEMO_CREATED
+        )
         self.assertEqual(event.event_type.code, models.EventType.DEMO_CREATED)
         self.assertEqual(event.user, self.review.creator)
+
+        # reviewer events
+        reviewer_events = models.Event.objects.filter(
+            event_type__code=models.EventType.REVIEWER_ADDED
+        )
+        self.assertEqual(reviewer_events.count(), 3)
+
+        # follower events
+        follower_events = models.Event.objects.filter(
+            event_type__code=models.EventType.FOLLOWER_ADDED
+        )
+        self.assertEqual(follower_events.count(), 2)
 
         statuses = models.UserReviewStatus.objects.filter(review=self.review)
         # We just make the creator's here
