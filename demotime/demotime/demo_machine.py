@@ -72,10 +72,10 @@ class Open(State):
             created=timezone.now(), modified=timezone.now()
         )
         for reviewer in review.reviewer_set.active():
-            reviewer.create_reviewer_event(review.creator)
+            reviewer.create_reviewer_event(review.last_action_by)
 
         for follower in review.follower_set.active():
-            follower.create_follower_event(review.creator)
+            follower.create_follower_event(review.last_action_by)
 
 
     def _reopen(self, review, prev_state):
