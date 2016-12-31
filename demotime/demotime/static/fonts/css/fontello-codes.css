@@ -42,3 +42,5 @@
 .icon-attention-circled:before { content: '\e828'; } /* '' */
 .icon-link-ext:before { content: '\e829'; } /* '' */
 .icon-help-circled-alt:before { content: '\e82a'; } /* '' */
+.icon-pause:before { content: '\e82b'; } /* '' */
+.icon-play:before { content: '\e82c'; } /* '' */

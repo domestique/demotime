@@ -6,7 +6,7 @@
     font-size: 35px;
     line-height: 42px;
     color: #333333;
-    padding: 25px 25px 5px;
+    padding: 25px 0 5px;
     font-weight: 300;
     position: relative;
 }
@@ -124,22 +124,7 @@ li.open.state-highlight {
 .comment_parent .attachment-card {
     margin: 10px 0;
 }
-.attachments .attachment-card.image {
-    width: 48%;
-    display: inline-block;
-    margin: 5px;
-    vertical-align: top;
-}
-@media screen and (max-width:480px) {
-    .attachments .attachment-card.image {
-        width: 100%;
-        margin: 5px 0;
-        display: block;
-    }
-}
-.attachments .attachment-card.image .demobox {
-    margin-top: 0;
-}
+
 .comment_parent .attachment-card.image {
     width: 100%;
     float: none;
@@ -281,10 +266,6 @@ input.find_person {
 
 h1.heading {
     position: relative;
-}
-.copy_link {
-    margin-left: -20px;
-    cursor: pointer;
 }
 
 a[data-type='approved'] {

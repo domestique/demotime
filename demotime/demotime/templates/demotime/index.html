@@ -102,11 +102,30 @@
                 {% if drafts %}
                     <h3 class="icon icon-pencil">
                         Your demo <strong>drafts</strong>
+                        <span class="help" title="These are demos you're a part of creating but
+                        have not published yet. Start a demo now and perhaps finish it later if you
+                        like. It's really up to you."></span>
                     </h3>
                     <section class="aggregated_dashboard-section aggregated_dashboard-drafts">
                         <div>
                             {% for demo in drafts %}
                                 {% include "includes/demo.html" with draft=True %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
+                {% if paused_demos %}
+                    <h3 class="icon icon-pause">
+                        Your <strong>paused</strong> demos
+                        <span class="help" title="Pausing can be used to signal a number of
+                        different things to reviewers of your demo. It's often good to accompany
+                        a state-change like this with a comment to your reviewers to give them
+                        some context on why your demo might be paused."></span>
+                    </h3>
+                    <section class="aggregated_dashboard-section aggregated_dashboard-paused">
+                        <div>
+                            {% for demo in paused_demos %}
+                                {% include "includes/demo.html" %}
                             {% endfor %}
                         </div>
                     </section>
@@ -163,17 +182,17 @@
 {{ block.super }}
 <script type="text/x-pattern" id="events_pattern">
 <div class="events">
-<% _.each(moments, function(moment) { %>
+<% _.each(moments, function(feed_item) { %>
     <div class="demobox">
         <div class="demobox-header">
             <a class="has_bubble"
-                data-prj="<%= moment.review.project.id %>"
-                data-pk="<%= moment.review.pk %>"
-                href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
-                <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
-            <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+                data-prj="<%= feed_item.review.project.id %>"
+                data-pk="<%= feed_item.review.pk %>"
+                href="<%= feed_item.review.url %>">DT-<%= feed_item.review.pk %></a>:
+                <a title="<%= new Date(feed_item.created) %>" href="<%= feed_item.review.url %>"><%= feed_item.review.title %></a>
+            <% if (feed_item.event_type.code != 'reviewer-removed' && feed_item.event_type.code != 'follower-removed') { %>
                 was updated by
-                <a href="<%= moment.user.url %>"><%= moment.user.name %></a>
+                <a href="<%= feed_item.user.url %>"><%= feed_item.user.name %></a>
             <% } %>
         </div>
         <div class="demobox-body">

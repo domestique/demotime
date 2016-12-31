@@ -5,7 +5,7 @@
             {% if attachment.description %}
                 - <strong class="attachment-description">{{ attachment.description }}</strong>
             {% endif %}
-            {% if comment and request.user = comment.commenter %}
+            {% if comment and request.user == comment.commenter %}
                 <a href="#" class="attachment-delete" data-comment="{{ comment.pk }}" data-attachment="{{ attachment.pk }}">delete</a>
             {% endif %}
             {% if review_inst.state == "draft" %}
@@ -14,6 +14,10 @@
                      data-url="{% url 'delete-review-attachment' project.slug review_inst.pk attachment.pk %}">
                      delete
                   </a>
+            {% else %}
+                {% if show_delete %}
+                    - <a href="#" class="attachment_delete" data-pk="{{ attachment.pk }}">delete</a>
+                {% endif %}
             {% endif %}
         </div>
     </div>

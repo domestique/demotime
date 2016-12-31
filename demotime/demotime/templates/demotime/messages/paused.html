@@ -1,0 +1,4 @@
+{% extends "demotime/messages/msg_base.html" %}
+{% block content %}
+<p>The demo, <a href="http://{{ dt_url }}{{ review.get_absolute_url }}">{{ review.title }}</a>, that you're {% if is_reviewer %}reviewing{% else %}following{% endif %} is now paused.</p>
+{% endblock %}

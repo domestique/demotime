@@ -1,6 +1,6 @@
 from django import forms
 
-from demotime import models
+from demotime import constants, models
 
 
 class ReviewerStatusForm(forms.Form):
@@ -36,3 +36,19 @@ class ReviewStateForm(forms.Form):
             creator=user,
             pk=review_pk
         )
+
+    def clean(self):
+        cleaned_data = super(ReviewStateForm, self).clean()
+        state = cleaned_data.get('state')
+        review = cleaned_data.get('review')
+        if review and review.state == constants.DRAFT and state == constants.OPEN:
+            if not review.reviewer_set.active().exists():
+                self.add_error(
+                    'review', 'Demo must have Reviewers to be opened'
+                )
+            if not review.revision.description:
+                self.add_error(
+                    'review', 'Demo must contain a description'
+                )
+
+        return cleaned_data

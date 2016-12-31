@@ -53,10 +53,20 @@
                {% endif %}
             </a>
         </li>
-        {% if object.state == 'closed' %}
-            <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
+        {% if object.state == 'closed' or object.state == 'aborted' or object.state == 'paused' %}
+            {% if object.state == 'paused' %}
+                <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-play">Resume</a></li>
+            {% else %}
+                <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
+            {% endif %}
         {% else %}
-            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-ok">Close</a></li>
+            {% if object.state == "draft" %}
+                <li class="published"><a data-type="open" href="#" class="subnav-item review-changer icon icon-ok">Publish</a></li>
+            {% endif %}
+            {% if object.state != "draft" %}
+                <li class="paused"><a data-type="paused" href="#" class="subnav-item review-changer icon icon-pause">Pause</a></li>
+            {% endif %}
+            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-trash">Close</a></li>
         {% endif %}
     {% else %}
         {% if reviewer and object.state != "closed" %}
@@ -134,7 +144,7 @@
 
     <div class="main-content">
         <h1 class="heading">
-            <strong class="copy_link" data-clipboard-text="https://{{ site_settings.SERVER_URL }}/DT-{{ object.pk }}">DT-{{ object.pk }}</strong>: {{ object.title }}
+            <strong>DT-{{ object.pk }}</strong>: {{ object.title }}
                 <small class="alert">
                 {% if not revision.is_max_revision %}
                     Rev {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
@@ -420,13 +430,13 @@
 </script>
 <script type="text/x-pattern" id="events_pattern">
 <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
-<% _.each(moments, function(moment) { %>
+<% _.each(moments, function(feed_item) { %>
     <div class="demobox">
         <div class="demobox-header">
-            <strong><%= new Date(moment.created) %></strong>
-            <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+            <strong><%= new Date(feed_item.created) %></strong>
+            <% if (feed_item.event_type.code != 'reviewer-removed' && feed_item.event_type.code != 'follower-removed') { %>
                 update by
-                <a href="<%= moment.user.url %>"><%= moment.user.name %></a>
+                <a href="<%= feed_item.user.url %>"><%= feed_item.user.name %></a>
             <% } %>
         </div>
         <div class="demobox-body">

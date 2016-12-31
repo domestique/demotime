@@ -2,6 +2,7 @@ from mock import patch
 
 from django.core import mail
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import constants, models
 from demotime.tests import BaseTestCase
@@ -100,9 +101,11 @@ class TestReviewModels(BaseTestCase):
 
     def test_update_draft_review(self):
         self.default_review_kwargs['state'] = constants.DRAFT
+        attachments = self.default_review_kwargs['attachments']
+        self.default_review_kwargs['attachments'] = []
         obj = models.Review.create_review(**self.default_review_kwargs)
         self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.attachments.count(), 0)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(len(mail.outbox), 0)
         models.UserReviewStatus.objects.filter(review=obj).update(read=True)
@@ -112,14 +115,16 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'attachments': attachments,
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.state, constants.DRAFT)
         # Should still be the same, singular revision
         self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.reviewer_set.active().count(), 2)
         self.assertEqual(obj.revision.number, 1)
         self.assertEqual(len(mail.outbox), 0)
-        self.assertEqual(obj.revision.attachments.count(), 4)
+        self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.description, 'New Description')
         self.assertEqual(obj.case_link, 'http://badexample.org')
         self.assertFalse(
@@ -240,6 +245,7 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'delete_attachments': obj.revision.attachments.all(),
         })
         new_obj = models.Review.update_review(**review_kwargs)
         event = new_obj.event_set.get(
@@ -295,6 +301,79 @@ class TestReviewModels(BaseTestCase):
             constants.UPDATED,
         )
 
+    def test_update_review_keep_some_attachments(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        first_attachment, second_attachment = obj.revision.attachments.all()
+
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'delete_attachments': [first_attachment],
+            'attachments': [
+                {
+                    'attachment': File(BytesIO(b'new_file'), name='new_file.jpeg'),
+                    'description': 'Testing',
+                    'sort_order': 0,
+                },
+            ],
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewers.count(), 3)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        second_attach_content = second_attachment.attachment.file.read()
+        updated_attach_content = obj.revision.attachments.all()[0].attachment.file.read()
+        self.assertEqual(second_attach_content, updated_attach_content)
+        new_first = obj.revision.attachments.first()
+        new_last = obj.revision.attachments.last()
+        self.assertEqual(new_first.sort_order, 0)
+        self.assertEqual(new_last.sort_order, 1)
+        self.assertEqual(new_last.attachment.file.read(), b'new_file')
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+
+    def test_update_paused_review(self):
+        ''' Updating a paused review should reopen it '''
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        for reviewer in obj.reviewer_set.all():
+            reviewer.set_status(constants.APPROVED)
+        mail.outbox = []
+        models.MessageBundle.objects.all().delete()
+        models.Event.objects.all().delete()
+        obj.update_state(constants.PAUSED)
+        obj.refresh_from_db()
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.assertEqual(obj.state, constants.PAUSED)
+        self.assertEqual(obj.reviewer_state, constants.APPROVED)
+        models.UserReviewStatus.objects.filter(review=obj).update(read=True)
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'reviewers': self.test_users.exclude(username='test_user_0'),
+            'delete_attachments': obj.revision.attachments.all(),
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.reviewer_set.count(), 3)
+        self.assertEqual(obj.reviewer_set.active().count(), 2)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.description, 'New Description')
+        self.assertEqual(obj.reviewrevision_set.count(), 2)
+        self.assertEqual(obj.revision.number, 2)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+
     def test_update_closed_review(self):
         ''' Updating a closed review should reopen it '''
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -313,9 +392,9 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'delete_attachments': obj.revision.attachments.all(),
         })
         obj = models.Review.update_review(**self.default_review_kwargs)
-        # Should still be the same, singular revision
         self.assertEqual(obj.reviewer_set.count(), 3)
         self.assertEqual(obj.reviewer_set.active().count(), 2)
         self.assertEqual(obj.revision.number, 2)
@@ -350,6 +429,7 @@ class TestReviewModels(BaseTestCase):
             'description': 'New Description',
             'case_link': 'http://badexample.org',
             'reviewers': self.test_users.exclude(username='test_user_0'),
+            'delete_attachments': obj.revision.attachments.all(),
         })
         new_obj = models.Review.update_review(**review_kwargs)
         second_rev = new_obj.revision
@@ -510,6 +590,54 @@ class TestReviewModels(BaseTestCase):
         obj = models.Review.create_review(**self.default_review_kwargs)
         self.assertFalse(obj.update_state(constants.OPEN))
 
+    def test_review_state_change_paused(self):
+        self.assertEqual(len(mail.outbox), 0)
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 5)
+        dropped_reviewer = obj.reviewer_set.all()[0]
+        dropped_follower = obj.follower_set.all()[0]
+        dropped_reviewer.drop_reviewer(obj.creator)
+        dropped_follower.drop_follower(obj.creator)
+        mail.outbox = []
+
+        models.UserReviewStatus.objects.update(read=True)
+        models.Reminder.objects.filter(review=obj).update(active=True)
+        self.assertTrue(obj.update_state(constants.PAUSED))
+        # refresh it
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.state, constants.PAUSED)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_PAUSED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_PAUSED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
+        msgs = models.Message.objects.filter(
+            review=obj.reviewrevision_set.latest(),
+            title='"{}" has been {}'.format(
+                obj.title, constants.PAUSED.capitalize()
+            )
+        )
+        self.assertEqual(msgs.count(), 3)
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            5
+        )
+        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=False).count(),
+            3
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.PAUSED,
+        )
+
     def test_review_state_change_closed(self):
         self.assertEqual(len(mail.outbox), 0)
         obj = models.Review.create_review(**self.default_review_kwargs)
@@ -600,6 +728,57 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(
             self.hook_patch_run.call_args_list[1][0][0],
             constants.ABORTED
+        )
+
+    def test_review_state_change_paused_to_open(self):
+        self.assertEqual(len(mail.outbox), 0)
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(len(mail.outbox), 5)
+        mail.outbox = []
+
+        obj.update_state(constants.PAUSED)
+        self.assertEqual(len(mail.outbox), 5)
+        mail.outbox = []
+
+        models.UserReviewStatus.objects.update(read=True)
+        models.Reminder.objects.filter(review=obj).update(active=False)
+        self.assertTrue(obj.update_state(constants.OPEN))
+        # refresh it
+        obj = models.Review.objects.get(pk=obj.pk)
+        self.assertEqual(obj.state, constants.OPEN)
+        event = obj.event_set.get(event_type__code=models.EventType.DEMO_OPENED)
+        self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
+        self.assertEqual(event.related_object, obj)
+        self.assertEqual(event.user, obj.creator)
+        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
+        msgs = models.Message.objects.filter(
+            review=obj.reviewrevision_set.latest(),
+            title='"{}" has been Reopened'.format(obj.title)
+        )
+        self.assertEqual(msgs.count(), 5)
+        self.assertEqual(
+            models.UserReviewStatus.objects.filter(
+                review=obj,
+                read=False
+            ).exclude(user=self.user).count(),
+            5
+        )
+        self.assertEqual(len(mail.outbox), 5)
+        self.assertEqual(
+            models.Reminder.objects.filter(review=obj, active=True).count(),
+            4
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[0][0][0],
+            constants.CREATED
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[1][0][0],
+            constants.PAUSED,
+        )
+        self.assertEqual(
+            self.hook_patch_run.call_args_list[2][0][0],
+            constants.REOPENED,
         )
 
     def test_review_state_change_closed_to_open(self):

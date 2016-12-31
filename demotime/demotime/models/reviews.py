@@ -22,6 +22,7 @@ from demotime.constants import (
     REJECTED,
     APPROVED,
     OPEN,
+    PAUSED,
     CLOSED,
     ABORTED,
     UPDATED,
@@ -39,6 +40,7 @@ class Review(BaseModel):
         (CLOSED, CLOSED.capitalize()),
         (ABORTED, ABORTED.capitalize()),
         (CANCELLED, CANCELLED.capitalize()),
+        (PAUSED, PAUSED.capitalize()),
     )
 
     REVIEWER_STATE_CHOICES = (
@@ -80,10 +82,19 @@ class Review(BaseModel):
     def to_json(self):
         reviewers = []
         followers = []
-        for reviewer in self.reviewer_set.active():
+        approved_count = rejected_count = reviewing_count = 0
+        for reviewer in self.reviewer_set.active().select_related(
+                'reviewer', 'reviewer__userprofile'):
             reviewers.append(reviewer.to_json())
+            if reviewer.status == APPROVED:
+                approved_count += 1
+            elif reviewer.status == REJECTED:
+                rejected_count += 1
+            else:
+                reviewing_count += 1
 
-        for follower in self.follower_set.active():
+        for follower in self.follower_set.active().select_related(
+                'user', 'user__userprofile'):
             followers.append(follower.to_json())
 
         return {
@@ -101,9 +112,9 @@ class Review(BaseModel):
                 'slug': self.project.slug,
                 'name': self.project.name,
             },
-            'reviewing_count': self.reviewing_count,
-            'approved_count': self.approved_count,
-            'rejected_count': self.rejected_count,
+            'reviewing_count': reviewing_count,
+            'approved_count': approved_count,
+            'rejected_count': rejected_count,
             'url': self.get_absolute_url(),
             'pk': self.pk,
             'created': self.created.isoformat(),
@@ -200,7 +211,7 @@ class Review(BaseModel):
 
         for reviewer in reviewers:
             Reviewer.create_reviewer(
-                obj, reviewer, creator, True, draft=state == DRAFT
+                obj, reviewer, creator, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, reviewer,
@@ -208,7 +219,7 @@ class Review(BaseModel):
 
         for follower in followers:
             Follower.create_follower(
-                obj, follower, creator, True, draft=state == DRAFT
+                obj, follower, creator, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, follower,
@@ -229,7 +240,8 @@ class Review(BaseModel):
     def update_review(
             cls, review, creator, title, description,
             case_link, reviewers, project, state=OPEN,
-            is_public=False, followers=None, attachments=None
+            is_public=False, followers=None, attachments=None,
+            delete_attachments=None,
         ):
         ''' Standard update review method '''
         # Figure out if we have a state transition
@@ -243,6 +255,8 @@ class Review(BaseModel):
         is_or_was_draft = state == DRAFT or obj.state == DRAFT
         state_change = obj.state != state
         is_update = not is_or_was_draft
+        attachment_offset = 0
+        delete_attachments = delete_attachments if delete_attachments else []
 
         if is_or_was_draft:
             obj.description = description
@@ -254,6 +268,9 @@ class Review(BaseModel):
             rev.description = description
             rev.save()
             prev_revision = None
+            attachment_offset = rev.attachments.aggregate(
+                Max('sort_order')
+            )['sort_order__max'] or 0
 
         if is_update:
             prev_revision = obj.revision
@@ -264,12 +281,14 @@ class Review(BaseModel):
                 number=rev_count + 1
             )
 
-            # No attachments, we'll copy them over
-            if not attachments:
-                for attachment in prev_revision.attachments.all():
+            # Copy over attachments that weren't removed
+            for count, attachment in enumerate(prev_revision.attachments.all()):
+                if attachment not in delete_attachments:
                     attachment.content_object = rev
                     attachment.pk = None
+                    attachment.sort_order = attachment_offset
                     attachment.save()
+                    attachment_offset += 1
 
             # Events
             Event.create_event(
@@ -284,7 +303,7 @@ class Review(BaseModel):
                 attachment=attachment['attachment'],
                 description=attachment['description'],
                 content_object=rev,
-                sort_order=attachment['sort_order'],
+                sort_order=int(attachment['sort_order']) + attachment_offset,
             )
 
         for reviewer in reviewers:
@@ -292,13 +311,13 @@ class Review(BaseModel):
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
                 reviewer = Reviewer.create_reviewer(
-                    obj, reviewer, creator, True, draft=state == DRAFT
+                    obj, reviewer, creator, True, draft=is_or_was_draft
                 )
             else:
                 reviewer.status = REVIEWING
                 reviewer.is_active = True
                 reviewer.save()
-                if state_change and state not in (DRAFT, CANCELLED):
+                if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
                     reviewer.create_reviewer_event(creator)
 
         for follower in followers:
@@ -308,12 +327,12 @@ class Review(BaseModel):
                 Follower.create_follower(
                     review=obj, user=follower,
                     creator=creator, skip_notifications=True,
-                    draft=state == DRAFT
+                    draft=is_or_was_draft
                 )
             else:
                 follower.is_active = True
                 follower.save()
-                if state_change and state not in (DRAFT, CANCELLED):
+                if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
                     follower.create_follower_event(creator)
 
         # Update UserReviewStatuses
@@ -322,15 +341,12 @@ class Review(BaseModel):
         ).update(read=False)
 
         # Drop Reviewers no longer assigned
-        reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
-        skip_drop_events = DRAFT in (
-            state, getattr(obj.state_machine.previous_state, 'name', '')
-        )
+        reviewers = obj.reviewer_set.active().exclude(review=obj, reviewer__in=reviewers)
         for reviewer in reviewers:
-            reviewer.drop_reviewer(obj.creator, draft=skip_drop_events)
-        followers = obj.follower_set.exclude(review=obj, user__in=followers)
+            reviewer.drop_reviewer(obj.creator, draft=is_or_was_draft)
+        followers = obj.follower_set.active().exclude(review=obj, user__in=followers)
         for follower in followers:
-            follower.drop_follower(obj.creator, draft=skip_drop_events)
+            follower.drop_follower(obj.creator, draft=is_or_was_draft)
 
         obj.state_machine.change_state(state)
         # Reviewer situation may have changed, update it

@@ -4,7 +4,7 @@ from demotime import models
 
 
 def unread_message_count(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return {
             'unread_message_count': models.MessageBundle.objects.filter(
                 owner=request.user,
@@ -17,7 +17,7 @@ def unread_message_count(request):
 
 
 def has_unread_messages(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return {
             'has_unread_messages': models.MessageBundle.objects.filter(
                 owner=request.user,
@@ -34,7 +34,7 @@ def site_settings(request):
 
 
 def available_projects(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return {'available_projects': models.Project.objects.none()}
 
     return {'available_projects': request.user.projects}

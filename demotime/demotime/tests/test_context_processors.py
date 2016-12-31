@@ -14,7 +14,6 @@ class TestContextProcessors(BaseTestCase):
         self.request_mock = Mock()
         self.user = models.UserProxy.objects.get(username='test_user_0')
         self.request_mock.user = self.user
-        self.request_mock.user.is_authenticated = Mock(return_value=True)
 
     def test_has_unread_messages(self):
         self.assertTrue(
@@ -47,13 +46,13 @@ class TestContextProcessors(BaseTestCase):
         )
 
     def test_has_unread_messages_unauthed(self):
-        self.request_mock.user.is_authenticated = Mock(return_value=False)
+        self.request_mock.user = AnonymousUser()
         self.assertFalse(
             context_processors.has_unread_messages(self.request_mock)['has_unread_messages']
         )
 
     def test_unread_message_count_unauthed(self):
-        self.request_mock.user.is_authenticated = Mock(return_value=False)
+        self.request_mock.user = AnonymousUser()
         self.assertEqual(
             context_processors.unread_message_count(self.request_mock)['unread_message_count'],
             0
