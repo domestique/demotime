@@ -55,18 +55,19 @@
         </li>
         {% if object.state == 'closed' or object.state == 'aborted' or object.state == 'paused' %}
             {% if object.state == 'paused' %}
-                <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-play">Resume</a></li>
+                <li class="open"><a data-type="open" href="#" class="subnav-item confirm review-changer icon icon-play">Resume</a></li>
             {% else %}
                 <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
             {% endif %}
         {% else %}
             {% if object.state == "draft" %}
-                <li class="published"><a data-type="open" href="#" class="subnav-item review-changer icon icon-ok">Publish</a></li>
+                <li class="published"><a data-type="open" href="#" class="subnav-item review-changer confirm icon icon-ok">Publish</a></li>
+                <li class="closed"><a data-type="closed" data-draft='true' href="#" class="subnav-item review-changer alert icon icon-trash">Abort</a></li>
             {% endif %}
             {% if object.state != "draft" %}
                 <li class="paused"><a data-type="paused" href="#" class="subnav-item review-changer icon icon-pause">Pause</a></li>
+                <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-trash">Close</a></li>
             {% endif %}
-            <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-trash">Close</a></li>
         {% endif %}
     {% else %}
         {% if reviewer and object.state != "closed" %}
