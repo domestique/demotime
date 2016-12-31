@@ -168,9 +168,18 @@
         <section class="review-meta with-gap:5">
             <div class="cel">
                 <h4 class="heading">Owner(s):</h4>
-                {% for creator in object.creator_set.active %}
-                    <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a><br>
-                {% endfor %}<br>
+                <ul class="owners">
+                    {% for creator in object.creator_set.active %}
+                        <li>
+                            <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a>
+                            {% if creator_obj.user == request.user %}
+                                <small class="person_deleter" style="display:none">
+                                    [<a href="#" class="person_deleter_link" data-action="drop_creator" data-person="{{ creator.user.pk }}">x</a>]
+                                </small>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
                 {% if object.state != "closed" %}
                     <h4 class="heading">
                         Reviewer State:
