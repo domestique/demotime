@@ -275,23 +275,7 @@
                 }
             </script>
 
-            <!--div id="feedbacker">
-                <a href="https://domestiquestudios.typeform.com/to/RDJWGc" target="blank">How are we doing?</a>
-                <span class="close">x</span>
-            </div-->
-            <script>
-                /*if (Cookies.get('gave_feedback')) {
-                    $('#feedbacker').hide();
-                } else {
-                    $('#feedbacker a').click(function() {
-                        Cookies.set('gave_feedback', true, { expires: 31 });
-                    });
-                    $('#feedbacker .close').click(function() {
-                        Cookies.set('gave_feedback', true, { expires: 7 });
-                        $('#feedbacker').fadeOut();
-                    })
-                }*/
-            </script>
+            <script src="/static/scripts/library/moment.min.js?{{ site_settings.CACHE_BUSTER }}"></script>
         {% endif %}
 
         {% block scripts %}{% endblock %}
