@@ -1,82 +1,93 @@
 <div>
-    <% if (moment.event_type.code == 'reviewer-added' || moment.event_type.code == 'follower-added') { %>
-        <a href="<%= moment.related_object.user_profile_url %>"><%= moment.related_object.name %></a> was added as a <%= moment.related_type %>
-    <% } else if (moment.event_type.code == 'demo-created') { %>
+    <% if (feed_item.event_type.code == 'reviewer-added' || feed_item.event_type.code == 'follower-added') { %>
+        <a href="<%= feed_item.related_object.user_profile_url %>"><%= feed_item.related_object.name %></a> was added as a <%= feed_item.related_type %>
+    <% } else if (feed_item.event_type.code == 'demo-created') { %>
         This demo was <strong>created</strong>. Let the games begin
-    <% } else if (moment.event_type.code == 'reviewer-approved') { %>
-        <a class="icon icon-Approved"></a> <%= moment.user.name %> <strong>approves</strong>!
-        <% if (moment.review.reviewing_count) { %>
+    <% } else if (feed_item.event_type.code == 'reviewer-approved') { %>
+        <a class="icon icon-Approved"></a> <%= feed_item.user.name %> <strong>approves</strong>!
+        <% if (feed_item.review.reviewing_count) { %>
             <span class="has_bubble"
-                data-prj="<%= moment.review.project.id %>"
-                data-pk="<%= moment.review.pk %>"
-                href="<%= moment.review.url %>" style="margin-left: 5px; cursor: pointer">
-                <% if (moment.review.reviewing_count) { %>
-                    <span class="icon icon-reviewing"><sup><%= moment.review.reviewing_count %></sup></span>
+                data-prj="<%= feed_item.review.project.id %>"
+                data-pk="<%= feed_item.review.pk %>"
+                href="<%= feed_item.review.url %>" style="margin-left: 5px; cursor: pointer">
+                <% if (feed_item.review.reviewing_count) { %>
+                    <span class="icon icon-reviewing"><sup><%= feed_item.review.reviewing_count %></sup></span>
                 <% } %>
-                <% if (moment.review.approved_count) { %>
-                    <span class="icon icon-approved"><sup><%= moment.review.approved_count %></sup></span>
+                <% if (feed_item.review.approved_count) { %>
+                    <span class="icon icon-approved"><sup><%= feed_item.review.approved_count %></sup></span>
                 <% } %>
-                <% if (moment.review.rejected_count) { %>
-                    <span class="icon icon-rejected"><sup><%= moment.review.rejected_count %></sup></span>
+                <% if (feed_item.review.rejected_count) { %>
+                    <span class="icon icon-rejected"><sup><%= feed_item.review.rejected_count %></sup></span>
                 <% } %>
             </span>
         <% } %>
-    <% } else if (moment.event_type.code == 'demo-approved') { %>
+    <% } else if (feed_item.event_type.code == 'demo-approved') { %>
         <a class="icon icon-Approved"></a> This demo was <strong>fully approved</strong>!
-    <% } else if (moment.event_type.code == 'demo-closed') { %>
+    <% } else if (feed_item.event_type.code == 'demo-closed') { %>
         This demo was <strong>closed</strong>, and there was much rejoicing
-    <% } else if (moment.event_type.code == 'demo-opened') { %>
+    <% } else if (feed_item.event_type.code == 'demo-opened') { %>
         This demo was <strong>re-opened</strong>. It begins again
-    <% } else if (moment.event_type.code == 'demo-reviewing') { %>
+    <% } else if (feed_item.event_type.code == 'demo-reviewing') { %>
         This demo is <strong>back under review</strong>
-    <% } else if (moment.event_type.code == 'reviewer-rejected') { %>
-        <a class="icon icon-Rejected"></a> <%= moment.user.name %> rejects
-    <% } else if (moment.event_type.code == 'demo-rejected') { %>
-        <a class="icon icon-Rejected"></a> <%= moment.event_type.name %>
-    <% } else if (moment.event_type.code == 'reviewer-reset') { %>
-        <%= moment.user.name %> resets an approval status
-    <% } else if (moment.event_type.code == 'reviewer-removed') { %>
-        <%= moment.related_object.name %> was <strong>removed as a reviewer</strong> by <%= moment.user.name %>
-    <% } else if (moment.event_type.code == 'follower-removed') { %>
-        <%= moment.related_object.name %> was <strong>removed as a follower</strong> by <%= moment.user.name %>
-    <% } else if (moment.event_type.code == 'demo-updated') { %>
-        A new revision was added. <a href="<%= moment.related_object.url %>">View it here</a>
-    <% } else if (moment.event_type.code == 'comment-added') { %>
+    <% } else if (feed_item.event_type.code == 'reviewer-rejected') { %>
+        <a class="icon icon-Rejected"></a> <%= feed_item.user.name %> rejects
+    <% } else if (feed_item.event_type.code == 'demo-rejected') { %>
+        <a class="icon icon-Rejected"></a> <%= feed_item.event_type.name %>
+    <% } else if (feed_item.event_type.code == 'reviewer-reset') { %>
+        <%= feed_item.user.name %> resets an approval status
+    <% } else if (feed_item.event_type.code == 'reviewer-removed') { %>
+        <%= feed_item.related_object.name %> was <strong>removed as a reviewer</strong> by <%= feed_item.user.name %>
+    <% } else if (feed_item.event_type.code == 'follower-removed') { %>
+        <%= feed_item.related_object.name %> was <strong>removed as a follower</strong> by <%= feed_item.user.name %>
+    <% } else if (feed_item.event_type.code == 'demo-updated') { %>
+        A new revision was added. <a href="<%= feed_item.related_object.url %>">View it here</a>
+    <% } else if (feed_item.event_type.code == 'comment-added') { %>
         <blockquote>
-            <% if (moment.related_object.comment) { %>
-                <%= moment.related_object.comment %>
+            <% if (feed_item.related_object.comment) { %>
+                <%= feed_item.related_object.comment %>
             <% } %>
-            <% if (moment.related_object.attachments.length) { %>
-                <% for (var x = 0; x < moment.related_object.attachments.length; x++) { %>
+            <% if (feed_item.related_object.attachments.length) { %>
+                <% for (var x = 0; x < feed_item.related_object.attachments.length; x++) { %>
                     <div class="demobox attachment-card" style="margin-top: 10px">
                         <div class="demobox-header">
-                            <div class="heading icon icon-<%= moment.related_object.attachments[x].attachment_type %>">
-                                <%= moment.related_object.attachments[x].attachment_type %>
-                                <% if (moment.related_object.attachments[x].description) { %>
-                                    <strong>- <%= moment.related_object.attachments[x].description %></strong>
+                            <div class="heading icon icon-<%= feed_item.related_object.attachments[x].attachment_type %>">
+                                <%= feed_item.related_object.attachments[x].attachment_type %>
+                                <% if (feed_item.related_object.attachments[x].description) { %>
+                                    <strong>- <%= feed_item.related_object.attachments[x].description %></strong>
                                 <% } %>
                             </div>
                         </div>
                         <div class="demobox-body">
-                            <% if (moment.related_object.attachments[x].attachment_type == 'image') { %>
-                                <a href="<%= moment.related_object.attachments[x].static_url %>" class="lightbox_img">
-                                    <img src="<%= moment.related_object.attachments[x].static_url %>">
+                            <% if (feed_item.related_object.attachments[x].attachment_type == 'image') { %>
+                                <a href="<%= feed_item.related_object.attachments[x].static_url %>" class="lightbox_img">
+                                    <img src="<%= feed_item.related_object.attachments[x].static_url %>">
                                 </a>
-                            <% } else if (moment.related_object.attachments[x].attachment_type == 'movie') { %>
-                                <video src="<%= moment.related_object.attachments[x].static_url %>" controls="true"></video>
-                                <br><small><a href="<%= moment.related_object.attachments[x].static_url %>">download this</a></small>
-                            <% } else if (moment.related_object.attachments[x].attachment_type == 'audio') { %>
-                                <audio src="<%= moment.related_object.attachments[x].static_url %>" controls="true"></audio>
+                            <% } else if (feed_item.related_object.attachments[x].attachment_type == 'movie') { %>
+                                <video src="<%= feed_item.related_object.attachments[x].static_url %>" controls="true"></video>
+                                <br><small><a href="<%= feed_item.related_object.attachments[x].static_url %>">download this</a></small>
+                            <% } else if (feed_item.related_object.attachments[x].attachment_type == 'audio') { %>
+                                <audio src="<%= feed_item.related_object.attachments[x].static_url %>" controls="true"></audio>
                             <% } else { %>
-                                <a href="<%= moment.related_object.attachments[x].static_url %>" class="icon icon-attach">Download attachment</a>
+                                <a href="<%= feed_item.related_object.attachments[x].static_url %>" class="icon icon-attach">Download attachment</a>
                             <% } %>
                         </div>
                     </div>
                 <% } %>
             <% } %>
         </blockquote>
-        <div class="demobox-footer"><a href="<%= moment.related_object.url %>" data-comment-id="<%= moment.related_object.id %>" class="comment_link">go to this comment</a></div>
     <% } else { %>
-        <strong><%= moment.event_type.name %></strong>
+        <strong><%= feed_item.event_type.name %></strong>
     <% } %>
+    <div class="demobox-footer">
+        <div class="split by:2">
+            <div class="cel">
+                <small><%= moment(feed_item.modified).fromNow() %></small>
+            </div>
+            <% if (feed_item.event_type.code == 'comment-added') { %>
+                <div class="cel" style="text-align: right">
+                    <a href="<%= feed_item.related_object.url %>" data-comment-id="<%= feed_item.related_object.id %>" class="comment_link">go to this comment</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
 </div>

@@ -90,8 +90,9 @@ class Review(BaseModel):
         reviewers = []
         followers = []
         creators = []
-        reviewing_count = approved_count = rejected_count = 0
-        for reviewer in self.reviewer_set.active():
+        approved_count = rejected_count = reviewing_count = 0
+        for reviewer in self.reviewer_set.active().select_related(
+                'reviewer', 'reviewer__userprofile'):
             reviewers.append(reviewer.to_json())
             if reviewer.status == APPROVED:
                 approved_count += 1
@@ -100,10 +101,12 @@ class Review(BaseModel):
             else:
                 reviewing_count += 1
 
-        for follower in self.follower_set.active():
+        for follower in self.follower_set.active().select_related(
+                'user', 'user__userprofile'):
             followers.append(follower.to_json())
 
-        for creator in self.creator_set.active():
+        for creator in self.creator_set.active().select_related(
+                'user', 'user__userprofile'):
             creators.append(creator.to_json())
 
         active_issues_count = Issue.objects.filter(
@@ -260,7 +263,7 @@ class Review(BaseModel):
 
         for reviewer in reviewers:
             Reviewer.create_reviewer(
-                obj, reviewer, owner, True, draft=state == DRAFT
+                obj, reviewer, owner, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, reviewer,
@@ -268,7 +271,7 @@ class Review(BaseModel):
 
         for follower in followers:
             Follower.create_follower(
-                obj, follower, owner, True, draft=state == DRAFT
+                obj, follower, owner, True, draft=True
             )
             UserReviewStatus.create_user_review_status(
                 obj, follower,
@@ -379,13 +382,13 @@ class Review(BaseModel):
                 reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
                 reviewer = Reviewer.create_reviewer(
-                    obj, reviewer, owner, True, draft=state == DRAFT
+                    obj, reviewer, owner, True, draft=is_or_was_draft
                 )
             else:
                 reviewer.status = REVIEWING
                 reviewer.is_active = True
                 reviewer.save()
-                if state_change and state not in (DRAFT, CANCELLED):
+                if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
                     reviewer.create_reviewer_event(owner)
 
         for follower in followers:
@@ -395,12 +398,12 @@ class Review(BaseModel):
                 Follower.create_follower(
                     review=obj, user=follower,
                     creator=owner, skip_notifications=True,
-                    draft=state == DRAFT
+                    draft=is_or_was_draft
                 )
             else:
                 follower.is_active = True
                 follower.save()
-                if state_change and state not in (DRAFT, CANCELLED):
+                if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
                     follower.create_follower_event(owner)
 
         # Update UserReviewStatuses
@@ -408,16 +411,13 @@ class Review(BaseModel):
             user=owner
         ).update(read=False)
 
-        # Drop Reviewers/Followers/Creators no longer assigned
-        reviewers = obj.reviewer_set.exclude(review=obj, reviewer__in=reviewers)
-        skip_drop_events = DRAFT in (
-            state, getattr(obj.state_machine.previous_state, 'name', '')
-        )
+        # Drop Reviewers no longer assigned
+        reviewers = obj.reviewer_set.active().exclude(review=obj, reviewer__in=reviewers)
         for reviewer in reviewers:
-            reviewer.drop_reviewer(owner, draft=skip_drop_events)
-        followers = obj.follower_set.exclude(review=obj, user__in=followers)
+            reviewer.drop_reviewer(owner, draft=is_or_was_draft)
+        followers = obj.follower_set.active().exclude(review=obj, user__in=followers)
         for follower in followers:
-            follower.drop_follower(owner, draft=skip_drop_events)
+            follower.drop_follower(owner, draft=is_or_was_draft)
 
         obj.state_machine.change_state(state)
         # Reviewer situation may have changed, update it

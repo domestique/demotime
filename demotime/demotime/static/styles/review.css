@@ -91,11 +91,18 @@ h1 .alert {
     cursor: pointer;
 }
 
+.review-meta ul.owners {
+    margin-bottom: 20px;
+}
+.owners li:hover .person_deleter,
 .reviewers li:hover .person_deleter {
-    margin-left: 2px;
     display: inline-block !important;
     cursor: pointer;
+    position: absolute;
+    margin-left: 2px;
+    margin-top: 2px;
 }
+.owners a,
 .reviewers a {
     line-height: 20px;
     display: inline-block;

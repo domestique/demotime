@@ -519,6 +519,9 @@ h3 small {
 .events strong a {
     font-weight: 700;
 }
+.events .demobox-body a {
+    text-decoration: underline;
+}
 .events blockquote {
     padding: 8px;
     border: 1px dashed #e0e0e0;
