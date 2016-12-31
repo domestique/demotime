@@ -150,17 +150,17 @@
 {{ block.super }}
 <script type="text/x-pattern" id="events_pattern">
 <div class="events">
-<% _.each(moments, function(moment) { %>
+<% _.each(moments, function(feed_item) { %>
     <div class="demobox">
         <div class="demobox-header">
             <a class="has_bubble"
-                data-prj="<%= moment.review.project.id %>"
-                data-pk="<%= moment.review.pk %>"
-                href="<%= moment.review.url %>">DT-<%= moment.review.pk %></a>:
-                <a title="<%= new Date(moment.created) %>" href="<%= moment.review.url %>"><%= moment.review.title %></a>
-            <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+                data-prj="<%= feed_item.review.project.id %>"
+                data-pk="<%= feed_item.review.pk %>"
+                href="<%= feed_item.review.url %>">DT-<%= feed_item.review.pk %></a>:
+                <a title="<%= new Date(feed_item.created) %>" href="<%= feed_item.review.url %>"><%= feed_item.review.title %></a>
+            <% if (feed_item.event_type.code != 'reviewer-removed' && feed_item.event_type.code != 'follower-removed') { %>
                 was updated by
-                <a href="<%= moment.user.url %>"><%= moment.user.name %></a>
+                <a href="<%= feed_item.user.url %>"><%= feed_item.user.name %></a>
             <% } %>
         </div>
         <div class="demobox-body">
