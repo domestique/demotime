@@ -435,13 +435,13 @@
 </script>
 <script type="text/x-pattern" id="events_pattern">
 <a href="#" id="refresh_events"><img src="/static/images/refresh.png" border="0" width="20" height="20"></a>
-<% _.each(moments, function(moment) { %>
+<% _.each(moments, function(feed_item) { %>
     <div class="demobox">
         <div class="demobox-header">
-            <strong><%= new Date(moment.created) %></strong>
-            <% if (moment.event_type.code != 'reviewer-removed' && moment.event_type.code != 'follower-removed') { %>
+            <strong><%= new Date(feed_item.created) %></strong>
+            <% if (feed_item.event_type.code != 'reviewer-removed' && feed_item.event_type.code != 'follower-removed') { %>
                 update by
-                <a href="<%= moment.user.url %>"><%= moment.user.name %></a>
+                <a href="<%= feed_item.user.url %>"><%= feed_item.user.name %></a>
             <% } %>
         </div>
         <div class="demobox-body">
