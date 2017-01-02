@@ -10,7 +10,9 @@ DemoTime.Comments = Backbone.View.extend({
         'click .comment_edit': 'comment_edit',
         'click .attachment-add': 'attachment_add',
         'click .attachment-remove': 'attachment_remove',
-        'click .attachment-delete': 'attachment_delete'
+        'click .attachment-delete': 'attachment_delete',
+        'click .issue-new': 'change_issue',
+        'click .issue-unresolved': 'change_issue'
     },
 
     initialize: function(options) {
@@ -188,8 +190,9 @@ DemoTime.Comments = Backbone.View.extend({
             } else {
                 var html = '<div class="comment_parent nested-reply">';
             }
+
             html += '<div class="demobox" id="' + data.comment.id + '">'
-            html += '<div class="demobox-header">Your comment (<a href="#" class="comment_edit" data-top-level="' + this.options.top_level_comment + '" data-comment="' + data.comment.id + '">edit this reply</a>)</div>'
+            html += '<div class="demobox-header">Your comment:</div>'
             html += '<div class="demobox-body"><div class="demobox-body-contents">' + this.options.comment + '</div></div>'
 
             if (data.comment.attachment_count && data.comment.attachments.length) {
@@ -216,6 +219,8 @@ DemoTime.Comments = Backbone.View.extend({
                     }
                 html += '</div>';
             }
+
+            html += '<div class="demobox-footer"><a href="#" class="comment_edit" data-top-level="' + this.options.top_level_comment + '" data-comment="' + data.comment.id + '">edit</a></div>'
 
             html += '</div>';
 
@@ -386,6 +391,46 @@ DemoTime.Comments = Backbone.View.extend({
                     $('.current_attachments .attachments').html('No attachments found');
                 }
             });
+        });
+    },
+
+    change_issue: function(event) {
+        var link = $(event.target),
+            self = this;
+
+        if (link.data('resolve')) {
+            var data = {
+                comment_pk: link.data('pk'),
+                issue: {
+                    resolve: true
+                }
+            }
+        } else {
+            var data = {
+                comment_pk: link.data('pk'),
+                issue: {
+                    create: true
+                }
+            }
+        }
+        var req = $.ajax({
+            url: self.options.comments_url,
+            method: 'PATCH',
+            dataType: 'json',
+            data: JSON.stringify(data)
+        });
+
+        req.success(function(data) {
+            console.log(data);
+            if (link.data('resolve')) {
+                link.data('resolve', false);
+                link.toggleClass('issue-unresolved issue-new');
+                link.html('mark as issue');
+            } else {
+                link.data('resolve', true);
+                link.toggleClass('issue-new issue-unresolved');
+                link.html('unresolved');
+            }
         });
     }
 });

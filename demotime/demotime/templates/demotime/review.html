@@ -326,10 +326,9 @@
 
                     {% macro comment button_text %}
                         <form>
-                            <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}">Reply to this {{ comment_form.comment.label }}</label>
+                            <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}" style="margin: 30px 0 10px">Reply to this {{ comment_form.comment.label }}</label>
                             {{ comment_form.comment.errors }}
                             {{ comment_form.comment }}
-                            <label>Mark as Issue: </label>{{ comment_form.is_issue }}
                             <div class="toggle_sibling">
                                 <label class="icon icon-attach"><a href="#">Add optional attachments</a></label>
                             </div>
@@ -357,6 +356,9 @@
                                 </section>
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
+                            <section class="issue-marker">
+                                <label>{{ comment_form.is_issue }} Mark as an issue</label>
+                            </section>
                             <div class="form-group">
                                 <button type="button" class="new_comment_button">{% if button_text %}{{ button_text }}{% else %}Post{% endif %}</button>
                                 {% if reviewer and request.user != creator_obj.user and review.state == 'open' and reviewer.status != 'approved' %}
@@ -374,15 +376,11 @@
                                 {% endif %}
                                     <div class="demobox" id="{{ comment.pk }}">
                                         <div class="demobox-header">
-                                            Reply by
-                                            <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
-                                                {{ comment.commenter.userprofile }}
-                                            </a> @
-                                            <a href="{{ review.get_absolute_url }}#{{ comment.pk }}">
-                                                {{ comment.created }}
-                                            </a>
+                                            From <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
+                                                    {{ comment.commenter.userprofile }}
+                                                </a>
                                             {% if comment.commenter == request.user %}
-                                                (<a href="#" class="comment_edit" data-comment="{{ comment.id }}" {% if forloop.first %}data-top-level="true"{% endif %}>edit this reply</a>)
+                                                <a href="#" class="comment_edit" data-comment="{{ comment.id }}" {% if forloop.first %}data-top-level="true"{% endif %}>edit</a>
                                             {% endif %}
                                         </div>
                                         {% if comment.comment or comment.attachments.all %}
@@ -395,14 +393,33 @@
                                                 </div>
                                             </div>
                                         {% endif %}
+                                        <div class="demobox-footer {% if thread.issue %}has-issues{% endif %}">
+                                            1 - {{ comment.issue }} - 2
+                                            <div class="split by:2 align:m">
+                                                <div class="cel">
+                                                    <a href="{{ review.get_absolute_url }}#{{ comment.pk }}" style="font-weight: normal">
+                                                        {{ comment.created }}
+                                                    </a>
+                                                </div>
+                                                <div class="cel" style="text-align: right">
+                                                    <span class="demo-issues">
+                                                        {% if comment.issue %}
+                                                            <span class="issue-unresolved" data-pk="{{ comment.pk }}" data-resolve='true'>unresolved</span>
+                                                        {% else %}
+                                                            <span class="issue-new" data-pk="{{ comment.pk }}">mark as issue</span>
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 {% if not forloop.first %}
                                 </div>
                                 {% endif %}
                             {% endfor %}
                             {% if request.user.is_authenticated %}
-                                <div style="margin-top: 10px">
-                                    <a href="#" class="icon icon-comment expand_reply_link">Reply</a>
+                                <div style="margin-top: 20px">
+                                    <a href="#" class="icon icon-comment expand_reply_link" style="margin-top: 10px">Reply</a>
                                     <div class="comment_form_container" {% if not comment_form.comment.errors %}style="display:none"{% endif %}>
                                         {% use_macro comment 'Reply' %}
                                     </div>
