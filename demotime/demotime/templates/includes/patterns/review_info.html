@@ -24,6 +24,12 @@
                 <%= review.reviewer_state %>
             <% } %>
         </p>
+        <% if (review.active_issues_count) { %>
+            <div class="issue-unresolved"><%= review.active_issues_count %> unresolved issue(s)</div>
+        <% } %>
+        <% if (review.resolved_issues_count) { %>
+            <div class="issue-resolved"><%= review.resolved_issues_count %> resolved issue(s)</div>
+        <% } %>
         <p>
             <strong>Demo State:</strong>
             <%= review.state %>
