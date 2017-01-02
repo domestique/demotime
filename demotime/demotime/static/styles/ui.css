@@ -147,6 +147,7 @@ section .demobox p:first-child {
     line-height: 25px;
     vertical-align: middle;
     cursor: pointer;
+    border-radius: 2px;
 }
 .demo-issues .issue-new {
     background: #fff;

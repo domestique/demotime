@@ -357,7 +357,7 @@
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <section class="issue-marker">
-                                <label>{{ comment_form.is_issue }} Mark as an issue</label>
+                                <label>{{ comment_form.is_issue }} Mark as issue</label>
                             </section>
                             <div class="form-group">
                                 <button type="button" class="new_comment_button">{% if button_text %}{{ button_text }}{% else %}Post{% endif %}</button>
@@ -393,8 +393,7 @@
                                                 </div>
                                             </div>
                                         {% endif %}
-                                        <div class="demobox-footer {% if thread.issue %}has-issues{% endif %}">
-                                            1 - {{ comment.issue }} - 2
+                                        <div class="demobox-footer">
                                             <div class="split by:2 align:m">
                                                 <div class="cel">
                                                     <a href="{{ review.get_absolute_url }}#{{ comment.pk }}" style="font-weight: normal">
