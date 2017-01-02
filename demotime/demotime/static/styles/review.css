@@ -320,3 +320,42 @@ a[data-type='rejected'] {
 .ajaxy_attachment:first-child .attachment-remove {
     display: none;
 }
+
+/* Issues */
+.issue-marker {
+    background: #fff;
+}
+.issue-new,
+.issue-resolved,
+.issue-unresolved {
+    padding: 3px 10px;
+    margin: 5px 0;
+    display: inline-block;
+    line-height: 25px;
+    vertical-align: middle;
+    cursor: pointer;
+    border-radius: 2px;
+}
+.issue-new {
+    background: #fff;
+    border: 1px solid #ccc;
+}
+.issue-resolved {
+    background: #2a9c86;
+    color: #fff;
+}
+.issue-unresolved {
+    background: #ff9381;
+    color: #fff;
+}
+.demobox .demo-issues .issue-unresolved:before {
+    content: 'x';
+    font-weight: 700;
+    margin-right: 5px;
+}
+.review-meta .issue-unresolved,
+.review-meta .issue-resolved {
+    display: block;
+    width: 100%;
+    font-size: 12px;
+}

@@ -271,6 +271,7 @@
                 </div>
             {% endif %}
             <div class="cel">
+                <div id="issues_placeholder" style="margin-bottom: 10px"></div>
                 <h4 class="heading">
                     Demo Revisions:
                     <span class="help" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be. Mouse over a revision to see when it was added."></span>
@@ -497,6 +498,7 @@ var mentions = new DemoTime.Mention({
 <script src="/static/scripts/ReviewActivity.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Reviewers.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/Comments.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/DemoInfo.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/review_utils.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/library/autolinker.min.js"></script>
 <script>
@@ -536,6 +538,11 @@ var review = new DemoTime.Review({
 var review_activity = new DemoTime.ReviewActivity({
     project_slug: '{{ revision.review.project.slug }}'
     , review_pk: '{{ revision.review.pk }}'
+});
+
+var demo_info = new DemoTime.DemoInfo({
+    review_url: '{% url "reviews-search-json" %}'
+    , review_pk: '{{ object.pk }}'
 });
 
 {% if request.user.is_authenticated %}

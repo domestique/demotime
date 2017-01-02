@@ -140,7 +140,9 @@ section .demobox p:first-child {
 .issue-marker {
     background: #fff;
 }
-.demo-issues span {
+.issue-new,
+.issue-resolved,
+.issue-unresolved {
     padding: 3px 10px;
     margin: 5px 0;
     display: inline-block;
@@ -149,15 +151,19 @@ section .demobox p:first-child {
     cursor: pointer;
     border-radius: 2px;
 }
-.demo-issues .issue-new {
+.issue-new {
     background: #fff;
     border: 1px solid #ccc;
 }
-.demo-issues .issue-unresolved {
+.issue-resolved {
+    background: #2a9c86;
+    color: #fff;
+}
+.issue-unresolved {
     background: #ff9381;
     color: #fff;
 }
-.demo-issues .issue-unresolved:before {
+.demobox .demo-issues .issue-unresolved:before {
     content: 'x';
     font-weight: 700;
     margin-right: 5px;

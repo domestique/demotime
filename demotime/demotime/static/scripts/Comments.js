@@ -424,7 +424,6 @@ DemoTime.Comments = Backbone.View.extend({
         });
 
         req.success(function(data) {
-            console.log(data);
             if (link.data('resolve')) {
                 link.data('resolve', false);
                 link.toggleClass('issue-unresolved issue-new');
@@ -434,6 +433,7 @@ DemoTime.Comments = Backbone.View.extend({
                 link.toggleClass('issue-new issue-unresolved');
                 link.html('unresolved');
             }
+            demo_info.render();
         });
     }
 });
