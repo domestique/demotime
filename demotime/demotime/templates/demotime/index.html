@@ -151,22 +151,7 @@
 <script type="text/x-pattern" id="events_pattern">
 <div class="events">
 <% _.each(moments, function(feed_item) { %>
-    <div class="demobox">
-        <div class="demobox-header">
-            <a class="has_bubble"
-                data-prj="<%= feed_item.review.project.id %>"
-                data-pk="<%= feed_item.review.pk %>"
-                href="<%= feed_item.review.url %>">DT-<%= feed_item.review.pk %></a>:
-                <a title="<%= new Date(feed_item.created) %>" href="<%= feed_item.review.url %>"><%= feed_item.review.title %></a>
-            <% if (feed_item.event_type.code != 'reviewer-removed' && feed_item.event_type.code != 'follower-removed') { %>
-                was updated by
-                <a href="<%= feed_item.user.url %>"><%= feed_item.user.name %></a>
-            <% } %>
-        </div>
-        <div class="demobox-body">
-            {% include "includes/event_item.html" %}
-        </div>
-    </div>
+    {% include "includes/event_item.html" %}
 <% }); %>
 </div>
 </script>
