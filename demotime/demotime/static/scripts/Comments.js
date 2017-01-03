@@ -300,7 +300,9 @@ DemoTime.Comments = Backbone.View.extend({
 
     end_loading_state: function() {
         this.options.comment_form_container.find('input, button').prop('disabled', false);
-        demo_info.render();
+        if (typeof demo_info !== 'undefined') {
+            demo_info.render();
+        }
     },
 
     // Leave a comment and approve at the same time
@@ -434,7 +436,9 @@ DemoTime.Comments = Backbone.View.extend({
                 link.toggleClass('issue-new issue-unresolved');
                 link.html('unresolved');
             }
-            demo_info.render();
+            if (typeof demo_info !== 'undefined') {
+                demo_info.render();
+            }
         });
     }
 });
