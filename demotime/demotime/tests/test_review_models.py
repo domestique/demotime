@@ -551,6 +551,33 @@ class TestReviewModels(BaseTestCase):
             1
         )
 
+    def test_update_review_publish_with_changed_coowners(self):
+        self.default_review_kwargs['creators'] = [self.user, self.co_owner]
+        self.default_review_kwargs['followers'] = []
+        self.default_review_kwargs['state'] = constants.DRAFT
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(obj.state, constants.DRAFT)
+        self.assertEqual(obj.creator_set.active().count(), 2)
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.revision.attachments.count(), 2)
+        self.assertEqual(obj.revision.number, 1)
+        self.default_review_kwargs.update({
+            'review': obj.pk,
+            'title': 'New Title',
+            'description': 'New Description',
+            'case_link': 'http://badexample.org',
+            'creators': [self.user, self.followers[0]],
+            'state': constants.OPEN
+        })
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(obj.state, constants.OPEN)
+        self.assertEqual(
+            models.Event.objects.filter(
+                event_type__code=models.EventType.OWNER_ADDED
+            ).count(),
+            0
+        )
+
     def test_update_review_change_coowner(self):
         self.default_review_kwargs['creators'] = [self.user, self.co_owner]
         self.default_review_kwargs['followers'] = []

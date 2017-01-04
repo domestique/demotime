@@ -326,7 +326,7 @@ class Review(BaseModel):
             )
             # Let's flip to Paused if this demo isn't a draft and we have a
             # new creator
-            if created and state != DRAFT:
+            if created and not is_or_was_draft:
                 state = PAUSED
 
         if is_or_was_draft:

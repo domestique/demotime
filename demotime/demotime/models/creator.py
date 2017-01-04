@@ -117,11 +117,12 @@ class Creator(BaseModel):
         self.active = False
         self.save(update_fields=['active', 'modified'])
         self._send_creator_message(removed=True)
-        self._create_creator_event(dropping_user, removed=True)
         UserReviewStatus.objects.filter(
             user=self.user,
             review=self.review
         ).delete()
+        if self.review.state != constants.DRAFT:
+            self._create_creator_event(dropping_user, removed=True)
 
     def save(self, *args, **kwargs):
         self.clean()
