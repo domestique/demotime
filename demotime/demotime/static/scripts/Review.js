@@ -31,7 +31,7 @@ DemoTime.Review = Backbone.View.extend({
                 self.change_reviewer_state(type, 'reload');
             }
             if (self.options.is_creator) {
-                self.change_demo_state(type);
+                self.change_demo_state(type, link);
             }
         }
     },
@@ -64,14 +64,15 @@ DemoTime.Review = Backbone.View.extend({
     },
 
     // Changing demo state
-    change_demo_state: function(type) {
-        var self = this;
-
-        // Check to warn if there are active reviewers
-        if ((type == 'closed' || type == 'aborted') && self.options.reviewer_state == 'reviewing') {
-            self.check_for_active_reviewers(type);
+    change_demo_state: function(type, link) {
+        if (type == 'cancelled' && link.data('draft')) {
+            // Warn users when deleting a draft
+            this.warn_before_closing_draft(type);
+        } else if ((type == 'closed' || type == 'aborted') && this.options.reviewer_state == 'reviewing') {
+            // Check to warn if there are active reviewers
+            this.check_for_active_reviewers(type);
         } else {
-            self.finish_demo_state_change(type);
+            this.finish_demo_state_change(type);
         }
     },
 
@@ -114,6 +115,26 @@ DemoTime.Review = Backbone.View.extend({
                 $('html, body').animate({
                     scrollTop: self.$el.find('.container.content')
                 }, 500);
+            }
+        });
+    },
+
+    warn_before_closing_draft: function(type) {
+        var self = this;
+
+        swal({
+            title: "Are you sure?",
+            text: "Be mindful that if this demo has co-owners, this will remove their draft as well.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Confirm",
+            closeOnConfirm: false
+        },
+        function (isConfirm) {
+            if (isConfirm) {
+                self.finish_demo_state_change(type);
+                swal.close();
             }
         });
     },
