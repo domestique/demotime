@@ -395,39 +395,34 @@ h3 small {
 }
 
 /* Custom icons */
-.icon-Reviewing:before,
 .icon-reviewing:before,
-.icon-Approved:before,
 .icon-approved:before,
-.icon-Rejected:before,
-.icon-rejected:before {
+.icon-rejected:before,
+.icon-issue:before {
     display: none;
 }
 
-.icon-Approved,
 .icon-approved {
     background: url(/static/images/emoji/smiley.png) 0 50% no-repeat;
 }
 
-.review_info .icon-Reviewing,
-.icon-reviewing,
-.icon-Reviewing,
 .icon-reviewing {
     background: url(/static/images/emoji/clock_dark.png) 0 50% no-repeat !important;
     background-size: 15px !important;
 }
 
-.icon-Rejected,
 .icon-rejected {
     background: url(/static/images/emoji/frowning2.png) 0 50% no-repeat;
 }
 
-.icon-Reviewing,
+.icon-issue {
+    background: url(/static/images/emoji/broken_heart.png) 0 50% no-repeat;
+}
+
 .icon-reviewing,
-.icon-Approved,
 .icon-approved,
-.icon-Rejected,
-.icon-rejected {
+.icon-rejected,
+.icon-issue {
     padding-left: 20px;
     background-size: 15px;
 }

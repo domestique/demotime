@@ -115,7 +115,7 @@
                             </td>
                             <td class="desktop">
                                 {% if obj.reviewer_state == "approved" %}
-                                    <span class="icon-{{ obj.reviewer_state }}">{{ obj.reviewer_state|capfirst }}</span>
+                                    <span class="icon-{{ obj.reviewer_state|lower }}">{{ obj.reviewer_state|capfirst }}</span>
                                 {% else %}
                                     {{ obj.reviewer_state|capfirst }}
                                 {% endif %}

@@ -47,7 +47,7 @@
                 <tr>
                     <th>Demo</th>
                     <th>Title</th>
-                    <th>Owner</th>
+                    <th>Owner(s)</th>
                     <th>Reviewer State</th>
                     <th>Reviewers</th>
                 </tr>
@@ -65,18 +65,18 @@
                         </td>
                         <td>{{ demo.title }}</td>
                         <td>
-                            {% for creator in object.creator_set.active %}
+                            {% for creator in demo.creator_set.active %}
                                 {% if not forloop.first %}, {% endif %}<a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a>
                             {% endfor %}
                         </td>
                         <td width="100">
-                            <span class="icon icon-{{ demo.reviewer_state }}">{{ demo.reviewer_state }}</span>
+                            <span class="icon icon-{{ demo.reviewer_state|lower }}">{{ demo.reviewer_state }}</span>
                         </td>
                         <td width="240">
                             <ul>
                                 {% for reviewer in demo.reviewer_set.active %}
                                     <li>
-                                        <a class="icon icon-{{ reviewer.get_status_display }}"
+                                        <a class="icon icon-{{ reviewer.get_status_display|lower }}"
                                         href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
                                             {{ reviewer.reviewer.userprofile }}</a>
                                         <small>

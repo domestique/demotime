@@ -1,6 +1,6 @@
 <div class="demobox attachment-card {{ attachment.attachment_type }}">
     <div class="demobox-header">
-        <div class="heading icon icon-{{ attachment.attachment_type }}">
+        <div class="heading icon icon-{{ attachment.attachment_type|lower }}">
             {{ attachment.attachment_type|capfirst }}
             {% if attachment.description %}
                 - <strong class="attachment-description">{{ attachment.description }}</strong>

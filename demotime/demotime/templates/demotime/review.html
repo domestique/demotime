@@ -192,7 +192,7 @@
                         <span class="help" title="The reviewer state is the over-arching state of the demo based on those assigned. For example, if 5 people assigned have 'approved' a demo and 1 person is still reviewing, the status would be 'Reviewing'"></span>
                     </h4>
                     {% if object.reviewer_state == "Approved" %}
-                        <span class="icon-{{ object.reviewer_state }}">{{ object.reviewer_state|capfirst }}</span>
+                        <span class="icon-{{ object.reviewer_state|lower }}">{{ object.reviewer_state|capfirst }}</span>
                     {% else %}
                         {{ object.reviewer_state|capfirst }}
                     {% endif %}
@@ -223,7 +223,7 @@
                     <ul class="reviewer_ul">
                         {% for reviewer in object.reviewer_set.active %}
                             <li>
-                                <a class="icon icon-{{ reviewer.get_status_display }}"
+                                <a class="icon icon-{{ reviewer.get_status_display|lower }}"
                                    href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
                                     {{ reviewer.reviewer.userprofile }}</a>
                                 <small>
