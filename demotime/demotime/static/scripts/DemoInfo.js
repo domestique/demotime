@@ -39,8 +39,9 @@ DemoTime.DemoInfo = Backbone.View.extend({
         }
         if (this.model.get('active_issues_count') || this.model.get('resolved_issues_count')) {
             issues_placeholder.html(html);
+            issues_placeholder.show();
         } else {
-            issues_placeholder.remove();
+            issues_placeholder.hide();
         }
     },
 

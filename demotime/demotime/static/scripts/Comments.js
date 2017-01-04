@@ -135,6 +135,7 @@ DemoTime.Comments = Backbone.View.extend({
                 comment_parent.find('.wysiwyg-editor').html('');
                 comment_parent.find('input[type="file"]').val('');
                 comment_parent.find('input[name="0-description"]').val('');
+                comment_parent.find('#id_is_issue').prop('checked', false);
 
                 // Remove all but the first attachment container
                 comment_parent.find('.ajaxy_attachment').each(function() {
@@ -166,6 +167,9 @@ DemoTime.Comments = Backbone.View.extend({
                     }
                     if (self.options.attachment_adder) {
                         self.options.attachment_adder.show();
+                    }
+                    if (self.options.issues_adder) {
+                        self.options.issues_adder.show();
                     }
                 }
 
@@ -223,7 +227,19 @@ DemoTime.Comments = Backbone.View.extend({
                 html += '</div>';
             }
 
-            html += '<div class="demobox-footer"><a href="#" class="comment_edit" data-top-level="' + this.options.top_level_comment + '" data-comment="' + data.comment.id + '">edit</a></div>'
+            html += '<div class="demobox-footer">'
+                html += '<div class="split by:2 align:m">'
+                    html += '<div class="cel">'
+                        html += '<a href="#" class="comment_edit" data-top-level="' + this.options.top_level_comment + '" data-comment="' + data.comment.id + '">edit</a>'
+                    html += '</div>'
+                    html += '<div class="cel" style="text-align: right">'
+                        if (data.comment.issue.id) {
+                            html += '<span class="issue-unresolved" data-pk="' + data.comment.id + '" data-resolve="true">unresolved</span>';
+                        } else {
+                            html += '<span class="issue-new" data-pk="' + data.comment.id + '">mark as issue</span>';
+                        }
+                    html += '</div>'
+                html += '</div>'
 
             html += '</div>';
 
@@ -259,6 +275,10 @@ DemoTime.Comments = Backbone.View.extend({
         this.options.attachments = comment_parent.find('.attachments').hide();
         this.options.attachment_adder = comment_parent.find('.toggle_sibling');
         this.options.attachment_adder.hide();
+
+        // Don't allow checkbox for toggling issue state on ajaxy edit (should be done with button in comment)
+        this.options.issues_adder = comment_parent.find('.issue-marker');
+        this.options.issues_adder.hide();
 
         // Grab comment ID
         this.options.comment_pk = link.data('comment');

@@ -594,7 +594,7 @@ h3 small {
     background: #ff9381;
     color: #fff;
 }
-.demobox .demo-issues .issue-unresolved:before {
+.comment_wrapper .issue-unresolved:before {
     content: 'x';
     font-weight: 700;
     margin-right: 5px;
