@@ -136,7 +136,7 @@ describe("Comments.js", function() {
 
     it("should generate proper success html", function() {
         $('.new_comment_button').click();
-        var html = this.comments.get_success_html({"comment": {"comment": "asdf", "thread": 426, "id": 801, "name": "Danny", "attachment_count": 1, "attachments": [{"static_url": "/file/496", "attachment_type": "image", "description": ""}]}, "errors": "", "status": "success"});
+        var html = this.comments.get_success_html({"comment": {"comment": "asdf", "thread": 426, "id": 801, "name": "Danny", "attachment_count": 1, "issue": [{"id": ''}], "attachments": [{"static_url": "/file/496", "attachment_type": "image", "description": ""}]}, "errors": "", "status": "success"});
         expect(html).toContain('nested-reply');
         expect(html).toContain('demobox');
         expect(html).toContain('attachment-card');
