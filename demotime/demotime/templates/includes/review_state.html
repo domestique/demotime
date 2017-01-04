@@ -20,16 +20,16 @@
         <span>
             {% if demo.reviewer_state == "reviewing" %}
                 {% if demo.reviewing_count %}
-                    <span class="icon icon-reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
+                    <span class="icon icon-reviewing" title="Reviewing"><sup>{{ demo.reviewing_count }}</sup></span>
                 {% endif %}
                 {% if demo.approved_count %}
-                    <span class="icon icon-approved"><sup>{{ demo.approved_count }}</sup></span>
+                    <span class="icon icon-approved" title="Approved"><sup>{{ demo.approved_count }}</sup></span>
                 {% endif %}
                 {% if demo.rejected_count %}
-                    <span class="icon icon-rejected"><sup>{{ demo.rejected_count }}</sup></span>
+                    <span class="icon icon-rejected" title="Rejected"><sup>{{ demo.rejected_count }}</sup></span>
                 {% endif %}
                 {% if demo.open_issue_count %}
-                    <span class="icon icon-issue"><sup>{{ demo.open_issue_count }}</sup></span>
+                    <span class="icon icon-issue" title="Open Issues"><sup>{{ demo.open_issue_count }}</sup></span>
                 {% endif %}
 
             {% else %}

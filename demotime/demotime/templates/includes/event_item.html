@@ -1,14 +1,34 @@
 <div class="demobox">
     <div class="demobox-header">
-        <a class="has_bubble"
-            data-prj="<%= feed_item.review.project.id %>"
-            data-pk="<%= feed_item.review.pk %>"
-            href="<%= feed_item.review.url %>">DT-<%= feed_item.review.pk %></a>:
-            <a title="<%= new Date(feed_item.created) %>" href="<%= feed_item.review.url %>"><%= feed_item.review.title %></a>
-        <% if (feed_item.event_type.code != 'reviewer-removed' && feed_item.event_type.code != 'follower-removed') { %>
-            was updated by
-            <a href="<%= feed_item.user.url %>"><%= feed_item.user.name %></a>
-        <% } %>
+        <div class="split by:3/1">
+            <div class="cel">
+                <a class="has_bubble"
+                    data-prj="<%= feed_item.review.project.id %>"
+                    data-pk="<%= feed_item.review.pk %>"
+                    href="<%= feed_item.review.url %>">DT-<%= feed_item.review.pk %></a>:
+                <a title="<%= new Date(feed_item.created) %>" href="<%= feed_item.review.url %>"><%= feed_item.review.title %></a>
+            </div>
+            <div class="cel" style="text-align: right">
+                <% if (feed_item.review.reviewer_state == "reviewing") { %>
+                    <% if (feed_item.review.reviewing_count) { %>
+                        <span class="icon icon-reviewing" title="Reviewing"><sup><%= feed_item.review.reviewing_count %></sup></span>
+                    <% } %>
+                    <% if (feed_item.review.approved_count) { %>
+                        <span class="icon icon-approved" title="Approved"><sup><%= feed_item.review.approved_count %></sup></span>
+                    <% } %>
+                    <% if (feed_item.review.rejected_count) { %>
+                        <span class="icon icon-rejected" title="Rejected"><sup><%= feed_item.review.rejected_count %></sup></span>
+                    <% } %>
+                    <% if (feed_item.review.active_issues_count) { %>
+                        <span class="icon icon-issue" title="Open Issues"><sup><%= feed_item.review.active_issues_count %></sup></span>
+                    <% } %>
+                <% } else { %>
+                    <small>
+                        <%= feed_item.review.reviewer_state %>
+                    </small>
+                <% } %>
+            </div>
+        </div>
     </div>
     <div class="demobox-body">
         <% if (feed_item.event_type.code == 'reviewer-added' || feed_item.event_type.code == 'follower-added') { %>
@@ -17,22 +37,6 @@
             This demo was <strong>created</strong>. Let the games begin
         <% } else if (feed_item.event_type.code == 'reviewer-approved') { %>
             <a class="icon icon-Approved"></a> <%= feed_item.user.name %> <strong>approves</strong>!
-            <% if (feed_item.review.reviewing_count) { %>
-                <span class="has_bubble"
-                    data-prj="<%= feed_item.review.project.id %>"
-                    data-pk="<%= feed_item.review.pk %>"
-                    href="<%= feed_item.review.url %>" style="margin-left: 5px; cursor: pointer">
-                    <% if (feed_item.review.reviewing_count) { %>
-                        <span class="icon icon-reviewing"><sup><%= feed_item.review.reviewing_count %></sup></span>
-                    <% } %>
-                    <% if (feed_item.review.approved_count) { %>
-                        <span class="icon icon-approved"><sup><%= feed_item.review.approved_count %></sup></span>
-                    <% } %>
-                    <% if (feed_item.review.rejected_count) { %>
-                        <span class="icon icon-rejected"><sup><%= feed_item.review.rejected_count %></sup></span>
-                    <% } %>
-                </span>
-            <% } %>
         <% } else if (feed_item.event_type.code == 'demo-approved') { %>
             <a class="icon icon-Approved"></a> This demo was <strong>fully approved</strong>!
         <% } else if (feed_item.event_type.code == 'demo-closed') { %>
@@ -96,7 +100,12 @@
     <div class="demobox-footer">
         <div class="split by:2">
             <div class="cel">
-                <small title="<%= new Date(feed_item.created) %>"><%= moment(feed_item.modified).fromNow() %></small>
+                <small title="<%= new Date(feed_item.created) %>">
+                    <%= moment(feed_item.modified).fromNow() %>
+                    <% if (feed_item.event_type.code != 'reviewer-removed' && feed_item.event_type.code != 'follower-removed') { %>
+                        by <a href="<%= feed_item.user.url %>"><%= feed_item.user.name %></a>
+                    <% } %>
+                </small>
             </div>
             <% if (feed_item.event_type.code == 'comment-added') { %>
                 <div class="cel" style="text-align: right">

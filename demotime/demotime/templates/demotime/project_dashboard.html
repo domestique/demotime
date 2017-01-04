@@ -49,6 +49,7 @@
                     <th>Title</th>
                     <th>Owner(s)</th>
                     <th>Reviewer State</th>
+                    <th>Open Issues</th>
                     <th>Reviewers</th>
                 </tr>
             </thead>
@@ -71,6 +72,9 @@
                         </td>
                         <td width="100">
                             <span class="icon icon-{{ demo.reviewer_state|lower }}">{{ demo.reviewer_state }}</span>
+                        </td>
+                        <td>
+                            <span class="icon icon-issue">{{ demo.open_issue_count }}</span>
                         </td>
                         <td width="240">
                             <ul>

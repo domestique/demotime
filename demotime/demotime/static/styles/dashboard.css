@@ -98,6 +98,7 @@ section.emph_lower {
 .dashboard .events small {
     text-transform: none;
     margin-left: 0;
+    position: relative;
 }
 .dashboard small.reviewing {
     color: #ffffe7;
