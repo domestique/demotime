@@ -220,10 +220,6 @@ nav.subnav {
 .new_demo > * {
     vertical-align: middle;
 }
-.new_demo select {
-    visibility: hidden;
-    min-width: 190px;
-}
 .new_demo a.subnav-item {
     padding-top: 7px;
     padding-bottom: 7px;

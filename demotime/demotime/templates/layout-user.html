@@ -22,7 +22,7 @@
                                 <label class="icon icon-pencil">
                                     New demo:
                                 </label>
-                                <select class="slick new_demo_dropdown">
+                                <select class="styled new_demo_dropdown">
                                     {% if object.name %}
                                         <option value="{% url 'create-review' object.slug %}">{{ object.name }}</option>
                                     {% endif %}

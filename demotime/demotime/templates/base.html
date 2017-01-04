@@ -218,15 +218,6 @@
 
             {# set up background tasks (new messages, comments etc) #}
             <script src="/static/scripts/BackgroundTasks.js?{{ site_settings.CACHE_BUSTER }}"></script>
-            <script>
-                /*var BackgroundTasks = new DemoTime.BackgroundTasks({
-                    messages_url: '{% url "messages-json" %}'
-                });*/
-            </script>
-
-            {# custom dropdowns #}
-            <script src="/static/scripts/library/selects.js"></script>
-            <script> $('select.slick').ddslick() </script>
 
             {# WYSIWYG editor #}
             <script src="/static/scripts/library/wysiwyg.min.js"></script>
