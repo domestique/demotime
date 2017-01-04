@@ -558,6 +558,20 @@ h3 small {
     margin: 0 auto;
 }
 
+.events img,
+.events audio {
+    max-width: 100%;
+    height: auto;
+}
+.events audio {
+    height: auto;
+}
+.events .lightbox_img:before {
+    content: ' ';
+    display: block;
+    margin-top: 10px;
+}
+
 @media screen and (max-width:720px) {
     .min720 {
         display: none !important;
