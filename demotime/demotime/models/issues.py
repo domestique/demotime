@@ -5,6 +5,15 @@ from demotime.models.base import BaseModel
 from demotime.models import Event, EventType
 
 
+class IssueManager(models.Manager):
+
+    def resolved(self):
+        return self.filter(resolved_by__isnull=False)
+
+    def open(self):
+        return self.filter(resolved_by__isnull=True)
+
+
 class Issue(BaseModel):
 
     review = models.ForeignKey('Review')
@@ -15,6 +24,8 @@ class Issue(BaseModel):
     resolved_by = models.ForeignKey(
         'auth.User', null=True, related_name='issue_resolver'
     )
+
+    objects = IssueManager()
 
     def __str__(self):
         return 'Issue {} on DT-{}, Created by: {}'.format(

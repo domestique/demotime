@@ -360,6 +360,27 @@ class TestCommentAPIViews(BaseTestCase):
             'comment': self.comment.to_json()
         })
 
+    def test_create_resolve_create_issue(self):
+        ''' Should be able to create an issue, resolve it, and then create a
+        new issue again afterwards
+        '''
+        self.assertEqual(models.Issue.objects.count(), 0)
+        models.Issue.create_issue(
+            self.review, self.comment, self.user
+        )
+        self.assertEqual(models.Issue.objects.count(), 1)
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'issue': {'resolve': True}
+        }))
+        self.assertStatusCode(response, 200)
+        response = self.client.patch(self.api_url, json.dumps({
+            'comment_pk': self.comment.pk,
+            'issue': {'create': True}
+        }))
+        self.assertStatusCode(response, 200)
+        self.assertEqual(models.Issue.objects.count(), 2)
+
     def test_create_and_resolve_issue_failure(self):
         response = self.client.patch(self.api_url, json.dumps({
             'comment_pk': self.comment.pk,

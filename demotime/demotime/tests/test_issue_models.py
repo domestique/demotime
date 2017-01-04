@@ -38,6 +38,8 @@ class TestIssueModels(BaseTestCase):
         self.assertEqual(event.review, issue.review)
         self.assertEqual(event.project, issue.review.project)
         self.assertEqual(event.related_object, issue)
+        self.assertEqual(self.review.open_issue_count, 1)
+        self.assertEqual(self.review.resolved_issue_count, 0)
 
     def test_create_dupe_issue(self):
         models.Issue.create_issue(
@@ -106,3 +108,27 @@ class TestIssueModels(BaseTestCase):
         self.assertEqual(event.review, issue.review)
         self.assertEqual(event.project, issue.review.project)
         self.assertEqual(event.related_object, issue)
+        self.assertEqual(self.review.open_issue_count, 0)
+        self.assertEqual(self.review.resolved_issue_count, 1)
+
+    def test_resolved_manager_method(self):
+        issue = models.Issue.create_issue(
+            self.review, self.comment, self.test_user
+        )
+        self.assertFalse(models.Issue.objects.resolved().exists())
+        self.assertFalse(self.review.issue_set.resolved().exists())
+        issue.resolved_by = self.user
+        issue.save(update_fields=['resolved_by'])
+        self.assertTrue(models.Issue.objects.resolved().exists())
+        self.assertTrue(self.review.issue_set.resolved().exists())
+
+    def test_open_manager_method(self):
+        issue = models.Issue.create_issue(
+            self.review, self.comment, self.test_user
+        )
+        self.assertTrue(models.Issue.objects.open().exists())
+        self.assertTrue(self.review.issue_set.open().exists())
+        issue.resolved_by = self.user
+        issue.save(update_fields=['resolved_by'])
+        self.assertFalse(models.Issue.objects.open().exists())
+        self.assertFalse(self.review.issue_set.open().exists())

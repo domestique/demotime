@@ -467,6 +467,14 @@ class Review(BaseModel):
     def rejected_count(self):
         return self.reviewer_set.active().filter(status=REJECTED).count()
 
+    @property
+    def open_issue_count(self):
+        return self.issue_set.open().count()
+
+    @property
+    def resolved_issue_count(self):
+        return self.issue_set.resolved().count()
+
 
 class ReviewRevision(BaseModel):
 

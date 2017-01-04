@@ -186,6 +186,7 @@ class CommentJsonView(CanViewJsonView):
             existing_issues = models.Issue.objects.filter(
                 review=self.review,
                 comment=comment,
+                resolved_by__isnull=True
             )
             if create and resolve:
                 self.status = 400
