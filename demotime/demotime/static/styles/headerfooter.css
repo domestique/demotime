@@ -217,6 +217,9 @@ nav.subnav {
     padding: 0;
     vertical-align: top;
 }
+.new_demo select {
+    margin-left: 5px;
+}
 .new_demo > * {
     vertical-align: middle;
 }
