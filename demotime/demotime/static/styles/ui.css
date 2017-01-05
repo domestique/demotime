@@ -573,6 +573,13 @@ h3 small {
 }
 
 @media screen and (max-width:720px) {
+    .comments iframe {
+        width: 100%;
+        height: auto;
+    }
+}
+
+@media screen and (max-width:720px) {
     .min720 {
         display: none !important;
     }
