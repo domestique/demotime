@@ -176,7 +176,7 @@ select[multiple='multiple']:focus {
     background-color: #ffffff;
     border: 1px solid #dce0e0;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: 2px;
     min-width: 100px;
     -webkit-appearance: none;
     padding: 5px 25px 5px 10px;
