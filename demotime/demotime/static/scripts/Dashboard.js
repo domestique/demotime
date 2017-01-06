@@ -11,7 +11,7 @@ DemoTime.Dashboard = Backbone.View.extend({
         event.preventDefault();
 
         var link = $(event.target),
-            select = link.parents('.new_demo').find('.dd-selected-value');
+            select = link.parents('.new_demo').find('select');
 
         if (select.val()) {
             window.location.href = select.val();

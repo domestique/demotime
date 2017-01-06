@@ -168,40 +168,65 @@ select[multiple='multiple']:focus {
     line-height: initial;
 }
 
-.dd-container,
-.dd-select {
-    max-width: 195px;
-}
-.dd-container {
+/* Custom dropdowns */
+.styled {
+    height: 32px;
+    background: url(/static/images/dropdown_arrow.png) no-repeat right 8px center;
+    margin-right: 5px;
+    overflow: hidden;
     display: inline-block;
-    text-align: left;
-}
-.dd-container li {
-    display: block;
-    text-align: left;
+    background-color: #ffffff;
+    border: 1px solid #dce0e0;
     box-sizing: border-box;
-    width: 100%;
-}
-.dd-container li a {
-    color: #666666;
-    padding: 5px;
-}
-.dd-container .dd-select {
-    border: 0;
     border-radius: 2px;
-}
-.dd-select label {
-    color: #666666;
-}
-.dd-select .dd-selected {
-    padding: 7px;
+    min-width: 100px;
+    -webkit-appearance: none;
+    padding: 5px 25px 5px 10px;
+    font-size: 14px;
 }
 @media screen and (max-width:375px) {
-    .dd-container,
-    .dd-select {
-        max-width: 140px;
+    .styled {
+        min-width: 50px;
+    }
+    .styled {
+        min-width: 30px;
     }
 }
-.dd-option {
-    border-bottom: 0 !important;
+.styled::-ms-expand {
+    display: none;
+}
+.styled[disabled] {
+    color: #ccc;
+    background-image: none;
+    padding: 5px;
+}
+
+/* Disabling 'focus outline' on Firefox */
+.styled:-moz-focusring {
+    outline: none;
+    color: transparent;
+    text-shadow: 0 0 0 #000000;
+}
+/* Firefox arrow tweaks */
+.styled {
+    -moz-appearance: none;
+    text-indent: .01px;
+    text-overflow: '';
+}
+
+.styled select {
+    outline: none;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+    vertical-align: middle;
+    -webkit-appearance: none;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.styled:focus {
+    outline: none;
 }

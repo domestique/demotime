@@ -509,7 +509,9 @@ $('.review-overview, .comment_parent, .attachment-description').each(function() 
 $('pre a').each(function() {
     $(this).contents().unwrap().wrap('<span />');
 })
-
+</script>
+<script src="/static/scripts/YouTube.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script>
 // Initialize the Review app
 var review = new DemoTime.Review({
     {% if reviewer %}

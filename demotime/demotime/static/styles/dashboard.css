@@ -242,26 +242,16 @@ section.aggregated_dashboard-activity {
     }
 }
 
-#events_filter {
+select#events_filter {
     margin: 0 0 0 5px;
     position: relative;
     top: -1px;
+    font-size: 11px;
 }
 .events {
     overflow: auto;
 }
-.events img,
-.events audio {
-    max-width: 100%;
-    height: auto;
-}
-.events audio {
-    height: auto;
-}
-.events .lightbox_img:before {
-    content: ' ';
-    display: block;
-}
+
 section .events .demobox-body {
     font-size: 11px;
     color: #888;

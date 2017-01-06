@@ -126,7 +126,7 @@
                 <h3>
                     <a href="#" id="expand_collapse" title="Expand/Collapse Demo Feed">&lt;&lt;</a>
                     Demo Feed
-                    <select id="events_filter">
+                    <select id="events_filter" class="styled">
                         {% for project in available_projects %}
                             <option value={{ project.slug }}>{{ project.name }}</option>
                         {% endfor %}

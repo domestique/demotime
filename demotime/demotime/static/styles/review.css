@@ -305,17 +305,6 @@ a[data-type='rejected'] {
     border-radius: 2px;
 }
 
-.review-overview.events img {
-    max-width: 375px;
-    height: auto;
-}
-
-.review-overview.events img:before,
-.events a.lightbox_img:before {
-    content: ' ';
-    margin-top: 10px;
-    display: block;
-}
 .events .demobox-header {
     display: none;
 }
