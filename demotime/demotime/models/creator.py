@@ -115,7 +115,7 @@ class Creator(BaseModel):
 
     def drop_creator(self, dropping_user):
         self.active = False
-        self.save(update_fields=['active', 'modified'])
+        self.save(update_fields=['active', 'modified'], dropping=True)
         self._send_creator_message(removed=True)
         UserReviewStatus.objects.filter(
             user=self.user,
@@ -125,7 +125,9 @@ class Creator(BaseModel):
             self._create_creator_event(dropping_user, removed=True)
 
     def save(self, *args, **kwargs):
-        self.clean()
+        dropping = kwargs.pop('dropping', False)
+        if not dropping:
+            self.clean()
         return super().save(*args, **kwargs)
 
     def clean(self):

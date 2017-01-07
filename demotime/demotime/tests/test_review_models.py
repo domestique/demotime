@@ -245,6 +245,36 @@ class TestReviewModels(BaseTestCase):
             ).exists()
         )
 
+    def test_draft_with_two_coowners_change_owners(self):
+        self.assertEqual(len(mail.outbox), 0)
+        self.default_review_kwargs['state'] = constants.DRAFT
+        self.default_review_kwargs['followers'] = []
+        self.default_review_kwargs['creators'] = [self.user, self.co_owner]
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertTrue(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(obj.state, constants.DRAFT)
+        assert obj.revision
+        self.default_review_kwargs['creators'] = [self.user, self.followers[0]]
+        self.default_review_kwargs['state'] = constants.DRAFT
+        self.default_review_kwargs['review'] = obj.pk
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.user).exists())
+        self.assertFalse(creators.filter(user=self.co_owner).exists())
+        self.assertTrue(creators.filter(user=self.followers[0]).exists())
+        self.assertEqual(obj.state, constants.DRAFT)
+        self.default_review_kwargs['creators'] = [self.followers[0], self.followers[1]]
+        self.default_review_kwargs['state'] = constants.OPEN
+        obj = models.Review.update_review(**self.default_review_kwargs)
+        creators = obj.creator_set.active()
+        self.assertTrue(creators.filter(user=self.followers[0]).exists())
+        self.assertTrue(creators.filter(user=self.followers[1]).exists())
+        self.assertFalse(creators.filter(user=self.user).exists())
+        self.assertFalse(creators.filter(user=self.co_owner).exists())
+        self.assertEqual(obj.state, constants.OPEN)
+
     def test_draft_review_opened(self):
         self.default_review_kwargs['state'] = constants.DRAFT
         obj = models.Review.create_review(**self.default_review_kwargs)
