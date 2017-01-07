@@ -31,8 +31,7 @@ DemoTime.Comments = Backbone.View.extend({
         // Saving container as an option for global use
         this.options.comment_form_container = button.parents('.comment_form_container');
         this.options.comment = comment_parent.find('.form-control').val();
-
-        this.start_loading_state();
+        this.options.comment_form_container.find('input, button').prop('disabled', true);
 
         // Check for 'editing' data attr, otherwise it's a new comment
         if (this.options.comment_form_container.data('editing')) {
@@ -84,7 +83,7 @@ DemoTime.Comments = Backbone.View.extend({
             comment_parent.find('.errorlist').remove();
 
             // Cancel loading state
-            self.end_loading_state();
+            self.options.comment_form_container.find('input, button').prop('disabled', false);
         });
 
         req.success(function(data) {
@@ -283,14 +282,6 @@ DemoTime.Comments = Backbone.View.extend({
         $('html, body').animate({
             scrollTop: self.options.comment_form_container.offset().top - 150
         }, 500);
-    },
-
-    start_loading_state: function() {
-        this.options.comment_form_container.find('input, button').prop('disabled', true);
-    },
-
-    end_loading_state: function() {
-        this.options.comment_form_container.find('input, button').prop('disabled', false);
     },
 
     // Leave a comment and approve at the same time

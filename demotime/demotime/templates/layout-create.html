@@ -57,7 +57,7 @@ h1 em {
 <article>
     <section>
         <div class="review">
-            <form action="" method="post" enctype="multipart/form-data" id="submit_review">
+            <form action="" method="post" enctype="multipart/form-data" id="submit_review" novalidate>
                 {% csrf_token %}
                 <div class="form-group" style="margin-top: 0">
                     <h3 class="icon icon-lightbulb">{{ review_form.title.label }} <small>ex. "TP #1234: Destroyed Tetsuo as his power grew out of control"</small></h3>

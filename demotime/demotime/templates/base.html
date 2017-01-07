@@ -243,10 +243,6 @@
 
             {# Account management dropdown in the header #}
             <script src="/static/scripts/Account.js?{{ site_settings.CACHE_BUSTER }}"></script>
-            <script>
-                // top right account toggler
-                var account = new DemoTime.Account();
-            </script>
 
             {# Global search #}
             <script src="/static/scripts/Search.js?{{ site_settings.CACHE_BUSTER }}"></script>
@@ -256,7 +252,10 @@
                     review_url: '{% url 'reviews-search-json' %}',
                     project_url: '{% url 'project-json' %}'
                 });
+            </script>
 
+            {# Blog updates #}
+            <script>
                 // Update this date to trigger new blog post notifications
                 var blog_update = '20161220';
 
@@ -266,6 +265,7 @@
                 }
             </script>
 
+            {# User-readable timestamps (x hours ago) #}
             <script src="/static/scripts/library/moment.min.js?{{ site_settings.CACHE_BUSTER }}"></script>
         {% endif %}
 

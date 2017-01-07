@@ -77,15 +77,7 @@ describe("Comments.js", function() {
 
     it("should start a loading state", function() {
         $('.new_comment_button').click();
-        this.comments.start_loading_state();
         expect(this.comments.options.comment_form_container.find('button').prop('disabled')).toBeTruthy();
-    });
-
-    it("should end a loading state", function() {
-        $('.new_comment_button').click();
-        this.comments.start_loading_state();
-        this.comments.end_loading_state();
-        expect(this.comments.options.comment_form_container.find('button').prop('disabled')).toBeFalsy();
     });
 
     it("should be able to expand a new reply", function() {
