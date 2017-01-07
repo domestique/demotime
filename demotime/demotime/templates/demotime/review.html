@@ -209,13 +209,14 @@
                     since {{ object.created|date:'M-d'}}, {{ object.created|date:'h:iA'|lower }}
                 {% endif %}
 
-                <br><br>
-                <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link|truncatechars:35 }}</a>
+                {% if object.case_link %}
+                    <br><br> <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link|truncatechars:35 }}</a>
+                {% endif %}
             </div>
             {% if request.user.is_authenticated %}
                 <div class="cel reviewers">
                     <h4 class="heading">
-                        Reviewers & Followers:
+                        Reviewers &amp; Followers:
                         <span class="help" title="When you assign someone as a 'reviewer' they
                         will need to either approve or reject a demo. A follower can simply follow
                         the progress of a demo without the ability or need to approve or reject."></span>
