@@ -51,10 +51,10 @@
                         {% endif %}
                     {% endif %}
                     {% if forloop.first and not forloop.last %}
-                        <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a>
+                        <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a>
                     {% endif %}
                     {% if not forloop.first and forloop.last %}
-                        and <a href="{{ demo.creator.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}'s</a> demo
+                        and <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}'s</a> demo
                     {% endif %}
                 {% endfor %}
             {% endif %}
