@@ -196,7 +196,6 @@
                     {% else %}
                         {{ object.reviewer_state|capfirst }}
                     {% endif %}
-                    <br><br>
                 {% endif %}
                 <h4 class="heading">
                     Demo State:
@@ -210,7 +209,7 @@
                 {% endif %}
 
                 {% if object.case_link %}
-                    <br><br> <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link|truncatechars:35 }}</a>
+                    <h4 class="heading">Case Link:</h4> <a href="{{ object.case_link }}" target="_blank">{{ object.case_link|truncatechars:35 }}</a>
                 {% endif %}
             </div>
             {% if request.user.is_authenticated %}
@@ -279,7 +278,8 @@
             {% endif %}
             <div class="cel">
                 <div id="issues_placeholder" style="margin-bottom: 10px"></div>
-                <h4 class="heading">
+
+                <h4 class="heading" style="margin-top:0">
                     Demo Revisions:
                     <span class="help" title="Every time you update a demo, its revision # increases. This way you can go back and reference old revisions if need be. Mouse over a revision to see when it was added."></span>
                 </h4>

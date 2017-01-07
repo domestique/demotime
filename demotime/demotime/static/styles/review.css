@@ -67,6 +67,9 @@ h1 .alert {
     font-weight: 700;
     font-size: 17px;
 }
+.review-meta h4:not(:first-child) {
+    margin-top: 20px;
+}
 .review-meta ol {
     margin: 0;
     padding-left: 20px;

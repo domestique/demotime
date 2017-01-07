@@ -71,7 +71,7 @@ $('.review form, .new_comment form').submit(function(e) {
 
     // It's quite easy to forget a revision description, so lets check
     // on-submit so the user doesn't lose their attachments.
-    if (!form.find('#id_description').val()) {
+    if (!form.find('#id_description').val() && $('#id_state').val() != 'draft') {
         e.preventDefault();
         $('#demo-description-error').remove();
         var description = $('#demo-description');
