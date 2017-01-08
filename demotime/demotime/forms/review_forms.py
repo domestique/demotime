@@ -86,6 +86,9 @@ class ReviewForm(forms.ModelForm):
         if not skip_deep_clean and not data.get('description'):
             self.add_error('description', 'This field is required')
 
+        if not skip_deep_clean and not data.get('title'):
+            self.add_error('title', 'This field is required')
+
         return data
 
     class Meta:

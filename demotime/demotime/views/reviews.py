@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.forms import formset_factory
-from django.views.generic import TemplateView, DetailView, ListView, RedirectView
+from django.views.generic import (
+    TemplateView, DetailView, ListView, RedirectView, View
+)
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.utils.decorators import method_decorator
@@ -113,7 +115,35 @@ class ReviewDetail(CanViewMixin, DetailView):
         return context
 
 
-class CreateReviewView(TemplateView):
+class CreateReviewView(View):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = None
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(
+            models.Project,
+            slug=kwargs['proj_slug']
+        )
+        return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        review = models.Review.create_review(
+            creators=[request.user],
+            title='',
+            description='',
+            case_link='',
+            reviewers=[],
+            followers=[],
+            project=self.project,
+            state=constants.DRAFT,
+            attachments=[],
+        )
+        return redirect('edit-review', proj_slug=self.project.slug, pk=review.pk)
+
+class EditReviewView(TemplateView):
     template_name = 'demotime/create_review.html'
 
     def __init__(self, *args, **kwargs):
@@ -139,7 +169,7 @@ class CreateReviewView(TemplateView):
             self.review_inst = models.Review(
                 project=self.project,
             )
-        return super(CreateReviewView, self).dispatch(request, *args, **kwargs)
+        return super(EditReviewView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, pk=None, *args, **kwargs):
         self.review_form = forms.ReviewForm(
@@ -225,10 +255,10 @@ class CreateReviewView(TemplateView):
                 {'sort_order': x} for x in range(1, AttachmentFormSet.extra + 1)
             ]
             self.attachment_forms = AttachmentFormSet(initial=initial_data)
-        return super(CreateReviewView, self).get(request, *args, **kwargs)
+        return super(EditReviewView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(CreateReviewView, self).get_context_data(**kwargs)
+        context = super(EditReviewView, self).get_context_data(**kwargs)
         context.update({
             'project': self.project,
             'review_form': self.review_form,
@@ -492,7 +522,8 @@ class DTRedirectView(RedirectView):
         return super(DTRedirectView, self).get_redirect_url(*args, **kwargs)
 
 # pylint: disable=invalid-name
-review_form_view = CreateReviewView.as_view()
+create_review_view = CreateReviewView.as_view()
+edit_review_form_view = EditReviewView.as_view()
 review_detail = ReviewDetail.as_view()
 reviewer_status_view = ReviewerStatusView.as_view()
 review_state_view = ReviewStateView.as_view()

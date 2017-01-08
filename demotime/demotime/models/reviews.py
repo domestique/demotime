@@ -66,7 +66,7 @@ class Review(BaseModel):
         related_name='followers',
         through='Follower'
     )
-    title = models.CharField(max_length=1024)
+    title = models.CharField(max_length=1024, blank=True)
     description = models.TextField(blank=True)
     case_link = models.CharField('Case URL', max_length=2048, blank=True)
     state = models.CharField(
