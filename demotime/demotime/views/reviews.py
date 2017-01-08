@@ -162,7 +162,7 @@ class CreateReviewView(TemplateView):
             if trash:
                 if self.review_inst and self.review_inst.state == constants.DRAFT:
                     # Draft deleted!
-                    self.review_inst.delete()
+                    self.review_inst.update_state(constants.CANCELLED)
                     return redirect('index')
                 else:
                     return HttpResponseBadRequest(
