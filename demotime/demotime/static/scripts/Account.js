@@ -29,3 +29,5 @@ DemoTime.Account = Backbone.View.extend({
         this.$el.find('ul').slideUp();
     }
 });
+
+var account = new DemoTime.Account();

@@ -66,13 +66,16 @@ if ($('blockquote p, .review-overview li, .review-overview p').length) {
 }
 
 // Handle review form submits (some light validation on attachments)
-$('.review form, .new_comment form').submit(function(e) {
+$('.review form').submit(function(e) {
     var form = $(this);
+
+    $(this).find('button').prop('disabled', true);
 
     // It's quite easy to forget a revision description, so lets check
     // on-submit so the user doesn't lose their attachments.
     if (!form.find('#id_description').val() && $('#id_state').val() != 'draft') {
         e.preventDefault();
+        $(this).find('button').prop('disabled', false);
         $('#demo-description-error').remove();
         var description = $('#demo-description');
         description.after('<ul id="demo-description-error" class="errorlist"><li>This field is required</li></ul>');
