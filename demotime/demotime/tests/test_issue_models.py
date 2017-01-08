@@ -69,6 +69,8 @@ class TestIssueModels(BaseTestCase):
             'created_by_name': issue.created_by.userprofile.name,
             'created_by_pk': issue.created_by.pk,
             'created_by_profile_url': issue.created_by.userprofile.get_absolute_url(),
+            'comment_url': issue.comment.get_absolute_url(),
+            'comment_thread_url': issue.comment.get_absolute_thread_url(),
             'resolved_by_name': None,
             'resolved_by_pk': None,
             'resolved_by_profile_url': None,
@@ -87,6 +89,8 @@ class TestIssueModels(BaseTestCase):
             'created_by_name': issue.created_by.userprofile.name,
             'created_by_pk': issue.created_by.pk,
             'created_by_profile_url': issue.created_by.userprofile.get_absolute_url(),
+            'comment_url': issue.comment.get_absolute_url(),
+            'comment_thread_url': issue.comment.get_absolute_thread_url(),
             'resolved_by_name': issue.resolved_by.userprofile.name,
             'resolved_by_pk': issue.resolved_by.pk,
             'resolved_by_profile_url': issue.resolved_by.userprofile.get_absolute_url()
