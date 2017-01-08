@@ -1725,6 +1725,29 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         json_data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(json_data['count'], 0)
 
+    def test_review_search_description(self):
+        response = self.client.post(reverse('reviews-search-json'), {
+            'title': 'Description'
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        self.assertEqual(review['pk'], self.review.pk)
+
+    def test_review_search_revision_description(self):
+        revision = self.review.revision
+        revision.description = 'zebra'
+        revision.save(update_fields=['description'])
+        response = self.client.post(reverse('reviews-search-json'), {
+            'title': 'Zebra'
+        })
+        self.assertStatusCode(response, 200)
+        json_data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(json_data['count'], 1)
+        review = json_data['reviews'][0]
+        self.assertEqual(review['pk'], self.review.pk)
+
     def test_review_list_sort_by_newest(self):
         review_kwargs = self.default_review_kwargs.copy()
         review_kwargs['title'] = 'Newer Review'
