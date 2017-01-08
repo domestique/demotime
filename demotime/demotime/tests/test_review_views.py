@@ -745,6 +745,42 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(obj.revision.number, 2)
 
+    def test_post_update_draft_review_with_errors(self):
+        self.default_review_kwargs['state'] = constants.DRAFT
+        self.default_review_kwargs['title'] = ''
+        self.default_review_kwargs['description'] = ''
+        self.default_review_kwargs['reviewers'] = []
+        self.default_review_kwargs['followers'] = []
+        review = models.Review.create_review(**self.default_review_kwargs)
+        response = self.client.post(
+            reverse('edit-review', args=[self.project.slug, review.pk]),
+            {
+                'title': '',
+                'description': '',
+                'reviewers': [],
+                'case_link': 'example.org',
+                'project': self.project.pk,
+                'state': constants.OPEN,
+                'form-TOTAL_FORMS': 4,
+                'form-INITIAL_FORMS': 0,
+                'form-MIN_NUM_FORMS': 0,
+                'form-MAX_NUM_FORMS': 5,
+            }
+        )
+        self.assertStatusCode(response, 200)
+        self.assertFormError(
+            response, 'review_form', 'reviewers',
+            'This field is required'
+        )
+        self.assertFormError(
+            response, 'review_form', 'title',
+            'This field is required'
+        )
+        self.assertFormError(
+            response, 'review_form', 'description',
+            'This field is required'
+        )
+
     def test_post_update_review_keep_one_attachment(self):
         """ Test for asserting that a Creator can bring Attachments over from
         the previous revision into the next revision

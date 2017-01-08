@@ -161,14 +161,9 @@ class EditReviewView(TemplateView):
             models.Project,
             slug=kwargs['proj_slug']
         )
-        if kwargs.get('pk'):
-            self.review_inst = get_object_or_404(models.Review, pk=kwargs['pk'])
-            self.project = self.review_inst.project
-            self.template_name = 'demotime/edit_review.html'
-        else:
-            self.review_inst = models.Review(
-                project=self.project,
-            )
+        self.review_inst = get_object_or_404(models.Review, pk=kwargs['pk'])
+        self.project = self.review_inst.project
+        self.template_name = 'demotime/edit_review.html'
         return super(EditReviewView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, pk=None, *args, **kwargs):
@@ -216,10 +211,7 @@ class EditReviewView(TemplateView):
                         'sort_order': form.cleaned_data['sort_order'],
                     })
 
-            if pk:
-                review = models.Review.update_review(self.review_inst.pk, **data)
-            else:
-                review = models.Review.create_review(**data)
+            review = models.Review.update_review(self.review_inst.pk, **data)
 
             return redirect(
                 'review-rev-detail',
@@ -234,13 +226,10 @@ class EditReviewView(TemplateView):
             # If we're using this method as the POST error path, let's
             # preserve the existing forms. Also, maybe this is dumb?
             description = ''
-            if pk:
-                self.review_inst = get_object_or_404(models.Review, pk=pk)
-                self.template_name = 'demotime/edit_review.html'
-                if self.review_inst.state == constants.DRAFT:
-                    description = self.review_inst.description
-            else:
-                self.review_inst = models.Review()
+            self.review_inst = get_object_or_404(models.Review, pk=pk)
+            self.template_name = 'demotime/edit_review.html'
+            if self.review_inst.state == constants.DRAFT:
+                description = self.review_inst.description
             self.review_form = forms.ReviewForm(
                 user=self.request.user,
                 instance=self.review_inst,
