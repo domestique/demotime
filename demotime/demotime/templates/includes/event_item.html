@@ -98,7 +98,7 @@
         <% } %>
     </div>
     <div class="demobox-footer">
-        <div class="split by:2">
+        <div class="split by:3/1">
             <div class="cel">
                 <small title="<%= new Date(feed_item.created) %>">
                     <%= moment(feed_item.modified).fromNow() %>
@@ -109,7 +109,7 @@
             </div>
             <% if (feed_item.event_type.code == 'comment-added') { %>
                 <div class="cel" style="text-align: right">
-                    <a href="<%= feed_item.related_object.url %>" data-comment-id="<%= feed_item.related_object.id %>" class="comment_link">go to this comment</a>
+                    <small><a href="<%= feed_item.related_object.url %>" data-comment-id="<%= feed_item.related_object.id %>" class="comment_link">to comment &gt;</a></small>
                 </div>
             <% } %>
         </div>
