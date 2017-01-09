@@ -13,7 +13,7 @@ from demotime.models import (
     UserReviewStatus
 )
 from demotime.models.base import BaseModel
-from demotime import constants
+from demotime import constants, tasks
 
 
 class CommentThread(BaseModel):
@@ -180,6 +180,7 @@ class Comment(BaseModel):
                     thread=thread,
                 )
 
+        tasks.post_process_comment.delay(obj.pk)
         return obj
 
     class Meta:

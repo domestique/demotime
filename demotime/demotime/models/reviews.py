@@ -284,6 +284,8 @@ class Review(BaseModel):
         )
 
         obj.update_state(state)
+        tasks.post_process_revision.delay(rev.pk)
+        tasks.post_process_review.delay(obj.pk)
         return obj
 
     # pylint: disable=too-many-arguments
@@ -431,6 +433,8 @@ class Review(BaseModel):
             if obj.state in (CLOSED, ABORTED):
                 obj.update_state(OPEN)
 
+        tasks.post_process_revision.delay(rev.pk)
+        tasks.post_process_review.delay(obj.pk)
         return obj
 
     def update_reviewer_state(self):
