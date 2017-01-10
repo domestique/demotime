@@ -849,9 +849,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             }
         )
         self.assertStatusCode(response, 302)
-        self.assertFalse(
-            models.Review.objects.filter(pk=draft_review.pk).exists()
-        )
+        draft_review.refresh_from_db()
+        self.assertEqual(draft_review.state, constants.CANCELLED)
 
     def test_post_delete_non_draft(self):
         response = self.client.post(
