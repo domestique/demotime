@@ -58,6 +58,7 @@
         <% } else if (feed_item.event_type.code == 'demo-updated') { %>
             A new revision was added. <a href="<%= feed_item.related_object.url %>">View it here</a>
         <% } else if (feed_item.event_type.code == 'issue-created' || feed_item.event_type.code == 'issue-resolved') { %>
+            <% console.log(feed_item) %>
             <strong><%= feed_item.event_type.name %></strong> by <a href="<%= feed_item.related_object.user_profile_url %>"><%= feed_item.user.name %></a>
         <% } else if (feed_item.event_type.code == 'comment-added') { %>
             <blockquote>
@@ -110,6 +111,11 @@
             <% if (feed_item.event_type.code == 'comment-added') { %>
                 <div class="cel" style="text-align: right">
                     <small><a href="<%= feed_item.related_object.url %>" data-comment-id="<%= feed_item.related_object.id %>" class="comment_link">to comment &gt;</a></small>
+                </div>
+            <% } else if (feed_item.event_type.code == 'issue-created') { %>
+                <% console.log(feed_item) %>
+                <div class="cel" style="text-align: right">
+                    <small><a href="<%= feed_item.related_object.comment_url %>" data-comment-id="<%= feed_item.related_object.id %>" class="comment_link">to issue &gt;</a></small>
                 </div>
             <% } %>
         </div>
