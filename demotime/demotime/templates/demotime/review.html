@@ -332,7 +332,7 @@
                     {% macro attachments %}
                     {% endmacro %}
 
-                    {% macro comment button_text %}
+                    {% macro comment %}
                         <form>
                             <label class="icon icon-comment" for="{{ comment_form.comment.id_for_label }}" style="margin: 30px 0 10px">Reply to this {{ comment_form.comment.label }}</label>
                             {{ comment_form.comment.errors }}
@@ -368,7 +368,7 @@
                                 <label>{{ comment_form.is_issue }} Mark as issue</label>
                             </section>
                             <div class="form-group">
-                                <button type="button" class="new_comment_button">{% if button_text %}{{ button_text }}{% else %}Post{% endif %}</button>
+                                <button type="button" class="new_comment_button">Submit</button>
                                 {% if reviewer and request.user != creator_obj.user and review.state == 'open' and reviewer.status != 'approved' %}
                                     <button class="button-bright reply_and_approve" data-type="approved" type="button">Reply &amp; approve</button>
                                 {% endif %}
