@@ -41,6 +41,8 @@ class Issue(BaseModel):
             'created_by_name': self.created_by.userprofile.name,
             'created_by_pk': self.created_by.pk,
             'created_by_profile_url': self.created_by.userprofile.get_absolute_url(),
+            'comment_url': self.comment.get_absolute_url(),
+            'comment_thread_url': self.comment.get_absolute_thread_url(),
             'resolved_by_name': None,
             'resolved_by_pk': None,
             'resolved_by_profile_url': None,
