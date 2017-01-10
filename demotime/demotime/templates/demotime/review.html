@@ -153,7 +153,12 @@
 
     <div class="main-content">
         <h1 class="heading">
-            <strong>DT-{{ object.pk }}</strong>: {{ object.title }}
+            <strong>DT-{{ object.pk }}</strong>:
+                {% if object.title %}
+                    {{ object.title }}
+                {% else %}
+                    [<a class="normal_text" href="{% url 'edit-review' object.project.slug object.pk %}">add a title</a>]
+                {% endif %}
                 <small class="alert">
                 {% if not revision.is_max_revision %}
                     Rev {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
