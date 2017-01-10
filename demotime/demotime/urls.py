@@ -64,7 +64,7 @@ urlpatterns += [
 # Reviews
 urlpatterns += [
     # Review Creation
-    url(r'^reviews/(?P<proj_slug>[\w-]+)/create/$', reviews.review_form_view, name='create-review'),
+    url(r'^reviews/(?P<proj_slug>[\w-]+)/create/$', reviews.create_review_view, name='create-review'),
     # DT-1234 redirect view
     url(r'^(?i)DT-(?P<pk>[\d]+)/$', reviews.dt_redirect_view, name='dt-redirect'),
     # Review Json Endpoint
@@ -86,7 +86,11 @@ urlpatterns += [
         name='review-rev-detail'
     ),
     # Review Edit Page
-    url(r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/edit/$', reviews.review_form_view, name='edit-review'),
+    url(
+        r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<pk>[\d]+)/edit/$',
+        reviews.edit_review_form_view,
+        name='edit-review'
+    ),
     # Reviewer Approval/Rejection
     url(
         r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/reviewer-status/(?P<reviewer_pk>[\d]+)/$',

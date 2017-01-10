@@ -45,11 +45,16 @@ class ReviewStateForm(forms.Form):
         if review and review.state == constants.DRAFT and state == constants.OPEN:
             if not review.reviewer_set.active().exists():
                 self.add_error(
-                    'review', 'Demo must have Reviewers to be opened'
+                    'review', 'Demo must have Reviewers to be published.'
                 )
             if not review.revision.description:
                 self.add_error(
-                    'review', 'Demo must contain a description'
+                    'review', 'Demo must contain a description to be published.'
+                )
+
+            if not review.title:
+                self.add_error(
+                    'review', 'Demo must have a title to be published.'
                 )
 
         return cleaned_data
