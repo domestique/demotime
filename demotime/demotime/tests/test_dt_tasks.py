@@ -55,10 +55,21 @@ class TestDTTasks(BaseTestCase):
         self.assertEqual(text, 'link to dt-1231241')
 
     def test_convert_dt_refs_to_links_no_duped_links(self):
-        text = tasks.convert_dt_refs_to_links(
-            'link to <a href="">dt-1231241</a>'
+        review = models.Review.create_review(**self.default_review_kwargs)
+        text = tasks.convert_dt_refs_to_links('link to DT-{}'.format(review.pk))
+        self.assertEqual(
+            text,
+            'link to <a href="/DT-{}/" target="_blank">DT-{}</a>'.format(
+                review.pk, review.pk
+            )
         )
-        self.assertEqual(text, 'link to <a href="">dt-1231241</a>')
+        text = tasks.convert_dt_refs_to_links(text)
+        self.assertEqual(
+            text,
+            'link to <a href="/DT-{}/" target="_blank">DT-{}</a>'.format(
+                review.pk, review.pk
+            )
+        )
 
     def test_post_process_comment(self):
         review = models.Review.create_review(**self.default_review_kwargs)
