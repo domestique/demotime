@@ -127,7 +127,7 @@ section .demobox p:first-child {
 .demobox-footer {
     background: #f7f7f7;
     padding: 5px 10px;
-    margin: 10px 0 0;
+    margin: 5px 0 0;
 }
 .demobox-body {
     padding: 10px;
