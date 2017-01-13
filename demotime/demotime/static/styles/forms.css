@@ -104,13 +104,16 @@ button.button-clear {
     color: #333333;
     border: 1px solid #cccccc;
 }
+button.button-emphasized {
+    background-color: #7591cc;
+}
 button.button-bright {
     background-color: #fff68e;
-    color: #555555;
+    color: #555;
 }
 button.button-confirm {
-    background-color: #7591cc;
-    color: #fff;
+    background-color: #fff68e;
+    color: #555;
 }
 button.button-alert {
     background-color: #d27d7d;

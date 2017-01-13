@@ -311,6 +311,9 @@ a[data-type='rejected'] {
 .events .demobox-header {
     display: none;
 }
+.events .demobox-footer {
+    margin: 0;
+}
 
 .ajaxy_attachment:first-child .attachment-remove {
     display: none;

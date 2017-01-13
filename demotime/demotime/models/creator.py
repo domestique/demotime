@@ -133,3 +133,6 @@ class Creator(BaseModel):
     def clean(self):
         if self.review.creator_set.active().exclude(user=self.user).count() >= 2:
             raise ValidationError('Demos may have a maximum of 2 Owners')
+
+    class Meta(object):
+        ordering = ('created',)

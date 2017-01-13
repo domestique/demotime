@@ -18,7 +18,16 @@
             {% include "includes/review_state.html" %}
 
             {% if draft %}
-                <strong>- <a href="{% url 'edit-review' demo.project.slug demo.pk %}">edit this draft</a></strong>
+                <strong>
+                    - <a href="{% url 'edit-review' demo.project.slug demo.pk %}">edit</a>
+                    - <a class="demo-changer"
+                        data-creator="{{ creator_obj.pk }}"
+                        data-pk="{{ demo.pk }}"
+                        data-state="cancelled"
+                        data-url="{% url 'update-review-state' demo.project.slug demo.pk %}"
+                        href="#">cancel</a></span>
+
+                </strong>
             {% endif %}
 
             <small class="time_stamp">

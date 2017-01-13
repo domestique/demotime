@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Q
 from django.contrib.auth.models import User
 
 from demotime import constants, models
@@ -86,6 +87,9 @@ class ReviewForm(forms.ModelForm):
         if not skip_deep_clean and not data.get('description'):
             self.add_error('description', 'This field is required')
 
+        if not skip_deep_clean and not data.get('title'):
+            self.add_error('title', 'This field is required')
+
         return data
 
     class Meta:
@@ -117,7 +121,7 @@ class ReviewFilterForm(forms.Form):
         ('oldest', 'Oldest'),
     )
 
-    title = forms.CharField(required=False)
+    title = forms.CharField(required=False, label='keyword')
     state = forms.ChoiceField(
         required=False,
         choices=STATE_CHOICES,
@@ -201,7 +205,11 @@ class ReviewFilterForm(forms.Form):
             qs = qs.filter(reviewer_state=data['reviewer_state'])
 
         if data.get('title'):
-            qs = qs.filter(title__icontains=data['title'])
+            qs = qs.filter(
+                Q(title__icontains=data['title']) |
+                Q(description__icontains=data['title']) |
+                Q(reviewrevision__description__icontains=data['title'])
+            )
 
         if data.get('sort_by'):
             sorting = data['sort_by']

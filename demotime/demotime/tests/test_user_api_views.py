@@ -868,7 +868,7 @@ class TestUserApiFollowers(BaseTestCase):
         )
         event = self.review.event_set.filter(
             event_type__code=models.EventType.FOLLOWER_ADDED
-        ).last()
+        ).first()
         self.assertEqual(
             event.event_type.code, models.EventType.FOLLOWER_ADDED
         )
