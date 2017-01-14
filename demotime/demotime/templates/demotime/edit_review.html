@@ -203,6 +203,7 @@ h1 em {
                         <div class="cel">
                             <button id="create-demo"
                                 onclick="$('#id_state').val('open')"
+                                class="button-confirm"
                                 type="submit">
                                 {% if review_inst.state == "draft" %}
                                     Publish Demo
@@ -215,7 +216,7 @@ h1 em {
                             {% if review_inst.pk %}
                                 {% if review_inst.state == 'draft' %}
                                     <button id="save-draft"
-                                        class="button-confirm"
+                                        class="button-emphasized"
                                         onclick="$('#id_state').val('draft')"
                                         type="submit">
                                         Save
@@ -229,7 +230,7 @@ h1 em {
                                 {% endif %}
                             {% else %}
                                 <button id="save-draft"
-                                    class="button-confirm"
+                                    class="button-emphasized"
                                     onclick="$('#id_state').val('draft')"
                                     type="submit">
                                     Save Draft
