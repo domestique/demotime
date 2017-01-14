@@ -57,9 +57,12 @@
             <%= feed_item.related_object.name %> was <strong>removed as a follower</strong> by <a href="<%= feed_item.related_object.user_profile_url %>"><%= feed_item.user.name %></a>
         <% } else if (feed_item.event_type.code == 'demo-updated') { %>
             A new revision was added. <a href="<%= feed_item.related_object.url %>">View it here</a>
-        <% } else if (feed_item.event_type.code == 'issue-created' || feed_item.event_type.code == 'issue-resolved') { %>
-            <% console.log(feed_item) %>
-            <strong><%= feed_item.event_type.name %></strong> by <a href="<%= feed_item.related_object.user_profile_url %>"><%= feed_item.user.name %></a>
+        <% } else if (feed_item.event_type.code == 'issue-created') { %>
+            An <a href="<%= feed_item.related_object.comment_url %>" class="comment_link">issue</a> <strong>was just created</strong> by
+            <a href="<%= feed_item.related_object.created_by_profile_url %>"><%= feed_item.user.name %></a>
+        <% } else if (feed_item.event_type.code == 'issue-resolved') { %>
+            An <a href="<%= feed_item.related_object.comment_url %>" class="comment_link">issue</a> was just <strong>marked as resolved</strong> by
+            <a href="<%= feed_item.related_object.resolved_by_profile_url %>"><%= feed_item.user.name %></a>
         <% } else if (feed_item.event_type.code == 'comment-added') { %>
             <blockquote>
                 <% if (feed_item.related_object.comment) { %>
