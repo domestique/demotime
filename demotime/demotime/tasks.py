@@ -9,7 +9,7 @@ from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail
 
-from demotime import models
+from demotime import constants, models
 
 
 @shared_task(bind=True)
@@ -56,7 +56,10 @@ def convert_dt_refs_to_links(text):
         except IndexError:
             return text
         else:
-            if not models.Review.objects.filter(pk=dt_pk).exists():
+            if not models.Review.objects.filter(
+                    pk=dt_pk,
+                    state__in=(constants.OPEN, constants.CLOSED)
+            ).exists():
                 return text
 
         if not re.search('>{}<'.format(match), text):

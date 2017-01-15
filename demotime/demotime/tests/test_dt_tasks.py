@@ -71,6 +71,16 @@ class TestDTTasks(BaseTestCase):
             )
         )
 
+    def test_convert_dt_refs_to_links_no_drafts(self):
+        self.default_review_kwargs['state'] = constants.DRAFT
+        review = models.Review.create_review(**self.default_review_kwargs)
+        text = tasks.convert_dt_refs_to_links('link to DT-{}'.format(review.pk))
+        # No changes, because the review is a draft
+        self.assertEqual(
+            text,
+            'link to DT-{}'.format(review.pk)
+        )
+
     def test_post_process_comment(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         second_review = models.Review.create_review(**self.default_review_kwargs)
@@ -88,6 +98,10 @@ class TestDTTasks(BaseTestCase):
             )
         )
 
+    def test_post_process_comment_doesnotexist(self):
+        with self.assertRaises(models.Comment.DoesNotExist):
+            tasks.post_process_comment(55555)
+
     def test_post_process_review(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         self.default_review_kwargs['description'] = 'Link to DT-{}'.format(
@@ -102,6 +116,10 @@ class TestDTTasks(BaseTestCase):
             )
         )
 
+    def test_post_process_review_doesnotexist(self):
+        with self.assertRaises(models.Review.DoesNotExist):
+            tasks.post_process_review(55555)
+
     def test_post_process_revision(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         second_review = models.Review.create_review(**self.default_review_kwargs)
@@ -115,3 +133,7 @@ class TestDTTasks(BaseTestCase):
                 review.pk, review.pk
             )
         )
+
+    def test_post_process_revision_doesnotexist(self):
+        with self.assertRaises(models.ReviewRevision.DoesNotExist):
+            tasks.post_process_revision(55555)
