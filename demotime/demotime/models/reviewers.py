@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -34,6 +36,7 @@ class Reviewer(BaseModel):
         default='reviewing', db_index=True
     )
     events = GenericRelation('Event')
+    last_viewed = models.DateTimeField(null=True)
     is_active = models.BooleanField(default=True, db_index=True)
 
     objects = ReviewerManager()
@@ -53,6 +56,7 @@ class Reviewer(BaseModel):
             'reviewer_status': self.status,
             'review_pk': self.review.pk,
             'is_active': self.is_active,
+            'last_viewed': self.last_viewed.isoformat() if self.last_viewed else None,
             'created': self.created.isoformat(),
             'modified': self.modified.isoformat(),
         }
@@ -222,3 +226,7 @@ class Reviewer(BaseModel):
         ).delete()
         self.save()
         review.update_reviewer_state()
+
+    def viewed_review(self):
+        self.last_viewed = datetime.now()
+        self.save(update_fields=['last_viewed', 'modified'])

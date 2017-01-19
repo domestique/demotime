@@ -74,6 +74,8 @@ class ReviewDetail(CanViewMixin, DetailView):
                     'review': reviewer.review
                 }
             )
+            reviewer.viewed_review()
+        
         if reviewer:
             context['reviewer'] = reviewer
 
