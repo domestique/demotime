@@ -3,6 +3,7 @@ import json
 from django.core import mail
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.core.files.uploadedfile import BytesIO, File
 
 from demotime import constants, models
@@ -226,6 +227,9 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertTemplateUsed(response, 'demotime/review.html')
         # We're the reviewer
         self.assertIn('reviewer', response.context)
+        reviewer = response.context['reviewer']
+        reviewer.refresh_from_db()
+        self.assertEqual(reviewer.last_viewed.date(), timezone.now().date())
         self.assertIn('reviewer_status_form', response.context)
         self.assertIsNone(response.context['creator_obj'])
         reviewer_form = response.context['reviewer_status_form']
@@ -1357,6 +1361,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
                     'reviewer_status': constants.REVIEWING,
                     'review_pk': reviewer.review.pk,
                     'is_active': reviewer.is_active,
+                    'last_viewed': None,
                     'created': reviewer.created.isoformat(),
                     'modified': reviewer.modified.isoformat(),
                     'user_profile_url': reviewer.reviewer.userprofile.get_absolute_url(),

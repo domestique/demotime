@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core import mail
 from django.contrib.auth.models import User
 
@@ -16,6 +18,7 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(reviewer.review.pk, obj.pk)
         self.assertEqual(reviewer.reviewer.pk, user.pk)
         self.assertTrue(reviewer.is_active)
+        self.assertIsNone(reviewer.last_viewed)
         reminders = models.Reminder.objects.filter(
             review=obj, user=user
         )
@@ -28,6 +31,13 @@ class TestReviewerModels(BaseTestCase):
         )
         self.assertEqual(event.user, self.user)
         self.assertEqual(event.related_object, reviewer)
+
+    def test_set_viewed(self):
+        obj = models.Review.create_review(**self.default_review_kwargs)
+        reviewer = obj.reviewer_set.all()[0]
+        self.assertIsNone(reviewer.last_viewed)
+        reviewer.viewed_review()
+        self.assertIsInstance(reviewer.last_viewed, datetime)
 
     def test_deleting_and_creating_reviewer(self):
         ''' Reminder should be created, reviewer flips back to active '''
@@ -43,6 +53,7 @@ class TestReviewerModels(BaseTestCase):
             review=obj, user=user
         )
         self.assertTrue(reviewer.is_active)
+        self.assertIsNone(reviewer.last_viewed)
         self.assertEqual(reminders.count(), 1)
         # Delete
         reviewer.drop_reviewer(user, user)
@@ -323,12 +334,23 @@ class TestReviewerModels(BaseTestCase):
     def test_reviewer_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         reviewer = review.reviewer_set.all()[0]
+        reviewer.last_viewed = datetime.now()
         reviewer_json = reviewer.to_json()
         self.assertEqual(reviewer_json['name'], reviewer.reviewer.userprofile.name)
         self.assertEqual(reviewer_json['user_pk'], reviewer.reviewer.pk)
         self.assertEqual(reviewer_json['reviewer_pk'], reviewer.pk)
         self.assertEqual(reviewer_json['review_pk'], reviewer.review.pk)
+        self.assertEqual(reviewer_json['last_viewed'], reviewer.last_viewed.isoformat())
         self.assertEqual(
             reviewer_json['user_profile_url'],
             reviewer.reviewer.userprofile.get_absolute_url()
+        )
+        expected_keys = [
+            'name', 'user_pk', 'user_profile_url', 'reviewer_pk',
+            'reviewer_status', 'review_pk', 'last_viewed', 'is_active',
+            'created', 'modified'
+        ]
+        self.assertEqual(
+            sorted(reviewer_json.keys()),
+            sorted(expected_keys)
         )
