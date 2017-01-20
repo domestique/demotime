@@ -2,8 +2,10 @@ import pytz
 from datetime import datetime, timedelta
 
 from freezegun import freeze_time
-from django.contrib.auth.models import User
+
+from django.core import mail
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from demotime import models
 from demotime.tests import BaseTestCase
@@ -138,35 +140,4 @@ class TestReminderModel(BaseTestCase):
         for reminder in models.Reminder.objects.all():
             reminder.send_reminder()
 
-        reminder_msgs = models.Message.objects.filter(
-            title__startswith='Reminder:',
-            review=self.review.revision,
-        )
-        self.assertEqual(
-            models.Reminder.objects.count(),
-            reminder_msgs.count()
-        )
-        # Creator Reminder
-        self.assertEqual(
-            models.Message.objects.filter(
-                message__contains='getting stale'
-            ).count(),
-            1
-        )
-        # Reviewer Reminders
-        self.assertEqual(
-            models.Message.objects.filter(
-                title__startswith='Reminder'
-            ).exclude(
-                message__contains='getting stale'
-            ).distinct().count(),
-            3
-        )
-
-        # Bundle testing
-        self.assertEqual(
-            models.MessageBundle.objects.filter(
-                message__in=reminder_msgs
-            ).count(),
-            4
-        )
+        self.assertEqual(len(mail.outbox), 4)

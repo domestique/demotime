@@ -556,10 +556,13 @@ var demo_info = new DemoTime.DemoInfo({
         review_pk: '{{ review.pk }}'
     });
 
+{% comment %}
     // set up background tasks (new messages, comments etc)
-    var background_tasks = new DemoTime.BackgroundTasks({
-        json_url: '{% url "messages-json" review.pk %}'
-    });
+    // FIXME: Remove?
+    // var background_tasks = new DemoTime.BackgroundTasks({
+    //    json_url: '{% url "messages-json" review.pk %}'
+    // });
+{% endcomment %}
 
     // Initialize AJAXy comments
     var comments = new DemoTime.Comments({

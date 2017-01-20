@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 
+from demotime import helpers
 from demotime.models.base import BaseModel
-from demotime.models import Event, EventType, Message
+from demotime.models import Event, EventType
 
 
 class FollowerManager(models.Manager):
@@ -127,7 +128,7 @@ class Follower(BaseModel):
                 'follower': self,
                 'is_follower': notify_follower,
             }
-            Message.send_system_message(
+            helpers.send_system_message(
                 title,
                 'demotime/messages/follower.html',
                 context,

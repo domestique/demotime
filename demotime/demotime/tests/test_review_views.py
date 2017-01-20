@@ -73,8 +73,8 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         response = self.client.get(reverse('index'))
         self.assertStatusCode(response, 200)
         self.assertTemplateUsed(response, 'demotime/index.html')
-        for key in ['open_demos', 'paused_demos', 'open_reviews', 'drafts',
-                    'message_bundles', 'followed_demos']:
+        for key in ['open_demos', 'paused_demos', 'open_reviews',
+                    'drafts', 'followed_demos']:
             self.assertIn(key, response.context)
 
         self.assertIn(followed_review, response.context['followed_demos'])
@@ -85,7 +85,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertIn(draft_review, response.context['drafts'])
         self.assertIn(paused_review, response.context['paused_demos'])
         self.assertEqual(models.Review.objects.count(), 7)
-        self.assertEqual(len(response.context['message_bundles']), 4)
 
     def test_index_does_hide_approved_reviews_from_open_reviews(self):
         review_one_kwargs = self.default_review_kwargs.copy()
@@ -115,21 +114,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             review=self.review,
             user=self.user
         ).update(read=False)
-        bundle, _ = models.MessageBundle.objects.get_or_create(
-            review=self.review,
-            owner=self.user
-        )
-        bundle.read = False
-        bundle.deleted = False
-        bundle.save()
-        self.assertTrue(
-            models.MessageBundle.objects.filter(
-                review=self.review,
-                owner=self.user,
-                read=False,
-                deleted=False,
-            ).exists()
-        )
         response = self.client.get(reverse(
             'review-detail',
             args=[self.project.slug, self.review.pk]
@@ -149,14 +133,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             user=self.user
         )
         self.assertTrue(user_review_status.read)
-        self.assertFalse(
-            models.MessageBundle.objects.filter(
-                review=self.review,
-                owner=self.user,
-                read=False,
-                deleted=False,
-            ).exists()
-        )
 
     def test_review_detail_hides_inactive_reviewer_followers(self):
         reviewer = self.review.reviewer_set.active()[0]
@@ -203,21 +179,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.client.logout()
         user = User.objects.get(username='test_user_0')
         self.client.login(username=user.username, password='testing')
-        bundle, _ = models.MessageBundle.objects.get_or_create(
-            review=self.review,
-            owner=user
-        )
-        bundle.read = False
-        bundle.deleted = False
-        bundle.save()
-        self.assertTrue(
-            models.MessageBundle.objects.filter(
-                review=self.review,
-                owner=user,
-                read=False,
-                deleted=False,
-            ).exists()
-        )
         response = self.client.get(reverse(
             'review-detail',
             args=[self.project.slug, self.review.pk]
@@ -237,14 +198,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             reviewer__username='test_user_0'
         ).exists())
         self.assertEqual(reviewer_form.initial['review'], self.review)
-        self.assertFalse(
-            models.MessageBundle.objects.filter(
-                review=self.review,
-                owner=self.user,
-                read=False,
-                deleted=False,
-            ).exists()
-        )
 
     def test_get_review_login_required(self):
         self.client.logout()
@@ -474,18 +427,11 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.revision.attachments.count(), 3)
         self.assertEqual(
-            models.Message.objects.filter(title__contains='POST').count(),
-            3
-        )
-        self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
                 read=False
             ).exclude(user=self.user).count(),
             5
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
         )
         self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(
@@ -529,18 +475,11 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(obj.follower_set.active().count(), 0)
         self.assertEqual(obj.revision.attachments.count(), 2)
         self.assertEqual(
-            models.Message.objects.filter(title__contains='POST').count(),
-            3
-        )
-        self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
                 read=False
             ).exclude(user=self.user).count(),
             5
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
         )
         self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(
@@ -649,13 +588,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(obj.reviewrevision_set.count(), 2)
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='Update Review POST').count(),
-            3
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
         self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
@@ -706,13 +638,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(attachment.description, 'Test Description')
         self.assertEqual(attachment.sort_order, 1)
         self.assertEqual(obj.reviewrevision_set.count(), 2)
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='Update Review POST').count(),
-            6
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
         self.assertEqual(len(mail.outbox), 6)
         self.assertEqual(
             models.Reminder.objects.filter(review=obj, active=True).count(),
@@ -955,11 +880,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
         })
         draft_review.refresh_from_db()
         self.assertEqual(draft_review.state, constants.OPEN)
-        title = 'New Review: Draft Open'
-        self.assertEqual(
-            models.Message.objects.filter(title=title).count(),
-            5
-        )
         self.assertEqual(len(mail.outbox), 5)
         event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_CREATED
@@ -1041,11 +961,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'success': True,
             'errors': {},
         })
-        title = '"{}" has been Paused'.format(self.review.title)
-        self.assertEqual(
-            models.Message.objects.filter(title=title).count(),
-            5
-        )
         self.assertEqual(len(mail.outbox), 5)
         event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_PAUSED
@@ -1069,11 +984,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'errors': {},
         })
         self.review.refresh_from_db()
-        title = '"{}" has been Closed'.format(self.review.title)
-        self.assertEqual(
-            models.Message.objects.filter(title=title).count(),
-            5
-        )
         self.assertEqual(len(mail.outbox), 5)
         event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_CLOSED
@@ -1095,11 +1005,6 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'success': True,
             'errors': {},
         })
-        title = '"{}" has been Aborted'.format(self.review.title)
-        self.assertEqual(
-            models.Message.objects.filter(title=title).count(),
-            5
-        )
         event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_ABORTED
         )
@@ -1120,11 +1025,7 @@ class TestReviewViews(BaseTestCase):  # pylint: disable=too-many-public-methods
             'success': True,
             'errors': {},
         })
-        title = '"{}" has been Reopened'.format(self.review.title)
-        self.assertEqual(
-            models.Message.objects.filter(title=title).count(),
-            5
-        )
+        self.assertEqual(len(mail.outbox), 5)
         event = self.review.event_set.get(
             event_type__code=models.EventType.DEMO_OPENED
         )

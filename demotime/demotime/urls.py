@@ -16,7 +16,6 @@ from demotime.views import (
     files,
     groups,
     index_view,
-    messages,
     profile,
     projects,
     reviews,
@@ -110,23 +109,6 @@ urlpatterns += [
         r'^reviews/(?P<proj_slug>[\w-]+)/review/(?P<review_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         reviews.delete_review_attachment_view,
         name='delete-review-attachment'
-    ),
-]
-
-# Messages
-urlpatterns += [
-    url(r'^inbox/$', messages.InboxView.as_view(), name='inbox'),
-    url(r'^message/(?P<pk>[\d]+)/$', messages.MessageDetailView.as_view(), name='message-detail'),
-    url(r'^messages/$', messages.MessagesJsonView.as_view(), name='messages-json'),
-    url(
-        r'^messages/(?P<review_pk>[\d]+)/$',
-        messages.MessagesJsonView.as_view(),
-        name='messages-json'
-    ),
-    url(
-        r'messages/pixel/(?P<bundle_pk>[\d]+).png',
-        messages.MessagePixelView.as_view(),
-        name='message-pixel',
     ),
 ]
 

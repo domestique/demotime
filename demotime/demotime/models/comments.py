@@ -9,11 +9,10 @@ from demotime.models import (
     Attachment,
     Event,
     EventType,
-    Message,
     UserReviewStatus
 )
 from demotime.models.base import BaseModel
-from demotime import constants, tasks
+from demotime import constants, helpers, tasks
 
 
 class CommentThread(BaseModel):
@@ -171,13 +170,12 @@ class Comment(BaseModel):
                     'url': review.get_absolute_url(),
                     'title': review.review.title,
                 }
-                Message.send_system_message(
+                helpers.send_system_message(
                     'New Comment on {}'.format(review.review.title),
                     'demotime/messages/new_comment.html',
                     context,
                     user,
                     revision=review,
-                    thread=thread,
                 )
 
         tasks.post_process_comment.delay(obj.pk)

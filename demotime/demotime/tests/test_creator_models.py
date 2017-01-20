@@ -1,3 +1,4 @@
+from django.core import mail
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
@@ -119,10 +120,13 @@ class TestCreatorModels(BaseTestCase):
         )
         self.assertFalse(models.Event.objects.exists())
         self.assertEqual(len(mail.outbox), 1)
-        message = models.Message.objects.get(
-            title='You have been added as an owner of {}'.format(self.review.title)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.to, [self.user.email])
+        self.assertEqual(
+            msg.subject,
+            '[DT-{}] - {}'.format(self.review.pk, self.review.title)
         )
-        self.assertEqual(message.receipient, self.user)
+
 
     def test_create_creator_notify(self):
         creator, _ = models.Creator.create_creator(
@@ -142,10 +146,12 @@ class TestCreatorModels(BaseTestCase):
             event.related_object, creator
         )
         self.assertEqual(len(mail.outbox), 6)
-        message = models.Message.objects.get(
-            title='You have been added as an owner of {}'.format(self.review.title)
+        msg = mail.outbox[-1]
+        self.assertEqual(msg.to, [self.user.email])
+        self.assertEqual(
+            msg.subject,
+            '[DT-{}] - {}'.format(self.review.pk, self.review.title)
         )
-        self.assertEqual(message.receipient, self.user)
         self.assertEqual(self.review.state, constants.PAUSED)
 
     def test_create_creator_event_added(self):
@@ -177,12 +183,12 @@ class TestCreatorModels(BaseTestCase):
 
         self.assertFalse(creator.active)
         self.assertEqual(len(mail.outbox), 1)
-        message = models.Message.objects.get(
-            title='You have been removed as an owner of {}'.format(
-                self.review.title
-            )
+        msg = mail.outbox[0]
+        self.assertEqual(msg.to, [self.user.email])
+        self.assertEqual(
+            msg.subject,
+            '[DT-{}] - {}'.format(self.review.pk, self.review.title)
         )
-        self.assertEqual(message.receipient, self.user)
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.OWNER_REMOVED)
         self.assertEqual(event.user, self.co_owner)

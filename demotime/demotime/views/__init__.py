@@ -146,12 +146,6 @@ class IndexView(TemplateView):
             pk__in=open_follow_pks
         )
 
-        message_bundles = models.MessageBundle.objects.filter(
-            owner=self.request.user,
-            read=False,
-            deleted=False,
-        ).order_by('-modified')[:5]
-        context['message_bundles'] = message_bundles
         return context
 
 

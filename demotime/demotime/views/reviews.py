@@ -50,10 +50,6 @@ class ReviewDetail(CanViewMixin, DetailView):
 
         self.review = self.revision.review
         if self.request.user.is_authenticated:
-            models.MessageBundle.objects.filter(
-                owner=request.user,
-                review=self.revision.review
-            ).update(read=True)
             self.user = self.request.user
         return super(ReviewDetail, self).dispatch(request, *args, **kwargs)
 
@@ -75,7 +71,7 @@ class ReviewDetail(CanViewMixin, DetailView):
                 }
             )
             reviewer.viewed_review()
-        
+
         if reviewer:
             context['reviewer'] = reviewer
 

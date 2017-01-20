@@ -45,7 +45,6 @@
                                                 <a href="{% url 'edit-profile' request.user.username %}" class="icon icon-attention">You need an avatar</a>
                                             </li>
                                         {% endif %}
-                                        <li style="display: none"><span class="msg_notifier {% if has_unread_messages %}un{% endif %}read_notification"><a href="{% url 'inbox' %}">{{ unread_message_count }}</a></span></li>
                                         <li>
                                             <div class="manage_user">
                                                 <a href="#" class="manage_user-toggler icon icon-user">

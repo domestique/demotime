@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 from django.utils import timezone
 
+from demotime import helpers
 from demotime.models.base import BaseModel
 from demotime.models import (
     Attachment,
@@ -12,7 +13,6 @@ from demotime.models import (
     EventType,
     Issue,
     Follower,
-    Message,
     Reminder,
     Reviewer,
     UserReviewStatus,
@@ -177,7 +177,7 @@ class Review(BaseModel):
                     'title': self.title,
                     'is_creator': True,
                 }
-                Message.send_system_message(
+                helpers.send_system_message(
                     title,
                     'demotime/messages/review.html',
                     context,
@@ -193,7 +193,7 @@ class Review(BaseModel):
                 'title': self.title,
                 'is_reviewer': True
             }
-            Message.send_system_message(
+            helpers.send_system_message(
                 title,
                 'demotime/messages/review.html',
                 context,
@@ -209,7 +209,7 @@ class Review(BaseModel):
                 'title': self.title,
                 'is_follower': True,
             }
-            Message.send_system_message(
+            helpers.send_system_message(
                 title,
                 'demotime/messages/review.html',
                 context,

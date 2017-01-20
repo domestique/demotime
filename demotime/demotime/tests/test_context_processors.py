@@ -15,49 +15,6 @@ class TestContextProcessors(BaseTestCase):
         self.user = models.UserProxy.objects.get(username='test_user_0')
         self.request_mock.user = self.user
 
-    def test_has_unread_messages(self):
-        self.assertTrue(
-            context_processors.has_unread_messages(self.request_mock)['has_unread_messages']
-        )
-
-    def test_unread_message_count(self):
-        self.assertEqual(
-            context_processors.unread_message_count(self.request_mock)['unread_message_count'],
-            1
-        )
-
-    def test_has_unread_messages_excludes_deleted_mail(self):
-        models.MessageBundle.objects.filter(owner=self.user).update(
-            read=False,
-            deleted=True
-        )
-        self.assertFalse(
-            context_processors.has_unread_messages(self.request_mock)['has_unread_messages']
-        )
-
-    def test_unread_message_count_excludes_deleted_mail(self):
-        models.MessageBundle.objects.filter(owner=self.user).update(
-            read=False,
-            deleted=True
-        )
-        self.assertEqual(
-            context_processors.unread_message_count(self.request_mock)['unread_message_count'],
-            0
-        )
-
-    def test_has_unread_messages_unauthed(self):
-        self.request_mock.user = AnonymousUser()
-        self.assertFalse(
-            context_processors.has_unread_messages(self.request_mock)['has_unread_messages']
-        )
-
-    def test_unread_message_count_unauthed(self):
-        self.request_mock.user = AnonymousUser()
-        self.assertEqual(
-            context_processors.unread_message_count(self.request_mock)['unread_message_count'],
-            0
-        )
-
     def test_available_projects_no_projects(self):
         models.ProjectMember.objects.all().delete()
         models.ProjectGroup.objects.all().delete()

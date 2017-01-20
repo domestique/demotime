@@ -2,7 +2,6 @@ from .review_forms import ReviewFilterForm, ReviewForm, ReviewQuickEditForm
 from .comment_forms import CommentForm, DemoAttachmentForm, CommentAttachmentForm
 from .reviewer_forms import ReviewerStatusForm, ReviewStateForm
 from .user_forms import UserProfileForm
-from .message_forms import BulkMessageUpdateForm
 from .project_forms import (
     ProjectForm, EditProjectGroupForm, ProjectGroupForm,
     ProjectMemberForm, EditProjectMemberForm
