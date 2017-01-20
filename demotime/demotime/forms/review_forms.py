@@ -49,7 +49,10 @@ class ReviewForm(forms.ModelForm):
         self.fields['creators'].queryset = user_queryset
 
         for key, _ in self.fields.items():
-            self.fields[key].widget.attrs['class'] = 'form-control'
+            if key == 'creators':
+                self.fields[key].widget.attrs['class'] = 'form-control styled'
+            else:
+                self.fields[key].widget.attrs['class'] = 'form-control'
 
         if self.instance.pk:
             self.fields['description'].required = False
