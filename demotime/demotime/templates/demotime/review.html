@@ -208,9 +208,9 @@
                 </h4>
                 {{ object.state|capfirst }}
                 {% if object.state == 'closed' %}
-                    on {{ object.modified }}
+                    ({{ object.modified }})
                 {% else %}
-                    since {{ object.created|date:'M-d'}}, {{ object.created|date:'h:iA'|lower }}
+                    ({{ object.created|date:'M-d'}}, {{ object.created|date:'h:iA'|lower }})
                 {% endif %}
 
                 {% if object.case_link %}
@@ -228,18 +228,20 @@
                     <ul class="reviewer_ul">
                         {% for reviewer in object.reviewer_set.active %}
                             <li>
-                                <a class="icon icon-{{ reviewer.get_status_display|lower }}"
-                                   href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
-                                    {{ reviewer.reviewer.userprofile }}</a>
-                                <small>
-                                    {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
-                                </small>
-                                <br><small>Last Viewed: {{ reviewer.last_viewed|date:'m-d'}}, {{ reviewer.last_viewed|date:'h:iA'|lower }}</small>
+                                <a class="icon icon-{{ reviewer.get_status_display|lower }}" href="{{ reviewer.reviewer.userprofile.get_absolute_url }}">
+                                    {{ reviewer.reviewer.userprofile }}
+                                </a>
                                 {% if creator_obj.user == request.user or reviewer.reviewer == request.user %}
-                                    <small class="person_deleter" style="display:none">
+                                    <small class="person_deleter" style="display:none; margin-left: 5px">
                                         [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
                                     </small>
                                 {% endif %}
+                                <small style="display: block">
+                                    {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
+                                    {% if reviewer.last_viewed and reviewer.get_status_display|lower == "reviewing" %}
+                                        (viewed <span class="humanize_date">{{ reviewer.modified|date:'Y-m-d'}} {{ reviewer.modified|date:'h:i:s'|lower }}</span>)
+                                    {% endif %}
+                                </small>
                             </li>
                         {% endfor %}
                     </ul>
@@ -247,15 +249,16 @@
                         {% for follower in object.follower_set.active %}
                             <li>
                                 <a href="{{ follower.user.userprofile.get_absolute_url }}">
-                                    {{ follower.user.userprofile }}</a>
-                                <small>
-                                    following
-                                </small>
+                                    {{ follower.user.userprofile }}
+                                </a>
                                 {% if creator_obj.user == request.user or follower.user == request.user %}
                                     <small class="person_deleter" style="display:none">
                                         [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
                                     </small>
                                 {% endif %}
+                                <small>
+                                    following
+                                </small>
                             </li>
                         {% endfor %}
                     </ul>
