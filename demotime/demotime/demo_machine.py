@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from demotime import constants, models
+from demotime import constants, helpers, models
 
 
 class State(object):
@@ -92,7 +92,7 @@ class Open(State):
         reviewers = review.reviewer_set.active()
         for user in users:
             is_reviewer = user in reviewers
-            models.Message.send_system_message(
+            helpers.send_system_message(
                 '"{}" has been Reopened'.format(review.title),
                 'demotime/messages/reopened.html',
                 {
@@ -141,7 +141,7 @@ class Paused(State):
         reviewers = review.reviewers.all()
         for user in users:
             is_reviewer = user in reviewers
-            models.Message.send_system_message(
+            helpers.send_system_message(
                 '"{}" has been Paused'.format(review.title),
                 'demotime/messages/paused.html',
                 {
@@ -177,7 +177,7 @@ class Closed(State):
         reviewers = review.reviewers.all()
         for user in users:
             is_reviewer = user in reviewers
-            models.Message.send_system_message(
+            helpers.send_system_message(
                 '"{}" has been Closed'.format(review.title),
                 'demotime/messages/closed.html',
                 {
@@ -213,7 +213,7 @@ class Aborted(State):
         reviewers = review.reviewers.all()
         for user in users:
             is_reviewer = user in reviewers
-            models.Message.send_system_message(
+            helpers.send_system_message(
                 '"{}" has been Aborted'.format(review.title),
                 'demotime/messages/closed.html',
                 {
@@ -241,7 +241,7 @@ class Reviewing(ReviewerState):
 
     def on_enter(self, review, prev_state):
         super().on_enter(review, prev_state)
-        models.Message.send_system_message(
+        helpers.send_system_message(
             '"{}" is back Under Review'.format(review.title),
             'demotime/messages/reviewing.html',
             {'review': review, 'previous_state': prev_state.name.title()},
@@ -263,7 +263,7 @@ class Approved(ReviewerState):
 
     def on_enter(self, review, prev_state):
         super().on_enter(review, prev_state)
-        models.Message.send_system_message(
+        helpers.send_system_message(
             '"{}" has been Approved!'.format(review.title),
             'demotime/messages/approved.html',
             {'review': review},
@@ -285,7 +285,7 @@ class Rejected(ReviewerState):
 
     def on_enter(self, review, prev_state):
         super().on_enter(review, prev_state)
-        models.Message.send_system_message(
+        helpers.send_system_message(
             '"{}" has been Rejected'.format(review.title),
             'demotime/messages/rejected.html',
             {'review': review},

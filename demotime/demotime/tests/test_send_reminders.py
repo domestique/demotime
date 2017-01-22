@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.core import mail
 from django.utils import timezone
 
 from demotime import models
@@ -18,6 +19,7 @@ class TestSendReminders(BaseTestCase):
         models.Reminder.objects.all().delete()
 
     def test_send_reminders(self):
+        mail.outbox = []
         models.Reminder.create_reminders_for_review(self.review)
         yesterday = timezone.now() - timedelta(days=1)
         models.Reminder.objects.update(remind_at=yesterday)
@@ -29,23 +31,4 @@ class TestSendReminders(BaseTestCase):
         self.command.handle()
 
         self.assertEqual(models.Reminder.objects.count(), 4)
-        self.assertEqual(
-            models.Reminder.objects.count() - 1,
-            models.Message.objects.filter(title__startswith='Reminder:').count()
-        )
-        # Creator Reminder
-        self.assertEqual(
-            models.Message.objects.filter(
-                message__contains='getting stale'
-            ).count(),
-            1
-        )
-        # Reviewer Reminders
-        self.assertEqual(
-            models.Message.objects.filter(
-                title__startswith='Reminder'
-            ).exclude(
-                message__contains='getting stale'
-            ).distinct().count(),
-            2
-        )
+        self.assertEqual(len(mail.outbox), 3)

@@ -141,13 +141,6 @@ class TestUserApiReviewers(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='You have been added as a reviewer on: {}'.format(self.review.title),
-                receipient=self.test_user_2,
-                review=reviewer.review.revision,
-            ).exists()
-        )
         event = reviewer.events.get(
             event_type__code=models.EventType.REVIEWER_ADDED
         )
@@ -187,13 +180,6 @@ class TestUserApiReviewers(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertFalse(
-            models.Message.objects.filter(
-                title='You have been added as a reviewer on: {}'.format(self.review.title),
-                receipient=self.test_user_2,
-                review=reviewer.review.revision,
-            ).exists()
-        )
         events = reviewer.events.filter(
             event_type__code=models.EventType.REVIEWER_ADDED
         )
@@ -226,13 +212,6 @@ class TestUserApiReviewers(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='You have been added as a reviewer on: {}'.format(self.review.title),
-                receipient=follower,
-                review=reviewer.review.revision,
-            ).exists()
-        )
         follower_obj = models.Follower.objects.get(
             user=follower, review=self.review
         )
@@ -629,15 +608,6 @@ class TestUserApiFollowers(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='You are now following {}'.format(
-                    self.review.title
-                ),
-                receipient=self.test_user_2,
-                review=follower.review.revision,
-            ).exists()
-        )
         event = follower.events.get(
             event_type__code=models.EventType.FOLLOWER_ADDED
         )
@@ -674,15 +644,6 @@ class TestUserApiFollowers(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertFalse(
-            models.Message.objects.filter(
-                title='You are now following {}'.format(
-                    draft_review.title
-                ),
-                receipient=self.test_user_2,
-                review=follower.review.revision,
-            ).exists()
-        )
         events = follower.events.filter(
             event_type__code=models.EventType.FOLLOWER_ADDED
         )
@@ -718,25 +679,6 @@ class TestUserApiFollowers(BaseTestCase):
         })
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(self.review.follower_set.count(), 3)
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='You are now following {}'.format(
-                    self.review.title
-                ),
-                receipient=self.test_user_2,
-                review=follower.review.revision,
-            ).exists()
-        )
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='{} is now following {}'.format(
-                    self.test_user_2.userprofile.name,
-                    self.review.title
-                ),
-                receipient=self.review.creator_set.active().get().user,
-                review=follower.review.revision,
-            ).exists()
-        )
         event = follower.events.get(
             event_type__code=models.EventType.FOLLOWER_ADDED
         )
@@ -1098,13 +1040,6 @@ class TestUserApiCreators(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='You have been added as an owner of {}'.format(self.review.title),
-                receipient=self.co_owner,
-                review=creator.review.revision,
-            ).exists()
-        )
         event = creator.events.get(
             event_type__code=models.EventType.OWNER_ADDED
         )
@@ -1140,13 +1075,6 @@ class TestUserApiCreators(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertFalse(
-            models.Message.objects.filter(
-                title='You have been added as an owner on: {}'.format(self.review.title),
-                receipient=self.co_owner,
-                review=creator.review.revision,
-            ).exists()
-        )
         events = creator.events.filter(
             event_type__code=models.EventType.OWNER_ADDED
         )
@@ -1178,13 +1106,6 @@ class TestUserApiCreators(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='You have been added as an owner of {}'.format(self.review.title),
-                receipient=follower,
-                review=creator.review.revision,
-            ).exists()
-        )
         follower_obj = models.Follower.objects.get(
             user=follower, review=self.review
         )
@@ -1262,13 +1183,6 @@ class TestUserApiCreators(BaseTestCase):
             'success': True,
             'errors': {},
         })
-        self.assertTrue(
-            models.Message.objects.filter(
-                title='You have been added as an owner of {}'.format(self.review.title),
-                receipient=reviewer,
-                review=creator.review.revision,
-            ).exists()
-        )
         reviewer_obj = models.Reviewer.objects.get(
             reviewer=reviewer, review=self.review
         )

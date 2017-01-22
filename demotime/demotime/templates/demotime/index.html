@@ -172,9 +172,12 @@ var review_activity = new DemoTime.ReviewActivity({
     exclusion_list: '?exclude_type=reviewer-added&exclude_type=reviewer-removed&exclude_type=follower-added&exclude_type=follower-removed'
 });
 
-var archive_all = new DemoTime.ArchiveAll({
-    url: '{% url "messages-json" %}'
-});
+{% comment %}
+// FIXME: Remove?
+// var archive_all = new DemoTime.ArchiveAll({
+//    url: '{% url "messages-json" %}'
+// });
+{% endcomment %}
 
 var demo_state = new DemoTime.DemoState();
 
