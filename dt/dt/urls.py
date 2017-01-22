@@ -28,3 +28,8 @@ if settings.DEBUG:
         url(r'^404/$', page_not_found, {'exception': 'Http404'}),
         url(r'^500/$', server_error),
     ]
+    if not settings.TEST_RUN:
+        from silk import urls as silk_urls
+        urlpatterns += [
+            url(r'^silk/', include(silk_urls, namespace='silk')),
+        ]

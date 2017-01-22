@@ -36,7 +36,8 @@ if not parser.has_section('demotime'):
 
 if not parser.has_section('celery'):
     parser.add_section('celery')
-    if os.environ.get('TESTS', '').lower() == 'true':
+    TEST_RUN = os.environ.get('TESTS', '').lower() == 'true'
+    if TEST_RUN:
         parser.set('celery', 'always_eager', 'true')
     else:
         parser.set('celery', 'always_eager', 'false')
@@ -93,6 +94,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+if not TEST_RUN:
+    INSTALLED_APPS = INSTALLED_APPS + ('silk',)
+    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('silk.middleware.SilkyMiddleware',)
+    SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = False
+    SILKY_PYTHON_PROFILER_RESULT_PATH = '/backups/'
 
 ROOT_URLCONF = 'dt.urls'
 
