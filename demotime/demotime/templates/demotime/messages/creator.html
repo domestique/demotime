@@ -1,6 +1,14 @@
 {% extends "demotime/messages/msg_base.html" %}
 {% block content %}
 <p>
+    <strong>Heads up!</strong>
+</p>
+<p>
     You have been {% if removed %}removed{% else %}added{% endif %} as an owner on <a href="http://{{ dt_url }}{{ url }}">{{ title }}</a>!
 </p>
+{% if not removed %}
+    <p>Someone added you as a co-owner. Co-owners are often expected to contribute to these demos, so
+    we suggest you <a href="http://{{ dt_url }}{{ url }}">have a look at this demo</a> to see if there
+    is anything you want to add.</p>
+{% endif %}
 {% endblock %}

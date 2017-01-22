@@ -27,8 +27,8 @@ h1 .alert {
     font-size: 10px;
     color: #aaaaaa;
 }
-.review ul br,
-.review ol br {
+.review #comments br,
+.review #comments br {
     display: none;
 }
 .review p {
@@ -109,6 +109,13 @@ h1 .alert {
 .reviewers a {
     line-height: 20px;
     display: inline-block;
+}
+.reviewers small {
+    font-size: 11px;
+}
+.reviewer_ul small {
+    margin-left: 20px;
+    color: #888;
 }
 
 .main-content {

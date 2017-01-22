@@ -256,7 +256,7 @@
             {# Blog updates #}
             <script>
                 // Update this date to trigger new blog post notifications
-                var blog_update = '20170107';
+                var blog_update = '20170120';
 
                 if (!Cookies.get('blog_entry') || Cookies.get('blog_entry') != blog_update) {
                     Cookies.set('blog_entry', blog_update);
@@ -266,6 +266,12 @@
 
             {# User-readable timestamps (x hours ago) #}
             <script src="/static/scripts/library/moment.min.js?{{ site_settings.CACHE_BUSTER }}"></script>
+            <script>
+            $('.humanize_date').each(function() {
+                $(this).html(moment($(this).html()).fromNow());
+
+            });
+            </script>
         {% endif %}
 
         {% block scripts %}{% endblock %}
