@@ -134,6 +134,7 @@ class TestReminderModel(BaseTestCase):
         self.assertFalse(reminder.active)
 
     def test_send_reminder(self):
+        mail.outbox = []
         models.Reminder.create_reminders_for_review(self.review)
         yesterday = timezone.now() - timedelta(days=1)
         models.Reminder.objects.update(remind_at=yesterday)

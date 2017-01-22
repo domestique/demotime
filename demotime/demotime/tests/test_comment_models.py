@@ -35,6 +35,7 @@ class TestCommentModels(BaseTestCase):
         dropped_follower = self.review.follower_set.all()[0]
         dropped_reviewer.drop_reviewer(self.review.creator_set.active().get().user)
         dropped_follower.drop_follower(self.review.creator_set.active().get().user)
+        mail.outbox = []
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
         attachments = [
             {
@@ -101,6 +102,7 @@ class TestCommentModels(BaseTestCase):
         self.review.state = constants.DRAFT
         self.review.save(update_fields=['state'])
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=self.review.revision,
@@ -151,6 +153,7 @@ class TestCommentModels(BaseTestCase):
             'sort_order': 1,
             'description': 'Test Description'
         }]
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -179,6 +182,7 @@ class TestCommentModels(BaseTestCase):
     def test_create_comment_starting_with_mention(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -202,14 +206,14 @@ class TestCommentModels(BaseTestCase):
         '''
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="<br><p>Hey, do you think @test_user_1 and @test_user_2 should see this?</p><br>",
             thread=thread
         )
-        # Followers 1/2, Test Users 1/2
-        self.assertEqual(len(mail.outbox), 4)
+        self.assertEqual(len(mail.outbox), 5)
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
@@ -226,6 +230,7 @@ class TestCommentModels(BaseTestCase):
         '''
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -247,6 +252,7 @@ class TestCommentModels(BaseTestCase):
     def test_create_comment_case_insensitive_mentions(self):
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -270,6 +276,7 @@ class TestCommentModels(BaseTestCase):
         '''
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,

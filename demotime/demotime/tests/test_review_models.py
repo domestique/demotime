@@ -521,7 +521,8 @@ class TestReviewModels(BaseTestCase):
         co_owner_msgs = [
             msg for msg in mail.outbox if msg.to == [self.co_owner.email]
         ]
-        self.assertEqual(len(co_owner_msgs), 1)
+        # 1 for Revision, 1 for being added
+        self.assertEqual(len(co_owner_msgs), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
@@ -559,7 +560,8 @@ class TestReviewModels(BaseTestCase):
         co_owner_msgs = [
             msg for msg in mail.outbox if msg.to == [self.co_owner.email]
         ]
-        self.assertEqual(len(co_owner_msgs), 1)
+        # 1 for adding, 1 for removing
+        self.assertEqual(len(co_owner_msgs), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
@@ -636,8 +638,10 @@ class TestReviewModels(BaseTestCase):
         follower_msgs = [
             msg for msg in mail.outbox if msg.to == [self.followers[0].email]
         ]
-        self.assertEqual(len(co_owner_msgs), 1)
-        self.assertEqual(len(follower_msgs), 1)
+        # 1 for being added, 1 for removal
+        self.assertEqual(len(co_owner_msgs), 2)
+        # 1 for being added, 1 for revision
+        self.assertEqual(len(follower_msgs), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
@@ -790,7 +794,7 @@ class TestReviewModels(BaseTestCase):
         creator = obj.creator_set.active().get().user
         approved_msg = []
         for msg in mail.outbox:
-            if msg.to == [creator.email] and 'Approved' in msg.body:
+            if msg.to == [creator.email] and 'approved' in msg.body:
                 approved_msg.append(msg)
 
         self.assertEqual(len(approved_msg), 1)
@@ -835,8 +839,8 @@ class TestReviewModels(BaseTestCase):
         rejected_msg = []
         creator = obj.creator_set.active().get().user
         for msg in mail.outbox:
-            if msg.to == [creator.email] and 'Rejected' in msg.body:
-                approved_msg.append(msg)
+            if msg.to == [creator.email] and 'rejected' in msg.body:
+                rejected_msg.append(msg)
 
         self.assertEqual(len(rejected_msg), 1)
         self.assertTrue(changed)

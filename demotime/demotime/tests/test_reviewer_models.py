@@ -133,10 +133,12 @@ class TestReviewerModels(BaseTestCase):
             status=constants.APPROVED
         )
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        mail.outbox = []
         reviewer = models.Reviewer.objects.get(reviewer=test_user_1)
         reviewer.drop_reviewer(obj.creator_set.active().get().user)
         obj.refresh_from_db()
-        self.assertEqual(len(mail.outbox), 6)
+        # 1 approved demo, 1 removed reviewer
+        self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.REVIEWER_REMOVED
@@ -157,10 +159,12 @@ class TestReviewerModels(BaseTestCase):
             status=constants.REJECTED
         )
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        mail.outbox = []
         reviewer = models.Reviewer.objects.get(reviewer=test_user_1)
         reviewer.drop_reviewer(obj.creator_set.active().get().user)
         obj.refresh_from_db()
-        self.assertEqual(len(mail.outbox), 6)
+        # 1 rejected demo, 1 removed reviewer
+        self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.REVIEWER_REMOVED

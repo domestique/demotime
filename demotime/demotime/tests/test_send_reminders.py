@@ -19,6 +19,7 @@ class TestSendReminders(BaseTestCase):
         models.Reminder.objects.all().delete()
 
     def test_send_reminders(self):
+        mail.outbox = []
         models.Reminder.create_reminders_for_review(self.review)
         yesterday = timezone.now() - timedelta(days=1)
         models.Reminder.objects.update(remind_at=yesterday)

@@ -129,6 +129,7 @@ class TestCreatorModels(BaseTestCase):
 
 
     def test_create_creator_notify(self):
+        mail.outbox = []
         creator, _ = models.Creator.create_creator(
             user=self.user, review=self.review,
             notify=True, adding_user=self.user
@@ -146,7 +147,7 @@ class TestCreatorModels(BaseTestCase):
             event.related_object, creator
         )
         self.assertEqual(len(mail.outbox), 6)
-        msg = mail.outbox[-1]
+        msg = mail.outbox[0]
         self.assertEqual(msg.to, [self.user.email])
         self.assertEqual(
             msg.subject,
