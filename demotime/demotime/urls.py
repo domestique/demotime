@@ -19,6 +19,7 @@ from demotime.views import (
     profile,
     projects,
     reviews,
+    reactions,
     users,
     webhooks,
     gif_search,
@@ -163,6 +164,16 @@ urlpatterns += [
         r'projects/(?P<proj_slug>[-\w]+)/events/$',
         events.EventView.as_view(),
         name='events'
+    ),
+    url(
+        r'projects/(?P<proj_slug>[-\w]+)/reactions/(?P<reaction_pk>[-\d]+)/$',
+        reactions.ReactionJsonView.as_view(),
+        name='reactions'
+    ),
+    url(
+        r'projects/(?P<proj_slug>[-\w]+)/reactions/$',
+        reactions.ReactionJsonView.as_view(),
+        name='reactions'
     ),
     url(
         r'projects/(?P<proj_slug>[-\w]+)/admin/hooks/create/$',

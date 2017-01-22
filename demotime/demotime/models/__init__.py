@@ -16,6 +16,7 @@ from .comments import Comment, CommentThread
 from .creator import Creator
 from .issues import Issue
 from .reviews import Review, ReviewRevision
+from .reaction import Reaction, ReactionType
 
 
 def create_profile(sender, instance, created, raw, **kwargs):
