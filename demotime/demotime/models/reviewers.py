@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 
+from demotime import helpers
 from demotime.models.base import BaseModel
 from demotime.constants import (
     REVIEWING,
@@ -10,7 +11,7 @@ from demotime.constants import (
     REJECTED
 )
 from demotime.models import (
-    Event, EventType, Message,
+    Event, EventType,
     Reminder
 )
 
@@ -149,7 +150,7 @@ class Reviewer(BaseModel):
                 'creator': notify_creator,
                 'reviewer': self,
             }
-            Message.send_system_message(
+            helpers.send_system_message(
                 title,
                 'demotime/messages/reviewer.html',
                 context,
@@ -196,7 +197,7 @@ class Reviewer(BaseModel):
                 'title': self.review.title,
             }
             for creator in self.review.creator_set.active():
-                Message.send_system_message(
+                helpers.send_system_message(
                     title,
                     'demotime/messages/reviewer_status_change.html',
                     context,

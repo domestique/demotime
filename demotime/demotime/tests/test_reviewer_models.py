@@ -89,7 +89,7 @@ class TestReviewerModels(BaseTestCase):
 
     def test_drop_reviewer(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
-        models.MessageBundle.objects.all().delete()
+        mail.outbox = []
         reviewer = obj.reviewer_set.last()
         reviewer.drop_reviewer(obj.creator_set.active().get().user)
         reviewer.refresh_from_db()
@@ -98,7 +98,7 @@ class TestReviewerModels(BaseTestCase):
         )
         self.assertFalse(reviewer.is_active)
         self.assertFalse(reminders.exists())
-        self.assertEqual(models.MessageBundle.objects.count(), 1)
+        self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.REVIEWER_REMOVED
@@ -113,12 +113,12 @@ class TestReviewerModels(BaseTestCase):
 
     def test_drop_reviewer_draft(self):
         obj = models.Review.create_review(**self.default_review_kwargs)
-        models.MessageBundle.objects.all().delete()
+        mail.outbox = []
         reviewer = obj.reviewer_set.last()
         reviewer.drop_reviewer(obj.creator_set.active().get().user, draft=True)
         reviewer.refresh_from_db()
         self.assertFalse(reviewer.is_active)
-        self.assertEqual(models.MessageBundle.objects.count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.REVIEWER_REMOVED
@@ -133,10 +133,12 @@ class TestReviewerModels(BaseTestCase):
             status=constants.APPROVED
         )
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        mail.outbox = []
         reviewer = models.Reviewer.objects.get(reviewer=test_user_1)
         reviewer.drop_reviewer(obj.creator_set.active().get().user)
         obj.refresh_from_db()
-        self.assertEqual(models.MessageBundle.objects.count(), 6)
+        # 1 approved demo, 1 removed reviewer
+        self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.REVIEWER_REMOVED
@@ -157,10 +159,12 @@ class TestReviewerModels(BaseTestCase):
             status=constants.REJECTED
         )
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
+        mail.outbox = []
         reviewer = models.Reviewer.objects.get(reviewer=test_user_1)
         reviewer.drop_reviewer(obj.creator_set.active().get().user)
         obj.refresh_from_db()
-        self.assertEqual(models.MessageBundle.objects.count(), 6)
+        # 1 rejected demo, 1 removed reviewer
+        self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 event_type__code=models.EventType.REVIEWER_REMOVED
@@ -192,16 +196,13 @@ class TestReviewerModels(BaseTestCase):
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             constants.APPROVED
         )
-        msg_bundle = models.MessageBundle.objects.get(
-            review=obj,
-            owner=obj.creator_set.active().get().user
-        )
-        self.assertEqual(
-            msg_bundle.message_set.first().title,
-            '{} has approved your review: {}'.format(
-                reviewer.reviewer_display_name, obj.title
-            )
-        )
+        status_msg = []
+        creator = obj.creator_set.active().get().user
+        for msg in mail.outbox:
+            if msg.to == [creator.email] and 'approved' in msg.body:
+                status_msg.append(msg)
+
+        self.assertEqual(len(status_msg), 1)
         self.assertFalse(models.Reminder.objects.get(pk=reminder.pk).active)
         models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
 
@@ -218,12 +219,6 @@ class TestReviewerModels(BaseTestCase):
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             constants.REJECTED
         )
-        self.assertEqual(
-            msg_bundle.message_set.first().title,
-            '{} has rejected your review: {}'.format(
-                reviewer.reviewer_display_name, obj.title
-            )
-        )
         self.assertFalse(models.Reminder.objects.get(pk=reminder.pk).active)
         models.Reminder.objects.filter(pk=reminder.pk).update(active=True)
 
@@ -239,12 +234,6 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(
             models.Reviewer.objects.get(pk=reviewer.pk).status,
             constants.REVIEWING
-        )
-        self.assertEqual(
-            msg_bundle.message_set.first().title,
-            '{} resumed reviewing your review: {}'.format(
-                reviewer.reviewer_display_name, obj.title
-            )
         )
         self.assertTrue(models.Reminder.objects.get(pk=reminder.pk).active)
 
@@ -271,24 +260,6 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(review.reviewer_set.count(), 1)
         self.assertEqual(reviewer_obj.review, review)
         self.assertEqual(reviewer_obj.reviewer, new_reviewer)
-        self.assertTrue(
-            reviewer_obj.reviewer.messagebundle_set.filter(
-                review=review,
-                message__title='You have been added as a reviewer on: {}'.format(review.title),
-                read=False,
-            ).exists()
-        )
-        creator = review.creator_set.active().get().user
-        self.assertFalse(
-            creator.messagebundle_set.filter(
-                review=review,
-                message__title='{} has been added as a reviewer on: {}'.format(
-                    reviewer_obj.reviewer_display_name,
-                    review.title
-                ),
-                read=False,
-            ).exists()
-        )
 
     def test_create_reviewer_notify_creator(self):
         review = models.Review.create_review(**self.default_review_kwargs)
@@ -312,24 +283,6 @@ class TestReviewerModels(BaseTestCase):
         self.assertEqual(review.reviewer_set.count(), 1)
         self.assertEqual(reviewer_obj.review, review)
         self.assertEqual(reviewer_obj.reviewer, new_reviewer)
-        self.assertFalse(
-            reviewer_obj.reviewer.messagebundle_set.filter(
-                review=review,
-                message__title='You have been added as a reviewer on: {}'.format(review.title),
-                read=False,
-            ).exists()
-        )
-        creator = review.creator_set.active().get().user
-        self.assertTrue(
-            creator.messagebundle_set.filter(
-                review=review,
-                message__title='{} has been added as a reviewer on: {}'.format(
-                    reviewer_obj.reviewer_display_name,
-                    review.title
-                ),
-                read=False,
-            ).exists()
-        )
 
     def test_reviewer_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)

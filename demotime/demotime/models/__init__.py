@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from .settings import Setting
 from .events import EventType, Event
 from .attachments import Attachment, attachment_filename
-from .messages import Message, MessageBundle
 from .reminders import Reminder
 from .followers import Follower
 from .reviewers import Reviewer

@@ -75,23 +75,6 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(self.review.follower_set.count(), 1)
         self.assertEqual(follower_obj.review, self.review)
         self.assertEqual(follower_obj.user, follower)
-        self.assertTrue(
-            follower.messagebundle_set.filter(
-                review=self.review,
-                message__title='You are now following {}'.format(self.review.title),
-                read=False,
-            ).exists()
-        )
-        self.assertFalse(
-            self.review.creator_set.active().get().user.messagebundle_set.filter(
-                review=self.review,
-                message__title='{} is now following {}'.format(
-                    follower_obj.display_name,
-                    self.review.title
-                ),
-                read=False,
-            ).exists()
-        )
         event = follower_obj.events.get(
             event_type__code=models.EventType.FOLLOWER_ADDED
         )
@@ -115,23 +98,6 @@ class TestFollowerModels(BaseTestCase):
         self.assertEqual(self.review.follower_set.count(), 1)
         self.assertEqual(follower_obj.review, self.review)
         self.assertEqual(follower_obj.user, follower)
-        self.assertFalse(
-            follower.messagebundle_set.filter(
-                review=self.review,
-                message__title='You are now following {}'.format(self.review.title),
-                read=False,
-            ).exists()
-        )
-        self.assertTrue(
-            self.review.creator_set.active().get().user.messagebundle_set.filter(
-                review=self.review,
-                message__title='{} is now following {}'.format(
-                    follower_obj.display_name,
-                    self.review.title
-                ),
-                read=False,
-            ).exists()
-        )
         event = follower_obj.events.get(
             event_type__code=models.EventType.FOLLOWER_ADDED
         )

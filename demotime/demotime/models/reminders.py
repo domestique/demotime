@@ -3,8 +3,9 @@ import bdateutil
 from django.db import models
 from django.utils import timezone
 
+from demotime import helpers
 from demotime.models.base import BaseModel
-from demotime.models import Message, Setting
+from demotime.models import Setting
 
 
 def get_reminder_days(project):
@@ -119,7 +120,7 @@ class Reminder(BaseModel):
             'url': self.review.get_absolute_url(),
         }
         title = 'Reminder: {}'.format(self.review.title)
-        Message.send_system_message(
+        helpers.send_system_message(
             title,
             'demotime/messages/reminder.html',
             context,

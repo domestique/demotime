@@ -493,13 +493,6 @@ class TestReviewModels(BaseTestCase):
             len(mail.outbox),
             6 # 3 reviewers, 2 followers, 1 co-owner
         )
-        self.assertEqual(
-            models.Message.objects.filter(
-                receipient=self.co_owner,
-                review__in=obj.reviewrevision_set.all()
-            ).count(),
-            2 # 1 for creation, 1 for update
-        )
         self.assertEqual(obj.last_action_by, self.user)
 
     def test_update_review_add_coowner(self):
@@ -525,13 +518,11 @@ class TestReviewModels(BaseTestCase):
         creators = obj.creator_set.active()
         self.assertTrue(creators.filter(user=self.user).exists())
         self.assertTrue(creators.filter(user=self.co_owner).exists())
-        self.assertEqual(
-            models.Message.objects.filter(
-                receipient=self.co_owner,
-                title__contains='added'
-            ).count(),
-            1
-        )
+        co_owner_msgs = [
+            msg for msg in mail.outbox if msg.to == [self.co_owner.email]
+        ]
+        # 1 for Revision, 1 for being added
+        self.assertEqual(len(co_owner_msgs), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
@@ -566,13 +557,11 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(creators.count(), 1)
         self.assertTrue(creators.filter(user=self.user).exists())
         self.assertFalse(creators.filter(user=self.co_owner).exists())
-        self.assertEqual(
-            models.Message.objects.filter(
-                receipient=self.co_owner,
-                title__contains='removed'
-            ).count(),
-            1
-        )
+        co_owner_msgs = [
+            msg for msg in mail.outbox if msg.to == [self.co_owner.email]
+        ]
+        # 1 for adding, 1 for removing
+        self.assertEqual(len(co_owner_msgs), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
@@ -643,13 +632,16 @@ class TestReviewModels(BaseTestCase):
         self.assertTrue(creators.filter(user=self.user).exists())
         self.assertTrue(creators.filter(user=self.followers[0]).exists())
         self.assertFalse(creators.filter(user=self.co_owner).exists())
-        self.assertEqual(
-            models.Message.objects.filter(
-                receipient=self.co_owner,
-                title__contains='removed'
-            ).count(),
-            1
-        )
+        co_owner_msgs = [
+            msg for msg in mail.outbox if msg.to == [self.co_owner.email]
+        ]
+        follower_msgs = [
+            msg for msg in mail.outbox if msg.to == [self.followers[0].email]
+        ]
+        # 1 for being added, 1 for removal
+        self.assertEqual(len(co_owner_msgs), 2)
+        # 1 for being added, 1 for revision
+        self.assertEqual(len(follower_msgs), 2)
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
@@ -657,14 +649,6 @@ class TestReviewModels(BaseTestCase):
             ).count(),
             1
         )
-        self.assertEqual(
-            models.Message.objects.filter(
-                receipient=self.followers[0],
-                title__contains='added as an owner'
-            ).count(),
-            1
-        )
-        #import ipdb; ipdb.set_trace()
         self.assertEqual(
             models.Event.objects.filter(
                 user=self.user,
@@ -679,7 +663,6 @@ class TestReviewModels(BaseTestCase):
         for reviewer in obj.reviewer_set.all():
             reviewer.set_status(constants.APPROVED)
         mail.outbox = []
-        models.MessageBundle.objects.all().delete()
         models.Event.objects.all().delete()
         obj.update_state(constants.PAUSED)
         obj.refresh_from_db()
@@ -808,11 +791,13 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj = models.Review.objects.get(pk=obj.pk)
         self.assertEqual(obj.reviewer_state, constants.APPROVED)
-        msg = models.Message.objects.get(
-            review=obj.reviewrevision_set.latest(),
-            receipient=obj.creator_set.active().get().user
-        )
-        self.assertEqual(msg.title, '"{}" has been Approved!'.format(obj.title))
+        creator = obj.creator_set.active().get().user
+        approved_msg = []
+        for msg in mail.outbox:
+            if msg.to == [creator.email] and 'approved' in msg.body:
+                approved_msg.append(msg)
+
+        self.assertEqual(len(approved_msg), 1)
         self.assertTrue(changed)
         self.assertEqual(new_state, constants.APPROVED)
         event = obj.event_set.get(event_type__code=models.EventType.DEMO_APPROVED)
@@ -851,11 +836,13 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_REJECTED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.active().get().user)
-        msg = models.Message.objects.get(
-            review=obj.reviewrevision_set.latest(),
-            receipient=obj.creator_set.active().get().user
-        )
-        self.assertEqual(msg.title, '"{}" has been Rejected'.format(obj.title))
+        rejected_msg = []
+        creator = obj.creator_set.active().get().user
+        for msg in mail.outbox:
+            if msg.to == [creator.email] and 'rejected' in msg.body:
+                rejected_msg.append(msg)
+
+        self.assertEqual(len(rejected_msg), 1)
         self.assertTrue(changed)
         self.assertEqual(new_state, constants.REJECTED)
         self.assertTrue(
@@ -893,11 +880,13 @@ class TestReviewModels(BaseTestCase):
         changed, new_state = obj.update_reviewer_state()
         obj.refresh_from_db()
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
-        msg = models.Message.objects.get(
-            review=obj.reviewrevision_set.latest(),
-            receipient=obj.creator_set.active().get().user
-        )
-        self.assertEqual(msg.title, '"{}" is back Under Review'.format(obj.title))
+        review_msg = []
+        creator = obj.creator_set.active().get().user
+        for msg in mail.outbox:
+            if msg.to == [creator.email] and 'Under Review' in msg.body:
+                review_msg.append(msg)
+
+        self.assertEqual(len(review_msg), 1)
         self.assertTrue(changed)
         self.assertEqual(new_state, constants.REVIEWING)
         event = obj.event_set.get(
@@ -945,13 +934,6 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_PAUSED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.active().get().user)
-        msgs = models.Message.objects.filter(
-            review=obj.reviewrevision_set.latest(),
-            title='"{}" has been {}'.format(
-                obj.title, constants.PAUSED.capitalize()
-            )
-        )
-        self.assertEqual(msgs.count(), 3)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -993,13 +975,6 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_CLOSED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.get().user)
-        msgs = models.Message.objects.filter(
-            review=obj.reviewrevision_set.latest(),
-            title='"{}" has been {}'.format(
-                obj.title, constants.CLOSED.capitalize()
-            )
-        )
-        self.assertEqual(msgs.count(), 3)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -1036,14 +1011,6 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_ABORTED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.get().user)
-        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
-        msgs = models.Message.objects.filter(
-            review=obj.reviewrevision_set.latest(),
-            title='"{}" has been {}'.format(
-                obj.title, constants.ABORTED.capitalize()
-            )
-        )
-        self.assertEqual(msgs.count(), 5)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -1085,12 +1052,6 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.get().user)
-        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
-        msgs = models.Message.objects.filter(
-            review=obj.reviewrevision_set.latest(),
-            title='"{}" has been Reopened'.format(obj.title)
-        )
-        self.assertEqual(msgs.count(), 5)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -1136,12 +1097,6 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.get().user)
-        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
-        msgs = models.Message.objects.filter(
-            review=obj.reviewrevision_set.latest(),
-            title='"{}" has been Reopened'.format(obj.title)
-        )
-        self.assertEqual(msgs.count(), 5)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,
@@ -1186,12 +1141,6 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.DEMO_OPENED)
         self.assertEqual(event.related_object, obj)
         self.assertEqual(event.user, obj.creator_set.get().user)
-        msgs = models.Message.objects.filter(review=obj.reviewrevision_set.latest())
-        msgs = models.Message.objects.filter(
-            review=obj.reviewrevision_set.latest(),
-            title='"{}" has been Reopened'.format(obj.title)
-        )
-        self.assertEqual(msgs.count(), 5)
         self.assertEqual(
             models.UserReviewStatus.objects.filter(
                 review=obj,

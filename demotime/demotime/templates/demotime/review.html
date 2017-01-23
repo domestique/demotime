@@ -559,11 +559,6 @@ var demo_info = new DemoTime.DemoInfo({
         review_pk: '{{ review.pk }}'
     });
 
-    // set up background tasks (new messages, comments etc)
-    var background_tasks = new DemoTime.BackgroundTasks({
-        json_url: '{% url "messages-json" review.pk %}'
-    });
-
     // Initialize AJAXy comments
     var comments = new DemoTime.Comments({
         comments_url: "{% url 'comments-api' proj_slug=revision.review.project.slug review_pk=revision.review.pk rev_num=revision.number %}"

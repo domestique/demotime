@@ -117,7 +117,6 @@ class TestOpenState(BaseDemoMachineCase):
 
     def test_open_draft(self):
         models.Event.objects.all().delete()
-        models.Message.objects.all().delete()
         models.UserReviewStatus.objects.filter(
             review=self.review
         ).delete()
@@ -158,14 +157,11 @@ class TestOpenState(BaseDemoMachineCase):
         # 3 reviewers, 1 creator
         self.assertEqual(reminders.count(), 4)
 
-        messages = models.Message.objects.all()
         # 2 followers, 3 reviewers
-        self.assertEqual(messages.count(), 5)
         self.assertEqual(len(mail.outbox), 5)
 
     def test_reopen(self):
         models.Event.objects.all().delete()
-        models.Message.objects.all().delete()
         models.UserReviewStatus.objects.filter(
             review=self.review
         ).delete()
@@ -193,9 +189,7 @@ class TestOpenState(BaseDemoMachineCase):
         # 3 reviewers, 1 creator
         self.assertEqual(reminders.count(), 4)
 
-        messages = models.Message.objects.all()
         # 2 followers, 3 reviewers
-        self.assertEqual(messages.count(), 5)
         self.assertEqual(len(mail.outbox), 5)
 
     def test_on_enter_draft(self):
@@ -273,7 +267,6 @@ class TestPausedState(BaseDemoMachineCase):
 
     def test_on_enter(self):
         models.Event.objects.all().delete()
-        models.Message.objects.all().delete()
         models.UserReviewStatus.objects.filter(
             review=self.review
         ).delete()
@@ -298,12 +291,7 @@ class TestPausedState(BaseDemoMachineCase):
         # 3 reviewers, 1 creator
         self.assertEqual(reminders.count(), 4)
 
-        messages = models.Message.objects.filter(
-            title__contains='Paused',
-            review=self.review.revision
-        )
         # 2 followers, 3 reviewers
-        self.assertEqual(messages.count(), 5)
         self.assertEqual(len(mail.outbox), 5)
         self.hook_patch_run.assert_called_once_with(
             constants.PAUSED
@@ -321,7 +309,6 @@ class TestClosedState(BaseDemoMachineCase):
 
     def test_on_enter(self):
         models.Event.objects.all().delete()
-        models.Message.objects.all().delete()
         models.UserReviewStatus.objects.filter(
             review=self.review
         ).delete()
@@ -346,12 +333,7 @@ class TestClosedState(BaseDemoMachineCase):
         # 3 reviewers, 1 creator
         self.assertEqual(reminders.count(), 4)
 
-        messages = models.Message.objects.filter(
-            title__contains='Closed',
-            review=self.review.revision
-        )
         # 2 followers, 3 reviewers
-        self.assertEqual(messages.count(), 5)
         self.assertEqual(len(mail.outbox), 5)
         self.hook_patch_run.assert_called_once_with(
             constants.CLOSED
@@ -369,7 +351,6 @@ class TestAbortedState(BaseDemoMachineCase):
 
     def test_on_enter(self):
         models.Event.objects.all().delete()
-        models.Message.objects.all().delete()
         models.UserReviewStatus.objects.filter(
             review=self.review
         ).delete()
@@ -394,12 +375,7 @@ class TestAbortedState(BaseDemoMachineCase):
         # 3 reviewers, 1 creator
         self.assertEqual(reminders.count(), 4)
 
-        messages = models.Message.objects.filter(
-            title__contains='Aborted',
-            review=self.review.revision
-        )
         # 2 followers, 3 reviewers
-        self.assertEqual(messages.count(), 5)
         self.assertEqual(len(mail.outbox), 5)
         self.hook_patch_run.assert_called_once_with(
             constants.ABORTED
@@ -437,7 +413,6 @@ class TestReviewingState(BaseDemoMachineCase):
     def test_on_enter(self):
         self.review.reviewer_state = 'notastate'
         self.review.save(update_fields=['reviewer_state'])
-        models.Message.objects.all().delete()
         models.Event.objects.all().delete()
         mail.outbox = []
 
@@ -445,13 +420,7 @@ class TestReviewingState(BaseDemoMachineCase):
         self.review.refresh_from_db()
         self.assertEqual(self.review.reviewer_state, constants.REVIEWING)
 
-        self.assertEqual(
-            models.Message.objects.filter(
-                title__contains='Under Review',
-                review=self.review.revision
-            ).count(),
-            1
-        )
+        self.assertEqual(len(mail.outbox), 1)
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_REVIEWING)
         self.hook_patch_run.assert_called_once_with(
@@ -468,7 +437,6 @@ class TestApprovedState(BaseDemoMachineCase):
     def test_on_enter(self):
         self.review.reviewer_state = 'notastate'
         self.review.save(update_fields=['reviewer_state'])
-        models.Message.objects.all().delete()
         models.Event.objects.all().delete()
         mail.outbox = []
 
@@ -476,13 +444,7 @@ class TestApprovedState(BaseDemoMachineCase):
         self.review.refresh_from_db()
         self.assertEqual(self.review.reviewer_state, constants.APPROVED)
 
-        self.assertEqual(
-            models.Message.objects.filter(
-                title__contains='Approved',
-                review=self.review.revision
-            ).count(),
-            1
-        )
+        self.assertEqual(len(mail.outbox), 1)
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_APPROVED)
         self.hook_patch_run.assert_called_once_with(
@@ -499,7 +461,6 @@ class TestRejectedState(BaseDemoMachineCase):
     def test_on_enter(self):
         self.review.reviewer_state = 'notastate'
         self.review.save(update_fields=['reviewer_state'])
-        models.Message.objects.all().delete()
         models.Event.objects.all().delete()
         mail.outbox = []
 
@@ -507,13 +468,7 @@ class TestRejectedState(BaseDemoMachineCase):
         self.review.refresh_from_db()
         self.assertEqual(self.review.reviewer_state, constants.REJECTED)
 
-        self.assertEqual(
-            models.Message.objects.filter(
-                title__contains='Rejected',
-                review=self.review.revision
-            ).count(),
-            1
-        )
+        self.assertEqual(len(mail.outbox), 1)
         event = models.Event.objects.get()
         self.assertEqual(event.event_type.code, models.EventType.DEMO_REJECTED)
         self.hook_patch_run.assert_called_once_with(

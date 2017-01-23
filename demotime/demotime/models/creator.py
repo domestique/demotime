@@ -2,9 +2,9 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 
-from demotime import constants
+from demotime import constants, helpers
 from demotime.models.base import BaseModel
-from demotime.models import Event, EventType, Message, UserReviewStatus
+from demotime.models import Event, EventType, UserReviewStatus
 
 
 class CreatorManager(models.Manager):
@@ -44,7 +44,7 @@ class Creator(BaseModel):
             'removed' if removed else 'added',
             self.review.title
         )
-        Message.send_system_message(
+        helpers.send_system_message(
             subject,
             'demotime/messages/creator.html',
             {

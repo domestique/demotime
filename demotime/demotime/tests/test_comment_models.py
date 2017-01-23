@@ -1,5 +1,6 @@
 from mock import patch
 
+from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import BytesIO, File
 
@@ -20,8 +21,6 @@ class TestCommentModels(BaseTestCase):
             trigger_event=constants.COMMENT,
             target='http://www.example.com'
         )
-        # All the tests expect a clean slate of messages
-        models.Message.objects.all().delete()
 
     def test_create_comment_thread(self):
         thread = models.CommentThread.create_comment_thread(self.review.revision)
@@ -32,11 +31,11 @@ class TestCommentModels(BaseTestCase):
         )
 
     def test_create_comment(self):
-        self.assertEqual(models.Message.objects.count(), 0)
         dropped_reviewer = self.review.reviewer_set.all()[0]
         dropped_follower = self.review.follower_set.all()[0]
         dropped_reviewer.drop_reviewer(self.review.creator_set.active().get().user)
         dropped_follower.drop_follower(self.review.creator_set.active().get().user)
+        mail.outbox = []
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
         attachments = [
             {
@@ -76,13 +75,7 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(attachment_two.sort_order, 1)
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='New Comment').count(),
-            3
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
+        self.assertEqual(len(mail.outbox), 3)
         statuses = models.UserReviewStatus.objects.filter(review=self.review)
         self.assertEqual(statuses.count(), 6)
         # Dropped people aren't updated
@@ -108,8 +101,8 @@ class TestCommentModels(BaseTestCase):
     def test_create_comment_on_draft(self):
         self.review.state = constants.DRAFT
         self.review.save(update_fields=['state'])
-        self.assertEqual(models.Message.objects.count(), 0)
         models.UserReviewStatus.objects.filter(review=self.review).update(read=True)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=self.review.revision,
@@ -140,13 +133,7 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(attachment.sort_order, 0)
         self.assertEqual(comment.commenter, self.user)
         self.assertEqual(comment.comment, 'Test Comment')
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='New Comment').count(),
-            0
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
+        self.assertEqual(len(mail.outbox), 0)
         self.assertEqual(
             comment.__str__(),
             'Comment by {} on Review: {}'.format(
@@ -158,7 +145,6 @@ class TestCommentModels(BaseTestCase):
         self.assertFalse(comment.events.exists())
 
     def test_create_comment_with_thread(self):
-        self.assertEqual(models.Message.objects.count(), 0)
         review = models.Review.create_review(**self.default_review_kwargs)
         thread = models.CommentThread.create_comment_thread(review.revision)
         models.UserReviewStatus.objects.filter(review=review).update(read=True)
@@ -167,6 +153,7 @@ class TestCommentModels(BaseTestCase):
             'sort_order': 1,
             'description': 'Test Description'
         }]
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -186,13 +173,7 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
         self.assertEqual(event.related_object, comment)
         self.assertEqual(event.user, comment.commenter)
-        self.assertEqual(
-            models.Message.objects.filter(title__contains='New Comment').count(),
-            5
-        )
-        self.assertFalse(
-            models.Message.objects.filter(receipient=self.user).exists()
-        )
+        self.assertEqual(len(mail.outbox), 5)
         statuses = models.UserReviewStatus.objects.filter(review=review)
         self.assertEqual(statuses.count(), 6)
         self.assertEqual(statuses.filter(read=True).count(), 1)
@@ -200,27 +181,15 @@ class TestCommentModels(BaseTestCase):
 
     def test_create_comment_starting_with_mention(self):
         review = models.Review.create_review(**self.default_review_kwargs)
-        models.Message.objects.all().delete()
-        self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="<p></p>@test_user_1 check this out with @test_user_2</p><br>",
             thread=thread
         )
-        self.assertEqual(models.Message.objects.count(), 2)
-        test_user_1, test_user_2 = models.UserProxy.objects.filter(
-            username__in=('test_user_1', 'test_user_2')
-        )
-        self.assertEqual(
-            models.Message.objects.filter(receipient=test_user_1).count(),
-            1
-        )
-        self.assertEqual(
-            models.Message.objects.filter(receipient=test_user_2).count(),
-            1
-        )
+        self.assertEqual(len(mail.outbox), 2)
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
@@ -236,29 +205,15 @@ class TestCommentModels(BaseTestCase):
         people otherwise not on the demo.
         '''
         review = models.Review.create_review(**self.default_review_kwargs)
-        models.Message.objects.all().delete()
-        review.reviewer_set.all().delete()
-        self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="<br><p>Hey, do you think @test_user_1 and @test_user_2 should see this?</p><br>",
             thread=thread
         )
-        # Followers 1/2, Test Users 1/2
-        self.assertEqual(models.Message.objects.count(), 4)
-        test_user_1, test_user_2 = models.UserProxy.objects.filter(
-            username__in=('test_user_1', 'test_user_2')
-        )
-        self.assertEqual(
-            models.Message.objects.filter(receipient=test_user_1).count(),
-            1
-        )
-        self.assertEqual(
-            models.Message.objects.filter(receipient=test_user_2).count(),
-            1
-        )
+        self.assertEqual(len(mail.outbox), 5)
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
@@ -274,9 +229,8 @@ class TestCommentModels(BaseTestCase):
         mention and follow our normal comment emailing rules
         '''
         review = models.Review.create_review(**self.default_review_kwargs)
-        models.Message.objects.all().delete()
-        self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
@@ -284,7 +238,7 @@ class TestCommentModels(BaseTestCase):
             thread=thread
         )
         # 3 reviewers, 2 followers, commenter was creator
-        self.assertEqual(models.Message.objects.count(), 5)
+        self.assertEqual(len(mail.outbox), 5)
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
@@ -297,27 +251,15 @@ class TestCommentModels(BaseTestCase):
 
     def test_create_comment_case_insensitive_mentions(self):
         review = models.Review.create_review(**self.default_review_kwargs)
-        models.Message.objects.all().delete()
-        self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="<p></p>@TEST_USER_1 check this out with @TeSt_UsEr_2</p><br>",
             thread=thread
         )
-        self.assertEqual(models.Message.objects.count(), 2)
-        test_user_1, test_user_2 = models.UserProxy.objects.filter(
-            username__in=('test_user_1', 'test_user_2')
-        )
-        self.assertEqual(
-            models.Message.objects.filter(receipient=test_user_1).count(),
-            1
-        )
-        self.assertEqual(
-            models.Message.objects.filter(receipient=test_user_2).count(),
-            1
-        )
+        self.assertEqual(len(mail.outbox), 2)
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
@@ -333,21 +275,15 @@ class TestCommentModels(BaseTestCase):
         the other mentions
         '''
         review = models.Review.create_review(**self.default_review_kwargs)
-        models.Message.objects.all().delete()
-        self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
+        mail.outbox = []
         comment = models.Comment.create_comment(
             commenter=self.user,
             review=review.revision,
             comment="<p></p>@test_user_1 check this out with @BAD_USERNAME</p><br>",
             thread=thread
         )
-        self.assertEqual(models.Message.objects.count(), 1)
-        test_user_1 = models.UserProxy.objects.get(username='test_user_1')
-        self.assertEqual(
-            models.Message.objects.filter(receipient=test_user_1).count(),
-            1
-        )
+        self.assertEqual(len(mail.outbox), 1)
         self.task_patch.delay.assert_called_with(
             review.pk,
             self.hook.pk,
@@ -360,8 +296,6 @@ class TestCommentModels(BaseTestCase):
 
     def test_comment_to_json(self):
         review = models.Review.create_review(**self.default_review_kwargs)
-        models.Message.objects.all().delete()
-        self.assertEqual(models.Message.objects.count(), 0)
         thread = models.CommentThread.create_comment_thread(review.revision)
         attachments = [{
             'attachment': File(BytesIO(b'test_file_1'), name='test_file_1.png'),
