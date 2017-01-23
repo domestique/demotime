@@ -159,7 +159,6 @@
 
 {% block scripts %}
 <script src="/static/scripts/ReviewActivity.js?{{ site_settings.CACHE_BUSTER }}"></script>
-<script src="/static/scripts/ArchiveAll.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/DemoState.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
@@ -171,13 +170,6 @@ var review_activity = new DemoTime.ReviewActivity({
     project_slug: null,
     exclusion_list: '?exclude_type=reviewer-added&exclude_type=reviewer-removed&exclude_type=follower-added&exclude_type=follower-removed'
 });
-
-{% comment %}
-// FIXME: Remove?
-// var archive_all = new DemoTime.ArchiveAll({
-//    url: '{% url "messages-json" %}'
-// });
-{% endcomment %}
 
 var demo_state = new DemoTime.DemoState();
 
