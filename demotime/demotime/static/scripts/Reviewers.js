@@ -6,7 +6,7 @@ DemoTime.Reviewers = Backbone.View.extend({
     events: {
         'keyup .find_person': 'typing',
         'click .add_person_click': 'add',
-        'click .person_deleter_link': 'delete',
+        'click .person_changer_link': 'change',
         'click .cancel': 'cancel'
     },
 
@@ -70,11 +70,10 @@ DemoTime.Reviewers = Backbone.View.extend({
 
     add: function(event) {
         var link = $(event.target),
-            pk = link.data('reviewer'),
+            pk = link.data('person'),
             self = this;
 
         event.preventDefault();
-
         var req = $.ajax({
             url: self.options.url,
             method: 'POST',
@@ -121,7 +120,7 @@ DemoTime.Reviewers = Backbone.View.extend({
         });
     },
 
-    delete: function(event) {
+    change: function(event) {
         event.preventDefault();
         var $link = $(event.target),
             pk = $link.data('person'),
@@ -139,10 +138,18 @@ DemoTime.Reviewers = Backbone.View.extend({
         });
 
         req.success(function() {
-            if (!$li.length) {
-                window.location.reload();
-            } else {
+            // nextaction lets us chain AJAX requests to demote reviewers
+            // to followers and vice versa
+            if ($link.data('nextaction')) {
+                $link.data('action', $link.data('nextaction'));
+                self.add(event);
                 $li.slideUp();
+            } else {
+                if (!$li.length) {
+                    window.location.reload();
+                } else {
+                    $li.slideUp();
+                }
             }
         });
 
