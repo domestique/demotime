@@ -272,6 +272,15 @@
 
             });
             </script>
+
+            {# Custom multi-selects #}
+            <link href="/static/styles/library/chosen/chosen.min.css" rel="stylesheet">
+            <script src="/static/scripts/library/chosen.jquery.min.js?{{ site_settings.CACHE_BUSTER }}"></script>
+            <script>
+                $("select[multiple]").chosen({
+                    placeholder_text_multiple: 'Click or start typing a name'
+                });
+            </script>
         {% endif %}
 
         {% block scripts %}{% endblock %}
