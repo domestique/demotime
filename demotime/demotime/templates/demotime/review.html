@@ -160,8 +160,7 @@
                         <img src="/static/images/emoji/smiley.png" width="25" height="25">
                     {% endif %}
                     {{ object.state }}
-                {% endif %}
-                {% if reviewer %}
+                {% elif reviewer %}
                     {% if object.state == 'closed' or object.state == 'approved' %}
                         {{ object.state }}
                     {% else %}
@@ -174,16 +173,15 @@
                         {% endif %}
                         {{ reviewer.status }}
                     {% endif %}
-                {% endif %}
-                {% if object.state != "closed" %}
-                    {% if follower_obj %}
-                        following
-                        <span class="person_deleter normal_text">
-                            <a href="#" class="person_changer_link"
-                               data-action="drop_follower"
-                               data-person="{{ request.user.pk }}">unfollow</a>
-                        </span>
-                    {% endif %}
+                {% elif object.state != "closed" and follower_obj %}
+                    following
+                    <span class="person_deleter normal_text">
+                        <a href="#" class="person_changer_link"
+                           data-action="drop_follower"
+                           data-person="{{ request.user.pk }}">unfollow</a>
+                    </span>
+                {% else %}
+                    {{ object.state }}
                 {% endif %}
             </span>
             <strong>DT-{{ object.pk }}</strong>:
