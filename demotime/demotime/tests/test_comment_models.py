@@ -98,6 +98,19 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(event.related_object, comment)
         self.assertEqual(event.user, comment.commenter)
 
+    def test_create_comment_as_issue(self):
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=self.review.revision,
+            comment='Test Comment',
+            attachments=[],
+            is_issue=True
+        )
+        self.assertEqual(
+            comment.issue,
+            models.Issue.objects.get(comment=comment)
+        )
+
     def test_create_comment_on_draft(self):
         self.review.state = constants.DRAFT
         self.review.save(update_fields=['state'])

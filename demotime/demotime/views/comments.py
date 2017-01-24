@@ -118,17 +118,15 @@ class CommentJsonView(CanViewJsonView):
         )
         if comment_form.is_valid():
             data = comment_form.cleaned_data
+            is_issue = data.get('is_issue', None) is not None
             comment = models.Comment.create_comment(
                 commenter=request.user,
                 comment=data['comment'],
                 review=self.revision,
                 thread=thread,
                 attachments=attachments,
+                is_issue=is_issue,
             )
-            if data.get('is_issue'):
-                models.Issue.create_issue(
-                    self.review, comment, request.user
-                )
             return {
                 'errors': '',
                 'status': 'success',

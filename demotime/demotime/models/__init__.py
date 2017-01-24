@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 # pylint: disable=import-error
 from .settings import Setting
 from .events import EventType, Event
+from .issues import Issue
 from .attachments import Attachment, attachment_filename
 from .reminders import Reminder
 from .followers import Follower
@@ -14,7 +15,6 @@ from .webhooks import WebHook
 from .users import UserProfile, UserReviewStatus, UserProxy
 from .comments import Comment, CommentThread
 from .creator import Creator
-from .issues import Issue
 from .reviews import Review, ReviewRevision
 
 

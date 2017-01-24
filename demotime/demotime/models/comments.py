@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from demotime.helpers import strip_tags
 from demotime.models import (
     Attachment,
+    Issue,
     Event,
     EventType,
     UserReviewStatus
@@ -46,6 +47,7 @@ class Comment(BaseModel):
             self.commenter.username, self.thread.review_revision.review.title
         )
 
+    @property
     def issue(self):
         issues = self.issue_set.filter(resolved_by=None)
         if issues.exists():
@@ -54,7 +56,7 @@ class Comment(BaseModel):
         return None
 
     def to_json(self):
-        issue = self.issue()
+        issue = self.issue
         if issue:
             issue_json = issue.to_json()
         else:
@@ -89,7 +91,7 @@ class Comment(BaseModel):
 
     @classmethod
     def create_comment(cls, commenter, comment, review,
-                       thread=None, attachments=None):
+                       thread=None, attachments=None, is_issue=False):
         if not thread:
             thread = CommentThread.create_comment_thread(review)
 
@@ -114,6 +116,10 @@ class Comment(BaseModel):
             comment=comment,
             thread=thread
         )
+        if is_issue:
+            Issue.create_issue(
+                review.review, obj, commenter
+            )
         if not attachments:
             attachments = []
 
