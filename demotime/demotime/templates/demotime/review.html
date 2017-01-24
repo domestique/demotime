@@ -33,6 +33,14 @@
 {# <meta name="twitter:description" content="{{ object.description|safe|linebreaksbr }}" /> #}
 {% endblock %}
 
+{# Share this #}
+{% block head_scripts %}
+    {{ block.super }}
+    {% if object.is_public and object.state != "draft" %}
+        <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-588667f4ccb41d92"></script>
+    {% endif %}
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <div class="container">
@@ -61,37 +69,76 @@
         {% endif %}
         {% if object.state == 'closed' or object.state == 'aborted' or object.state == 'paused' %}
             {% if object.state == 'paused' %}
-                <li class="open"><a data-type="open" href="#" class="subnav-item confirm review-changer icon icon-play">Resume</a></li>
+                <li class="open">
+                    <a data-type="open"
+                       href="#"
+                       class="subnav-item confirm review-changer icon icon-play">Resume</a>
+                </li>
             {% else %}
-                <li class="open"><a data-type="open" href="#" class="subnav-item review-changer icon icon-eye">Re-open</a></li>
+                <li class="open">
+                    <a data-type="open"
+                       href="#"
+                       class="subnav-item review-changer icon icon-eye">Re-open</a>
+                </li>
             {% endif %}
         {% elif object.state == 'cancelled' %}
-            <li class="open"><a data-type="draft" href="#" class="subnav-item review-changer icon icon-eye">Restore Draft</a></li>
+            <li class="open">
+                <a data-type="draft"
+                   href="#"
+                   class="subnav-item review-changer icon icon-eye">Restore Draft</a>
+            </li>
         {% else %}
             {% if object.state == "draft" %}
-                <li class="published"><a data-type="open" href="#" class="subnav-item review-changer confirm icon icon-ok">Publish</a></li>
-                <li class="closed"><a data-type="cancelled" data-draft='true' href="#" class="subnav-item review-changer alert icon icon-trash">Abandon</a></li>
+                <li class="published">
+                    <a data-type="open"
+                       href="#"
+                       class="subnav-item review-changer confirm icon icon-ok">Publish</a>
+                </li>
+                <li class="closed">
+                    <a data-type="cancelled"
+                       data-draft='true'
+                       href="#"
+                       class="subnav-item review-changer alert icon icon-trash">Abandon</a>
+                </li>
             {% endif %}
             {% if object.state != "draft" and object.state != "cancelled" %}
-                <li class="paused"><a data-type="paused" href="#" class="subnav-item review-changer icon icon-pause">Pause</a></li>
-                <li class="closed"><a data-type="closed" href="#" class="subnav-item review-changer icon icon-trash">Close</a></li>
+                <li class="paused">
+                    <a data-type="paused"
+                       href="#"
+                       class="subnav-item review-changer icon icon-pause">Pause</a>
+                </li>
+                <li class="closed">
+                    <a data-type="closed"
+                       href="#"
+                       class="subnav-item review-changer icon icon-trash">Close</a>
+                </li>
             {% endif %}
         {% endif %}
     {% else %}
         {% if reviewer and object.state != "closed" %}
             {% if reviewer.status == 'approved' %}
-                <li class="approved state-highlight"><a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove</a></li>
+                <li class="approved state-highlight">
+                    <a data-type="reviewing" href="#" class="subnav-item review-changer icon icon-thumbs-up">Unapprove</a>
+                </li>
             {% else %}
-                <li><a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve</a></li>
+                <li>
+                    <a data-type="approved" href="#" class="subnav-item confirm review-changer icon icon-thumbs-up">Approve</a>
+                </li>
             {% endif %}
             {% if reviewer.status == 'rejected' %}
-                <li class="rejected state-highlight"><a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject</a></li>
+                <li class="rejected state-highlight">
+                    <a data-type="reviewing" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Unreject</a>
+                </li>
             {% else %}
-                <li><a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject</a></li>
+                <li>
+                    <a data-type="rejected" href="#" class="subnav-item alert review-changer icon icon-thumbs-down">Reject</a>
+                </li>
             {% endif %}
         {% endif %}
     {% endif %}
-    <li><a class="subnav-item icon icon-plus" href="{% url 'create-review' object.project.slug %}">New demo</a></li>
+    <li>
+        <a class="subnav-item icon icon-plus" href="{% url 'create-review' object.project.slug %}">New demo</a>
+    </li>
 </ul>
 {% endblock %}
 
@@ -103,27 +150,20 @@
 {% block content %}
 
 <div class="review" id="review">
-    <div class="review-top">
-        {% if creator_obj %}
-            <div class="your-status">
-                <h3>
-                    Demo State:
+    <div class="main-content">
+        <h1 class="heading">
+            <span class="demo-status {{ object.state|lower }} {% if reviewer %}{{ reviewer.status|lower }}{% endif %}">
+                {% if creator_obj %}
                     {% if object.state == 'closed' %}
                         <canvas id="confetti" width="1" height="1"></canvas>
                         <script type="text/javascript" src="/static/scripts/confetti.js"></script>
                         <img src="/static/images/emoji/smiley.png" width="25" height="25">
                     {% endif %}
-                    <strong>{{ object.state|capfirst }}</strong>
-                </h3>
-            </div>
-        {% endif %}
-        {% if reviewer %}
-            <div class="your-status">
-                <h3>
-                    {% if object.state == 'closed' or  object.state == 'approved' %}
-                        This demo is <strong>{{ object.state }}</strong>. No further action is required.
+                    {{ object.state }}
+                {% elif reviewer %}
+                    {% if object.state == 'closed' or object.state == 'approved' %}
+                        {{ object.state }}
                     {% else %}
-                        Your approval status:
                         {% if reviewer.status == 'approved' %}
                             <canvas id="confetti" width="1" height="1"></canvas>
                             <script type="text/javascript" src="/static/scripts/confetti.js"></script>
@@ -131,28 +171,19 @@
                         {% elif reviewer.status == 'rejected' %}
                             <img src="/static/images/emoji/frowning2.png" width="25" height="25">
                         {% endif %}
-                        <strong>{{ reviewer.status|capfirst }}</strong>
+                        {{ reviewer.status }}
                     {% endif %}
-                </h3>
-            </div>
-        {% endif %}
-        {% if object.state != "closed" %}
-            {% if follower_obj %}
-                <div class="your-status">
-                    You are following this demo
-                    <small class="person_deleter">
-                        [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
-                    </small>
-                    <span class="help" title="When you are assigned as a 'reviewer' you
-                    will need to either approve or reject a demo. A follower can simply follow
-                    the progress of a review without the ability or need to approve or reject."></span>
-                </div>
-            {% endif %}
-        {% endif %}
-    </div>
-
-    <div class="main-content">
-        <h1 class="heading">
+                {% elif object.state != "closed" and follower_obj %}
+                    following
+                    <span class="person_deleter normal_text">
+                        <a href="#" class="person_changer_link"
+                           data-action="drop_follower"
+                           data-person="{{ request.user.pk }}">unfollow</a>
+                    </span>
+                {% else %}
+                    {{ object.state }}
+                {% endif %}
+            </span>
             <strong>DT-{{ object.pk }}</strong>:
                 {% if object.title %}
                     {{ object.title }}
@@ -185,7 +216,9 @@
                             <a href="{{ creator.user.userprofile.get_absolute_url }}">{{ creator.user.userprofile }}</a>
                             {% if creator_obj.user == request.user %}
                                 <small class="person_deleter" style="display:none">
-                                    [<a href="#" class="person_deleter_link" data-action="drop_creator" data-person="{{ creator.user.pk }}">x</a>]
+                                    [<a href="#" class="person_changer_link"
+                                        data-action="drop_creator"
+                                        data-person="{{ creator.user.pk }}">x</a>]
                                 </small>
                             {% endif %}
                         </li>
@@ -233,7 +266,22 @@
                                 </a>
                                 {% if creator_obj.user == request.user or reviewer.reviewer == request.user %}
                                     <small class="person_deleter" style="display:none; margin-left: 5px">
-                                        [<a href="#" class="person_deleter_link" data-action="drop_reviewer" data-person="{{ reviewer.reviewer.pk }}">x</a>]
+                                        [<a href="#"
+                                            class="person_changer_link"
+                                            data-action="drop_reviewer"
+                                            title="Remove"
+                                            data-person="{{ reviewer.reviewer.pk }}">
+                                            x
+                                        </a>
+                                        -
+                                        <a href="#"
+                                           class="person_changer_link"
+                                           data-action="drop_reviewer"
+                                           data-nextaction="add_follower"
+                                           title="Downgrade to Follower"
+                                           data-person="{{ reviewer.reviewer.pk }}">
+                                           &#8595;
+                                        </a>]
                                     </small>
                                 {% endif %}
                                 <small style="display: block">
@@ -251,14 +299,29 @@
                                 <a href="{{ follower.user.userprofile.get_absolute_url }}">
                                     {{ follower.user.userprofile }}
                                 </a>
-                                {% if creator_obj.user == request.user or follower.user == request.user %}
-                                    <small class="person_deleter" style="display:none">
-                                        [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
-                                    </small>
-                                {% endif %}
                                 <small>
                                     following
                                 </small>
+                                {% if creator_obj.user == request.user or follower.user == request.user %}
+                                    <small class="person_deleter" style="display:none">
+                                        [<a href="#"
+                                            class="person_changer_link"
+                                            data-action="drop_follower"
+                                            title="Remove"
+                                            data-person="{{ follower.user.pk }}">
+                                            x
+                                        </a>
+                                        -
+                                        <a href="#"
+                                           class="person_changer_link"
+                                           data-action="drop_follower"
+                                           data-nextaction="add_reviewer"
+                                           title="Upgrade to Reviewer"
+                                           data-person="{{ follower.user.pk }}">
+                                           &#8593;
+                                        </a>]
+                                    </small>
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>
@@ -267,10 +330,18 @@
                             <li class="find_person_li">
                                 <div class="split by:2 with-gap:2">
                                     <div class="cel">
-                                        <input type="text" class="find_person" data-action="find_reviewer" placeholder="add reviewer" maxlength="3">
+                                        <input type="text"
+                                               class="find_person"
+                                               data-action="find_reviewer"
+                                               placeholder="add reviewer"
+                                               maxlength="3">
                                     </div>
                                     <div class="cel">
-                                        <input type="text" class="find_person" data-action="find_follower" placeholder="add follower" maxlength="3">
+                                        <input type="text"
+                                               class="find_person"
+                                               data-action="find_follower"
+                                               placeholder="add follower"
+                                               maxlength="3">
                                     </div>
                                     {% comment %}
                                     {% if creator_obj %}
@@ -466,14 +537,14 @@
 <script type="text/x-pattern" id="new_reviewers">
 <ul>
 <% _.each(person, function(person) { %>
-<li><a href="#" data-reviewer="<%= person.pk %>" data-action="add_reviewer" class="add_person_click"><%= person.name %></a></li>
+<li><a href="#" data-person="<%= person.pk %>" data-action="add_reviewer" class="add_person_click"><%= person.name %></a></li>
 <% }) %>
 </ul>
 </script>
 <script type="text/x-pattern" id="new_followers">
 <ul>
 <% _.each(person, function(person) { %>
-<li><a href="#" data-reviewer="<%= person.pk %>" data-action="add_follower" class="add_person_click"><%= person.name %></a></li>
+<li><a href="#" data-person="<%= person.pk %>" data-action="add_follower" class="add_person_click"><%= person.name %></a></li>
 <% }) %>
 </ul>
 </script>
@@ -558,14 +629,6 @@ var demo_info = new DemoTime.DemoInfo({
         url: '{% url 'user-api' %}',
         review_pk: '{{ review.pk }}'
     });
-
-{% comment %}
-    // set up background tasks (new messages, comments etc)
-    // FIXME: Remove?
-    // var background_tasks = new DemoTime.BackgroundTasks({
-    //    json_url: '{% url "messages-json" review.pk %}'
-    // });
-{% endcomment %}
 
     // Initialize AJAXy comments
     var comments = new DemoTime.Comments({

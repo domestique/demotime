@@ -24,6 +24,8 @@
             <link href="/static/styles/ui.css?{{ site_settings.CACHE_BUSTER }}" rel="stylesheet">
         {% endblock %}
 
+        {% block head_scripts %}{% endblock %}
+
         {# Web fonts #}
         <link href='//fonts.googleapis.com/css?family=Roboto:300,400,700' rel='stylesheet' type='text/css'>
     </head>
@@ -256,7 +258,7 @@
             {# Blog updates #}
             <script>
                 // Update this date to trigger new blog post notifications
-                var blog_update = '20170120';
+                var blog_update = '20170123';
 
                 if (!Cookies.get('blog_entry') || Cookies.get('blog_entry') != blog_update) {
                     Cookies.set('blog_entry', blog_update);
@@ -271,6 +273,15 @@
                 $(this).html(moment($(this).html()).fromNow());
 
             });
+            </script>
+
+            {# Custom multi-selects #}
+            <link href="/static/styles/library/chosen/chosen.min.css" rel="stylesheet">
+            <script src="/static/scripts/library/chosen.jquery.min.js?{{ site_settings.CACHE_BUSTER }}"></script>
+            <script>
+                $("select[multiple]").chosen({
+                    placeholder_text_multiple: 'Click or start typing a name'
+                });
             </script>
         {% endif %}
 

@@ -33,6 +33,8 @@ DemoTime.Comments = Backbone.View.extend({
         // Saving container as an option for global use
         this.options.comment_form_container = button.parents('.comment_form_container');
         this.options.comment = comment_parent.find('.form-control').val();
+        this.options.comment = this.options.comment.replace(/(@)([a-zA-Z0-9_.]+)/g, "<a href=\"/accounts/profile/$2\">$1$2</a>");
+
         this.options.comment_form_container.find('input, button').prop('disabled', true);
 
         // Check for 'editing' data attr, otherwise it's a new comment
