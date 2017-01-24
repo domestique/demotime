@@ -10,4 +10,4 @@ from .group_forms import GroupForm, GroupTypeForm, GroupMemberForm
 from .webhook_forms import WebHookForm
 from .settings_forms import ProjectSettingForm
 from .event_forms import EventFilterForm
-from .reaction_forms import ReactionForm
+from .reaction_forms import ReactionForm, ReactionFilterForm

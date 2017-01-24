@@ -1,10 +1,5 @@
-import json
 
-from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-
 from demotime import forms, models
 from demotime.views import CanViewJsonView
 
@@ -30,7 +25,7 @@ class ReactionJsonView(CanViewJsonView):
             )
         return super().dispatch(request, *args, **kwargs)
 
-    def delete(self, request, reaction_pk, *args, **kwargs):
+    def delete(self, request, reaction_pk, *args, **kwargs): # pylint: disable=unused-argument
         reaction = get_object_or_404(
             models.Reaction,
             pk=reaction_pk
@@ -44,8 +39,15 @@ class ReactionJsonView(CanViewJsonView):
                 },
                 'reaction': reaction.to_json(),
             }
+        else:
+            reaction.delete()
+            return {
+                'status': 'success',
+                'errors': {},
+                'reaction': None,
+            }
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs): # pylint: disable=unused-argument
         reactions = models.Reaction.objects.all()
         form = forms.ReactionFilterForm(request.GET)
         if form.is_valid():
@@ -58,7 +60,7 @@ class ReactionJsonView(CanViewJsonView):
             return {
                 'status': 'success',
                 'errors': {},
-                'reactions': [reaction.to_json for reaction in reactions]
+                'reactions': [reaction.to_json() for reaction in reactions]
             }
         else:
             self.status = 400
@@ -66,4 +68,30 @@ class ReactionJsonView(CanViewJsonView):
                 'status': 'failure',
                 'errors': form.errors,
                 'reactions': []
+            }
+
+    def post(self, request, *args, **kwargs): # pylint: disable=unused-argument
+        form = forms.ReactionForm(request.POST)
+        if form.is_valid():
+            review = form.cleaned_data['review']
+            reaction_type = form.cleaned_data['reaction_type']
+            reaction_object = form.cleaned_data['reaction_object']
+            react_kwargs = {
+                'project': self.project, 'review': review,
+                'reaction_type': reaction_type, 'user': request.user,
+            }
+            react_kwargs[form.cleaned_data['object_type']] = reaction_object
+            reaction = models.Reaction.create_reaction(**react_kwargs)
+            self.status = 201
+            return {
+                'status': 'success',
+                'errors': {},
+                'reaction': reaction.to_json()
+            }
+        else:
+            self.status = 400
+            return {
+                'status': 'failure',
+                'errors': form.errors,
+                'reaction': {},
             }

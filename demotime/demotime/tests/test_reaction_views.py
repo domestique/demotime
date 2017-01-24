@@ -23,11 +23,15 @@ class TestReactionViews(BaseTestCase):
             revision=self.second_review.revision,
             user=self.user, reaction_type=constants.LOVE,
         )
+        assert self.client.login(
+            username=self.user.username,
+            password='testing'
+        )
 
     def test_requires_authentication(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertStatusCode(response, 401)
+        self.assertStatusCode(response, 302) # Redirect to Login
 
     def test_get_reactions(self):
         response = self.client.get(self.url)
@@ -46,7 +50,7 @@ class TestReactionViews(BaseTestCase):
         response = self.client.get(self.url, data={'review': self.review.pk})
         self.assertStatusCode(response, 200)
         data = json.loads(response.content.decode('utf-8'))
-        reactions = models.Reaction.objects.get(review=self.review)
+        reactions = models.Reaction.objects.filter(review=self.review)
         reaction_json = [reaction.to_json() for reaction in reactions]
         self.assertEqual(data, {
             'errors': {},
@@ -61,17 +65,35 @@ class TestReactionViews(BaseTestCase):
             'review': self.review.pk,
             'user': self.user.pk,
             'reaction_type': constants.PLUS_ONE,
-            'reaction_object_type': 'revision',
-            'reaction_object_pk': self.review.revision.pk,
+            'object_type': 'revision',
+            'object_pk': self.review.revision.pk,
         })
-        reaction = models.Reaction.objects.get(code=constants.PLUS_ONE)
         self.assertStatusCode(response, 201)
         self.assertEqual(models.Reaction.objects.count(), 3)
+        reaction = models.Reaction.objects.get(
+            reaction_type__code=constants.PLUS_ONE)
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'status': 'success',
             'errors': {},
             'reaction': reaction.to_json(),
+        })
+
+    def test_create_reaction_invalid_pk(self):
+        self.assertEqual(models.Reaction.objects.count(), 2)
+        response = self.client.post(self.url, data={
+            'review': self.review.pk,
+            'user': self.user.pk,
+            'reaction_type': constants.PLUS_ONE,
+            'object_type': 'revision',
+            'object_pk': 184761,
+        })
+        self.assertStatusCode(response, 400)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(data, {
+            'status': 'failure',
+            'errors': {'object_pk': ['Invalid PK supplied']},
+            'reaction': {},
         })
 
     def test_delete_reaction(self):
@@ -84,6 +106,11 @@ class TestReactionViews(BaseTestCase):
         self.assertFalse(
             models.Reaction.objects.filter(pk=self.reaction.pk).exists()
         )
+        self.assertEqual(json.loads(response.content.decode('utf-8')), {
+            'status': 'success',
+            'errors': {},
+            'reaction': None,
+        })
 
     def test_delete_reaction_not_owned(self):
         self.client.logout()
@@ -95,7 +122,7 @@ class TestReactionViews(BaseTestCase):
         })
         response = self.client.delete(url)
         self.assertStatusCode(response, 400)
-        data = json.loads(response.contentt.decode('utf-8'))
+        data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data, {
             'status': 'failure',
             'errors': {'user': "User can not delete reaction they don't own."},

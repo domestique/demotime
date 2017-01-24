@@ -28,7 +28,7 @@ class TestReactionModels(BaseTestCase):
             reaction_type.__str__(),
             'ReactionType: Test Reaction Type - test-reaction-type'
         )
-        self.assertEqual(reaction.to_json(), {
+        self.assertEqual(reaction_type.to_json(), {
             'pk': reaction_type.pk,
             'name': 'Test Reaction Type',
             'code': 'test-reaction-type'
