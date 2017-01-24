@@ -36,7 +36,7 @@
 {# Share this #}
 {% block head_scripts %}
     {{ block.super }}
-    {% if object.is_public %}
+    {% if object.is_public and object.state != "draft" %}
         <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-588667f4ccb41d92"></script>
     {% endif %}
 {% endblock %}
