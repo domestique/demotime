@@ -1,20 +1,18 @@
 /* Review overview */
 .content h1 {
-    margin-top: 20px;
-    margin-bottom: 0;
     text-transform: none;
     font-size: 35px;
     line-height: 42px;
     color: #333333;
-    padding: 25px 0 5px;
+    padding: 0;
+    margin: 0;
     font-weight: 300;
-    position: relative;
 }
 @media screen and (max-width:680px) {
     .content h1 {
-        padding: 10px 10px 5px;
         font-size: 20px;
         line-height: 24px;
+        padding: 20px 0;
     }
 }
 
@@ -37,7 +35,6 @@ h1 .alert {
 .review a {
     font-weight: 700;
 }
-.review-top,
 .review-meta {
     overflow: hidden;
 }
@@ -120,6 +117,12 @@ h1 .alert {
 
 .main-content {
     clear: both;
+    padding-top: 20px;
+}
+@media screen and (max-width:720px) {
+    .main-content {
+        padding-top: 0;
+    }
 }
 li.updated a.subnav-item {
     background: #fff2ee;
@@ -236,38 +239,43 @@ input.find_person {
     border: 1px solid #ddd;
 }
 
-.your-status {
-    box-shadow: 4px 4px 0 #dddddd;
+.demo-status {
     border: 1px solid #dddddd;
     background: #fafafa;
-    padding: 10px 25px;
-    margin: 15px 0 5px;
-    float: left;
-    border-radius: 2px;
-}
-@media screen and (max-width:680px) {
-    .your-status {
-        padding: 10px;
-    }
-}
-.your-status img {
+    padding: 1px 10px 2px;
+    margin: 0 10px 0 0;
     position: relative;
-    top: 4px;
-}
-@media screen and (max-width:680px) {
-    .your-status {
-        width: 100%;
-        float: none;
-        box-sizing: border-box;
-        margin-bottom: 5px;
-    }
-}
-.your-status h3 {
-    margin: 0;
-}
-.your-status span {
-    color: #333333;
+    top: -2px;
+    border-radius: 2px;
+    font-size: 14px;
+    text-align: center;
+    vertical-align: middle;
     font-weight: 700;
+    text-transform: uppercase;
+}
+.demo-status.open {
+    background: #1f8470;
+    color: #fff;
+}
+.demo-status.open.rejected {
+    background: #E56C6A;
+}
+.demo-status img {
+    position: relative;
+    top: 3px;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+.demo-status a {
+    color: #333;
+    text-decoration: underline;
+    font-size: 10px !important;
+    text-transform: lowercase;
+    font-weight: 400;
+}
+.demo-status.open a {
+    color: #fff;
 }
 
 #confetti {

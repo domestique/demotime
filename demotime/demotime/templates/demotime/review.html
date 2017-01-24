@@ -103,27 +103,21 @@
 {% block content %}
 
 <div class="review" id="review">
-    <div class="review-top">
-        {% if creator_obj %}
-            <div class="your-status">
-                <h3>
-                    Demo State:
+    <div class="main-content">
+        <h1 class="heading">
+            <span class="demo-status {{ object.state|lower }} {% if reviewer %}{{ reviewer.status|lower }}{% endif %}">
+                {% if creator_obj %}
                     {% if object.state == 'closed' %}
                         <canvas id="confetti" width="1" height="1"></canvas>
                         <script type="text/javascript" src="/static/scripts/confetti.js"></script>
                         <img src="/static/images/emoji/smiley.png" width="25" height="25">
                     {% endif %}
-                    <strong>{{ object.state|capfirst }}</strong>
-                </h3>
-            </div>
-        {% endif %}
-        {% if reviewer %}
-            <div class="your-status">
-                <h3>
-                    {% if object.state == 'closed' or  object.state == 'approved' %}
-                        This demo is <strong>{{ object.state }}</strong>. No further action is required.
+                    {{ object.state }}
+                {% endif %}
+                {% if reviewer %}
+                    {% if object.state == 'closed' or object.state == 'approved' %}
+                        {{ object.state }}
                     {% else %}
-                        Your approval status:
                         {% if reviewer.status == 'approved' %}
                             <canvas id="confetti" width="1" height="1"></canvas>
                             <script type="text/javascript" src="/static/scripts/confetti.js"></script>
@@ -131,28 +125,19 @@
                         {% elif reviewer.status == 'rejected' %}
                             <img src="/static/images/emoji/frowning2.png" width="25" height="25">
                         {% endif %}
-                        <strong>{{ reviewer.status|capfirst }}</strong>
+                        {{ reviewer.status }}
                     {% endif %}
-                </h3>
-            </div>
-        {% endif %}
-        {% if object.state != "closed" %}
-            {% if follower_obj %}
-                <div class="your-status">
-                    You are following this demo
-                    <small class="person_deleter">
-                        [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>]
-                    </small>
-                    <span class="help" title="When you are assigned as a 'reviewer' you
-                    will need to either approve or reject a demo. A follower can simply follow
-                    the progress of a review without the ability or need to approve or reject."></span>
-                </div>
-            {% endif %}
-        {% endif %}
-    </div>
+                {% endif %}
+                {% if object.state != "closed" %}
+                    {% if follower_obj %}
+                        following
+                        <span class="person_deleter normal_text">
+                            <a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ request.user.pk }}">unfollow</a>
+                        </span>
+                    {% endif %}
+                {% endif %}
+            </span>
 
-    <div class="main-content">
-        <h1 class="heading">
             <strong>DT-{{ object.pk }}</strong>:
                 {% if object.title %}
                     {{ object.title }}
@@ -251,14 +236,14 @@
                                 <a href="{{ follower.user.userprofile.get_absolute_url }}">
                                     {{ follower.user.userprofile }}
                                 </a>
+                                <small>
+                                    following
+                                </small>
                                 {% if creator_obj.user == request.user or follower.user == request.user %}
                                     <small class="person_deleter" style="display:none">
                                         [<a href="#" class="person_deleter_link" data-action="drop_follower" data-person="{{ follower.user.pk }}">x</a>]
                                     </small>
                                 {% endif %}
-                                <small>
-                                    following
-                                </small>
                             </li>
                         {% endfor %}
                     </ul>
