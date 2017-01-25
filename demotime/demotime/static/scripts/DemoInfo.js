@@ -46,10 +46,10 @@ DemoTime.DemoInfo = Backbone.View.extend({
     },
 
     focus_issue: function() {
-        $('#comments').find('.issue-unresolved').first().parents('.demobox').get(0).scrollIntoView();
+        ScrollTo($('#comments').find('.issue-unresolved').first().parents('.demobox'));
     },
 
     focus_comments: function() {
-        $('#comments').get(0).scrollIntoView();
+        ScrollTo($('#comments'));
     }
 });
