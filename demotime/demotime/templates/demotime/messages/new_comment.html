@@ -1,7 +1,7 @@
 {% extends "demotime/messages/msg_base.html" %}
 {% block content %}
 <p>
-{{ comment.commenter.userprofile.name }} just added a new comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>
+    {{ comment.commenter.userprofile.name }} just added a new comment to <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">{{ title }}</a>
 </p>
 {% if "data:image" in comment.comment %}
     <p>
@@ -18,6 +18,9 @@
             read the rest <a href="http://{{ dt_url }}{{ url }}#{{ comment.pk }}">here</a>
         </p>
     {% endif %}
+{% endif %}
+{% if comment.issue %}
+    <p>This comment was marked as <strong>an issue</stong> and requires resolution.</p>
 {% endif %}
 {% if comment.attachments.exists %}
     <p>
