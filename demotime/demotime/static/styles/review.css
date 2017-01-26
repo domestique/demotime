@@ -352,3 +352,19 @@ a[data-type='rejected'] {
 .issue-marker label {
     cursor: pointer;
 }
+
+nav.subnav.is_stuck {
+    padding: 5px 0;
+}
+nav.subnav.is_stuck .quickfind input[type='text'] {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+nav.subnav.is_stuck .global_actions {
+    padding-top: 0;
+}
+nav.subnav.is_stuck a.subnav-item {
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 12px;
+}
