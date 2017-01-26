@@ -3,23 +3,13 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
     events: {
         'click #activity_toggler': 'toggle_activity_pane',
-        'click .comment_link': 'jump_to_comment',
         'change #events_filter': 'render',
         'click #refresh_events': 'render',
         'click #expand_collapse': 'expand_collapse'
     },
 
-    jump_to_comment: function(event) {
-        var self = this;
-        this.hide_pane();
-        setTimeout(function() {
-            self.scroller.jump_to_link($(event.target).data('comment-id'));
-        }, 250);
-    },
-
     initialize: function(options) {
         this.options = options;
-        this.scroller = new DemoTime.ScrollToLink();
         // If there's no toggler, just launch onload (dashboard)
         if (!$('#activity_toggler').length) {
             this.render();
@@ -31,7 +21,6 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
         if ($('#events').is(':visible')) {
             this.hide_pane();
-            this.scroller.jump_to_link('review');
         } else {
             this.show_pane();
         }
@@ -41,7 +30,6 @@ DemoTime.ReviewActivity = Backbone.View.extend({
         var triggerer = $('#activity_toggler');
 
         this.$el.find('#events').slideUp('fast', function() {
-            triggerer.trigger("sticky_kit:detach");
             triggerer.removeClass('enabled');
         });
     },
@@ -52,11 +40,6 @@ DemoTime.ReviewActivity = Backbone.View.extend({
 
         this.$el.find('#events').slideDown('fast', function() {
             triggerer.addClass('enabled');
-            triggerer.stick_in_parent({
-                'parent': '.main-content',
-                'offset_top': 75,
-                'recalc_every': 100,
-            });
             self.render();
         });
     },
