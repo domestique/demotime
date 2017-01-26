@@ -64,6 +64,7 @@ class TestCommentModels(BaseTestCase):
                 comment.pk
             )
         )
+        self.assertIsNone(comment.issue)
         self.assertEqual(comment.thread.review_revision, self.review.revision)
         self.assertEqual(comment.attachments.count(), 2)
         attachment_one, attachment_two = comment.attachments.all()
