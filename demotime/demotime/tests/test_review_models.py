@@ -353,7 +353,7 @@ class TestReviewModels(BaseTestCase):
         first_rev = obj.revision
         second_review = models.Review.create_review(**second_review_kwargs)
         self.assertEqual(obj.reviewers.count(), 3)
-        approving_reviewer = obj.reviewer_set.all()[0]
+        approving_reviewer = obj.reviewer_set.active()[0]
         approving_reviewer.status = constants.APPROVED
         approving_reviewer.save()
         self.assertEqual(obj.revision.number, 1)
@@ -722,6 +722,30 @@ class TestReviewModels(BaseTestCase):
         self.assertEqual(obj.state, constants.OPEN)
         self.assertEqual(obj.reviewer_state, constants.REVIEWING)
 
+    def test_update_review_duped_reviewer_existing_follower(self):
+        self.assertEqual(len(mail.outbox), 0)
+        review = models.Review.create_review(**self.default_review_kwargs)
+        self.assertEqual(review.reviewer_set.active().count(), 3)
+        self.assertEqual(review.follower_set.active().count(), 2)
+        approving_reviewer = review.reviewer_set.active()[0]
+        approving_reviewer.status = constants.APPROVED
+        approving_reviewer.save()
+        self.assertEqual(review.revision.number, 1)
+        self.assertEqual(len(mail.outbox), 5)
+        existing_reviewer_pks = list(review.reviewer_set.active().values_list(
+            'reviewer__pk', flat=True
+        ))
+        follower_pk = review.follower_set.active()[0].user.pk
+        updated_reviewers = User.objects.filter(
+            pk__in=existing_reviewer_pks + [follower_pk]
+        )
+        self.default_review_kwargs['reviewers'] = updated_reviewers
+        self.default_review_kwargs['review'] = review.pk
+        review = models.Review.update_review(**self.default_review_kwargs)
+        self.assertEqual(review.reviewer_set.active().count(), 4)
+        self.assertEqual(review.follower_set.active().count(), 1)
+
+
     def test_update_review_duped_reviewer_follower(self):
         self.assertEqual(len(mail.outbox), 0)
         review_kwargs = self.default_review_kwargs.copy()
@@ -730,9 +754,9 @@ class TestReviewModels(BaseTestCase):
         review_kwargs['followers'] = User.objects.filter(pk__in=user_pks)
         obj = models.Review.create_review(**review_kwargs)
         first_rev = obj.revision
-        self.assertEqual(obj.reviewers.count(), 3)
-        self.assertEqual(obj.follower_set.count(), 2)
-        approving_reviewer = obj.reviewer_set.all()[0]
+        self.assertEqual(obj.reviewer_set.active().count(), 3)
+        self.assertEqual(obj.follower_set.active().count(), 2)
+        approving_reviewer = obj.reviewer_set.active()[0]
         approving_reviewer.status = constants.APPROVED
         approving_reviewer.save()
         self.assertEqual(obj.revision.number, 1)
