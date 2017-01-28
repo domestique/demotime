@@ -15,7 +15,7 @@ class ProjectMemberForm(forms.ModelForm):
                 projectmember__project=project
             ).order_by('username')
 
-        return super(ProjectMemberForm, self).__init__(*args, **kwargs)
+        super(ProjectMemberForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = models.ProjectMember
@@ -44,7 +44,7 @@ class ProjectGroupForm(forms.ModelForm):
                 projectgroup__project=project
             ).order_by('name')
 
-        return super(ProjectGroupForm, self).__init__(*args, **kwargs)
+        super(ProjectGroupForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = models.ProjectGroup
@@ -69,5 +69,5 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = (
-            'name', 'slug', 'description', 'is_public',
+            'name', 'slug', 'description', 'is_public', 'is_active'
         )
