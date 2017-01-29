@@ -627,10 +627,10 @@ h3 small {
     padding-left: 10px;
     padding-right: 10px;
 }
-[contenteditable="true"] {
+.editable[contenteditable="true"] {
     border: 0;
 }
-[contenteditable="true"]:after {
+.editable[contenteditable="true"]:after {
     content: '<enter> saves';
     font-size: 10px;
     color: #aaa;
