@@ -381,21 +381,22 @@ class Review(BaseModel):
 
         for reviewer in reviewers:
             try:
-                reviewer = Reviewer.objects.get(review=obj, reviewer=reviewer)
+                reviewer_obj = Reviewer.objects.get(review=obj, reviewer=reviewer)
             except Reviewer.DoesNotExist:
-                reviewer = Reviewer.create_reviewer(
+                reviewer_obj = Reviewer.create_reviewer(
                     obj, reviewer, owner, True, draft=is_or_was_draft
                 )
-            else:
-                reviewer.status = REVIEWING
-                reviewer.is_active = True
-                reviewer.save()
+            finally:
+                reviewer_obj.status = REVIEWING
+                reviewer_obj.is_active = True
+                reviewer_obj.save()
+                obj.follower_set.filter(user=reviewer).update(is_active=False)
                 if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
-                    reviewer.create_reviewer_event(owner)
+                    reviewer_obj.create_reviewer_event(owner)
 
         for follower in followers:
             try:
-                follower = Follower.objects.get(review=obj, user=follower)
+                follower_obj = Follower.objects.get(review=obj, user=follower)
             except Follower.DoesNotExist:
                 Follower.create_follower(
                     review=obj, user=follower,
@@ -403,10 +404,12 @@ class Review(BaseModel):
                     draft=is_or_was_draft
                 )
             else:
-                follower.is_active = True
-                follower.save()
+                if follower not in reviewers:
+                    follower_obj.is_active = True
+                    follower_obj.save()
+
                 if state_change and state not in (DRAFT, CANCELLED) and not is_or_was_draft:
-                    follower.create_follower_event(owner)
+                    follower_obj.create_follower_event(owner)
 
         # Update UserReviewStatuses
         UserReviewStatus.objects.filter(review=obj).exclude(
