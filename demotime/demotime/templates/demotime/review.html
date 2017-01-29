@@ -185,11 +185,13 @@
                 {% endif %}
             </span>
             <strong>DT-{{ object.pk }}</strong>:
-                {% if object.title %}
-                    {{ object.title }}
-                {% else %}
-                    [<a class="normal_text" href="{% url 'edit-review' object.project.slug object.pk %}">add a title</a>]
-                {% endif %}
+                <span class="editable" data-type="title">
+                    {% if object.title %}
+                        {{ object.title }}
+                    {% else %}
+                        add a title
+                    {% endif %}
+                </span>
                 <small class="alert">
                 {% if not revision.is_max_revision %}
                     Rev {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
@@ -619,7 +621,8 @@ var review_activity = new DemoTime.ReviewActivity({
 });
 
 var demo_info = new DemoTime.DemoInfo({
-    review_url: '{% url "reviews-search-json" %}'
+    review_search_url: '{% url "reviews-search-json" %}'
+    , review_info_url: '{% url "review-json" revision.review.project.slug revision.review.pk %}'
     , review_pk: '{{ object.pk }}'
 });
 
