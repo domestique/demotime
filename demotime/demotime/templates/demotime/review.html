@@ -185,13 +185,13 @@
                 {% endif %}
             </span>
             <strong>DT-{{ object.pk }}</strong>:
-                <span class="editable" data-type="title">
+                {% if creator_obj.user == request.user or reviewer.reviewer == request.user %}<span class="editable" data-type="title">{% endif %}
                     {% if object.title %}
                         {{ object.title }}
                     {% else %}
                         add a title
                     {% endif %}
-                </span>
+                {% if creator_obj.user == request.user or reviewer.reviewer == request.user %}</span>{% endif %}
                 <small class="alert">
                 {% if not revision.is_max_revision %}
                     Rev {{ revision.number }} of {{ object.reviewrevision_set.all.count }}
