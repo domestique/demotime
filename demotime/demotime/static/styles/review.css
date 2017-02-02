@@ -25,10 +25,6 @@ h1 .alert {
     font-size: 10px;
     color: #aaaaaa;
 }
-.review #comments br,
-.review #comments br {
-    display: none;
-}
 .review p {
     margin: 3px 0;
 }
