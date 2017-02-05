@@ -34,7 +34,7 @@ class UserProxy(User):
 
     @property
     def projects(self):
-        return Project.objects.filter(
+        return Project.objects.active().filter(
             models.Q(projectmember__user=self) |
             models.Q(projectgroup__group__groupmember__user=self)
         ).distinct()

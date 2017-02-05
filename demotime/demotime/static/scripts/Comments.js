@@ -153,13 +153,9 @@ DemoTime.Comments = Backbone.View.extend({
                     $('a[data-type="approved"]').click();
                 } else {
                     if (self.options.top_level_comment) {
-                        $('html, body').animate({
-                            scrollTop: comment_parent.offset().top - 75
-                        }, 500);
+                        ScrollTo(comment_parent);
                     } else {
-                        $('html, body').animate({
-                            scrollTop: comment_parent.find('.nested-reply').last().offset().top - 75
-                        }, 500);
+                        ScrollTo(comment_parent.find('.nested-reply').last());
                     }
 
                     // Show 'new reply' link
@@ -300,9 +296,7 @@ DemoTime.Comments = Backbone.View.extend({
             }
             self.options.comment_form_container.find('.wysiwyg-editor').focus();
             if ($(window).width() > 720) {
-                $('html, body').animate({
-                    scrollTop: self.options.comment_form_container.offset().top - 200
-                }, 500);
+                ScrollTo(self.options.comment_form_container);
             }
         });
     },
@@ -310,9 +304,7 @@ DemoTime.Comments = Backbone.View.extend({
     show_errors: function(msg) {
         var self = this;
         this.options.comment_form_container.before('<ul class="errorlist"><li>' + msg + '</li></ul>');
-        $('html, body').animate({
-            scrollTop: self.options.comment_form_container.offset().top - 150
-        }, 500);
+        ScrollTo(self.options.comment_form_container);
     },
 
     // Leave a comment and approve at the same time
@@ -332,9 +324,7 @@ DemoTime.Comments = Backbone.View.extend({
         this.options.trigger_link.next('.comment_form_container').slideDown(function() {
             comment_form_container.find('.wysiwyg-editor').focus();
             if ($(window).width() > 720) {
-                $('html, body').animate({
-                    scrollTop: comment_form_container.offset().top - 200
-                }, 500);
+                ScrollTo(comment_form_container);
             }
         });
         this.options.trigger_link.hide();

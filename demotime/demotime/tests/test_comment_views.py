@@ -125,7 +125,9 @@ class TestCommentAPIViews(BaseTestCase):
             '0-description': 'Test Description',
         })
         self.assertStatusCode(response, 200)
-        comment = models.Comment.objects.latest('created')
+        comment = models.Comment.objects.get(
+            comment='test_comment_json_create_comment_thread'
+        )
         self.assertTrue(comment.events.filter(
             event_type__code=models.EventType.COMMENT_ADDED
         ).exists())
@@ -134,6 +136,7 @@ class TestCommentAPIViews(BaseTestCase):
             'errors': '',
             'comment': comment.to_json()
         })
+        self.assertIsNone(comment.issue)
         comment = self.review.revision.commentthread_set.latest().comment_set.get()
         self.assertTrue(comment.events.filter(
             event_type__code=models.EventType.COMMENT_ADDED
@@ -150,7 +153,7 @@ class TestCommentAPIViews(BaseTestCase):
         })
         self.assertStatusCode(response, 200)
         comment = models.Comment.objects.latest('created')
-        self.assertIsNotNone(comment.issue())
+        self.assertIsNotNone(comment.issue)
         self.assertTrue(comment.events.filter(
             event_type__code=models.EventType.COMMENT_ADDED
         ).exists())
@@ -177,6 +180,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.assertTrue(comment.events.filter(
             event_type__code=models.EventType.COMMENT_ADDED
         ).exists())
+        self.assertIsNone(comment.issue)
         self.assertEqual(comment.comment, '')
         self.assertEqual(comment.attachments.count(), 1)
 
@@ -265,7 +269,7 @@ class TestCommentAPIViews(BaseTestCase):
         })
         self.assertStatusCode(response, 200)
         comment = models.Comment.objects.latest('created')
-        self.assertIsNotNone(comment.issue())
+        self.assertIsNotNone(comment.issue)
         self.assertTrue(comment.events.filter(
             event_type__code=models.EventType.COMMENT_ADDED
         ).exists())
@@ -332,7 +336,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.comment.refresh_from_db()
         self.assertEqual(self.comment.attachments.count(), 1)
         self.assertEqual(self.comment.comment, 'Test Comment')
-        self.assertIsNotNone(self.comment.issue())
+        self.assertIsNotNone(self.comment.issue)
         self.assertEqual(json.loads(response.content.decode('utf8')), {
             'status': 'success',
             'errors': '',
@@ -351,7 +355,7 @@ class TestCommentAPIViews(BaseTestCase):
         self.comment.refresh_from_db()
         self.assertEqual(self.comment.attachments.count(), 1)
         self.assertEqual(self.comment.comment, 'Test Comment')
-        self.assertIsNone(self.comment.issue())
+        self.assertIsNone(self.comment.issue)
         issue = models.Issue.objects.get()
         self.assertEqual(issue.resolved_by, self.user)
         self.assertEqual(json.loads(response.content.decode('utf8')), {

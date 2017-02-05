@@ -5,6 +5,12 @@ from django.core.urlresolvers import reverse
 from demotime.models.base import BaseModel
 
 
+class ProjectManager(models.Manager):
+
+    def active(self):
+        return self.get_queryset().filter(is_active=True)
+
+
 class Project(BaseModel):
 
     name = models.CharField(max_length=128)
@@ -14,6 +20,9 @@ class Project(BaseModel):
     members = models.ManyToManyField('auth.User', through='ProjectMember')
     is_public = models.BooleanField(default=False)
     token = models.CharField(max_length=256)
+    is_active = models.BooleanField(default=True)
+
+    objects = ProjectManager()
 
     def __str__(self):
         return 'Project {}'.format(self.name)

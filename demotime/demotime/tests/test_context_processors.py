@@ -56,6 +56,23 @@ class TestContextProcessors(BaseTestCase):
             list(models.Project.objects.filter(pk=self.project.pk).values_list('pk', flat=True))
         )
 
+    def test_available_projects_hides_inactive_projects(self):
+        models.ProjectMember.objects.all().delete()
+        models.ProjectGroup.objects.all().delete()
+        models.ProjectMember.objects.create(
+            project=self.project,
+            user=self.user,
+        )
+        self.project.is_active = False
+        self.project.save()
+        projects = context_processors.available_projects(
+            self.request_mock
+        )['available_projects']
+        self.assertEqual(
+            list(projects),
+            list(models.Project.objects.none())
+        )
+
     def test_available_projects_unauthed(self):
         self.request_mock.user = AnonymousUser()
         projects = context_processors.available_projects(

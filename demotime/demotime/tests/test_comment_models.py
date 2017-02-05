@@ -64,6 +64,7 @@ class TestCommentModels(BaseTestCase):
                 comment.pk
             )
         )
+        self.assertIsNone(comment.issue)
         self.assertEqual(comment.thread.review_revision, self.review.revision)
         self.assertEqual(comment.attachments.count(), 2)
         attachment_one, attachment_two = comment.attachments.all()
@@ -97,6 +98,19 @@ class TestCommentModels(BaseTestCase):
         self.assertEqual(event.event_type.code, event.event_type.COMMENT_ADDED)
         self.assertEqual(event.related_object, comment)
         self.assertEqual(event.user, comment.commenter)
+
+    def test_create_comment_as_issue(self):
+        comment = models.Comment.create_comment(
+            commenter=self.user,
+            review=self.review.revision,
+            comment='Test Comment',
+            attachments=[],
+            is_issue=True
+        )
+        self.assertEqual(
+            comment.issue,
+            models.Issue.objects.get(comment=comment)
+        )
 
     def test_create_comment_on_draft(self):
         self.review.state = constants.DRAFT
