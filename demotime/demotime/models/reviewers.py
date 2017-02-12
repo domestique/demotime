@@ -230,4 +230,4 @@ class Reviewer(BaseModel):
 
     def viewed_review(self):
         self.last_viewed = datetime.now()
-        self.save(update_fields=['last_viewed', 'modified'])
+        self.save(update_fields=['last_viewed'])
