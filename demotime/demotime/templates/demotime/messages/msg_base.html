@@ -1,26 +1,18 @@
-{% comment %}
-If we're sending an email, wrap it with the proper html stuff. Otherwise, we
-leave it unwrapped so it looks better in the Inbox.
-{% endcomment %}
-{% if is_email %}
-    <!DOCTYPE html>
-    <html lang="en">
-        <body>
-            <div style="background: #1f8470; padding: 10px; margin-bottom: 0">
-                <a href="{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}">
-                    <img src="{% if dt_prod %}https{% else %}http{% endif %}://demoti.me/static/images/logo.png" with="265" height="46">
-                </a>
-            </div>
-            <div style="padding: 10px; font-family: Helvetica; font-weight: 400;">
-                <p>Hello from DemoTime!</p>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div style="background: #1f8470; padding: 10px; margin-bottom: 0">
+            <a href="{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}">
+                <img src="{% if dt_prod %}https{% else %}http{% endif %}://demoti.me/static/images/logo.png" with="265" height="46">
+            </a>
+        </div>
+        <div style="padding: 10px; font-family: Helvetica; font-weight: 400;">
+            <p>Hello from DemoTime!</p>
 
-{% block content %}{% endblock %}
+            {% block content %}{% endblock %}
 
-{% if is_email %}
-                <p style="margin-top: 40px; color: #777; font-size: 13px; font-style: italic;">Thank you for using DemoTime!</p>
-                <img src="{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}/messages/pixel/{{ bundle.pk }}.png?{{ site_settings.CACHE_BUSTER }}" width="1" height="1" style="display: none">
-            </div>
-        </body>
-    </html>
-{% endif %}
+            <p style="margin-top: 40px; color: #777; font-size: 13px; font-style: italic;">Thank you for using DemoTime!</p>
+            <img src="{% if dt_prod %}https{% else %}http{% endif %}://{{ dt_url }}/messages/pixel/{{ bundle.pk }}.png?{{ site_settings.CACHE_BUSTER }}" width="1" height="1" style="display: none">
+        </div>
+    </body>
+</html>
