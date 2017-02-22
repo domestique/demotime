@@ -35,3 +35,9 @@ ATTACHMENT_MAP = {
         'mp3', 'wav', 'aiff', 'ogg', 'mpeg3'
     ],
 }
+
+# Reaction Constants
+LOVE = 'love'
+LIKE = 'like'
+PLUS_ONE = 'plus-one'
+MINUS_ONE = 'minus-one'
