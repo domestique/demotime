@@ -3,7 +3,7 @@ DemoTime.YouTube = Backbone.View.extend({
     initialize: function(options) {
         $('.comments a').each(function() {
             var yturl= /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([\w\-]{10,12})(?:&feature=related)?(?:[\w\-]{0})?/g;
-            var ytplayer= '<iframe width="640" height="360" src="http://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>';
+            var ytplayer= '<iframe width="640" height="360" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>';
 
             var url = $(this).attr('href');
             if (url != null) {
