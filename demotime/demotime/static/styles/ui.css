@@ -622,16 +622,6 @@ h3 small {
     font-size: 12px;
 }
 
-.editable {
-    border: 1px dashed #ddd;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-.editable[contenteditable="true"] {
-    border: 0;
-}
-.editable[contenteditable="true"]:after {
-    content: '<enter> saves';
-    font-size: 10px;
-    color: #aaa;
+.editable:hover {
+    border: 1px dashed #ccc;
 }
