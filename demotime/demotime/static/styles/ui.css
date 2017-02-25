@@ -597,6 +597,7 @@ h3 small {
     vertical-align: middle;
     cursor: pointer;
     border-radius: 2px;
+    box-shadow: 1px 1px 0 #ddd;
 }
 .issue-new {
     background: #fff;
