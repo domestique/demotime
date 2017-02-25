@@ -349,6 +349,11 @@ a[data-type='rejected'] {
     cursor: pointer;
 }
 
+div.demobox.has_issue {
+    border: 2px solid #ff9381;
+    border-radius: 2px;
+}
+
 nav.subnav.is_stuck {
     padding: 5px 0;
 }

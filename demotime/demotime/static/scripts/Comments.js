@@ -238,7 +238,7 @@ DemoTime.Comments = Backbone.View.extend({
                         if (data.comment.issue.id) {
                             html += '<span class="issue-unresolved" data-pk="' + data.comment.id + '" data-resolve="true">unresolved</span>';
                         } else {
-                            html += '<span class="issue-new" data-pk="' + data.comment.id + '">mark as issue</span>';
+                            html += '<span class="issue-new" data-pk="' + data.comment.id + '">mark as an issue</span>';
                         }
                     html += '</div>'
                 html += '</div>'
@@ -435,10 +435,12 @@ DemoTime.Comments = Backbone.View.extend({
             if (link.data('resolve')) {
                 link.data('resolve', false);
                 link.toggleClass('issue-unresolved issue-new');
-                link.html('mark as issue');
+                link.parents('.demobox').removeClass('has_issue');
+                link.html('mark as an issue');
             } else {
                 link.data('resolve', true);
                 link.toggleClass('issue-new issue-unresolved');
+                link.parents('.demobox').addClass('has_issue');
                 link.html('unresolved');
             }
             if (typeof demo_info !== 'undefined') {
