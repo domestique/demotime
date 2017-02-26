@@ -189,10 +189,11 @@ select[multiple='multiple']:focus {
 }
 @media screen and (max-width:375px) {
     .styled {
-        min-width: 50px;
-    }
-    .styled {
+        font-size: 12px;
         min-width: 30px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        height: 26px;
     }
 }
 .styled::-ms-expand {

@@ -24,7 +24,7 @@ body.bookmarklet h1 {
     width: 265px;
     height: 46px;
 }
-@media screen and (max-width:420px) {
+@media screen and (max-width:640px) {
     .navbar .navbar-logo {
         width: 170px;
         height: 30px;
@@ -161,13 +161,19 @@ nav.subnav {
     margin-top: 0;
     padding: 8px 0;
 }
+@media screen and (max-width: 450px) {
+    nav.subnav {
+        padding: 4px 0;
+    }
+}
 .subnav a.subnav-item {
     background: #ffffff;
     color: #555555;
     font-weight: 400;
     display: inline-block;
-    padding: 3px 10px;
+    padding: 3px 8px;
     border-radius: 2px;
+    font-size: 15px;
     margin: 0;
 }
 @media screen and (max-width: 680px) {
@@ -176,9 +182,20 @@ nav.subnav {
     }
 }
 @media screen and (max-width: 450px) {
+    .subnav ul.subnav-item {
+        margin-left: 0;
+    }
     .subnav a.subnav-item {
         margin: 3px 0;
-        font-size: 14px;
+        font-size: 12px;
+    }
+}
+@media screen and (max-width: 375px) {
+    .subnav ul.subnav-item li {
+        margin: 0 0 0 2px;
+    }
+    .subnav a.subnav-item {
+        font-size: 11px;
     }
 }
 .subnav .cel {
@@ -186,7 +203,7 @@ nav.subnav {
 }
 .subnav ul.subnav-item,
 .subnav ul.subnav-item li {
-    margin: 0 0 0 10px;
+    margin: 0 0 0 5px;
     padding: 0;
 }
 .subnav .global_actions {
@@ -201,7 +218,7 @@ nav.subnav {
         font-size: 12px;
     }
     .subnav .global_actions {
-        padding-top: 8px;
+        padding-top: 0;
     }
 }
 
@@ -220,6 +237,11 @@ nav.subnav {
 .new_demo select {
     margin-left: 5px;
 }
+@media screen and (max-width:375px) {
+    .new_demo select {
+        max-width: 130px;
+    }
+}
 .new_demo > * {
     vertical-align: middle;
 }
@@ -227,7 +249,12 @@ nav.subnav {
     padding-top: 7px;
     padding-bottom: 7px;
 }
-
+@media screen and (max-width:375px) {
+    .new_demo a.subnav-item {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+}
 .hide_header .breadcrumbs {
     display: none;
 }
@@ -249,4 +276,21 @@ nav.subnav {
 }
 .breadcrumbs a {
     font-weight: 700;
+}
+
+@media screen and (min-width:720px) {
+    .quicksearch_desktop {
+        display: block;
+    }
+    .quicksearch_mobile {
+        display: none;
+    }
+}
+@media screen and (max-width:720px) {
+    .quicksearch_desktop {
+        display: none;
+    }
+    .quicksearch_mobile {
+        display: inline-block;
+    }
 }

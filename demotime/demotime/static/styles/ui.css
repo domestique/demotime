@@ -7,6 +7,11 @@ body {
     font-size: 100%;
     font-weight: 300;
 }
+@media screen and (max-width:375px) {
+    body {
+        font-size: 12px;
+    }
+}
 h1,
 h2,
 h3 {
@@ -45,6 +50,12 @@ ul {
     .container {
         padding-left: 10px;
         padding-right: 10px;
+    }
+}
+@media screen and (max-width: 375px) {
+    .container {
+        padding-left: 5px;
+        padding-right: 5px;
     }
 }
 
@@ -134,6 +145,18 @@ section .demobox p:first-child {
     font-size: 14px;
     background: #fff;
 }
+@media screen and (max-width:375px) {
+    .demobox-header {
+        padding: 5px;
+    }
+    .demobox-footer {
+        padding: 5px;
+    }
+    .demobox-body {
+        padding: 5px;
+        font-size: 12px;
+    }
+}
 .demobox .demobox {
     box-shadow: none;
 }
@@ -165,7 +188,13 @@ li {
 }
 @media screen and (max-width: 680px) {
     .content h1 {
-        font-size: 30px;
+        font-size: 20px;
+    }
+}
+@media screen and (max-width: 375px) {
+    .content h1 {
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 }
 .content h1 small {
@@ -634,4 +663,10 @@ h3 small {
     content: '<enter> saves';
     font-size: 10px;
     color: #aaa;
+}
+
+@media screen and (min-width:721px) {
+    #sk-holder {
+        display: none;
+    }
 }

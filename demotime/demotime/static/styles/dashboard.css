@@ -53,6 +53,11 @@ section .demobox.de-emphasize * {
 section .demobox .demobox-body {
     font-size: 16px;
 }
+@media screen and (max-width:375px) {
+    section .demobox .demobox-body {
+        font-size: 12px;
+    }
+}
 
 /* Message center messages */
 li.de-emphasize {
@@ -151,6 +156,10 @@ section .demobox .time_stamp {
     font-weight: 300;
     color: #999;
 }
+.dashboard .legend section li {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
 
 table {
     background: #fff;
@@ -229,6 +238,12 @@ td {
 }
 .your_dashboard .your_dashboard a {
     background: rgba(255, 255, 231, .4);
+}
+
+@media screen and (min-width:721px) {
+    .aggregated_dashboard article:first-child {
+        margin-top: 30px;
+    }
 }
 
 section.aggregated_dashboard-activity {
