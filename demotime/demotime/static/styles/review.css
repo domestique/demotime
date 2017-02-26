@@ -1,3 +1,9 @@
+@media screen and (max-width:880px) {
+    .sub_nav_search {
+        display: none !important;
+    }
+}
+
 /* Review overview */
 .content h1 {
     text-transform: none;

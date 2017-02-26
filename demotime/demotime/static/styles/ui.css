@@ -464,9 +464,9 @@ h3 small {
     margin: 0;
     border-radius: 2px;
 }
-@media screen and (max-width:680px) {
-    .quickfind input[type='text'] {
-        font-size: 11px;
+@media screen and (max-width:880px) {
+    .sub_nav_search input[type='text'] {
+        margin-bottom: 8px;
     }
 }
 .quickfind-results {

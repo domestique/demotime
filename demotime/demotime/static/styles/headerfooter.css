@@ -277,20 +277,3 @@ nav.subnav {
 .breadcrumbs a {
     font-weight: 700;
 }
-
-@media screen and (min-width:720px) {
-    .quicksearch_desktop {
-        display: block;
-    }
-    .quicksearch_mobile {
-        display: none;
-    }
-}
-@media screen and (max-width:720px) {
-    .quicksearch_desktop {
-        display: none;
-    }
-    .quicksearch_mobile {
-        display: inline-block;
-    }
-}
