@@ -126,7 +126,7 @@ urlpatterns += [
     url(r'^accounts/profile/(?P<pk>[\d]+)/$', profile.profile_view, name='profile'),
     url(r'^accounts/profile/(?P<pk>[\d]+)/edit/$', profile.edit_profile_view, name='edit-profile'),
     url(r'^accounts/profile/(?P<username>[\w.-_@]+)/edit/$', profile.edit_profile_view, name='edit-profile'),
-    url(r'^accounts/profile/(?P<username>[\w.-_@]+)/$', profile.profile_view, name='profile'),
+    url(r'^(?i)accounts/profile/(?P<username>[\w.-_@]+)/$', profile.profile_view, name='profile'),
     url(
         r'^accounts/password/reset/$',
         password_reset,

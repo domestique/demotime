@@ -92,7 +92,7 @@ class ProfileView(DetailView):
         if self.lookup_args.get('pk'):
             lookup_dict['pk'] = self.lookup_args['pk']
         if self.lookup_args.get('username'):
-            lookup_dict['user__username'] = self.lookup_args['username']
+            lookup_dict['user__username'] = self.lookup_args['username'].lower()
 
         return get_object_or_404(
             models.UserProfile,

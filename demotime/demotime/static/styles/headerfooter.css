@@ -96,8 +96,8 @@ body.bookmarklet h1 {
     font-size: 12px;
     font-weight: 400;
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 3px;
+    top: 1px;
     color: #fff;
 }
 a.footer-blog.highlight {
