@@ -289,7 +289,7 @@
                                 <small style="display: block">
                                     {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                                     {% if reviewer.last_viewed and reviewer.get_status_display|lower == "reviewing" %}
-                                        (viewed <span class="humanize_date">{{ reviewer.last_viewed|date:'Y-m-d'}} {{ reviewer.last_viewed|date:'h:i:s'|lower }}</span>)
+                                        (viewed <span class="humanize_date">{{ reviewer.last_viewed|date:'Y-m-d'}} {{ reviewer.last_viewed|date:'H:i:s'|lower }}</span>)
                                     {% endif %}
                                 </small>
                             </li>
