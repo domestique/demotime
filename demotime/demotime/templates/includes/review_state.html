@@ -7,13 +7,13 @@
             Fully {{ demo.reviewer_state }}!
             {% creator_for_user demo.pk as creator_obj %}
             {% if demo.state == "open" and request.user == creator_obj.user %}
-            <span style="margin-left: 3px;">please
-                <a class="demo-changer"
-                   data-creator="{{ creator_obj.pk }}"
-                   data-pk="{{ demo.pk }}"
-                   data-state="closed"
-                   data-url="{% url "update-review-state" demo.project.slug demo.pk %}"
-                   data-url="" href="#">close this demo</a></span>
+                <span style="margin-left: 3px;">please
+                    <a class="demo-changer"
+                       data-creator="{{ creator_obj.pk }}"
+                       data-pk="{{ demo.pk }}"
+                       data-state="closed"
+                       data-url="{% url "update-review-state" demo.project.slug demo.pk %}"
+                       href="#">close this demo</a></span>
             {% endif %}
         </small>
     {% elif demo.reviewing_count or demo.reviewing_count or demo.rejected_count %}
@@ -31,7 +31,6 @@
                 {% if demo.open_issue_count %}
                     <span class="icon icon-issue" title="Open Issues"><sup>{{ demo.open_issue_count }}</sup></span>
                 {% endif %}
-
             {% else %}
                 <small>
                     {{ demo.reviewer_state }}
@@ -59,5 +58,18 @@
                 {% endfor %}
             {% endif %}
         </small>
+    {% endif %}
+    {% if following or reviewing %}
+        <span style="margin-left: 3px;">
+            <a href="#" class="person_changer_link"
+               style="font-weight: 700"
+               {% if following %}
+                   data-action="drop_follower"
+               {% elif reviewing %}
+                   data-action="drop_reviewer"
+               {% endif %}
+               data-review_pk="{{ demo.pk }}"
+               data-person="{{ request.user.pk }}">leave review</a>
+        </span>
     {% endif %}
 </div>

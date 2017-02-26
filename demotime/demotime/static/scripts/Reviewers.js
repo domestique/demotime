@@ -127,6 +127,10 @@ DemoTime.Reviewers = Backbone.View.extend({
             $li = $link.parents('li'),
             self = this;
 
+        if ($link.data('review_pk')) {
+            self.options.review_pk = $link.data('review_pk');
+        }
+
         var req = $.ajax({
             url: self.options.url,
             method: 'POST',

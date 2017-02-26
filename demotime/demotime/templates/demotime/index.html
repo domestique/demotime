@@ -33,7 +33,7 @@
                     <section class="aggregated_dashboard-section aggregated_dashboard-reviewing">
                         <div>
                             {% for demo in open_reviews %}
-                                {% include "includes/demo.html" %}
+                                {% include "includes/demo.html" with reviewing=True %}
                             {% endfor %}
                         </div>
                     </section>
@@ -47,7 +47,7 @@
                     <section class="aggregated_dashboard-section aggregated_dashboard-following">
                         <div>
                             {% for demo in followed_demos %}
-                                {% include "includes/demo.html" %}
+                                {% include "includes/demo.html" with following=True %}
                             {% endfor %}
                         </div>
                     </section>
@@ -159,6 +159,7 @@
 
 {% block scripts %}
 <script src="/static/scripts/ReviewActivity.js?{{ site_settings.CACHE_BUSTER }}"></script>
+<script src="/static/scripts/Reviewers.js?{{ site_settings.CACHE_BUSTER }}"></script>
 <script src="/static/scripts/DemoState.js?{{ site_settings.CACHE_BUSTER }}"></script>
 {{ block.super }}
 <script>
@@ -172,6 +173,11 @@ var review_activity = new DemoTime.ReviewActivity({
 });
 
 var demo_state = new DemoTime.DemoState();
+
+// Initialize the ability to modify demo reviewers
+var modify_reviewers = new DemoTime.Reviewers({
+    url: '{% url "user-api" %}'
+});
 
 {# Tour for project dash #}
 if (!Cookies.get('seen_dash_updates')) {
