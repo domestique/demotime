@@ -68,8 +68,9 @@
                {% elif reviewing %}
                    data-action="drop_reviewer"
                {% endif %}
+               data-warn="true"
                data-review_pk="{{ demo.pk }}"
-               data-person="{{ request.user.pk }}">leave review</a>
+               data-person="{{ request.user.pk }}">leave demo</a>
         </span>
     {% endif %}
 </div>

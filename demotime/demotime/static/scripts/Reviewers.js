@@ -131,39 +131,60 @@ DemoTime.Reviewers = Backbone.View.extend({
             self.options.review_pk = $link.data('review_pk');
         }
 
-        var req = $.ajax({
-            url: self.options.url,
-            method: 'POST',
-            data: {
-                action: $link.data('action'),
-                review_pk: self.options.review_pk,
-                user_pk: pk
-            }
-        });
-
-        req.success(function() {
-            // nextaction lets us chain AJAX requests to demote reviewers
-            // to followers and vice versa
-            if ($link.data('nextaction')) {
-                $link.data('action', $link.data('nextaction'));
-                self.add(event);
-                $li.slideUp();
-            } else {
-                if (!$li.length) {
-                    window.location.reload();
-                } else {
-                    $li.slideUp();
+        function do_request() {
+            var req = $.ajax({
+                url: self.options.url,
+                method: 'POST',
+                data: {
+                    action: $link.data('action'),
+                    review_pk: self.options.review_pk,
+                    user_pk: pk
                 }
-            }
-        });
-
-        req.error(function(err) {
-            swal ({
-                title: 'Whoops',
-                type: 'error',
-                text: 'Your request was denied: ' + err.responseText,
-                html: true
             });
-        });
+
+            req.success(function() {
+                // nextaction lets us chain AJAX requests to demote reviewers
+                // to followers and vice versa
+                if ($link.data('nextaction')) {
+                    $link.data('action', $link.data('nextaction'));
+                    self.add(event);
+                    $li.slideUp();
+                } else {
+                    if (!$li.length) {
+                        window.location.reload();
+                    } else {
+                        $li.slideUp();
+                    }
+                }
+            });
+
+            req.error(function(err) {
+                swal ({
+                    title: 'Whoops',
+                    type: 'error',
+                    text: 'Your request was denied: ' + err.responseText,
+                    html: true
+                });
+            });
+        }
+
+        if ($link.data('warn')) {
+            swal({
+                title: "Leave this demo?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Confirm",
+                closeOnConfirm: false
+            },
+            function (isConfirm) {
+                if (isConfirm) {
+                    do_request();
+                    swal.close();
+                }
+            });
+        } else {
+            do_request();
+        }
     }
 });
