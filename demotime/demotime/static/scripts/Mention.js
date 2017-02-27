@@ -128,7 +128,7 @@ DemoTime.Mention = Backbone.View.extend({
         var wysiwyg = $(event.target),
             clean_html = wysiwyg.html().replace(/<.*?>/g, ' ');
 
-        this.options.last_word = clean_html.substr(clean_html.trim().lastIndexOf(" ")+1).trim();
+        this.options.last_word = clean_html.substr(clean_html.trim().lastIndexOf(" ")+1).trim().replace('&nbsp;', '');
 
         if (this.options.last_word.length > 1) {
             this.do_mention(event);

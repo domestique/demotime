@@ -1,8 +1,8 @@
 /* Review overview */
 .content h1 {
     text-transform: none;
-    font-size: 35px;
-    line-height: 42px;
+    font-size: 28px;
+    line-height: 35px;
     color: #333333;
     padding: 0;
     margin: 0;
@@ -347,6 +347,11 @@ a[data-type='rejected'] {
 }
 .issue-marker label {
     cursor: pointer;
+}
+
+div.demobox.has_issue {
+    border: 2px solid #ff9381;
+    border-radius: 2px;
 }
 
 nav.subnav.is_stuck {

@@ -6,7 +6,8 @@ DemoTime.DemoInfo = Backbone.View.extend({
         'click .jump-to-first-issue': 'focus_issue',
         'click .jump-to-comments': 'focus_comments',
         'click .editable': 'edit_in_place',
-        'keypress .editable': 'typing'
+        'keydown .editable': 'typing',
+        'blur .editable': 'save_change'
     },
 
     initialize: function(options) {
@@ -56,18 +57,21 @@ DemoTime.DemoInfo = Backbone.View.extend({
     },
 
     edit_in_place: function(event) {
-        $(event.target).attr('contenteditable', true);
+        var title = $(event.target);
+        title.attr('contenteditable', true);
+        title.data('existing_title', title.html());
         document.execCommand('selectAll', false, null);
     },
 
     typing: function(event) {
+        var element = $(event.target);
         if (event.keyCode == 13) event.preventDefault();
-
-        if ($(event.target).html().length) {
+        if (element.html().length) {
             if (event.keyCode == 13) {
                 this.save_change(event);
-            } else if (event.keyCode == 96) {
+            } else if (event.keyCode == 27) {
                 element.attr('contenteditable', false);
+                element.html(element.data('existing_title'));
             }
         }
     },

@@ -289,7 +289,7 @@
                                 <small style="display: block">
                                     {{ reviewer.get_status_display }} since {{ reviewer.modified|date:'m-d'}}, {{ reviewer.modified|date:'h:iA'|lower }}
                                     {% if reviewer.last_viewed and reviewer.get_status_display|lower == "reviewing" %}
-                                        (viewed <span class="humanize_date">{{ reviewer.last_viewed|date:'Y-m-d'}} {{ reviewer.last_viewed|date:'h:i:s'|lower }}</span>)
+                                        (viewed <span class="humanize_date">{{ reviewer.last_viewed|date:'Y-m-d'}} {{ reviewer.last_viewed|date:'H:i:s'|lower }}</span>)
                                     {% endif %}
                                 </small>
                             </li>
@@ -447,7 +447,7 @@
                                 <input id="id_thread" name="thread" value="{{ thread.pk }}" type="hidden">
                             </div>
                             <section class="issue-marker">
-                                <label>{{ comment_form.is_issue }} Mark as issue</label>
+                                <label>{{ comment_form.is_issue }} Mark as an issue</label>
                             </section>
                             <div class="form-group">
                                 <button type="button" class="new_comment_button">Submit</button>
@@ -464,7 +464,7 @@
                                 {% if not forloop.first %}
                                     <div class="nested-reply">
                                 {% endif %}
-                                    <div class="demobox" id="{{ comment.pk }}">
+                                    <div class="demobox {% if comment.issue %}has_issue{% endif %}" id="{{ comment.pk }}">
                                         <div class="demobox-header">
                                             From <a href="{{ comment.commenter.userprofile.get_absolute_url }}">
                                                     {{ comment.commenter.userprofile }}
@@ -495,7 +495,7 @@
                                                         {% if comment.issue %}
                                                             <span class="issue-unresolved" data-pk="{{ comment.pk }}" data-resolve='true'>unresolved</span>
                                                         {% else %}
-                                                            <span class="issue-new" data-pk="{{ comment.pk }}">mark as issue</span>
+                                                            <span class="issue-new" data-pk="{{ comment.pk }}">mark as an issue</span>
                                                         {% endif %}
                                                     </span>
                                                 </div>

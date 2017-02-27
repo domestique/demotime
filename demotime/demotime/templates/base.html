@@ -268,7 +268,9 @@
 
             {# User-readable timestamps (x hours ago) #}
             <script src="/static/scripts/library/moment.min.js?{{ site_settings.CACHE_BUSTER }}"></script>
+            <script src="/static/scripts/library/moment.timezones.min.js?{{ site_settings.CACHE_BUSTER }}"></script>
             <script>
+            moment.tz.setDefault("America/Chicago");
             $('.humanize_date').each(function() {
                 $(this).html(moment($(this).html()).fromNow());
             });
