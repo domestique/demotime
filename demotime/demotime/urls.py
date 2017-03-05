@@ -11,6 +11,7 @@ from django.contrib.auth.views import (
 )
 
 from demotime.views import (
+    attachments,
     comments,
     events,
     files,
@@ -57,6 +58,18 @@ urlpatterns += [
         r'^comment/(?P<comment_pk>[\d]+)/attachment/(?P<attachment_pk>[\d]+)/update/$',
         comments.delete_comment_attachment_view,
         name='update-comment-attachment'
+    ),
+]
+
+# Attachments
+urlpatterns += [
+    url(
+        r'^attachments/(?P<review_pk>[\d]+)/$',
+        attachments.attachments_json_view, name='attachments-api'
+    ),
+    url(
+        r'^attachments/(?P<review_pk>[\d]+)/(?P<attachment_pk>[\d]+)/$',
+        attachments.attachments_json_view, name='attachments-api'
     ),
 ]
 

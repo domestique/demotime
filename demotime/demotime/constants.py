@@ -20,6 +20,10 @@ MOVIE = 'movie'
 AUDIO = 'audio'
 OTHER = 'other'
 
+# Attachment Object Types
+REVIEW = 'review'
+COMMENT = 'comment'
+
 ATTACHMENT_MAP = {
     IMAGE: [
         'png', 'gif', 'bmp', 'jpg', 'jpeg', 'tiff', 'svg',
